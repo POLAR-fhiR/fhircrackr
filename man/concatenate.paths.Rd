@@ -4,7 +4,7 @@
 \alias{concatenate.paths}
 \title{concatenate.paths}
 \usage{
-concatenate.paths(path1, path2, os = "LiNuX")
+concatenate.paths(path1 = "w", path2 = "d", os = "LiNuX")
 }
 \arguments{
 \item{path1}{the left hand part of final path.}
