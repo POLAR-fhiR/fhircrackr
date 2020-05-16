@@ -17,3 +17,6 @@ bundle.to.dataframes(bundle, design)
 \description{
 converts a fhir bundle to a list of data frames
 }
+\examples{
+bundle.to.dataframes( bundle, design )
+}

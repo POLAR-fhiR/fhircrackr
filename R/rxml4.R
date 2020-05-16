@@ -309,6 +309,7 @@ page.to.dataframes <- function( page, design ) {
 #' @export
 #'
 #' @examples
+#' bundle.to.dataframes( bundle, design )
 bundle.to.dataframes <- function( bundle, design ) {
 
 	d <- lapply(
@@ -336,13 +337,3 @@ bundle.to.dataframes <- function( bundle, design ) {
 
 	d
 }
-
-# example
-# all.data <- fhir.get.bundle.entries.data( xmls, entries.obs )
-#
-# all.data$Observation
-# all.data$Patient
-# all.data$Encounter
-
-#save( all.data, file = "data/obsWithEncSubjPat2/allData.RData" )
-
