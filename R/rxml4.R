@@ -336,7 +336,7 @@ bundle.to.dataframes <- function( bundle, design ) {
 	)
 
 	d <- lapply(
-		lat( names( design ) ),
+		lst( names( design ) ),
 		function( n ) {
 			as.data.frame(
 				stringAsFactors = F,
