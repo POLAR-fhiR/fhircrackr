@@ -18,5 +18,7 @@ the downloaded bundle as a list of pages in xml format
 downloads a fhir bunde via fhir search request from a fhir server.
 }
 \examples{
+\dontrun{
 download.bundle( "https://hapi.fhir.org/baseR4/Medication?_format=xml" )
+}
 }

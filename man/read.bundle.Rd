@@ -16,5 +16,7 @@ the bundle as a list of xml text files.
 reads a bundle stored as xml files from a directory
 }
 \examples{
+\dontrun{
 read.bundle( "result" )
+}
 }

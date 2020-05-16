@@ -23,6 +23,7 @@ The second one is a named list with XPath expressions of locations to the values
 The names are the column names of the resultung data frames
 }
 \examples{
+\dontrun{
 page.to.dataframes(
 page,
 design = list(
@@ -33,4 +34,5 @@ MEDICATION = list(
 	  CODE    = "code/coding/code/@value",
 	  DISPLAY = "code/coding/display/@value"
 	) ) ) )
+	}
 }

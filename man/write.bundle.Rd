@@ -18,5 +18,7 @@ nothing to return.
 writes a fhir bundle as numbered xml files into a directory.
 }
 \examples{
+\dontrun{
 write.bundle( my.fhir.xmls, "result" )
+}
 }

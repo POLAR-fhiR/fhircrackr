@@ -1,3 +1,6 @@
+usethis::use_package( "xml2" )
+usethis::use_package( "stringr" )
+
 #' th
 #' @description add the right suffix to a number or a vector of numbers. e.g. 1st 2nd 3rd ...
 #'
@@ -86,7 +89,9 @@ concatenate.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' download.page( "https://hapi.fhir.org/baseR4/Medication?_format=xml" )
+#' }
 download.page <- function( fhir.search.request, max.attempts = 5 ) {
 
 	for( n in 1 : max.attempts ) {
@@ -122,7 +127,9 @@ download.page <- function( fhir.search.request, max.attempts = 5 ) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' download.bundle( "https://hapi.fhir.org/baseR4/Medication?_format=xml" )
+#' }
 download.bundle <- function( fhir.search.request, max.attempts = 5 ) {
 
 	xmls <- list( )
@@ -179,7 +186,9 @@ download.bundle <- function( fhir.search.request, max.attempts = 5 ) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' write.bundle( my.fhir.xmls, "result" )
+#' }
 write.bundle <- function( bundle, directory ) {
 #
 	w <- 1 + floor( log10( length( bundle ) ) )
@@ -203,7 +212,9 @@ write.bundle <- function( bundle, directory ) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' read.bundle( "result" )
+#' }
 read.bundle <- function( directory ) {
 
 	xml.files <- dir( directory, "*.xml" )
@@ -227,6 +238,7 @@ read.bundle <- function( directory ) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' page.to.dataframes(
 #' page,
 #' design = list(
@@ -237,6 +249,7 @@ read.bundle <- function( directory ) {
 #' 	  CODE    = "code/coding/code/@value",
 #' 	  DISPLAY = "code/coding/display/@value"
 #' 	) ) ) )
+#' 	}
 page.to.dataframes <- function( page, design ) {
 
 	if( is.null( page ) ) return( NULL )
@@ -305,27 +318,33 @@ page.to.dataframes <- function( page, design ) {
 #' @param bundle a list of xml text files representing the pages of a fhir bundle.
 #' @param design a structure that specifies which table should contain which entries of the bundle.
 #'
-#' @return
+#' @return a list of data frames.
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' bundle.to.dataframes( bundle, design )
+#' }
 bundle.to.dataframes <- function( bundle, design ) {
 
-	d <- lapply(
-		lst( names( design ) ),
+	pages.dfs <- lapply(
+		bundle,
+		function( x ) {
+
+			page.to.dataframes( x, design )
+		}
+	)
+
+	d <- sapply(
+		names( design ),
 		function( n ) {
-
-			cat( n, "\n" )
-
 			as.data.frame(
 				Reduce(
 					rbind,
 					lapply(
-						bundle,
-						function( x ) {
-
-							page.to.dataframes( x, design )[[ n ]]
+						pages.dfs,
+						function( dfs ) {
+							dfs[[ n ]]
 						}
 					)
 				)
@@ -337,3 +356,48 @@ bundle.to.dataframes <- function( bundle, design ) {
 
 	d
 }
+#
+#
+# b <- download.bundle( "https://vonk.fire.ly/R4/Observation?_include=Observation:encounter&_include=Observation:patient&_format=xml&_pretty=true&_count=1000000")
+#
+# d <- list(
+# 	Besuch = list(
+# 		".//Observation",
+# 		list(
+# 			OID     = "id/@value",
+# 			PID     = "subject/reference/@value",
+# 			WERT    = "valueQuantity/value/@value",
+# 			EINHEIT = "valueQuantity/unit/@value",
+# 			TEXT    = "code/text/@value",
+# 			CODE    = "code/coding/code/@value",
+# 			DATUM   = "effectiveDateTime/@value"
+# 		)
+# 	),
+# 	Aufnahme = list(
+# 		".//Encounter",
+# 		list(
+# 			EID           = "id/@value",
+# 			PATIENTEN.ID  = "subject/reference/@value",
+# 			TEILNEHMER.ID = "participant/individual/reference/@value",
+# 			BEGINN        = "period/start/@value",
+# 			ENDE          = "period/end/@value",
+# 			SYSTEM        = "class/system/@value",
+# 			CODE          = "class/code/@value",
+# 			DISPLAY       = "class/display/@value"
+# 		)
+# 	),
+# 	Patient = list(
+# 		".//Patient",
+# 		list(
+# 			PID             = "id/@value",
+# 			NAME.VERWENDUNG = "name/use/@value",
+# 			VORNAME         = "name/given/@value",
+# 			NACHNAME        = "name/family/@value",
+# 			SEX             = "gender/@value",
+# 			BIRTHDAY        = "birthDate/@value"
+# 		)
+# 	)
+# )
+#
+# dfs <- bundle.to.dataframes( b, d )
+# dfs$Besuch

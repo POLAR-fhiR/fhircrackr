@@ -12,11 +12,13 @@ bundle.to.dataframes(bundle, design)
 \item{design}{a structure that specifies which table should contain which entries of the bundle.}
 }
 \value{
-
+a list of data frames.
 }
 \description{
 converts a fhir bundle to a list of data frames
 }
 \examples{
+\dontrun{
 bundle.to.dataframes( bundle, design )
+}
 }
