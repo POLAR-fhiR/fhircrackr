@@ -335,10 +335,11 @@ bundle.to.dataframes <- function( bundle, design ) {
 		}
 	)
 
-	d <- sapply(
+	d <- lapply(
 		names( design ),
 		function( n ) {
 			as.data.frame(
+				stringAsFactors = F,
 				Reduce(
 					rbind,
 					lapply(
