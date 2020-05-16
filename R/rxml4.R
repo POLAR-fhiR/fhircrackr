@@ -67,11 +67,9 @@ concatenate.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
 
 	os <- tolower( substr( os, 1, 1 ) )
 
-	if( os == "l" )
-		return( paste0( sub( "/$" , "", path1 ), "/", sub( "^/", "", path2 ) ) )
+	if( os == "l" ) return( paste0( sub( "/$" , "", path1 ), "/", sub( "^/", "", path2 ) ) )
 
-	if( os == "w")
-		return( paste0( sub( "\\\\$" , "", path1 ), "\\", sub( "^\\\\", "", path2 ) ) )
+	if( os == "w" ) return( paste0( sub( "\\\\$" , "", path1 ), "\\", sub( "^\\\\", "", path2 ) ) )
 
 	NULL
 }
