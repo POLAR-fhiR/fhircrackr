@@ -95,17 +95,17 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
 
 
 ### extract an attribute from bundle tags
-- ```bundle.tag.attr( bundle, xpath )```
+- ```tag.attr( bundle, xpath )```
 
   e.g. how many medication statements are available?
   ```
-  bundle.tag.attr(
+  tag.attr(
     download.page( "https://hapi.fhir.org/baseR4/MedicationStatement/?_summary=count&_format=xml" ),
     "total/@value" )
 
   # or
 
-  bundle.tag.attr(
+  tag.attr(
     download.bundle( "https://hapi.fhir.org/baseR4/MedicationStatement/?_summary=count&_format=xml" )[[ 1 ]],
     "total/@value" )
   ```

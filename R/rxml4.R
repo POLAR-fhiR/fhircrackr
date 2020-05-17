@@ -404,8 +404,8 @@ bundle.to.dataframes <- function( bundle, design ) {
 # dfs$Besuch
 
 
-#' bundle.tag.attr
-#'@description extracts attributes from bundle tags.
+#' tag.attr
+#'@description extracts an attribute from tags.
 #'
 #' @param bundle fhir bundle
 #' @param xpath the path to the tag's attribute in the xml document.
@@ -415,9 +415,9 @@ bundle.to.dataframes <- function( bundle, design ) {
 #'
 #' @examples
 #' \dontrun{
-#' bundle.tag.attr( bundle, xpath )
+#' tag.attr( bundle, xpath )
 #' }
-bundle.tag.attr <- function( bundle, xpath ) {
+tag.attr <- function( bundle, xpath ) {
 
 	addr <- sub( "/@[a-zA-Z0-9]+$", "", xpath )
 	item <- sub( "^.*/@", "", xpath )
