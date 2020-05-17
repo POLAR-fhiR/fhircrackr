@@ -190,7 +190,7 @@ download.bundle <- function( fhir.search.request, max.attempts = 5 ) {
 #' write.bundle( my.fhir.xmls, "result" )
 #' }
 write.bundle <- function( bundle, directory ) {
-#
+
 	w <- 1 + floor( log10( length( bundle ) ) )
 
 	if( ! dir.exists( directory ) )
