@@ -298,7 +298,7 @@ page.to.dataframes <- function( page, design ) {
 
 									if( length( val ) < 1 ) val <- NA
 
-									else if( 1 < length( val ) ) val <- paste0( val, collapse = " # " )
+									else if( 1 < length( val ) ) val <- paste0( val, collapse = " › " )
 								}
 
 								val
