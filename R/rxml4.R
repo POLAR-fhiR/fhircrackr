@@ -404,20 +404,20 @@ bundle.to.dataframes <- function( bundle, design ) {
 # dfs$Besuch
 
 
-#' bundle.tag.values
-#'@description extracts values from bundle root path.
+#' bundle.tag.attr
+#'@description extracts attributes from bundle tags.
 #'
 #' @param bundle fhir bundle
-#' @param xpath the path to the value in the xml document.
+#' @param xpath the path to the tag's attribute in the xml document.
 #'
 #' @return a single value or vector
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' bundle.tag.values( bundle, xpath = "total" )
+#' bundle.tag.attr( bundle, xpath )
 #' }
-bundle.tag.values <- function( bundle, xpath ) {
+bundle.tag.attr <- function( bundle, xpath ) {
 
 	addr <- sub( "/@[a-zA-Z0-9]+$", "", xpath )
 	item <- sub( "^.*/@", "", xpath )
