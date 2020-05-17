@@ -338,16 +338,16 @@ bundle.to.dataframes <- function( bundle, design ) {
 	d <- lapply(
 		lst( names( design ) ),
 		function( n ) {
-			as.data.frame(
+			as.data.frame(fix.empty.names=T,
 				stringAsFactors = F,
 				Reduce(
-					rbind,
+					rbind2,
 					lapply(
 						pages.dfs,
 						function( dfs ) {
 							dfs[[ n ]]
 						}
-					)
+					),
 				)
 			)
 		}
@@ -402,3 +402,27 @@ bundle.to.dataframes <- function( bundle, design ) {
 #
 # dfs <- bundle.to.dataframes( b, d )
 # dfs$Besuch
+
+
+#' bundle.tag.values
+#'@description extracts values from bundle root path.
+#'
+#' @param bundle fhir bundle
+#' @param xpath the path to the value in the xml document.
+#'
+#' @return a single value or vector
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' bundle.tag.values( bundle, xpath = "total" )
+#' }
+bundle.tag.values <- function( bundle, xpath ) {
+
+	addr <- sub( "/@[a-zA-Z0-9]+$", "", xpath )
+	item <- sub( "^.*/@", "", xpath )
+
+	xp <- concatenate.paths( "/Bundle", addr )
+
+	xml2::xml_attr( xml2::xml_find_all( bundle, xp ), item )
+}
