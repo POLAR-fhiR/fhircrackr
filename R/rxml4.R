@@ -338,8 +338,9 @@ bundle.to.dataframes <- function( bundle, design ) {
 	d <- lapply(
 		lst( names( design ) ),
 		function( n ) {
-			as.data.frame(fix.empty.names=T,
-				stringAsFactors = F,
+			as.data.frame(
+				fix.empty.names = T,
+				stringsAsFactors = FALSE,
 				Reduce(
 					rbind2,
 					lapply(
