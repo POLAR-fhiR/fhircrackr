@@ -40,7 +40,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
 ### extract a complete bundle to data frames
 - ```bundle.to.dataframes( bundle, design )```
 
-  e.g.  
+  e.g. create 3 data frames with a set of items of interest  
   ```
   design <- list(
     Medication = list(
@@ -48,18 +48,12 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
         list(
             AID                   = "id/@value",
             STATUS                = "status/@value",
-            STATUS.REASON.SYSTEM  = "statusReason/coding/system/@value",
-            STATUS.REASON.CODE    = "statusReason/coding/code/@value",
-            STATUS.REASON.DISPLAY = "statusReason/coding/display/@value",
-            REASON.CODE.SYSTEM    = "reasonCode/coding/system/@value",
-            REASON.CODE.VALUE     = "reasonCode/coding/code/@value",
-            REASON.CODE.DISPLAY   = "reasonCode/coding/display/@value",
             MEDICATION.SYSTEM     = "medicationCodeableConcept/coding/system/@value",
             MEDICATION.CODE       = "medicationCodeableConcept/coding/code/@value",
             MEDICATION.DIPLAY     = "medicationCodeableConcept/coding/display/@value",
             PATIENT               = "subject/reference/@value",
             ENCOUNTER             = "context/reference/@value",
-            BEGIN                 = "effectivePeriod/start/@value",
+            START                 = "effectivePeriod/start/@value",
             END                   = "effectivePeriod/end/@value",
             DATE                  = "dateAsserted/@value"
         )
@@ -70,7 +64,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
 			EID            = "id/@value",
 			PATIENTS.ID    = "subject/reference/@value",
 			PARTICIPANT.ID = "participant/individual/reference/@value",
-			BEGIN          = "period/start/@value",
+			START          = "period/start/@value",
 			END            = "period/end/@value",
 			SYSTEM         = "class/system/@value",
 			CODE           = "class/code/@value",
@@ -108,4 +102,16 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
   tag.attr(
     download.bundle( "https://hapi.fhir.org/baseR4/MedicationStatement/?_summary=count&_format=xml" )[[ 1 ]],
     "total/@value" )
+  ```
+
+  tag.attr gives a vector of all available values. missings aren't in the results.
+  so never use it in this way!
+
+  ```
+  b <- fhiR::download.page( "https://vonk.fire.ly/R4/Patient?_format=xml" )
+
+  data.frame(
+    vname = fhiR::tag.attr( b, ".//name/given/@value" ),
+    nname = fhiR::tag.attr( b, ".//name/family/@value" )
+  )
   ```
