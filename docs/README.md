@@ -18,7 +18,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
     "https://hapi.fhir.org/baseR4/MedicationStatement?
     _include=MedicationStatement:context&
     _include=MedicationStatement:subject&
-    _format=xml&" )
+    _format=xml" )
   ```  
 
 ### write bundle pages as xml files to directory
