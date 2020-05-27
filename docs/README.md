@@ -9,7 +9,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
   Actually one doesn't use this one.  
   Use download.bundles for downloading all bundles at once!  
 
-### download all fhir bundle at once
+### download all fhir bundles at once
 - ```download.bundles( fhir.search.request, max.attempts = 5 )```  
 
   e.g.
