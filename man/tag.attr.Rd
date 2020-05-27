@@ -19,6 +19,6 @@ extracts an attribute from tags.
 }
 \examples{
 \dontrun{
-tag.attr( bundle, xpath )
+tag.attr( bundles[[ 1 ]], xpath = ".//total/@value" )
 }
 }

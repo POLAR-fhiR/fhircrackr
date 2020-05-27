@@ -3,42 +3,42 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
 
 ## Set of commands:
 
-### download a single fhir bundle page
-- ```download.page( fhir.search.request, max.attempts = 5 )```  
+### download a single fhir bundle
+- ```download.bundle( fhir.search.request, max.attempts = 5 )```  
 
   Actually one doesn't use this one.  
-  Use download.bundle for downloading a complete bundle!  
+  Use download.bundles for downloading all bundles at once!  
 
-### download a complete fhir bundle
-- ```download.bundle( fhir.search.request, max.attempts = 5 )```  
+### download all fhir bundle at once
+- ```download.bundles( fhir.search.request, max.attempts = 5 )```  
 
   e.g.
   ```
-  bundle <- download.bundle(
+  bundles <- download.bundles(
     "https://hapi.fhir.org/baseR4/MedicationStatement?
     _include=MedicationStatement:context&
     _include=MedicationStatement:subject&
     _format=xml" )
   ```  
 
-### write bundle pages as xml files to directory
-- ```write.bundle( bundle, directory )```  
+### write all bundles as xml files to directory
+- ```write.bundles( bundles, directory )```  
 
-  e.g. ```write.bundle( bundle, "bundle-medication-statement" )```
+  e.g. ```write.bundles( bundles, "bundle-medication-statement" )```
 
-### read bundle pages as xml files from directory
-- ```read.bundle( directory )```  
+### read bundles as xml files from directory
+- ```read.bundles( directory )```  
 
-  e.g. ``` bundle.bak <- read.bundle( "bundle-medication-statement" )```
+  e.g. ``` bundles.bak <- read.bundles( "bundle-medication-statement" )```
 
-### extract a single bundle page to data frames
-- ```page.to.dataframes( page, design )```  
+### extract a single bundle to data frames
+- ```bundle.to.dataframes( bundle, design )```  
 
   Actually one doesn't use this one.  
-  Use bundle.to.dataframes( bundle, design ) for extracting a complete bundle to data frames!  
+  Use bundles.to.dataframes( bundles, design ) for extracting a all bundles of a fhir search request to data frames!  
 
-### extract a complete bundle to data frames
-- ```bundle.to.dataframes( bundle, design )```
+### extract all bundles to data frames at once
+- ```bundles.to.dataframes( bundles, design )```
 
   e.g. create 3 data frames with a set of items of interest  
   ```
@@ -84,7 +84,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
      )
   )
 
-  dfs <- bundle.to.dataframes( bundle, design )
+  dfs <- bundles.to.dataframes( bundles, design )
   ```
 
 
@@ -94,13 +94,13 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
   e.g. how many medication statements are available?
   ```
   tag.attr(
-    download.page( "https://hapi.fhir.org/baseR4/MedicationStatement/?_summary=count&_format=xml" ),
+    download.bundle( "https://hapi.fhir.org/baseR4/MedicationStatement/?_summary=count&_format=xml" ),
     "total/@value" )
 
   # or
 
   tag.attr(
-    download.bundle( "https://hapi.fhir.org/baseR4/MedicationStatement/?_summary=count&_format=xml" )[[ 1 ]],
+    download.bundles( "https://hapi.fhir.org/baseR4/MedicationStatement/?_summary=count&_format=xml" )[[ 1 ]],
     "total/@value" )
   ```
 
@@ -108,7 +108,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
   so never use it in this way!
 
   ```
-  b <- fhiR::download.page( "https://vonk.fire.ly/R4/Patient?_format=xml" )
+  b <- fhiR::download.bundle( "https://vonk.fire.ly/R4/Patient?_format=xml" )
 
   data.frame(
     vname = fhiR::tag.attr( b, ".//name/given/@value" ),

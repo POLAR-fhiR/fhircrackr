@@ -79,20 +79,20 @@ concatenate.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
 }
 
 
-#' download.page
-#' @description downloads a fhir bundle page via fhir search request and return it as xml file.
+#' download.bundle
+#' @description downloads a fhir bundle via fhir search request and return it as xml file.
 #'
 #' @param fhir.search.request a fhir search request. it must contain _format=xml.
 #' @param max.attempts the maximal number of attempts to send a request. Default is 5.
 #'
-#' @return the downloaded bundle page in xml format.
+#' @return the downloaded bundle in xml format.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' download.page( "https://hapi.fhir.org/baseR4/Medication?_format=xml" )
+#' download.bundle( "https://hapi.fhir.org/baseR4/Medication?_format=xml" )
 #' }
-download.page <- function( fhir.search.request, max.attempts = 5 ) {
+download.bundle <- function( fhir.search.request, max.attempts = 5 ) {
 
 	for( n in 1 : max.attempts ) {
 
@@ -117,20 +117,20 @@ download.page <- function( fhir.search.request, max.attempts = 5 ) {
 }
 
 
-#' download.bundle
-#' @description downloads a fhir bunde via fhir search request from a fhir server.
+#' download.bundles
+#' @description downloads all fhir bunde of a fhir search request from a fhir server.
 #'
 #' @param fhir.search.request a fhir search request
 #' @param max.attempts maximal attempts to connect to a page address
 #'
-#' @return the downloaded bundle as a list of pages in xml format
+#' @return the downloaded bundles as a list of pages in xml format
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' download.bundle( "https://hapi.fhir.org/baseR4/Medication?_format=xml" )
+#' bundles <- download.bundles( "https://vonk.fire.ly/R4/Medication?_format=xml" )
 #' }
-download.bundle <- function( fhir.search.request, max.attempts = 5 ) {
+download.bundles <- function( fhir.search.request, max.attempts = 5 ) {
 
 	xmls <- list( )
 
@@ -138,7 +138,7 @@ download.bundle <- function( fhir.search.request, max.attempts = 5 ) {
 
 	repeat {
 
-		xml <- download.page( addr, max.attempts )
+		xml <- download.bundle( addr, max.attempts )
 
 		if( is.null( xml ) ) {
 
@@ -176,10 +176,10 @@ download.bundle <- function( fhir.search.request, max.attempts = 5 ) {
 }
 
 
-#' write.bundle
-#' @description writes a fhir bundle as numbered xml files into a directory.
+#' write.bundles
+#' @description writes all fhir bundle as numbered xml files into a directory.
 #'
-#' @param bundle a list of xml text files representing the pages of a fhir bundle.
+#' @param bundles a list of xml text files representing the pages of a fhir bundle.
 #' @param directory the location to store the data.
 #'
 #' @return nothing to return.
@@ -187,35 +187,36 @@ download.bundle <- function( fhir.search.request, max.attempts = 5 ) {
 #'
 #' @examples
 #' \dontrun{
-#' write.bundle( my.fhir.xmls, "result" )
+#' write.bundles( bundles, "result" )
 #' }
-write.bundle <- function( bundle, directory ) {
+write.bundles <- function( bundles, directory = "result" ) {
 
-	w <- 1 + floor( log10( length( bundle ) ) )
+	w <- 1 + floor( log10( length( bundles ) ) )
 
 	if( ! dir.exists( directory ) )
 
 		dir.create( directory, recursive = T )
 
-	for( n in 1 : length( bundle ) )
+	for( n in 1 : length( bundles ) ) {
 
-		xml2::write_xml( bundle[[ n ]], concatenate.paths( bundle, paste0( stringr::str_pad( n, width = w, pad = "0" ), ".xml" ) ) )
+		xml2::write_xml( bundles[[ n ]], concatenate.paths( directory, paste0( stringr::str_pad( n, width = w, pad = "0" ), ".xml" ) ) )
+	}
 }
 
 
-#' read.bundle
-#' @description reads a bundle stored as xml files from a directory
+#' read.bundles
+#' @description reads all bundles stored as xml files from a directory
 #'
-#' @param directory the location to store the data.
+#' @param directory the location the data are stored.
 #'
-#' @return the bundle as a list of xml text files.
+#' @return the bundles as a list of xml text files.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' read.bundle( "result" )
+#' bundles.bak <- read.bundles( "result" )
 #' }
-read.bundle <- function( directory ) {
+read.bundles <- function( directory ) {
 
 	xml.files <- dir( directory, "*.xml" )
 
@@ -223,15 +224,15 @@ read.bundle <- function( directory ) {
 }
 
 
-#' page.to.dataframes
-#' @description converts a fhir bundle page to a list of data frames.
+#' bundle.to.dataframes
+#' @description converts a fhir bundle to a list of data frames.
 #' design is a named list. Its names are the one of the resulting tables.
 #' The elements of design are lists of 2 elements.
 #' The first one is a XPath expression to locate the entry in a fhir bundle page.
 #' The second one is a named list with XPath expressions of locations to the values of the items in the bundle page.
 #' The names are the column names of the resultung data frames
 #'
-#' @param page a xml text file the represents a fhir bundle page.
+#' @param bundle a xml text file the represents a fhir bundle.
 #' @param design a structure that specifies which table should contain which entries of the bundle.
 #'
 #' @return a list of data frames
@@ -239,8 +240,8 @@ read.bundle <- function( directory ) {
 #'
 #' @examples
 #' \dontrun{
-#' page.to.dataframes(
-#' page,
+#' bundle.to.dataframes(
+#' bundles[[ 1 ]],
 #' design = list(
 #' MEDICATION = list(
 #'  tag     = ".//Medication",
@@ -250,9 +251,9 @@ read.bundle <- function( directory ) {
 #' 	  DISPLAY = "code/coding/display/@value"
 #' 	) ) ) )
 #' 	}
-page.to.dataframes <- function( page, design ) {
+bundle.to.dataframes <- function( bundle, design ) {
 
-	if( is.null( page ) ) return( NULL )
+	if( is.null( bundle ) ) return( NULL )
 
 	lapply(
 		lst( names( design ) ),
@@ -268,16 +269,16 @@ page.to.dataframes <- function( page, design ) {
 			entry <- e[[ 1 ]]
 			items <- e[[ 2 ]]
 
-			page.entry <- xml2::xml_find_all( page, entry )
+			bundle.entry <- xml2::xml_find_all( bundle, entry )
 
 			Reduce(
 				rbind,
 				lapply(
-					page.entry,
+					bundle.entry,
 					function( tg ) {
 
 						#dbg
-						#tg <- page.entry[[ 1 ]]
+						#tg <- bundle.entry[[ 1 ]]
 
 						cat( "." )
 
@@ -312,10 +313,10 @@ page.to.dataframes <- function( page, design ) {
 }
 
 
-#' bundle.to.dataframes
-#' @description converts a fhir bundle to a list of data frames
+#' bundles.to.dataframes
+#' @description converts all fhir bundles to a list of data frames
 #'
-#' @param bundle a list of xml text files representing the pages of a fhir bundle.
+#' @param bundles a list of xml text files representing the fhir bundles.
 #' @param design a structure that specifies which table should contain which entries of the bundle.
 #'
 #' @return a list of data frames.
@@ -323,15 +324,15 @@ page.to.dataframes <- function( page, design ) {
 #'
 #' @examples
 #' \dontrun{
-#' bundle.to.dataframes( bundle, design )
+#' bundles.to.dataframes( bundles, design )
 #' }
-bundle.to.dataframes <- function( bundle, design ) {
+bundles.to.dataframes <- function( bundles, design ) {
 
-	pages.dfs <- lapply(
-		bundle,
+	bundle.dfs <- lapply(
+		bundles,
 		function( x ) {
 
-			page.to.dataframes( x, design )
+			bundle.to.dataframes( x, design )
 		}
 	)
 
@@ -344,7 +345,7 @@ bundle.to.dataframes <- function( bundle, design ) {
 				Reduce(
 					rbind2,
 					lapply(
-						pages.dfs,
+						bundle.dfs,
 						function( dfs ) {
 							dfs[[ n ]]
 						}
@@ -360,7 +361,7 @@ bundle.to.dataframes <- function( bundle, design ) {
 }
 #
 #
-# b <- download.bundle( "https://vonk.fire.ly/R4/Observation?_include=Observation:encounter&_include=Observation:patient&_format=xml&_pretty=true&_count=1000000")
+# b <- download.bundles( "https://vonk.fire.ly/R4/Observation?_include=Observation:encounter&_include=Observation:patient&_format=xml&_pretty=true&_count=1000000")
 #
 # d <- list(
 # 	Besuch = list(
@@ -416,7 +417,7 @@ bundle.to.dataframes <- function( bundle, design ) {
 #'
 #' @examples
 #' \dontrun{
-#' tag.attr( bundle, xpath )
+#' tag.attr( bundles[[ 1 ]], xpath = ".//total/@value" )
 #' }
 tag.attr <- function( bundle, xpath ) {
 

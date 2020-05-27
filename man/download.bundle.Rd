@@ -7,15 +7,15 @@
 download.bundle(fhir.search.request, max.attempts = 5)
 }
 \arguments{
-\item{fhir.search.request}{a fhir search request}
+\item{fhir.search.request}{a fhir search request. it must contain _format=xml.}
 
-\item{max.attempts}{maximal attempts to connect to a page address}
+\item{max.attempts}{the maximal number of attempts to send a request. Default is 5.}
 }
 \value{
-the downloaded bundle as a list of pages in xml format
+the downloaded bundle in xml format.
 }
 \description{
-downloads a fhir bunde via fhir search request from a fhir server.
+downloads a fhir bundle via fhir search request and return it as xml file.
 }
 \examples{
 \dontrun{

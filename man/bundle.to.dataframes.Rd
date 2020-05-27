@@ -7,18 +7,32 @@
 bundle.to.dataframes(bundle, design)
 }
 \arguments{
-\item{bundle}{a list of xml text files representing the pages of a fhir bundle.}
+\item{bundle}{a xml text file the represents a fhir bundle.}
 
 \item{design}{a structure that specifies which table should contain which entries of the bundle.}
 }
 \value{
-a list of data frames.
+a list of data frames
 }
 \description{
-converts a fhir bundle to a list of data frames
+converts a fhir bundle to a list of data frames.
+design is a named list. Its names are the one of the resulting tables.
+The elements of design are lists of 2 elements.
+The first one is a XPath expression to locate the entry in a fhir bundle page.
+The second one is a named list with XPath expressions of locations to the values of the items in the bundle page.
+The names are the column names of the resultung data frames
 }
 \examples{
 \dontrun{
-bundle.to.dataframes( bundle, design )
-}
+bundle.to.dataframes(
+bundles[[ 1 ]],
+design = list(
+MEDICATION = list(
+ tag     = ".//Medication",
+ items   = list(
+	  SYSTEM  = "code/coding/system/@value",
+	  CODE    = "code/coding/code/@value",
+	  DISPLAY = "code/coding/display/@value"
+	) ) ) )
+	}
 }
