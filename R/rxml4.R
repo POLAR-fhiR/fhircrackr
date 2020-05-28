@@ -164,7 +164,7 @@ download.bundles <- function( fhir.search.request, max.attempts = 5 ) {
 
 		addr <- urls[ rels.nxt ][ 1 ]
 
-		if( addr == "" ) {
+		if( is.null( addr ) || is.na( addr ) || length( addr ) < 1 || addr == "" ) {
 
 			cat( "\ndownload completed\n" )
 
@@ -262,7 +262,7 @@ bundle.to.dataframes <- function( bundle, design, sep = "›" ) {
 			#dbg
 			#n.e <- names( design )[ 1 ]
 
-			cat( "\n", n.e )
+			cat( n.e )
 
 			e <- design[[ n.e ]]
 
@@ -271,7 +271,7 @@ bundle.to.dataframes <- function( bundle, design, sep = "›" ) {
 
 			bundle.entry <- xml2::xml_find_all( bundle, entry )
 
-			Reduce(
+			r <- Reduce(
 				rbind,
 				lapply(
 					bundle.entry,
@@ -280,9 +280,7 @@ bundle.to.dataframes <- function( bundle, design, sep = "›" ) {
 						#dbg
 						#tg <- bundle.entry[[ 1 ]]
 
-						cat( "." )
-
-						sapply(
+						s <- sapply(
 							names( items ),
 							function( i.n )  {
 
@@ -305,9 +303,17 @@ bundle.to.dataframes <- function( bundle, design, sep = "›" ) {
 								val
 							}
 						)
+
+						cat( "." )
+
+						s
 					}
 				)
 			)
+
+			cat( "\n" )
+
+			r
 		}
 	)
 }
