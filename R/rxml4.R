@@ -164,7 +164,7 @@ download.bundles <- function( fhir.search.request, max.attempts = 5 ) {
 
 		addr <- urls[ rels.nxt ][ 1 ]
 
-		if( is.na( addr ) || length( addr ) < 1 || addr == "" ) {
+		if( is.null( addr ) || is.na( addr ) || length( addr ) < 1 || addr == "" ) {
 
 			cat( "\ndownload completed\n" )
 
