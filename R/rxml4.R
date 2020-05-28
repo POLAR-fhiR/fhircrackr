@@ -251,7 +251,7 @@ read.bundles <- function( directory ) {
 #' 	  DISPLAY = "code/coding/display/@value"
 #' 	) ) ) )
 #' 	}
-bundle.to.dataframes <- function( bundle, design ) {
+bundle.to.dataframes <- function( bundle, design, seperator.brackets = c( "«", "»" ) ) {
 
 	if( is.null( bundle ) ) return( NULL )
 
@@ -299,7 +299,11 @@ bundle.to.dataframes <- function( bundle, design ) {
 
 									if( length( val ) < 1 ) val <- NA
 
-									else if( 1 < length( val ) ) val <- paste0( val, collapse = " › " )
+									else if( 1 < length( val ) ) {
+
+										val <- paste0( seperator.brackets[ 1 ], stringr::str_pad( seq_along( val ), width = 2, pad = "0" ), seperator.brackets[ 2 ], val, collapse = "" )
+#										val <- paste0( val, collapse = " › " )
+									}
 								}
 
 								val
