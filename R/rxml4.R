@@ -255,6 +255,8 @@ bundle.to.dataframes <- function( bundle, design, sep = "›" ) {
 
 	if( is.null( bundle ) ) return( NULL )
 
+	xml2::xml_ns_strip( bundle )
+
 	lapply(
 		lst( names( design ) ),
 		function( n.e ) {
