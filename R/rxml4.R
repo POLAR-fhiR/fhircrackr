@@ -251,7 +251,7 @@ read.bundles <- function( directory ) {
 #' 	  DISPLAY = "code/coding/display/@value"
 #' 	) ) ) )
 #' 	}
-bundle.to.dataframes <- function( bundle, design ) {
+bundle.to.dataframes <- function( bundle, design, sep = "›" ) {
 
 	if( is.null( bundle ) ) return( NULL )
 
@@ -299,7 +299,7 @@ bundle.to.dataframes <- function( bundle, design ) {
 
 									if( length( val ) < 1 ) val <- NA
 
-									else if( 1 < length( val ) ) val <- paste0( val, collapse = " › " )
+									else if( 1 < length( val ) ) val <- paste0( val, collapse = sep )
 								}
 
 								val
@@ -326,13 +326,13 @@ bundle.to.dataframes <- function( bundle, design ) {
 #' \dontrun{
 #' bundles.to.dataframes( bundles, design )
 #' }
-bundles.to.dataframes <- function( bundles, design ) {
+bundles.to.dataframes <- function( bundles, design, sep = "›" ) {
 
 	bundle.dfs <- lapply(
 		bundles,
 		function( x ) {
 
-			bundle.to.dataframes( x, design )
+			bundle.to.dataframes( x, design, sep )
 		}
 	)
 
@@ -349,7 +349,7 @@ bundles.to.dataframes <- function( bundles, design ) {
 						function( dfs ) {
 							dfs[[ n ]]
 						}
-					),
+					)
 				)
 			)
 		}
