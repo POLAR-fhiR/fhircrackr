@@ -4,7 +4,7 @@
 \alias{bundles.to.dataframes}
 \title{bundles.to.dataframes}
 \usage{
-bundles.to.dataframes(bundles, design)
+bundles.to.dataframes(bundles, design, sep = "›")
 }
 \arguments{
 \item{bundles}{a list of xml text files representing the fhir bundles.}
