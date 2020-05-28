@@ -28,7 +28,7 @@ th <- function( n ) {
 
 
 #' lst
-#'@description transforms a vector of items to a named list. The names are created the a prefix and a suffix surrounding the items.
+#'@description transforms a vector of items to a named list. The names are created with a prefix and a suffix surrounding the items.
 #'
 #' @param ... a scalar or a vector of scalars.
 #' @param prefix a prefix in front of the result text.
