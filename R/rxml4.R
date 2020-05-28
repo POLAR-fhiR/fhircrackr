@@ -92,15 +92,32 @@ concatenate.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
 #' \dontrun{
 #' download.bundle( "https://hapi.fhir.org/baseR4/Medication?_format=xml" )
 #' }
-download.bundle <- function( fhir.search.request, max.attempts = 5 ) {
+download.bundle <- function( fhir.search.request, max.attempts = 5, username=NULL, password=NULL ) {
 
 	for( n in 1 : max.attempts ) {
 
 		cat( paste0( th( n ), " attempt to download: ", fhir.search.request, "\n" ) )
 
 		r <- try(
+			{
+				auth<-if(is.null(username)|is.null(password)){
+					NULL
+				}else{
+					httr::authenticate(username, password)
+				}
 
-			xml2::read_xml( fhir.search.request, silent = T )
+
+				response<-httr::GET(fhir.search.request,
+									add_headers(Accept = "application/fhir+xml"),
+									content_type("application/fhir+xml;charset=utf-8"),
+									auth)
+
+				payload<-httr::content(response, as = "text", encoding = "UTF-8")
+
+				xml2::read_xml(payload)
+			}
+
+			#xml2::read_xml( fhir.search.request, silent = T )
 		)
 
 		if( class( r )[ 1 ] != "try-error" ) {
@@ -115,6 +132,8 @@ download.bundle <- function( fhir.search.request, max.attempts = 5 ) {
 
 	NULL
 }
+
+
 
 
 #' download.bundles
