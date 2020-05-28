@@ -1,5 +1,6 @@
 usethis::use_package( "xml2" )
 usethis::use_package( "stringr" )
+usethis::use_package( "httr" )
 
 #' th
 #' @description add the right suffix to a number or a vector of numbers. e.g. 1st 2nd 3rd ...
