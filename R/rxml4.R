@@ -34,7 +34,7 @@ th <- function( n ) {
 #' @param prefix a prefix in front of the result text.
 #' @param suffix a suffix after the result text.
 #'
-#' @return a named list, where the names are the content surrounded bei prefix and suffix
+#' @return a named list, where the names are the content surrounded by a prefix and a suffix
 #' @export
 #'
 #' @examples
