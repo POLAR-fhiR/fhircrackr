@@ -262,7 +262,7 @@ bundle.to.dataframes <- function( bundle, design, seperator.brackets = c( "«", 
 			#dbg
 			#n.e <- names( design )[ 1 ]
 
-			cat( "\n", n.e )
+			cat( n.e )
 
 			e <- design[[ n.e ]]
 
@@ -271,7 +271,7 @@ bundle.to.dataframes <- function( bundle, design, seperator.brackets = c( "«", 
 
 			bundle.entry <- xml2::xml_find_all( bundle, entry )
 
-			Reduce(
+			r <- Reduce(
 				rbind,
 				lapply(
 					bundle.entry,
@@ -280,9 +280,7 @@ bundle.to.dataframes <- function( bundle, design, seperator.brackets = c( "«", 
 						#dbg
 						#tg <- bundle.entry[[ 1 ]]
 
-						cat( "." )
-
-						sapply(
+						s <- sapply(
 							names( items ),
 							function( i.n )  {
 
@@ -309,9 +307,17 @@ bundle.to.dataframes <- function( bundle, design, seperator.brackets = c( "«", 
 								val
 							}
 						)
+
+						cat( "." )
+
+						s
 					}
 				)
 			)
+
+			cat( "\n" )
+
+			r
 		}
 	)
 }
