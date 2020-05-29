@@ -1,6 +1,7 @@
 usethis::use_package( "xml2" )
 usethis::use_package( "stringr" )
 usethis::use_package( "httr" )
+usethis::use_package( "utils" )
 
 #' th
 #' @description add the right suffix to a number or a vector of numbers. e.g. 1st 2nd 3rd ...
@@ -285,7 +286,7 @@ read.bundles <- function( directory ) {
 bundle.to.dataframes <- function( bundle, design, sep = "›" ) {
 
 	#dbg
-	#bundle <- bundles[[ 1 ]]
+	#bundle <- bundles[[ length( bundle ) ]]
 
 	if( is.null( bundle ) ) return( NULL )
 
@@ -307,49 +308,90 @@ bundle.to.dataframes <- function( bundle, design, sep = "›" ) {
 
 			bundle.entry <- xml2::xml_find_all( bundle, entry )
 
-			r <- Reduce(
-				rbind,
-				lapply(
-					bundle.entry,
-					function( tg ) {
+			if( length( bundle.entry ) < 1 ) {
+
+				r <- NULL
+			}
+			else if( 1 < length( bundle.entry ) ) {
+
+				r <- Reduce(
+					rbind,
+					lapply(
+						bundle.entry,
+						function( tg ) {
+
+							#dbg
+							#tg <- bundle.entry[[ 1 ]]
+
+							s <- sapply(
+								names( items ),
+								function( i.n )  {
+
+									#dbg
+									#i.n <- names( items )[ 1 ]
+
+									i.srch <- items[[ i.n ]]
+
+									addr <- sub( "/@[a-zA-Z0-9]+$", "", i.srch )
+									item <- sub( "^.*/@", "", i.srch )
+									val  <- xml2::xml_attr( xml2::xml_find_all( tg, addr ), item )
+
+									if( is.character( val ) ) {
+
+										if( length( val ) < 1 ) val <- NA
+
+										else if( 1 < length( val ) ) val <- paste0( val, collapse = sep )
+									}
+
+									val
+								}
+							)
+
+							cat( "." )
+
+							s
+						}
+					)
+				)
+
+				cat( "\n" )
+
+				as.data.frame( r, stringsAsFactors = F )
+			}
+			else {
+
+				s <- lapply(
+					names( items ),
+					function( i.n )  {
 
 						#dbg
-						#tg <- bundle.entry[[ 1 ]]
+						#i.n <- names( items )[ 1 ]
 
-						s <- sapply(
-							names( items ),
-							function( i.n )  {
+						i.srch <- items[[ i.n ]]
 
-								#dbg
-								#i.n <- names( items )[ 1 ]
+						addr <- sub( "/@[a-zA-Z0-9]+$", "", i.srch )
+						item <- sub( "^.*/@", "", i.srch )
+						val  <- xml2::xml_attr( xml2::xml_find_all( bundle.entry[ 1 ], addr ), item )
 
-								i.srch <- items[[ i.n ]]
+						if( is.character( val ) ) {
 
-								addr <- sub( "/@[a-zA-Z0-9]+$", "", i.srch )
-								item <- sub( "^.*/@", "", i.srch )
-								val  <- xml2::xml_attr( xml2::xml_find_all( tg, addr ), item )
+							if( length( val ) < 1 ) val <- NA
 
-								if( is.character( val ) ) {
+							else if( 1 < length( val ) ) val <- paste0( val, collapse = sep )
+						}
 
-									if( length( val ) < 1 ) val <- NA
-
-									else if( 1 < length( val ) ) val <- paste0( val, collapse = sep )
-								}
-
-								val
-							}
-						)
-
-						cat( "." )
-
-						s
+						val
 					}
 				)
-			)
 
-			cat( "\n" )
+				cat( "." )
 
-			as.data.frame( r, stringsAsFactors = F )
+				s <- as.data.frame( s, stringsAsFactors = F )
+
+				names( s ) <- names( items )
+
+				s
+			}
 		}
 	)
 }
@@ -386,28 +428,33 @@ bundles.to.dataframes <- function( bundles, design, sep = "›" ) {
 
 				#dbg
 				#n<-names( design )[ 1 ]
+
+				r <- Reduce(
+					rbind,
+					lapply(
+						bundle.dfs,
+						function( dfs ) {
+							#dbg
+							#dfs <- bundle.dfs[[ 1 ]]
+							dfs[[ n ]]
+						}
+					)
+				)
+
 				as.data.frame(
-					Reduce(
-						rbind,
-						lapply(
-							bundle.dfs,
-							function( dfs ) {
-								#dbg
-								#dfs <- bundle.dfs[[ 1 ]]
-								dfs[[ n ]]
-							}
-						)
-					),
+					r,
 					fix.empty.names = T,
-					stringsAsFactors = FALSE
+					stringsAsFactors = FALSE,
+					row.names = 1 : nrow( r )
 				)
 			}
 		)
 	}
-	else {
+	else if( 1 == length( bunddle.dfs ) ) {
 
 		d <- bundle.dfs[[ 1 ]]
 	}
+	else d <- NULL
 
 	cat( "\n" )
 
@@ -481,4 +528,22 @@ tag.attr <- function( bundle, xpath ) {
 	xp <- concatenate.paths( "/Bundle", addr )
 
 	xml2::xml_attr( xml2::xml_find_all( bundle, xp ), item )
+}
+
+
+#' coerce.types
+#' @description coerce a data frame's columns
+#'
+#' @param df a data frame with strings as column entries
+#'
+#' @return a data frame with coerced types
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' coerce.types( dfs$Besuch )
+#' }
+coerce.types <- function( df, stringsAsFactors = F ) {
+
+	utils::type.convert( df, as.is = ! stringsAsFactors )
 }
