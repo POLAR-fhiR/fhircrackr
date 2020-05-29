@@ -349,7 +349,7 @@ bundle.to.dataframes <- function( bundle, design, sep = "›" ) {
 
 			cat( "\n" )
 
-			r
+			as.data.frame( r, stringsAsFactors = F )
 		}
 	)
 }
