@@ -1,5 +1,6 @@
 usethis::use_package( "xml2" )
 usethis::use_package( "stringr" )
+usethis::use_package( "httr" )
 
 #' th
 #' @description add the right suffix to a number or a vector of numbers. e.g. 1st 2nd 3rd ...
@@ -84,6 +85,8 @@ concatenate.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
 #'
 #' @param fhir.search.request a fhir search request. it must contain _format=xml.
 #' @param max.attempts the maximal number of attempts to send a request. Default is 5.
+#' @param username a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
+#' @param password a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
 #'
 #' @return the downloaded bundle in xml format.
 #' @export
@@ -92,15 +95,32 @@ concatenate.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
 #' \dontrun{
 #' download.bundle( "https://hapi.fhir.org/baseR4/Medication?_format=xml" )
 #' }
-download.bundle <- function( fhir.search.request, max.attempts = 5 ) {
+download.bundle <- function( fhir.search.request, max.attempts = 5, username=NULL, password=NULL ) {
 
 	for( n in 1 : max.attempts ) {
 
 		cat( paste0( th( n ), " attempt to download: ", fhir.search.request, "\n" ) )
 
 		r <- try(
+			{
+				auth<-if(is.null(username)|is.null(password)){
+					NULL
+				}else{
+					httr::authenticate(username, password)
+				}
 
-			xml2::read_xml( fhir.search.request, silent = T )
+
+				response<-httr::GET(fhir.search.request,
+									add_headers(Accept = "application/fhir+xml"),
+									content_type("application/fhir+xml;charset=utf-8"),
+									auth)
+
+				payload<-httr::content(response, as = "text", encoding = "UTF-8")
+
+				xml2::read_xml(payload)
+			}
+
+			#xml2::read_xml( fhir.search.request, silent = T )
 		)
 
 		if( class( r )[ 1 ] != "try-error" ) {
@@ -117,11 +137,15 @@ download.bundle <- function( fhir.search.request, max.attempts = 5 ) {
 }
 
 
+
+
 #' download.bundles
 #' @description downloads all fhir bunde of a fhir search request from a fhir server.
 #'
 #' @param fhir.search.request a fhir search request
 #' @param max.attempts maximal attempts to connect to a page address
+#' @param username a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
+#' @param password a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
 #'
 #' @return the downloaded bundles as a list of pages in xml format
 #' @export
@@ -130,7 +154,7 @@ download.bundle <- function( fhir.search.request, max.attempts = 5 ) {
 #' \dontrun{
 #' bundles <- download.bundles( "https://vonk.fire.ly/R4/Medication?_format=xml" )
 #' }
-download.bundles <- function( fhir.search.request, max.attempts = 5 ) {
+download.bundles <- function( fhir.search.request, max.attempts = 5, username=NULL, password=NULL ) {
 
 	xmls <- list( )
 
@@ -138,7 +162,7 @@ download.bundles <- function( fhir.search.request, max.attempts = 5 ) {
 
 	repeat {
 
-		xml <- download.bundle( addr, max.attempts )
+		xml <- download.bundle( addr, max.attempts, username, password )
 
 		if( is.null( xml ) ) {
 
