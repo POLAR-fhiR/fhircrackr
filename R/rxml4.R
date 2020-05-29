@@ -284,6 +284,9 @@ read.bundles <- function( directory ) {
 #' 	}
 bundle.to.dataframes <- function( bundle, design, sep = "›" ) {
 
+	#dbg
+	#bundle <- bundles[[ 1 ]]
+
 	if( is.null( bundle ) ) return( NULL )
 
 	xml2::xml_ns_strip( bundle )
@@ -318,7 +321,7 @@ bundle.to.dataframes <- function( bundle, design, sep = "›" ) {
 							function( i.n )  {
 
 								#dbg
-								#i.n <- names( n$items )[[ 2 ]]
+								#i.n <- names( items )[ 1 ]
 
 								i.srch <- items[[ i.n ]]
 
@@ -375,24 +378,36 @@ bundles.to.dataframes <- function( bundles, design, sep = "›" ) {
 		}
 	)
 
-	d <- lapply(
-		lst( names( design ) ),
-		function( n ) {
-			as.data.frame(
-				fix.empty.names = T,
-				stringsAsFactors = FALSE,
-				Reduce(
-					rbind2,
-					lapply(
-						bundle.dfs,
-						function( dfs ) {
-							dfs[[ n ]]
-						}
-					)
+	if( 1 < length( bundle.dfs ) ) {
+
+		d <- lapply(
+			lst( names( design ) ),
+			function( n ) {
+
+				#dbg
+				#n<-names( design )[ 1 ]
+				as.data.frame(
+					Reduce(
+						rbind,
+						lapply(
+							bundle.dfs,
+							function( dfs ) {
+								#dbg
+								#dfs <- bundle.dfs[[ 1 ]]
+								dfs[[ n ]]
+							}
+						)
+					),
+					fix.empty.names = T,
+					stringsAsFactors = FALSE
 				)
-			)
-		}
-	)
+			}
+		)
+	}
+	else {
+
+		d <- bundle.dfs[[ 1 ]]
+	}
 
 	cat( "\n" )
 
