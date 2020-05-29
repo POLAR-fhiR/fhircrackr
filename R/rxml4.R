@@ -97,35 +97,40 @@ concatenate.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
 #' }
 download.bundle <- function( fhir.search.request, max.attempts = 5, username=NULL, password=NULL ) {
 
+	#dbg
+	#fhir.search.request="https://hapi.fhir.org/baseR4/Medication?_format=xml"
+
 	for( n in 1 : max.attempts ) {
+
+		#dbg
+		#n <- 1
 
 		cat( paste0( th( n ), " attempt to download: ", fhir.search.request, "\n" ) )
 
+		auth <- NULL
+
 		r <- try(
 			{
-				auth<-if(is.null(username)|is.null(password)){
-					NULL
-				}else{
-					httr::authenticate(username, password)
+				if( ! is.null( username ) & ! is.null( password ) ) {
+
+					auth <- httr::authenticate( username, password )
 				}
 
+				response <- httr::GET(
+					fhir.search.request,
+					httr::add_headers( Accept = "application/fhir+xml" ),
+					httr::content_type( "application/fhir+xml;charset=utf-8" ),
+					auth )
 
-				response<-httr::GET(fhir.search.request,
-									add_headers(Accept = "application/fhir+xml"),
-									content_type("application/fhir+xml;charset=utf-8"),
-									auth)
+				payload <- httr::content( response, as = "text", encoding = "UTF-8" )
 
-				payload<-httr::content(response, as = "text", encoding = "UTF-8")
-
-				xml2::read_xml(payload)
+				xml2::read_xml( payload )
 			}
 
 			#xml2::read_xml( fhir.search.request, silent = T )
 		)
 
 		if( class( r )[ 1 ] != "try-error" ) {
-
-			xml2::xml_ns_strip( r )
 
 			return( r )
 		}
@@ -154,7 +159,7 @@ download.bundle <- function( fhir.search.request, max.attempts = 5, username=NUL
 #' \dontrun{
 #' bundles <- download.bundles( "https://vonk.fire.ly/R4/Medication?_format=xml" )
 #' }
-download.bundles <- function( fhir.search.request, max.attempts = 5, username=NULL, password=NULL ) {
+download.bundles <- function( fhir.search.request, max.attempts = 5, username = NULL, password = NULL ) {
 
 	xmls <- list( )
 
@@ -171,9 +176,11 @@ download.bundles <- function( fhir.search.request, max.attempts = 5, username=NU
 			break
 		}
 
+		xml2::xml_ns_strip( xml )
+
 		xmls[[ addr ]] <- xml
 
-		links <- xml2::xml_find_all( xml, "/Bundle/link" )
+		links <- xml2::xml_find_all( xml, "link" )
 
 		rels.nxt  <- xml2::xml_attr( xml2::xml_find_first( links, "./relation" ), "value" ) == "next"
 
