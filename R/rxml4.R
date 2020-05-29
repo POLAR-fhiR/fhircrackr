@@ -85,6 +85,8 @@ concatenate.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
 #'
 #' @param fhir.search.request a fhir search request. it must contain _format=xml.
 #' @param max.attempts the maximal number of attempts to send a request. Default is 5.
+#' @param username a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
+#' @param password a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
 #'
 #' @return the downloaded bundle in xml format.
 #' @export
@@ -142,6 +144,8 @@ download.bundle <- function( fhir.search.request, max.attempts = 5, username=NUL
 #'
 #' @param fhir.search.request a fhir search request
 #' @param max.attempts maximal attempts to connect to a page address
+#' @param username a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
+#' @param password a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
 #'
 #' @return the downloaded bundles as a list of pages in xml format
 #' @export
@@ -150,7 +154,7 @@ download.bundle <- function( fhir.search.request, max.attempts = 5, username=NUL
 #' \dontrun{
 #' bundles <- download.bundles( "https://vonk.fire.ly/R4/Medication?_format=xml" )
 #' }
-download.bundles <- function( fhir.search.request, max.attempts = 5 ) {
+download.bundles <- function( fhir.search.request, max.attempts = 5, username=NULL, password=NULL ) {
 
 	xmls <- list( )
 
@@ -158,7 +162,7 @@ download.bundles <- function( fhir.search.request, max.attempts = 5 ) {
 
 	repeat {
 
-		xml <- download.bundle( addr, max.attempts )
+		xml <- download.bundle( addr, max.attempts, username, password )
 
 		if( is.null( xml ) ) {
 
