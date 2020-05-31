@@ -107,7 +107,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
 
   tag.attr(
     download.bundles( "https://hapi.fhir.org/baseR4/MedicationStatement/?_summary=count&_format=xml" )[[ 1 ]],
-    "total/@value" )
+    ".//total/@value" )
   ```
 
   tag.attr gives a vector of all available values. missings aren't in the results.
