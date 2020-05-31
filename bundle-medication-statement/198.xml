@@ -1,0 +1,799 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bundle>
+  <id value="15792624-5f41-4e1b-89cd-99bb6d64f628"/>
+  <meta>
+    <lastUpdated value="2020-05-31T19:18:49.635+00:00"/>
+  </meta>
+  <type value="searchset"/>
+  <total value="5700"/>
+  <link>
+    <relation value="self"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=3940&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="next"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=3960&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="previous"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=3920&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/590165"/>
+    <resource>
+      <MedicationStatement>
+        <id value="590165"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-14T06:19:00.930+00:00"/>
+          <source value="#bmtEz8sb9pfLhTXY"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>citalopram 20 mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="321987003"/>
+            <display value="citalopram 20 mg"/>
+          </coding>
+          <text value="citalopram 20 mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/590106"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/590175"/>
+    <resource>
+      <MedicationStatement>
+        <id value="590175"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-14T06:19:00.930+00:00"/>
+          <source value="#bmtEz8sb9pfLhTXY"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>zolpidem 5mg sublingual tablet, 1 nocte</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="442160008"/>
+            <display value="zolpidem 5mg sublingual tablet"/>
+          </coding>
+          <text value="zolpidem 5mg sublingual tablet"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/590106"/>
+        </subject>
+        <dosage>
+          <text value="1 tab before bed"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/590161"/>
+    <resource>
+      <MedicationStatement>
+        <id value="590161"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-14T06:19:00.930+00:00"/>
+          <source value="#bmtEz8sb9pfLhTXY"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>aspirin 81mg once daily</div>
+        </text>
+        <contained>
+          <Medication>
+            <id value="med1"/>
+            <code>
+              <coding>
+                <system value="http://snomed.info/ct"/>
+                <code value="370167008 "/>
+                <display value="aspirin 81mg e/c tablet "/>
+              </coding>
+              <text value="aspirin 81mg e/c tablet"/>
+            </code>
+          </Medication>
+        </contained>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="#med1"/>
+          <display value="aspirin 81mg e/c tablet"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/590106"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/590171"/>
+    <resource>
+      <MedicationStatement>
+        <id value="590171"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-14T06:19:00.930+00:00"/>
+          <source value="#bmtEz8sb9pfLhTXY"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>omeprazole 40mg daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="407848004"/>
+            <display value="omeprazole 40mg e/c tablet"/>
+          </coding>
+          <text value="omeprazole 40mg e/c tablet "/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/590106"/>
+        </subject>
+        <dosage>
+          <text value="1 tab once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/590170"/>
+    <resource>
+      <MedicationStatement>
+        <id value="590170"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-14T06:19:00.930+00:00"/>
+          <source value="#bmtEz8sb9pfLhTXY"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>naproxen 500mg twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="329839005"/>
+            <display value="naproxen 500mg e/c tablet"/>
+          </coding>
+          <text value="naproxen 500mg e/c tablet"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/590106"/>
+        </subject>
+        <dosage>
+          <text value="1 tab twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/590160"/>
+    <resource>
+      <MedicationStatement>
+        <id value="590160"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-14T06:19:00.930+00:00"/>
+          <source value="#bmtEz8sb9pfLhTXY"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>salbutamol inhaler 2 puffs every 4 hours as required</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value=" 320176004"/>
+            <display value=" salbutamol 100micrograms/inhaler "/>
+          </coding>
+          <text value="salbutamol 100micrograms/inhaler"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/590106"/>
+        </subject>
+        <dosage>
+          <text value="2 puffs every 4 hours as needed"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="4"/>
+              <periodUnit value="h"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="true"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/587984"/>
+    <resource>
+      <MedicationStatement>
+        <id value="587984"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-10T12:57:44.352+00:00"/>
+          <source value="#LK6pvvAHa4ztx9U1"/>
+        </meta>
+        <medicationReference>
+          <reference value="Medication/587953"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1208"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/587982"/>
+    <resource>
+      <MedicationStatement>
+        <id value="587982"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-10T12:56:24.183+00:00"/>
+          <source value="#wlOGqTeYnvDTtTar"/>
+        </meta>
+        <medicationReference>
+          <reference value="Medication/587943"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1208"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/587980"/>
+    <resource>
+      <MedicationStatement>
+        <id value="587980"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-10T12:54:50.653+00:00"/>
+          <source value="#PNiVqyasE9kb8ziA"/>
+        </meta>
+        <medicationReference>
+          <reference value="Medication/587967"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1208"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/587978"/>
+    <resource>
+      <MedicationStatement>
+        <id value="587978"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-10T12:54:16.425+00:00"/>
+          <source value="#CVObl4JcLCfNx6yt"/>
+        </meta>
+        <medicationReference>
+          <reference value="Medication/587967"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1208"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/587976"/>
+    <resource>
+      <MedicationStatement>
+        <id value="587976"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-10T12:53:48.239+00:00"/>
+          <source value="#vUms4wuavQyExUCE"/>
+        </meta>
+        <medicationReference>
+          <reference value="Medication/587967"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1208"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/587974"/>
+    <resource>
+      <MedicationStatement>
+        <id value="587974"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-10T12:51:36.066+00:00"/>
+          <source value="#S7cWTaAWBGjeGJvC"/>
+        </meta>
+        <medicationReference>
+          <reference value="Medication/587967"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1208"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/587972"/>
+    <resource>
+      <MedicationStatement>
+        <id value="587972"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-10T12:50:35.151+00:00"/>
+          <source value="#OnKlpxk8P1QdKN9z"/>
+        </meta>
+        <medicationReference>
+          <reference value="Medication/587967"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1208"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/587970"/>
+    <resource>
+      <MedicationStatement>
+        <id value="587970"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-10T12:48:52.466+00:00"/>
+          <source value="#jAORIjm0D0Uk9Qbf"/>
+        </meta>
+        <medicationReference>
+          <reference value="Medication/587967"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1208"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/587968"/>
+    <resource>
+      <MedicationStatement>
+        <id value="587968"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-10T12:47:00.828+00:00"/>
+          <source value="#sOqknPlkTRdfZVxB"/>
+        </meta>
+        <medicationReference>
+          <reference value="Medication/587967"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1208"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/587966"/>
+    <resource>
+      <MedicationStatement>
+        <id value="587966"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-10T12:44:27.765+00:00"/>
+          <source value="#sKV7kO4j00jsMAYe"/>
+        </meta>
+        <medicationReference>
+          <reference value="Medication/587953"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1208"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/587958"/>
+    <resource>
+      <MedicationStatement>
+        <id value="587958"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-10T12:39:19.102+00:00"/>
+          <source value="#jZobm8R9l1gQT6YF"/>
+        </meta>
+        <medicationReference>
+          <reference value="Medication/587957"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1207"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/587954"/>
+    <resource>
+      <MedicationStatement>
+        <id value="587954"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-10T12:36:02.518+00:00"/>
+          <source value="#c8iAuW2g4jpN5bTX"/>
+        </meta>
+        <medicationReference>
+          <reference value="Medication/587953"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1207"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/587952"/>
+    <resource>
+      <MedicationStatement>
+        <id value="587952"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-10T12:31:05.134+00:00"/>
+          <source value="#XM7GAybnLYOk9MkO"/>
+        </meta>
+        <medicationReference>
+          <reference value="Medication/587951"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1207"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/587950"/>
+    <resource>
+      <MedicationStatement>
+        <id value="587950"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-10T12:24:28.399+00:00"/>
+          <source value="#oTcvop3lXWoXrHPc"/>
+        </meta>
+        <medicationReference>
+          <reference value="Medication/587949"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/5"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/590106"/>
+    <resource>
+      <Patient>
+        <id value="590106"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-01-14T06:18:54.564+00:00"/>
+          <source value="#Kmek0dMpeDAjwyGO"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>Asher Johnson</div>
+        </text>
+        <name>
+          <use value="official"/>
+          <text value="Asher Johnson"/>
+          <family value="Johnson"/>
+          <given value="Asher"/>
+        </name>
+        <gender value="male"/>
+        <birthDate value="2020-01-14"/>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/5"/>
+    <resource>
+      <Patient>
+        <id value="5"/>
+        <meta>
+          <versionId value="88"/>
+          <lastUpdated value="2020-05-14T12:37:17.910+00:00"/>
+          <source value="#agJCn0xGKbOxs9px"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td/>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://hl7.org/fhir/v2/0203"/>
+              <code value="MR"/>
+            </coding>
+          </type>
+          <value value="      37b847a5-7e5b-439e-9adf-c325f0c837c9"/>
+        </identifier>
+        <name>
+          <use value="official"/>
+          <text value="Jane Jackson"/>
+          <family value="Jackson"/>
+          <given value="Jane"/>
+        </name>
+        <gender value="female"/>
+        <birthDate value="1980-06-01"/>
+        <address>
+          <use value="home"/>
+          <type value="both"/>
+          <text value="Gesundheitsallee 12 in 44137 Dortmund"/>
+          <line value="Gesundheitsallee 12"/>
+          <city value="Dortmund"/>
+          <postalCode value="44137"/>
+        </address>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1207"/>
+    <resource>
+      <Patient>
+        <id value="1207"/>
+        <meta>
+          <versionId value="6"/>
+          <lastUpdated value="2019-11-26T10:09:32.524+00:00"/>
+          <source value="#qpq4Eon8B5mZTGQJ"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Pratik 
+                     <b>B </b> 
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>5911bfd0-687e-4ac9-ab37-04e8815e4f0d</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://hl7.org/fhir/v2/0203"/>
+              <code value="MR"/>
+            </coding>
+          </type>
+          <value value="5911bfd0-687e-4ac9-ab37-04e8815e4f0d"/>
+        </identifier>
+        <name>
+          <family value="B"/>
+          <given value="Pratik"/>
+        </name>
+        <telecom>
+          <system value="email"/>
+          <value value="pratikB@appexinnovation.com"/>
+          <use value="work"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="0652352638"/>
+          <use value="home"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="0652152639"/>
+          <use value="work"/>
+        </telecom>
+        <gender value="male"/>
+        <birthDate value="1992-11-10"/>
+        <address>
+          <city value="Mumbai"/>
+        </address>
+        <generalPractitioner>
+          <reference value="Practitioner/1058"/>
+          <display value="Guru-General Practitioner"/>
+        </generalPractitioner>
+        <managingOrganization>
+          <reference value="Organization/1621"/>
+          <display value="CAPE COD HOSPITAL"/>
+        </managingOrganization>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1208"/>
+    <resource>
+      <Patient>
+        <id value="1208"/>
+        <meta>
+          <versionId value="13"/>
+          <lastUpdated value="2020-01-15T13:46:11.299+00:00"/>
+          <source value="#oLXZNGtuhH6uB4pm"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Murali 
+                     <b>A </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>undefined </span>
+                    <br/>
+                    <span>Mumbai </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>10 November 1992</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <name>
+          <family value="A"/>
+          <given value="Murali "/>
+        </name>
+        <gender value="male"/>
+        <birthDate value="1992-11-10"/>
+        <address>
+          <line value="undefined"/>
+          <city value="Mumbai"/>
+          <postalCode value="undefined"/>
+        </address>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+</Bundle>

@@ -1,0 +1,923 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bundle>
+  <id value="15792624-5f41-4e1b-89cd-99bb6d64f628"/>
+  <meta>
+    <lastUpdated value="2020-05-31T19:18:49.635+00:00"/>
+  </meta>
+  <type value="searchset"/>
+  <total value="5700"/>
+  <link>
+    <relation value="self"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=4500&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="next"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=4520&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="previous"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=4480&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71646"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71646"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>gabapentin 600mg twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="323021008"/>
+            <display value="gabapentin 600mg"/>
+          </coding>
+          <text value="gabapentin 600mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71649"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71649"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>metformin 1000mg twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="411533003"/>
+            <display value="metformin 1000mg"/>
+          </coding>
+          <text value="metformin 1000mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="1 tab twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71648"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71648"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>losartan 100mg + hydrochlorothiazide 12.5mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="444639002"/>
+            <display value="losartan 100mg + hydrochlorothiazide 12.5mg"/>
+          </coding>
+          <text value="losartan 100mg + hydrochlorothiazide 12.5mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71654"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71654"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>terbinafine 250mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="324718007"/>
+            <display value="terbinafine 250mg"/>
+          </coding>
+          <text value="terbinafine 250mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="1 tab once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="true"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71643"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71643"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>carvedilol 25 mg twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="318632005"/>
+            <display value="carvedilol 25 mg"/>
+          </coding>
+          <text value="carvedilol 25 mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71653"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71653"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>simvastatin 40mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="429374003"/>
+            <display value="simvastatin 40mg"/>
+          </coding>
+          <text value="simvastatin 40mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="1 tab once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="true"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71642"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71642"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>beclomethasone 2 puffs twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="376733004"/>
+            <display value="beclomethasone dipropionate 40mcg aerosol"/>
+          </coding>
+          <text value="beclomethasone dipropionate 40mcg aerosol"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="2 puffs twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="false"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71656"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71656"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>lisinopril 20mg mane</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="318860005"/>
+            <display value="lisinopril 20mg"/>
+          </coding>
+          <text value="lisinopril 20mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71645"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71645"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>citalopram 20 mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="321987003"/>
+            <display value="citalopram 20 mg"/>
+          </coding>
+          <text value="citalopram 20 mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71655"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71655"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>zolpidem 5mg sublingual tablet, 1 nocte</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="442160008"/>
+            <display value="zolpidem 5mg sublingual tablet"/>
+          </coding>
+          <text value="zolpidem 5mg sublingual tablet"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="1 tab before bed"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71644"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71644"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>chlortalidone 15 mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="376321007"/>
+            <display value="chlortalidone 15 mg"/>
+          </coding>
+          <text value="chlortalidone 15 mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/69434"/>
+    <resource>
+      <MedicationStatement>
+        <id value="69434"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-17T05:13:50.337+00:00"/>
+          <source value="#8B0pYbQAI7IeB78k"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>simvastatin 40mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="429374003"/>
+            <display value="simvastatin 40mg"/>
+          </coding>
+          <text value="simvastatin 40mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/69367"/>
+        </subject>
+        <dosage>
+          <text value="1 tab once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="true"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/69423"/>
+    <resource>
+      <MedicationStatement>
+        <id value="69423"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-17T05:13:50.337+00:00"/>
+          <source value="#8B0pYbQAI7IeB78k"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>beclomethasone 2 puffs twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="376733004"/>
+            <display value="beclomethasone dipropionate 40mcg aerosol"/>
+          </coding>
+          <text value="beclomethasone dipropionate 40mcg aerosol"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/69367"/>
+        </subject>
+        <dosage>
+          <text value="2 puffs twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="false"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/69435"/>
+    <resource>
+      <MedicationStatement>
+        <id value="69435"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-17T05:13:50.337+00:00"/>
+          <source value="#8B0pYbQAI7IeB78k"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>terbinafine 250mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="324718007"/>
+            <display value="terbinafine 250mg"/>
+          </coding>
+          <text value="terbinafine 250mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/69367"/>
+        </subject>
+        <dosage>
+          <text value="1 tab once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="true"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/69424"/>
+    <resource>
+      <MedicationStatement>
+        <id value="69424"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-17T05:13:50.337+00:00"/>
+          <source value="#8B0pYbQAI7IeB78k"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>carvedilol 25 mg twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="318632005"/>
+            <display value="carvedilol 25 mg"/>
+          </coding>
+          <text value="carvedilol 25 mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/69367"/>
+        </subject>
+        <dosage>
+          <text value="twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/69436"/>
+    <resource>
+      <MedicationStatement>
+        <id value="69436"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-17T05:13:50.337+00:00"/>
+          <source value="#8B0pYbQAI7IeB78k"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>zolpidem 5mg sublingual tablet, 1 nocte</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="442160008"/>
+            <display value="zolpidem 5mg sublingual tablet"/>
+          </coding>
+          <text value="zolpidem 5mg sublingual tablet"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/69367"/>
+        </subject>
+        <dosage>
+          <text value="1 tab before bed"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/69425"/>
+    <resource>
+      <MedicationStatement>
+        <id value="69425"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-17T05:13:50.337+00:00"/>
+          <source value="#8B0pYbQAI7IeB78k"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>chlortalidone 15 mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="376321007"/>
+            <display value="chlortalidone 15 mg"/>
+          </coding>
+          <text value="chlortalidone 15 mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/69367"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/69437"/>
+    <resource>
+      <MedicationStatement>
+        <id value="69437"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-17T05:13:50.337+00:00"/>
+          <source value="#8B0pYbQAI7IeB78k"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>lisinopril 20mg mane</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="318860005"/>
+            <display value="lisinopril 20mg"/>
+          </coding>
+          <text value="lisinopril 20mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/69367"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/69426"/>
+    <resource>
+      <MedicationStatement>
+        <id value="69426"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-17T05:13:50.337+00:00"/>
+          <source value="#8B0pYbQAI7IeB78k"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>citalopram 20 mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="321987003"/>
+            <display value="citalopram 20 mg"/>
+          </coding>
+          <text value="citalopram 20 mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/69367"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/69438"/>
+    <resource>
+      <MedicationStatement>
+        <id value="69438"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-17T05:13:50.337+00:00"/>
+          <source value="#8B0pYbQAI7IeB78k"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>isosorbide mononitrate 20mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="319134001"/>
+            <display value="isosorbide mononitrate 20mg"/>
+          </coding>
+          <text value="isosorbide mononitrate 20mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/69367"/>
+        </subject>
+        <dosage>
+          <text value="once daily at bedtime"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/71586"/>
+    <resource>
+      <Patient>
+        <id value="71586"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:42.899+00:00"/>
+          <source value="#8r54JGqc5xq0ZWCb"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>Asher Li</div>
+        </text>
+        <name>
+          <use value="official"/>
+          <text value="Asher Li"/>
+          <family value="Li"/>
+          <given value="Asher"/>
+        </name>
+        <gender value="male"/>
+        <birthDate value="1981-01-01"/>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/69367"/>
+    <resource>
+      <Patient>
+        <id value="69367"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-17T05:13:45.233+00:00"/>
+          <source value="#303zpLwGmd9XZIRw"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>Alexandra Lee</div>
+        </text>
+        <name>
+          <use value="official"/>
+          <text value="Alexandra Lee"/>
+          <family value="Lee"/>
+          <given value="Alexandra"/>
+        </name>
+        <gender value="female"/>
+        <birthDate value="2019-11-17"/>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+</Bundle>

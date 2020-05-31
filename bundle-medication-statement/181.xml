@@ -1,0 +1,1254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bundle>
+  <id value="15792624-5f41-4e1b-89cd-99bb6d64f628"/>
+  <meta>
+    <lastUpdated value="2020-05-31T19:18:49.635+00:00"/>
+  </meta>
+  <type value="searchset"/>
+  <total value="5700"/>
+  <link>
+    <relation value="self"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=3600&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="next"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=3620&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="previous"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=3580&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/a86a91aa-c43d-409d-8a5c-fb0946153782"/>
+    <resource>
+      <MedicationStatement>
+        <id value="a86a91aa-c43d-409d-8a5c-fb0946153782"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T17:53:09.595+00:00"/>
+          <source value="#wP11dHjLGlZ6MwzU"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/b8e4b8c4-dbc4-4959-a195-174c06f44f1d"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1b0580b9-1ee3-4353-b555-64c797d57564"/>
+        </subject>
+        <context>
+          <reference value="Encounter/135aee2a-f9d4-4627-ba9d-659ba067171d"/>
+        </context>
+        <effectiveDateTime value="2020-03-18T23:25:14-05:00"/>
+        <dateAsserted value="2020-03-18T23:25:14-05:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/1d1ca435-8887-46a6-bb25-4256896be929"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="386661006"/>
+            <display value="Fever (finding)"/>
+          </coding>
+          <text value="Fever (finding)"/>
+        </reasonCode>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/698047"/>
+    <resource>
+      <MedicationStatement>
+        <id value="698047"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T11:39:23.870+00:00"/>
+          <source value="#yqYAQmjGU77cNrfL"/>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <display value="abc"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/example"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/698045"/>
+    <resource>
+      <MedicationStatement>
+        <id value="698045"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T11:32:45.691+00:00"/>
+          <source value="#PiAB1c2lLcdvVYQP"/>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <display value="abc"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/example"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/698000"/>
+    <resource>
+      <MedicationStatement>
+        <id value="698000"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>prednisone 20mg 2 tabs/day</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="325456002"/>
+            <display value="prednisone 20mg"/>
+          </coding>
+          <text value="prednisone 20mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="2 tabs once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="true"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/697996"/>
+    <resource>
+      <MedicationStatement>
+        <id value="697996"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>losartan 100mg + hydrochlorothiazide 12.5mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="444639002"/>
+            <display value="losartan 100mg + hydrochlorothiazide 12.5mg"/>
+          </coding>
+          <text value="losartan 100mg + hydrochlorothiazide 12.5mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/697997"/>
+    <resource>
+      <MedicationStatement>
+        <id value="697997"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>metformin 1000mg twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="411533003"/>
+            <display value="metformin 1000mg"/>
+          </coding>
+          <text value="metformin 1000mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="1 tab twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/698005"/>
+    <resource>
+      <MedicationStatement>
+        <id value="698005"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>isosorbide mononitrate 20mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="319134001"/>
+            <display value="isosorbide mononitrate 20mg"/>
+          </coding>
+          <text value="isosorbide mononitrate 20mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="once daily at bedtime"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/697994"/>
+    <resource>
+      <MedicationStatement>
+        <id value="697994"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>gabapentin 600mg twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="323021008"/>
+            <display value="gabapentin 600mg"/>
+          </coding>
+          <text value="gabapentin 600mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/698006"/>
+    <resource>
+      <MedicationStatement>
+        <id value="698006"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="321323009"/>
+            <display value="buspirone 5mg"/>
+          </coding>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="3 times daily"/>
+          <timing>
+            <repeat>
+              <frequency value="3"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/697995"/>
+    <resource>
+      <MedicationStatement>
+        <id value="697995"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>insulin glargine 100units/mL 28 units nocte</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="400847007"/>
+            <display value="insulin glargine 100units/mL injection"/>
+          </coding>
+          <text value="insulin glargine 100units/mL injection"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="28 units before bed"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/698003"/>
+    <resource>
+      <MedicationStatement>
+        <id value="698003"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>zolpidem 5mg sublingual tablet, 1 nocte</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="442160008"/>
+            <display value="zolpidem 5mg sublingual tablet"/>
+          </coding>
+          <text value="zolpidem 5mg sublingual tablet"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="1 tab before bed"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/697992"/>
+    <resource>
+      <MedicationStatement>
+        <id value="697992"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>chlortalidone 15 mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="376321007"/>
+            <display value="chlortalidone 15 mg"/>
+          </coding>
+          <text value="chlortalidone 15 mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/698004"/>
+    <resource>
+      <MedicationStatement>
+        <id value="698004"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>lisinopril 20mg mane</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="318860005"/>
+            <display value="lisinopril 20mg"/>
+          </coding>
+          <text value="lisinopril 20mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/697993"/>
+    <resource>
+      <MedicationStatement>
+        <id value="697993"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>citalopram 20 mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="321987003"/>
+            <display value="citalopram 20 mg"/>
+          </coding>
+          <text value="citalopram 20 mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/698001"/>
+    <resource>
+      <MedicationStatement>
+        <id value="698001"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>simvastatin 40mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="429374003"/>
+            <display value="simvastatin 40mg"/>
+          </coding>
+          <text value="simvastatin 40mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="1 tab once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="true"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/697990"/>
+    <resource>
+      <MedicationStatement>
+        <id value="697990"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>beclomethasone 2 puffs twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="376733004"/>
+            <display value="beclomethasone dipropionate 40mcg aerosol"/>
+          </coding>
+          <text value="beclomethasone dipropionate 40mcg aerosol"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="2 puffs twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="false"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/698002"/>
+    <resource>
+      <MedicationStatement>
+        <id value="698002"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>terbinafine 250mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="324718007"/>
+            <display value="terbinafine 250mg"/>
+          </coding>
+          <text value="terbinafine 250mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="1 tab once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="true"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/697991"/>
+    <resource>
+      <MedicationStatement>
+        <id value="697991"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>carvedilol 25 mg twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="318632005"/>
+            <display value="carvedilol 25 mg"/>
+          </coding>
+          <text value="carvedilol 25 mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/697989"/>
+    <resource>
+      <MedicationStatement>
+        <id value="697989"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>aspirin 81mg once daily</div>
+        </text>
+        <contained>
+          <Medication>
+            <id value="med1"/>
+            <code>
+              <coding>
+                <system value="http://snomed.info/ct"/>
+                <code value="370167008 "/>
+                <display value="aspirin 81mg e/c tablet "/>
+              </coding>
+              <text value="aspirin 81mg e/c tablet"/>
+            </code>
+          </Medication>
+        </contained>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="#med1"/>
+          <display value="aspirin 81mg e/c tablet"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/697998"/>
+    <resource>
+      <MedicationStatement>
+        <id value="697998"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:27.686+00:00"/>
+          <source value="#E6HYFZqA2SwjQINi"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>naproxen 500mg twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="329839005"/>
+            <display value="naproxen 500mg e/c tablet"/>
+          </coding>
+          <text value="naproxen 500mg e/c tablet"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/697934"/>
+        </subject>
+        <dosage>
+          <text value="1 tab twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1b0580b9-1ee3-4353-b555-64c797d57564"/>
+    <resource>
+      <Patient>
+        <id value="1b0580b9-1ee3-4353-b555-64c797d57564"/>
+        <meta>
+          <versionId value="2"/>
+          <lastUpdated value="2020-04-02T22:25:49.380+00:00"/>
+          <source value="#SVvv3eOG6XNjDbZm"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>Generated by 
+                  <a href="https://github.com/synthetichealth/synthea">Synthea</a>.Version identifier: 2177cffc
+ .   Person seed: -7658080728774377404  Population seed: 12345 
+               </div>
+        </text>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-race">
+          <extension url="ombCategory">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238"/>
+              <code value="2106-3"/>
+              <display value="White"/>
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="White"/>
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity">
+          <extension url="ombCategory">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238"/>
+              <code value="2186-5"/>
+              <display value="Not Hispanic or Latino"/>
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="Not Hispanic or Latino"/>
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName">
+          <valueString value="Ignacia942 Gerlach374"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex">
+          <valueCode value="F"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/patient-birthPlace">
+          <valueAddress>
+            <city value="Wauconda"/>
+            <state value="Illinois"/>
+            <country value="US"/>
+          </valueAddress>
+        </extension>
+        <extension url="http://synthetichealth.github.io/synthea/disability-adjusted-life-years">
+          <valueDecimal value="0"/>
+        </extension>
+        <extension url="http://synthetichealth.github.io/synthea/quality-adjusted-life-years">
+          <valueDecimal value="40"/>
+        </extension>
+        <identifier>
+          <system value="https://github.com/synthetichealth/synthea"/>
+          <value value="878de4dd-d893-4a83-8820-f2d470a5e8cb"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical Record Number"/>
+            </coding>
+            <text value="Medical Record Number"/>
+          </type>
+          <system value="http://hospital.smarthealthit.org"/>
+          <value value="878de4dd-d893-4a83-8820-f2d470a5e8cb"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="SS"/>
+              <display value="Social Security Number"/>
+            </coding>
+            <text value="Social Security Number"/>
+          </type>
+          <system value="http://hl7.org/fhir/sid/us-ssn"/>
+          <value value="999-75-4029"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="DL"/>
+              <display value="Driver's License"/>
+            </coding>
+            <text value="Driver's License"/>
+          </type>
+          <system value="urn:oid:2.16.840.1.113883.4.3.25"/>
+          <value value="S99939375"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="PPN"/>
+              <display value="Passport Number"/>
+            </coding>
+            <text value="Passport Number"/>
+          </type>
+          <system value="http://standardhealthrecord.org/fhir/StructureDefinition/passportNumber"/>
+          <value value="X45739756X"/>
+        </identifier>
+        <name>
+          <use value="official"/>
+          <family value="Paucek755"/>
+          <given value="Abbie917"/>
+          <prefix value="Mrs."/>
+        </name>
+        <name>
+          <use value="maiden"/>
+          <family value="Walsh511"/>
+          <given value="Abbie917"/>
+          <prefix value="Mrs."/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="555-755-1737"/>
+          <use value="home"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1979-12-29"/>
+        <address>
+          <extension url="http://hl7.org/fhir/StructureDefinition/geolocation">
+            <extension url="latitude">
+              <valueDecimal value="39.755882"/>
+            </extension>
+            <extension url="longitude">
+              <valueDecimal value="-104.994178"/>
+            </extension>
+          </extension>
+          <line value="1274 Quitman St."/>
+          <city value="Denver"/>
+          <state value="CO"/>
+          <postalCode value="80204"/>
+          <country value="US"/>
+        </address>
+        <maritalStatus>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-MaritalStatus"/>
+            <code value="M"/>
+            <display value="M"/>
+          </coding>
+          <text value="M"/>
+        </maritalStatus>
+        <multipleBirthBoolean value="false"/>
+        <communication>
+          <language>
+            <coding>
+              <system value="urn:ietf:bcp:47"/>
+              <code value="en-US"/>
+              <display value="English"/>
+            </coding>
+            <text value="English"/>
+          </language>
+        </communication>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/697934"/>
+    <resource>
+      <Patient>
+        <id value="697934"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T06:19:22.991+00:00"/>
+          <source value="#F6KTacg6zpZSnNLM"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>Harry Hay</div>
+        </text>
+        <name>
+          <use value="official"/>
+          <text value="Harry Hay"/>
+          <family value="Hay"/>
+          <given value="Harry"/>
+        </name>
+        <gender value="male"/>
+        <birthDate value="2020-03-24"/>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/135aee2a-f9d4-4627-ba9d-659ba067171d"/>
+    <resource>
+      <Encounter>
+        <id value="135aee2a-f9d4-4627-ba9d-659ba067171d"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T17:53:09.595+00:00"/>
+          <source value="#wP11dHjLGlZ6MwzU"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="finished"/>
+        <class>
+          <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
+          <code value="AMB"/>
+        </class>
+        <type>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="185345009"/>
+            <display value="Encounter for symptom (procedure)"/>
+          </coding>
+          <text value="Encounter for symptom (procedure)"/>
+        </type>
+        <subject>
+          <reference value="Patient/1b0580b9-1ee3-4353-b555-64c797d57564"/>
+          <display value="Mrs. Abbie917 Paucek755"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/00000171-0929-2892-0000-0000000001f4"/>
+            <display value="Dr. Mafalda94 Pouros728"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2020-03-18T23:25:14-05:00"/>
+          <end value="2020-03-19T00:44:14-05:00"/>
+        </period>
+        <location>
+          <location>
+            <reference value="Location/3a690f5c-3f07-4396-b166-9b9d631727d9"/>
+            <display value="PRESENCE RESURRECTION MEDICAL CENTER"/>
+          </location>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/2aaf125e-5283-3dd4-b90b-3c17bef9ac7f"/>
+          <display value="PRESENCE RESURRECTION MEDICAL CENTER"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/example"/>
+    <resource>
+      <Patient>
+        <id value="example"/>
+        <meta>
+          <versionId value="19"/>
+          <lastUpdated value="2020-03-18T04:55:58.137+00:00"/>
+          <source value="#jQd948eABxSzPSEK"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <table>
+              <tbody>
+                <tr>
+                  <td>Name</td>
+                  <td>Peter James 
+                              <b>Chalmers</b> ("Jim") 
+                           </td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>534 Erewhon, Pleasantville, Vic, 3999</td>
+                </tr>
+                <tr>
+                  <td>Contacts</td>
+                  <td>Home: unknown. Work: (03) 5555 6473</td>
+                </tr>
+                <tr>
+                  <td>Id</td>
+                  <td>MRN: 12345 (Acme Healthcare)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <use value="usual"/>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+            </coding>
+          </type>
+          <system value="urn:oid:1.2.36.146.595.217.0.1"/>
+          <value value="12345"/>
+          <period>
+            <start value="2001-05-06"/>
+          </period>
+          <assigner>
+            <display value="Acne Healthcare"/>
+          </assigner>
+        </identifier>
+        <active value="true"/>
+        <name>
+          <use value="official"/>
+          <family value="Chalmers"/>
+          <given value="Peter"/>
+          <given value="James"/>
+        </name>
+        <name>
+          <use value="usual"/>
+          <given value="Jim"/>
+        </name>
+        <name>
+          <use value="maiden"/>
+          <family value="Windsor"/>
+          <given value="Peter"/>
+          <given value="James"/>
+          <period>
+            <end value="2002"/>
+          </period>
+        </name>
+        <telecom>
+          <use value="home"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="(03) 5555 6473"/>
+          <use value="work"/>
+          <rank value="1"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="(03) 3410 5613"/>
+          <use value="mobile"/>
+          <rank value="2"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="(03) 5555 8834"/>
+          <use value="old"/>
+          <period>
+            <end value="2014"/>
+          </period>
+        </telecom>
+        <gender value="male"/>
+        <birthDate value="1974-12-25">
+          <extension url="http://hl7.org/fhir/StructureDefinition/patient-birthTime">
+            <valueDateTime value="1974-12-25T14:35:45-05:00"/>
+          </extension>
+        </birthDate>
+        <deceasedBoolean value="false"/>
+        <address>
+          <use value="home"/>
+          <type value="both"/>
+          <text value="534 Erewhon St PeasantVille, Rainbow, Vic  3999"/>
+          <line value="534 Erewhon St"/>
+          <city value="PleasantVille"/>
+          <district value="Rainbow"/>
+          <state value="Vic"/>
+          <postalCode value="3999"/>
+          <period>
+            <start value="1974-12-25"/>
+          </period>
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0131"/>
+              <code value="N"/>
+            </coding>
+          </relationship>
+          <name>
+            <family value="du Marché">
+              <extension url="http://hl7.org/fhir/StructureDefinition/humanname-own-prefix">
+                <valueString value="VV"/>
+              </extension>
+            </family>
+            <given value="Bénédicte"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="+33 (237) 998327"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <type value="both"/>
+            <line value="534 Erewhon St"/>
+            <city value="PleasantVille"/>
+            <district value="Rainbow"/>
+            <state value="Vic"/>
+            <postalCode value="3999"/>
+            <period>
+              <start value="1974-12-25"/>
+            </period>
+          </address>
+          <gender value="female"/>
+          <period>
+            <start value="2012"/>
+          </period>
+        </contact>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+</Bundle>

@@ -1,0 +1,2211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bundle>
+  <id value="15792624-5f41-4e1b-89cd-99bb6d64f628"/>
+  <meta>
+    <lastUpdated value="2020-05-31T19:18:49.635+00:00"/>
+  </meta>
+  <type value="searchset"/>
+  <total value="5700"/>
+  <link>
+    <relation value="self"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=4480&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="next"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=4500&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="previous"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=4460&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/104915"/>
+    <resource>
+      <MedicationStatement>
+        <id value="104915"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-28T10:20:30.465+00:00"/>
+          <source value="#sHktagj5iVqhh0nr"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Adderall PM"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated tablet (qualifier value)"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 500 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1202"/>
+          <display value="Priya"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1202"/>
+          <display value="Priya"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one capsule One times daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/30154"/>
+    <resource>
+      <MedicationStatement>
+        <id value="30154"/>
+        <meta>
+          <versionId value="2"/>
+          <lastUpdated value="2019-11-28T10:17:48.053+00:00"/>
+          <source value="#pGVB4VaJrpPZpIg7"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Tylenol PM"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated tablet (qualifier value)"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 500 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1202"/>
+          <display value="Priya"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1202"/>
+          <display value="Priya"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one capsule two times daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/104584"/>
+    <resource>
+      <MedicationStatement>
+        <id value="104584"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-28T10:07:32.371+00:00"/>
+          <source value="#rdREdGTsYdMdKQyW"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Lexapro"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Capsule"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Lyxaride 250 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="ABCD 75 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1194"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1194"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one capsule two time daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/104583"/>
+    <resource>
+      <MedicationStatement>
+        <id value="104583"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-28T10:04:30.228+00:00"/>
+          <source value="#LkauaQeElVXwo1Zc"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Oxycodone"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="tablet"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Oxydize Acetamine 230 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="CarbonDizo 75 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Heart enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1194"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1194"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one tablet two time daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/30074"/>
+    <resource>
+      <MedicationStatement>
+        <id value="30074"/>
+        <meta>
+          <versionId value="3"/>
+          <lastUpdated value="2019-11-28T10:01:33.656+00:00"/>
+          <source value="#ghTF25s2XeTnusxH"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Ciprofloxacin"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="tablet"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="CiplaT 50 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="CarbonDizo 75 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Heart enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1194"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1194"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one tablet one time daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/104325"/>
+    <resource>
+      <MedicationStatement>
+        <id value="104325"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-28T09:55:41.642+00:00"/>
+          <source value="#EtGVkPXoOwSOHI60"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Atorvastatin L"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated tablet (qualifier value)"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 500 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Heart disorder"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1200"/>
+          <display value="Roshni Sahu"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1200"/>
+          <display value="Roshni Sahu"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one capsule three times daily"/>
+          <timing>
+            <repeat>
+              <frequency value="3"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/30018"/>
+    <resource>
+      <MedicationStatement>
+        <id value="30018"/>
+        <meta>
+          <versionId value="3"/>
+          <lastUpdated value="2019-11-28T09:53:01.318+00:00"/>
+          <source value="#sOKYmdOitfMwwJaZ"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Acetaminophen ZXT"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated tablet (qualifier value)"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 500 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1200"/>
+          <display value="Roshni Sahu"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1200"/>
+          <display value="Roshni Sahu"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one capsule two times daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/104256"/>
+    <resource>
+      <MedicationStatement>
+        <id value="104256"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-28T09:50:02.364+00:00"/>
+          <source value="#p2nledtHnji0AqCZ"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Tylenol PM"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated tablet (qualifier value)"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 100 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Triydrochloride 285 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Body Ache"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1316"/>
+          <display value="Harshil"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1316"/>
+          <display value="Harshil"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one capsule two times daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/104147"/>
+    <resource>
+      <MedicationStatement>
+        <id value="104147"/>
+        <meta>
+          <versionId value="2"/>
+          <lastUpdated value="2019-11-28T09:44:40.186+00:00"/>
+          <source value="#9SQy5INtVVWMt20w"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Amitriptyline"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated tablet (qualifier value)"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 100 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Triydrochloride 285 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Body Ache"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1316"/>
+          <display value="Harshil"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1316"/>
+          <display value="Harshil"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one capsule One times daily for 15days"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/104146"/>
+    <resource>
+      <MedicationStatement>
+        <id value="104146"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-28T09:17:22.099+00:00"/>
+          <source value="#cpztC0ZgkvbLcpzS"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Cefuroxime "/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="injectable powder for injection"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Antibiotic"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Antibiotic 125 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2019-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1316"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1316"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one injection One times daily for 3days"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/30160"/>
+    <resource>
+      <MedicationStatement>
+        <id value="30160"/>
+        <meta>
+          <versionId value="3"/>
+          <lastUpdated value="2019-11-28T09:04:15.816+00:00"/>
+          <source value="#7fVqFnzQoCsRRBLI"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Adderall PM"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated tablet (qualifier value)"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 500 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1316"/>
+          <display value="Harshil"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1316"/>
+          <display value="Harshil"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one capsule One times daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/30158"/>
+    <resource>
+      <MedicationStatement>
+        <id value="30158"/>
+        <meta>
+          <versionId value="2"/>
+          <lastUpdated value="2019-11-28T08:53:32.160+00:00"/>
+          <source value="#gWFRv7OwLIGQPanm"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Tylenol PM"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated tablet (qualifier value)"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 500 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1208"/>
+          <display value="Rahul"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1208"/>
+          <display value="Rahul"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one capsule three times daily"/>
+          <timing>
+            <repeat>
+              <frequency value="3"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71650"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71650"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>naproxen 500mg twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="329839005"/>
+            <display value="naproxen 500mg e/c tablet"/>
+          </coding>
+          <text value="naproxen 500mg e/c tablet"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="1 tab twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71652"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71652"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>prednisone 20mg 2 tabs/day</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="325456002"/>
+            <display value="prednisone 20mg"/>
+          </coding>
+          <text value="prednisone 20mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="2 tabs once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="true"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71641"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71641"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>aspirin 81mg once daily</div>
+        </text>
+        <contained>
+          <Medication>
+            <id value="med1"/>
+            <code>
+              <coding>
+                <system value="http://snomed.info/ct"/>
+                <code value="370167008 "/>
+                <display value="aspirin 81mg e/c tablet "/>
+              </coding>
+              <text value="aspirin 81mg e/c tablet"/>
+            </code>
+          </Medication>
+        </contained>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="#med1"/>
+          <display value="aspirin 81mg e/c tablet"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71651"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71651"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>omeprazole 40mg daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="407848004"/>
+            <display value="omeprazole 40mg e/c tablet"/>
+          </coding>
+          <text value="omeprazole 40mg e/c tablet "/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="1 tab once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71640"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71640"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>salbutamol inhaler 2 puffs every 4 hours as required</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value=" 320176004"/>
+            <display value=" salbutamol 100micrograms/inhaler "/>
+          </coding>
+          <text value="salbutamol 100micrograms/inhaler"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="2 puffs every 4 hours as needed"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="4"/>
+              <periodUnit value="h"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="true"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71658"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71658"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="321323009"/>
+            <display value="buspirone 5mg"/>
+          </coding>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="3 times daily"/>
+          <timing>
+            <repeat>
+              <frequency value="3"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71647"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71647"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>insulin glargine 100units/mL 28 units nocte</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="400847007"/>
+            <display value="insulin glargine 100units/mL injection"/>
+          </coding>
+          <text value="insulin glargine 100units/mL injection"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="28 units before bed"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/71657"/>
+    <resource>
+      <MedicationStatement>
+        <id value="71657"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:45.702+00:00"/>
+          <source value="#Jl0vTAt61H5CYr1A"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>isosorbide mononitrate 20mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="319134001"/>
+            <display value="isosorbide mononitrate 20mg"/>
+          </coding>
+          <text value="isosorbide mononitrate 20mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/71586"/>
+        </subject>
+        <dosage>
+          <text value="once daily at bedtime"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1200"/>
+    <resource>
+      <Patient>
+        <id value="1200"/>
+        <meta>
+          <versionId value="8"/>
+          <lastUpdated value="2019-11-26T10:08:12.467+00:00"/>
+          <source value="#oT8sQvwoJfWWrB5C"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Caleb 
+                     <b>CUSHING </b> 
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>5911bfd0-687e-4ac9-ab37-04e8815e4f0d</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://hl7.org/fhir/v2/0203"/>
+              <code value="Mrs"/>
+            </coding>
+          </type>
+          <value value="5911bfd0-687e-4ac9-ab37-04e8815e4f0d"/>
+        </identifier>
+        <name>
+          <family value="Ayyapan"/>
+          <given value="Sridevi"/>
+        </name>
+        <telecom>
+          <system value="email"/>
+          <value value="sridevi@appexinnovation.com"/>
+          <use value="work"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="0648444638"/>
+          <use value="home"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="0648444439"/>
+          <use value="work"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1990-10-10"/>
+        <address>
+          <city value="Mumbai"/>
+        </address>
+        <generalPractitioner>
+          <reference value="Practitioner/1058"/>
+          <display value="Guru-General Practitioner"/>
+        </generalPractitioner>
+        <managingOrganization>
+          <reference value="Organization/358"/>
+          <display value="PHARMACIE DU GINKGO"/>
+        </managingOrganization>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1202"/>
+    <resource>
+      <Patient>
+        <id value="1202"/>
+        <meta>
+          <versionId value="7"/>
+          <lastUpdated value="2020-02-25T13:18:14.080+00:00"/>
+          <source value="#aYt8LZGamLDzoumV"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Jyoti 
+                     <b>Sahu </b> 
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>5911bfd0-687e-4ac9-ab37-04e8815e4f0d</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://hl7.org/fhir/v2/0203"/>
+              <code value="MR"/>
+            </coding>
+          </type>
+          <value value="5911bfd0-687e-4ac9-ab37-04e8815e4f0d"/>
+        </identifier>
+        <name>
+          <family value="Jyoti"/>
+          <given value="Sahu"/>
+        </name>
+        <telecom>
+          <system value="email"/>
+          <value value="jyoti.sahu@gmail.com"/>
+          <use value="work"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="061235222"/>
+          <use value="home"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="0632152212"/>
+          <use value="work"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1980-11-18"/>
+        <address>
+          <city value="US"/>
+        </address>
+        <generalPractitioner>
+          <reference value="Practitioner/1058"/>
+          <display value="Guru-General Practitioner"/>
+        </generalPractitioner>
+        <managingOrganization>
+          <reference value="Organization/1621"/>
+        </managingOrganization>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/71586"/>
+    <resource>
+      <Patient>
+        <id value="71586"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-20T18:34:42.899+00:00"/>
+          <source value="#8r54JGqc5xq0ZWCb"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>Asher Li</div>
+        </text>
+        <name>
+          <use value="official"/>
+          <text value="Asher Li"/>
+          <family value="Li"/>
+          <given value="Asher"/>
+        </name>
+        <gender value="male"/>
+        <birthDate value="1981-01-01"/>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1316"/>
+    <resource>
+      <Patient>
+        <id value="1316"/>
+        <meta>
+          <versionId value="6"/>
+          <lastUpdated value="2020-02-25T11:04:13.589+00:00"/>
+          <source value="#JMFko5oR7ZyB85g7"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Naman 
+                     <b>JAIN </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>5911bfd0-687e-4ac9-ab37-04e8815e4f0d</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>155 Harber Green </span>
+                    <br/>
+                    <span>Marblehead </span>
+                    <span>Massachusetts </span>
+                    <span>US </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>25 December 1994</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://hl7.org/fhir/v2/0203"/>
+              <code value="MR"/>
+            </coding>
+          </type>
+          <value value="5911bfd0-687e-4ac9-ab37-04e8815e4f0d"/>
+        </identifier>
+        <name>
+          <family value="Jain"/>
+          <given value="Naman"/>
+        </name>
+        <telecom>
+          <system value="email"/>
+          <value value="naman.jain@gmail.com"/>
+          <use value="work"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="0612366638"/>
+          <use value="home"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="0632542639"/>
+          <use value="work"/>
+        </telecom>
+        <gender value="male"/>
+        <birthDate value="1994-12-25"/>
+        <address>
+          <line value="155 Harber Green"/>
+          <city value="Marblehead"/>
+          <state value="Massachusetts"/>
+          <postalCode value="01945"/>
+          <country value="US"/>
+        </address>
+        <generalPractitioner>
+          <reference value="Practitioner/1058"/>
+          <display value="Guru-General Practitioner"/>
+        </generalPractitioner>
+        <managingOrganization>
+          <reference value="Organization/1621"/>
+          <display value="CAPE COD HOSPITAL"/>
+        </managingOrganization>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1208"/>
+    <resource>
+      <Patient>
+        <id value="1208"/>
+        <meta>
+          <versionId value="13"/>
+          <lastUpdated value="2020-01-15T13:46:11.299+00:00"/>
+          <source value="#oLXZNGtuhH6uB4pm"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Murali 
+                     <b>A </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>undefined </span>
+                    <br/>
+                    <span>Mumbai </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>10 November 1992</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <name>
+          <family value="A"/>
+          <given value="Murali "/>
+        </name>
+        <gender value="male"/>
+        <birthDate value="1992-11-10"/>
+        <address>
+          <line value="undefined"/>
+          <city value="Mumbai"/>
+          <postalCode value="undefined"/>
+        </address>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1194"/>
+    <resource>
+      <Patient>
+        <id value="1194"/>
+        <meta>
+          <versionId value="5"/>
+          <lastUpdated value="2019-11-26T10:07:50.233+00:00"/>
+          <source value="#pSdYhgmSO7isn2n6"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">dsouza 
+                     <b>Violet </b> 
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>5911bfd0-687e-4ac9-ab37-04e8815e4f0d</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://hl7.org/fhir/v2/0203"/>
+              <code value="MR"/>
+            </coding>
+          </type>
+          <value value="5911bfd0-687e-4ac9-ab37-04e8815e4f0d"/>
+        </identifier>
+        <name>
+          <family value="dsouza"/>
+          <given value="Violet"/>
+        </name>
+        <telecom>
+          <system value="email"/>
+          <value value="vio.dsouza@gmail.com"/>
+          <use value="work"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="553456987"/>
+          <use value="home"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="0648644144"/>
+          <use value="work"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1984-12-15"/>
+        <address>
+          <city value="PleasantVille"/>
+        </address>
+        <generalPractitioner>
+          <reference value="Practitioner/1058"/>
+          <display value="Guru-General Practitioner"/>
+        </generalPractitioner>
+        <managingOrganization>
+          <reference value="Organization/358"/>
+          <display value="PHARMACIE DU GINKGO"/>
+        </managingOrganization>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+</Bundle>

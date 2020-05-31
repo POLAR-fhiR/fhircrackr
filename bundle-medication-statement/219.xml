@@ -1,0 +1,3058 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bundle>
+  <id value="15792624-5f41-4e1b-89cd-99bb6d64f628"/>
+  <meta>
+    <lastUpdated value="2020-05-31T19:18:49.635+00:00"/>
+  </meta>
+  <type value="searchset"/>
+  <total value="5700"/>
+  <link>
+    <relation value="self"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=4360&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="next"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=4380&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="previous"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=4340&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220451"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220451"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:47:45.709+00:00"/>
+          <source value="#hIV5aK5YsX3QDg79"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="MedicationRequest/220419"/>
+        </basedOn>
+        <partOf>
+          <reference value="MedicationAdministration/220429"/>
+        </partOf>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220443"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220448"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220428"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/220448"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220419"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Condition/${conditionId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220430"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220430"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:47:36.848+00:00"/>
+          <source value="#yP02JrCIbXtiylXn"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+        </identifier>
+        <identifier>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220387"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220387"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:40:49.101+00:00"/>
+          <source value="#bDNj2zidmE2cfoDu"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <p>
+              <b>Generated Narrative with Details</b>
+            </p>
+            <p><b>id</b>: example002
+                  </p>
+            <p><b>contained</b>: 
+                  </p>
+            <p><b>status</b>: active
+                  </p>
+            <p><b>statusReason</b>: Liver enzymes abnormal 
+                     <span>(Details : {SNOMED CT code '166643006' = 'Liver enzymes abnormal', given as 'Liver enzymes abnormal'})</span></p>
+            <p><b>medication</b>: id: med0309; Tylenol PM 
+                     <span>(Details : {http://hl7.org/fhir/sid/ndc code '50580-506-02' = 'n/a', given as 'Tylenol PM'})</span>; Film-coated tablet (qualifier value) 
+                     <span>(Details : {SNOMED CT code '385057009' = 'Film-coated tablet', given as 'Film-coated tablet (qualifier value)'})</span></p>
+            <p><b>subject</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>effective</b>: 23/01/2015
+                  </p>
+            <p><b>dateAsserted</b>: 22/02/2015
+                  </p>
+            <p><b>informationSource</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>note</b>: Patient cannot take acetaminophen as per Dr instructions
+                  </p>
+          </div>
+        </text>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <subject>
+          <reference value="Patient/220352"/>
+          <display value="Donald Duck"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220205"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220205"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:39:48.022+00:00"/>
+          <source value="#r6HG8PKcf1mI23tS"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="CarePlan/220163"/>
+        </basedOn>
+        <partOf>
+          <reference value="MedicationAdministration/220165"/>
+        </partOf>
+        <status value="not-taken"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220179"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220186"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220164"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/220186"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220155"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Condition/${conditionId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220203"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220203"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:39:47.661+00:00"/>
+          <source value="#PtQcLvptjuHyeYam"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="CarePlan/220163"/>
+        </basedOn>
+        <partOf>
+          <reference value="MedicationAdministration/220165"/>
+        </partOf>
+        <status value="unknown"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220179"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220186"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220164"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/220186"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220155"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Condition/${conditionId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220201"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220201"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:39:47.271+00:00"/>
+          <source value="#KK3e6gQwSmzT64of"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="CarePlan/220163"/>
+        </basedOn>
+        <partOf>
+          <reference value="MedicationAdministration/220165"/>
+        </partOf>
+        <status value="on-hold"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220179"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220186"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220164"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/220186"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220155"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Condition/${conditionId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220199"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220199"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:39:46.884+00:00"/>
+          <source value="#EDChFgzEwbkDddez"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="CarePlan/220163"/>
+        </basedOn>
+        <partOf>
+          <reference value="Observation/220158"/>
+        </partOf>
+        <status value="stopped"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220179"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220186"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220164"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/220186"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220155"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Condition/${conditionId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220198"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220198"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:39:46.221+00:00"/>
+          <source value="#GBLjHlQ3szalPqTJ"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="CarePlan/220163"/>
+        </basedOn>
+        <partOf>
+          <reference value="Procedure/220159"/>
+        </partOf>
+        <status value="intended"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220179"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220186"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220164"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/220186"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220155"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Condition/${conditionId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220196"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220196"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:39:45.815+00:00"/>
+          <source value="#uvm6hBuK5WnYr5j9"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="ServiceRequest/${serviceRequestId_1}"/>
+        </basedOn>
+        <partOf>
+          <reference value="MedicationStatement/220166"/>
+        </partOf>
+        <status value="entered-in-error"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220179"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220186"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220164"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="PractitionerRole/220160"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220155"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="DiagnosticReport/${diagnosticReportId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220194"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220194"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:39:45.429+00:00"/>
+          <source value="#YWVnSjHQYEhoIv1G"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="CarePlan/220163"/>
+        </basedOn>
+        <partOf>
+          <reference value="MedicationDispense/220162"/>
+        </partOf>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220179"/>
+        </medicationReference>
+        <subject>
+          <reference value="Group/220157"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="EpisodeOfCare/220161"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Practitioner/220170"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220155"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Observation/220158"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220192"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220192"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:39:45.032+00:00"/>
+          <source value="#HMv7X7cMXBUtCodv"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="MedicationRequest/220155"/>
+        </basedOn>
+        <partOf>
+          <reference value="MedicationAdministration/220165"/>
+        </partOf>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220179"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220186"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220164"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/220186"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220155"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Condition/${conditionId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220166"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220166"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:39:35.673+00:00"/>
+          <source value="#6lLGyOvc39ADYXUa"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+        </identifier>
+        <identifier>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220112"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220112"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:34:40.354+00:00"/>
+          <source value="#drxZzByq5z4pGFIf"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="CarePlan/220081"/>
+        </basedOn>
+        <partOf>
+          <reference value="MedicationAdministration/220083"/>
+        </partOf>
+        <status value="not-taken"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220097"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220102"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220082"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/220102"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220073"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Condition/${conditionId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220111"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220111"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:34:39.979+00:00"/>
+          <source value="#5m1LvMEauaOQE4ID"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="CarePlan/220081"/>
+        </basedOn>
+        <partOf>
+          <reference value="MedicationAdministration/220083"/>
+        </partOf>
+        <status value="unknown"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220097"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220102"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220082"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/220102"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220073"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Condition/${conditionId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220110"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220110"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:34:39.564+00:00"/>
+          <source value="#d535vNh9dMEZDZOh"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="CarePlan/220081"/>
+        </basedOn>
+        <partOf>
+          <reference value="MedicationAdministration/220083"/>
+        </partOf>
+        <status value="on-hold"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220097"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220102"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220082"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/220102"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220073"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Condition/${conditionId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220109"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220109"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:34:39.197+00:00"/>
+          <source value="#03ifFPnGjVynMPre"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="CarePlan/220081"/>
+        </basedOn>
+        <partOf>
+          <reference value="Observation/220076"/>
+        </partOf>
+        <status value="stopped"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220097"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220102"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220082"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/220102"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220073"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Condition/${conditionId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220108"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220108"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:34:38.832+00:00"/>
+          <source value="#zc6UZtNNMPSG60Kp"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="CarePlan/220081"/>
+        </basedOn>
+        <partOf>
+          <reference value="Procedure/220077"/>
+        </partOf>
+        <status value="intended"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220097"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220102"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220082"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/220102"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220073"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Condition/${conditionId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220107"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220107"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:34:38.454+00:00"/>
+          <source value="#XqaW2MJgM6M8Z7la"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="ServiceRequest/${serviceRequestId_1}"/>
+        </basedOn>
+        <partOf>
+          <reference value="MedicationStatement/220084"/>
+        </partOf>
+        <status value="entered-in-error"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220097"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220102"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220082"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="PractitionerRole/220078"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220073"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="DiagnosticReport/${diagnosticReportId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220106"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220106"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:34:38.087+00:00"/>
+          <source value="#mgL9iX3kUnO7a4Dz"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="CarePlan/220081"/>
+        </basedOn>
+        <partOf>
+          <reference value="MedicationDispense/220080"/>
+        </partOf>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220097"/>
+        </medicationReference>
+        <subject>
+          <reference value="Group/220075"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="EpisodeOfCare/220079"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Practitioner/220088"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220073"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Observation/220076"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/220105"/>
+    <resource>
+      <MedicationStatement>
+        <id value="220105"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:34:37.701+00:00"/>
+          <source value="#TD6smjPRBbpI6SgB"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+        <basedOn>
+          <reference value="MedicationRequest/220073"/>
+        </basedOn>
+        <partOf>
+          <reference value="MedicationAdministration/220083"/>
+        </partOf>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="33319005"/>
+            <display value="Fentanyl"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationReference>
+          <reference value="Medication/220097"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/220102"/>
+          <display value="Donald Duck"/>
+        </subject>
+        <context>
+          <reference value="Encounter/220082"/>
+          <display value="encounter who leads to this prescription"/>
+        </context>
+        <effectivePeriod>
+          <start value="2015-01-15T14:30:00+01:00"/>
+          <end value="2015-01-30T14:30:00+01:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/220102"/>
+          <display value="Donald Duck"/>
+        </informationSource>
+        <derivedFrom>
+          <reference value="MedicationRequest/220073"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="32914008"/>
+            <display value="Restless Legs"/>
+          </coding>
+        </reasonCode>
+        <reasonReference>
+          <reference value="Condition/${conditionId_1}"/>
+        </reasonReference>
+        <note>
+          <text value="Patient indicates they miss the occasional dose"/>
+        </note>
+        <dosage>
+          <sequence value="1"/>
+          <text value="1-2 tablets once daily at bedtime as needed for restless legs"/>
+          <additionalInstruction>
+            <text value="Taking at bedtime"/>
+          </additionalInstruction>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededCodeableConcept>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="32914008"/>
+              <display value="Restless Legs"/>
+            </coding>
+          </asNeededCodeableConcept>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="26643006"/>
+              <display value="Oral Route"/>
+            </coding>
+          </route>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseRange>
+              <low>
+                <value value="1"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </low>
+              <high>
+                <value value="2"/>
+                <unit value="TAB"/>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                <code value="TAB"/>
+              </high>
+            </doseRange>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/220082"/>
+    <resource>
+      <Encounter>
+        <id value="220082"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:34:27.972+00:00"/>
+          <source value="#g1imsVqqzI305MBT"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+        </identifier>
+        <identifier>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/EpisodeOfCare/220161"/>
+    <resource>
+      <EpisodeOfCare>
+        <id value="220161"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:39:33.609+00:00"/>
+          <source value="#R2bCl4KUgqrIID7O"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+        </identifier>
+        <identifier>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+      </EpisodeOfCare>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/220352"/>
+    <resource>
+      <Patient>
+        <id value="220352"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:40:32.608+00:00"/>
+          <source value="#he8MutuLCgb2NBDE"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Mrs Katerina 
+                     <b>NGUYEN </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>49476534</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>Unit 7 </span>
+                    <br/>
+                    <span>76 Clydesdale St </span>
+                    <br/>
+                    <span>Como </span>
+                    <span>WA </span>
+                    <span>Australia </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>18 August 1979</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <value value="49476534"/>
+        </identifier>
+        <active value="true"/>
+        <name>
+          <use value="usual"/>
+          <family value="Nguyen"/>
+          <given value="Katerina"/>
+          <prefix value="Mrs"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="0403 823 832"/>
+          <use value="mobile"/>
+          <rank value="1"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9398 1165"/>
+          <use value="home"/>
+          <rank value="2"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9876 5432"/>
+          <use value="work"/>
+          <rank value="3"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <value value="kate.nguyen79@gmail.com"/>
+          <use value="work"/>
+          <rank value="4"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1979-08-18"/>
+        <deceasedBoolean value="true"/>
+        <address>
+          <use value="home"/>
+          <line value="Unit 7"/>
+          <line value="76 Clydesdale St"/>
+          <city value="Como"/>
+          <state value="WA"/>
+          <postalCode value="6152"/>
+          <country value="Australia"/>
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://hl7.org/fhir/ValueSet/patient-contact-relationship"/>
+              <code value="partner"/>
+              <display value="Partner"/>
+            </coding>
+          </relationship>
+          <name>
+            <use value="usual"/>
+            <family value="Nguyen"/>
+            <given value="Jimmy"/>
+            <prefix value="Mr"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="0403 123 456"/>
+            <use value="mobile"/>
+            <rank value="1"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 4564 3214"/>
+            <use value="home"/>
+            <rank value="2"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 9994 5547"/>
+            <use value="work"/>
+            <rank value="3"/>
+          </telecom>
+          <telecom>
+            <system value="email"/>
+            <value value="jim.nguyen79@work.com"/>
+            <use value="work"/>
+            <rank value="4"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <line value="Unit 7"/>
+            <line value="76 Clydesdale St"/>
+            <city value="Como"/>
+            <state value="WA"/>
+            <postalCode value="6152"/>
+            <country value="Australia"/>
+          </address>
+          <gender value="male"/>
+        </contact>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/220448"/>
+    <resource>
+      <Patient>
+        <id value="220448"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:47:44.274+00:00"/>
+          <source value="#UTbEKfH00zH7rUnd"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Mrs Katerina 
+                     <b>NGUYEN </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>49476534</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>Unit 7 </span>
+                    <br/>
+                    <span>76 Clydesdale St </span>
+                    <br/>
+                    <span>Como </span>
+                    <span>WA </span>
+                    <span>Australia </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>18 August 1979</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <value value="49476534"/>
+        </identifier>
+        <active value="true"/>
+        <name>
+          <use value="usual"/>
+          <family value="Nguyen"/>
+          <given value="Katerina"/>
+          <prefix value="Mrs"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="0403 823 832"/>
+          <use value="mobile"/>
+          <rank value="1"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9398 1165"/>
+          <use value="home"/>
+          <rank value="2"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9876 5432"/>
+          <use value="work"/>
+          <rank value="3"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <value value="kate.nguyen79@gmail.com"/>
+          <use value="work"/>
+          <rank value="4"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1979-08-18"/>
+        <deceasedBoolean value="true"/>
+        <address>
+          <use value="home"/>
+          <line value="Unit 7"/>
+          <line value="76 Clydesdale St"/>
+          <city value="Como"/>
+          <state value="WA"/>
+          <postalCode value="6152"/>
+          <country value="Australia"/>
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://hl7.org/fhir/ValueSet/patient-contact-relationship"/>
+              <code value="partner"/>
+              <display value="Partner"/>
+            </coding>
+          </relationship>
+          <name>
+            <use value="usual"/>
+            <family value="Nguyen"/>
+            <given value="Jimmy"/>
+            <prefix value="Mr"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="0403 123 456"/>
+            <use value="mobile"/>
+            <rank value="1"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 4564 3214"/>
+            <use value="home"/>
+            <rank value="2"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 9994 5547"/>
+            <use value="work"/>
+            <rank value="3"/>
+          </telecom>
+          <telecom>
+            <system value="email"/>
+            <value value="jim.nguyen79@work.com"/>
+            <use value="work"/>
+            <rank value="4"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <line value="Unit 7"/>
+            <line value="76 Clydesdale St"/>
+            <city value="Como"/>
+            <state value="WA"/>
+            <postalCode value="6152"/>
+            <country value="Australia"/>
+          </address>
+          <gender value="male"/>
+        </contact>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/220102"/>
+    <resource>
+      <Patient>
+        <id value="220102"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:34:36.319+00:00"/>
+          <source value="#mx7a9VyJyKSEPcWI"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Mrs Katerina 
+                     <b>NGUYEN </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>49476534</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>Unit 7 </span>
+                    <br/>
+                    <span>76 Clydesdale St </span>
+                    <br/>
+                    <span>Como </span>
+                    <span>WA </span>
+                    <span>Australia </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>18 August 1979</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <value value="49476534"/>
+        </identifier>
+        <active value="true"/>
+        <name>
+          <use value="usual"/>
+          <family value="Nguyen"/>
+          <given value="Katerina"/>
+          <prefix value="Mrs"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="0403 823 832"/>
+          <use value="mobile"/>
+          <rank value="1"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9398 1165"/>
+          <use value="home"/>
+          <rank value="2"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9876 5432"/>
+          <use value="work"/>
+          <rank value="3"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <value value="kate.nguyen79@gmail.com"/>
+          <use value="work"/>
+          <rank value="4"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1979-08-18"/>
+        <deceasedBoolean value="true"/>
+        <address>
+          <use value="home"/>
+          <line value="Unit 7"/>
+          <line value="76 Clydesdale St"/>
+          <city value="Como"/>
+          <state value="WA"/>
+          <postalCode value="6152"/>
+          <country value="Australia"/>
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://hl7.org/fhir/ValueSet/patient-contact-relationship"/>
+              <code value="partner"/>
+              <display value="Partner"/>
+            </coding>
+          </relationship>
+          <name>
+            <use value="usual"/>
+            <family value="Nguyen"/>
+            <given value="Jimmy"/>
+            <prefix value="Mr"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="0403 123 456"/>
+            <use value="mobile"/>
+            <rank value="1"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 4564 3214"/>
+            <use value="home"/>
+            <rank value="2"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 9994 5547"/>
+            <use value="work"/>
+            <rank value="3"/>
+          </telecom>
+          <telecom>
+            <system value="email"/>
+            <value value="jim.nguyen79@work.com"/>
+            <use value="work"/>
+            <rank value="4"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <line value="Unit 7"/>
+            <line value="76 Clydesdale St"/>
+            <city value="Como"/>
+            <state value="WA"/>
+            <postalCode value="6152"/>
+            <country value="Australia"/>
+          </address>
+          <gender value="male"/>
+        </contact>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/220164"/>
+    <resource>
+      <Encounter>
+        <id value="220164"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:39:34.866+00:00"/>
+          <source value="#GLSD8K1k9baRWkbJ"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+        </identifier>
+        <identifier>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Group/220075"/>
+    <resource>
+      <Group>
+        <id value="220075"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:34:25.029+00:00"/>
+          <source value="#2ZSXgl1mVPKmTD4g"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+        </identifier>
+        <identifier>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+      </Group>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/220186"/>
+    <resource>
+      <Patient>
+        <id value="220186"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:39:43.609+00:00"/>
+          <source value="#hm9pCeUHRzdmJycU"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Mrs Katerina 
+                     <b>NGUYEN </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>49476534</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>Unit 7 </span>
+                    <br/>
+                    <span>76 Clydesdale St </span>
+                    <br/>
+                    <span>Como </span>
+                    <span>WA </span>
+                    <span>Australia </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>18 August 1979</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <value value="49476534"/>
+        </identifier>
+        <active value="true"/>
+        <name>
+          <use value="usual"/>
+          <family value="Nguyen"/>
+          <given value="Katerina"/>
+          <prefix value="Mrs"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="0403 823 832"/>
+          <use value="mobile"/>
+          <rank value="1"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9398 1165"/>
+          <use value="home"/>
+          <rank value="2"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9876 5432"/>
+          <use value="work"/>
+          <rank value="3"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <value value="kate.nguyen79@gmail.com"/>
+          <use value="work"/>
+          <rank value="4"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1979-08-18"/>
+        <deceasedBoolean value="true"/>
+        <address>
+          <use value="home"/>
+          <line value="Unit 7"/>
+          <line value="76 Clydesdale St"/>
+          <city value="Como"/>
+          <state value="WA"/>
+          <postalCode value="6152"/>
+          <country value="Australia"/>
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://hl7.org/fhir/ValueSet/patient-contact-relationship"/>
+              <code value="partner"/>
+              <display value="Partner"/>
+            </coding>
+          </relationship>
+          <name>
+            <use value="usual"/>
+            <family value="Nguyen"/>
+            <given value="Jimmy"/>
+            <prefix value="Mr"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="0403 123 456"/>
+            <use value="mobile"/>
+            <rank value="1"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 4564 3214"/>
+            <use value="home"/>
+            <rank value="2"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 9994 5547"/>
+            <use value="work"/>
+            <rank value="3"/>
+          </telecom>
+          <telecom>
+            <system value="email"/>
+            <value value="jim.nguyen79@work.com"/>
+            <use value="work"/>
+            <rank value="4"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <line value="Unit 7"/>
+            <line value="76 Clydesdale St"/>
+            <city value="Como"/>
+            <state value="WA"/>
+            <postalCode value="6152"/>
+            <country value="Australia"/>
+          </address>
+          <gender value="male"/>
+        </contact>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/EpisodeOfCare/220079"/>
+    <resource>
+      <EpisodeOfCare>
+        <id value="220079"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:34:26.764+00:00"/>
+          <source value="#bIWPAjABjVYN51kn"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+        </identifier>
+        <identifier>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+      </EpisodeOfCare>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Group/220157"/>
+    <resource>
+      <Group>
+        <id value="220157"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:39:31.851+00:00"/>
+          <source value="#jAF5lMsqyLPIvmhn"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+        </identifier>
+        <identifier>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+      </Group>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/220428"/>
+    <resource>
+      <Encounter>
+        <id value="220428"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T10:47:36.135+00:00"/>
+          <source value="#NPMFcPCiQ4e8a212"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+        </identifier>
+        <identifier>
+          <system value="http://www.bmc.nl/portal/medstatements"/>
+          <value value="12345689"/>
+        </identifier>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+</Bundle>

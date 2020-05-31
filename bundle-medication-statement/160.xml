@@ -1,0 +1,2612 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bundle>
+  <id value="15792624-5f41-4e1b-89cd-99bb6d64f628"/>
+  <meta>
+    <lastUpdated value="2020-05-31T19:18:49.635+00:00"/>
+  </meta>
+  <type value="searchset"/>
+  <total value="5700"/>
+  <link>
+    <relation value="self"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=3180&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="next"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=3200&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="previous"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=3160&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/4ddf4c43-38fa-4144-8969-976a6eb0c9e8"/>
+    <resource>
+      <MedicationStatement>
+        <id value="4ddf4c43-38fa-4144-8969-976a6eb0c9e8"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:38:07.863+00:00"/>
+          <source value="#H55WMSRqTyP4dPPs"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/9c3e35ed-68b0-4ecb-abdb-234c57ea250b"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/8a4908aa-c7e8-4771-93e2-493af651213c"/>
+        </subject>
+        <context>
+          <reference value="Encounter/52fedd84-e03a-4752-8b08-6c5afabffaec"/>
+        </context>
+        <effectiveDateTime value="2003-03-16T07:28:48-06:00"/>
+        <dateAsserted value="2003-03-16T07:28:48-06:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/9cd7a8eb-b47e-4b7f-a8c6-e963c2027c15"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+          <text value="Chronic congestive heart failure (disorder)"/>
+        </reasonCode>
+        <dosage>
+          <sequence value="1"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="false"/>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseQuantity>
+              <value value="1"/>
+            </doseQuantity>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/51056d1a-c3bc-4f3f-9d8d-969169b7f641"/>
+    <resource>
+      <MedicationStatement>
+        <id value="51056d1a-c3bc-4f3f-9d8d-969169b7f641"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:38:07.863+00:00"/>
+          <source value="#H55WMSRqTyP4dPPs"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/c54e1a1f-e93d-418e-9497-8cd2d01cd3ff"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/8a4908aa-c7e8-4771-93e2-493af651213c"/>
+        </subject>
+        <context>
+          <reference value="Encounter/52fedd84-e03a-4752-8b08-6c5afabffaec"/>
+        </context>
+        <effectiveDateTime value="2003-03-16T07:28:48-06:00"/>
+        <dateAsserted value="2003-03-16T07:28:48-06:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/288febfc-e4ce-4f49-9c63-4b16a427ffa9"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+          <text value="Chronic congestive heart failure (disorder)"/>
+        </reasonCode>
+        <dosage>
+          <sequence value="1"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="false"/>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseQuantity>
+              <value value="1"/>
+            </doseQuantity>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/fc051f4f-49da-4b77-b463-3fc1eada6bcd"/>
+    <resource>
+      <MedicationStatement>
+        <id value="fc051f4f-49da-4b77-b463-3fc1eada6bcd"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:38:07.863+00:00"/>
+          <source value="#H55WMSRqTyP4dPPs"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/ddebdbf8-60d3-4d88-9ecc-70d3c8ce3390"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/8a4908aa-c7e8-4771-93e2-493af651213c"/>
+        </subject>
+        <context>
+          <reference value="Encounter/e7dd7762-33d1-483d-9ecb-d46acb353d2c"/>
+        </context>
+        <effectiveDateTime value="2003-09-12T08:28:48-05:00"/>
+        <dateAsserted value="2003-09-12T08:28:48-05:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/fc9b3310-2783-4ae6-8fab-89a3f0577523"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+          <text value="Chronic congestive heart failure (disorder)"/>
+        </reasonCode>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/6201a4b1-9225-44ec-97a9-1b309e5c5583"/>
+    <resource>
+      <MedicationStatement>
+        <id value="6201a4b1-9225-44ec-97a9-1b309e5c5583"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:30:41.564+00:00"/>
+          <source value="#ZcnVBPoYsXP7CYwk"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/d03e6c93-2a1c-41df-bf41-a41747aa2232"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/d642022d-6681-4c59-b7d7-53b50aa4672c"/>
+        </subject>
+        <context>
+          <reference value="Encounter/fb6e59db-9b45-4975-886d-cdc3838ddf14"/>
+        </context>
+        <effectiveDateTime value="1999-02-04T14:08:13-06:00"/>
+        <dateAsserted value="1999-02-04T14:08:13-06:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/25f3b249-d178-46bb-986b-108002ef7ad8"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+          <text value="Chronic congestive heart failure (disorder)"/>
+        </reasonCode>
+        <dosage>
+          <sequence value="1"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="false"/>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseQuantity>
+              <value value="1"/>
+            </doseQuantity>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/abc8f09f-a694-48a3-9d14-6be8ec29ad95"/>
+    <resource>
+      <MedicationStatement>
+        <id value="abc8f09f-a694-48a3-9d14-6be8ec29ad95"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:30:41.564+00:00"/>
+          <source value="#ZcnVBPoYsXP7CYwk"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/5ea2445d-0746-49b1-8341-5b75daf4f363"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/d642022d-6681-4c59-b7d7-53b50aa4672c"/>
+        </subject>
+        <context>
+          <reference value="Encounter/fb6e59db-9b45-4975-886d-cdc3838ddf14"/>
+        </context>
+        <effectiveDateTime value="1999-02-04T14:08:13-06:00"/>
+        <dateAsserted value="1999-02-04T14:08:13-06:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/b7beab6f-af4a-4ed8-bd4e-c9c609bcb0fc"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+          <text value="Chronic congestive heart failure (disorder)"/>
+        </reasonCode>
+        <dosage>
+          <sequence value="1"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="false"/>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseQuantity>
+              <value value="1"/>
+            </doseQuantity>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/b363c1ec-5f51-49d8-bdd6-1e1c3727fd3f"/>
+    <resource>
+      <MedicationStatement>
+        <id value="b363c1ec-5f51-49d8-bdd6-1e1c3727fd3f"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:30:41.564+00:00"/>
+          <source value="#ZcnVBPoYsXP7CYwk"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/b993866a-5e80-4888-80ea-ad0a80f4fa72"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/d642022d-6681-4c59-b7d7-53b50aa4672c"/>
+        </subject>
+        <context>
+          <reference value="Encounter/947c8d27-7edd-4ab3-9154-9f77040e57b6"/>
+        </context>
+        <effectiveDateTime value="1999-08-03T15:08:13-05:00"/>
+        <dateAsserted value="1999-08-03T15:08:13-05:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/ed628da5-14b2-4319-906f-4edc5263f29c"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+          <text value="Chronic congestive heart failure (disorder)"/>
+        </reasonCode>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/2bde9354-cac2-474f-b82c-eb23845ff8c6"/>
+    <resource>
+      <MedicationStatement>
+        <id value="2bde9354-cac2-474f-b82c-eb23845ff8c6"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:30:41.564+00:00"/>
+          <source value="#ZcnVBPoYsXP7CYwk"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/6944fb6d-ddc8-4689-b8c2-f5e35ea7e6f9"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/d642022d-6681-4c59-b7d7-53b50aa4672c"/>
+        </subject>
+        <context>
+          <reference value="Encounter/fb6e59db-9b45-4975-886d-cdc3838ddf14"/>
+        </context>
+        <effectiveDateTime value="1999-02-04T14:08:13-06:00"/>
+        <dateAsserted value="1999-02-04T14:08:13-06:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/7b7e40e5-807d-4045-939e-8599e50fee52"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+          <text value="Chronic congestive heart failure (disorder)"/>
+        </reasonCode>
+        <dosage>
+          <sequence value="1"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="false"/>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseQuantity>
+              <value value="1"/>
+            </doseQuantity>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/f9ff7162-b078-4c57-9a9b-9a71830833cb"/>
+    <resource>
+      <MedicationStatement>
+        <id value="f9ff7162-b078-4c57-9a9b-9a71830833cb"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:30:10.893+00:00"/>
+          <source value="#OA6jOmu0NaLXUWi4"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/33797c96-f481-4422-b68d-7d27996bda60"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/6db861dd-5fad-483a-ab6a-e704e0040366"/>
+        </subject>
+        <context>
+          <reference value="Encounter/e5629897-bbca-4fef-b42f-9d5a431f094e"/>
+        </context>
+        <effectiveDateTime value="2016-01-21T14:08:13-06:00"/>
+        <dateAsserted value="2016-01-21T14:08:13-06:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/05d174da-a998-4bbe-b77c-87092e26be59"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+          <text value="Chronic congestive heart failure (disorder)"/>
+        </reasonCode>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/c22aaa85-bf5b-4d33-bd79-2a5dd64b5007"/>
+    <resource>
+      <MedicationStatement>
+        <id value="c22aaa85-bf5b-4d33-bd79-2a5dd64b5007"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:30:10.893+00:00"/>
+          <source value="#OA6jOmu0NaLXUWi4"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/4eee0c5e-ca83-48cb-9983-b7be75b1b2dc"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/6db861dd-5fad-483a-ab6a-e704e0040366"/>
+        </subject>
+        <context>
+          <reference value="Encounter/ef0f172d-3005-4c8b-8fe3-a2558af2d7ce"/>
+        </context>
+        <effectiveDateTime value="2014-01-31T14:08:13-06:00"/>
+        <dateAsserted value="2014-01-31T14:08:13-06:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/47c85745-782f-40f9-8c1f-fc485314c87d"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+          <text value="Chronic congestive heart failure (disorder)"/>
+        </reasonCode>
+        <dosage>
+          <sequence value="1"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="false"/>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseQuantity>
+              <value value="1"/>
+            </doseQuantity>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/959fe3d1-e83e-41c0-ac1c-429c00f695e3"/>
+    <resource>
+      <MedicationStatement>
+        <id value="959fe3d1-e83e-41c0-ac1c-429c00f695e3"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:30:10.893+00:00"/>
+          <source value="#OA6jOmu0NaLXUWi4"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/535975ad-ae92-40c3-9d71-8c3c125f2fa5"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/6db861dd-5fad-483a-ab6a-e704e0040366"/>
+        </subject>
+        <context>
+          <reference value="Encounter/ef0f172d-3005-4c8b-8fe3-a2558af2d7ce"/>
+        </context>
+        <effectiveDateTime value="2014-01-31T14:08:13-06:00"/>
+        <dateAsserted value="2014-01-31T14:08:13-06:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/546d415a-d6be-4517-ab35-f99c8908aa81"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+          <text value="Chronic congestive heart failure (disorder)"/>
+        </reasonCode>
+        <dosage>
+          <sequence value="1"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="false"/>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseQuantity>
+              <value value="1"/>
+            </doseQuantity>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/0531d099-b43b-473d-8f1d-79506b4ac6e1"/>
+    <resource>
+      <MedicationStatement>
+        <id value="0531d099-b43b-473d-8f1d-79506b4ac6e1"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:30:10.893+00:00"/>
+          <source value="#OA6jOmu0NaLXUWi4"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/068e3af8-eda4-4bf7-b3fa-d74bc8a78097"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/6db861dd-5fad-483a-ab6a-e704e0040366"/>
+        </subject>
+        <context>
+          <reference value="Encounter/ef0f172d-3005-4c8b-8fe3-a2558af2d7ce"/>
+        </context>
+        <effectiveDateTime value="2014-01-31T14:08:13-06:00"/>
+        <dateAsserted value="2014-01-31T14:08:13-06:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/08aaf5f9-1830-4b75-902d-b423fafe2256"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+          <text value="Chronic congestive heart failure (disorder)"/>
+        </reasonCode>
+        <dosage>
+          <sequence value="1"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="false"/>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseQuantity>
+              <value value="1"/>
+            </doseQuantity>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/619e842e-f999-464d-893b-475bc9aa8f87"/>
+    <resource>
+      <MedicationStatement>
+        <id value="619e842e-f999-464d-893b-475bc9aa8f87"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:29:21.204+00:00"/>
+          <source value="#A0EW8ZiKNyLZ6h2E"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/dd6a2f1a-fb96-4a3d-a0d9-691fba8566bd"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/5110db5f-5523-45cb-9d8e-65be9175df78"/>
+        </subject>
+        <context>
+          <reference value="Encounter/fc4a12e1-eb24-4e06-aa4f-219868e2c2aa"/>
+        </context>
+        <effectiveDateTime value="2017-05-29T20:02:33-05:00"/>
+        <dateAsserted value="2017-05-29T20:02:33-05:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/f049e95e-2661-4a4f-b0d4-64bfe9155ed5"/>
+        </derivedFrom>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/27f8574f-14d4-4493-bf29-ce0604ce1b43"/>
+    <resource>
+      <MedicationStatement>
+        <id value="27f8574f-14d4-4493-bf29-ce0604ce1b43"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:29:21.204+00:00"/>
+          <source value="#A0EW8ZiKNyLZ6h2E"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/f7645191-549c-473d-9b8a-e9e9b0c943be"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/5110db5f-5523-45cb-9d8e-65be9175df78"/>
+        </subject>
+        <context>
+          <reference value="Encounter/fc4a12e1-eb24-4e06-aa4f-219868e2c2aa"/>
+        </context>
+        <effectiveDateTime value="2017-05-29T20:02:33-05:00"/>
+        <dateAsserted value="2017-05-29T20:02:33-05:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/c8494088-501e-4067-8432-e2ce48dcf51e"/>
+        </derivedFrom>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/5da07391-e078-4670-b6ea-a60fc853b9b6"/>
+    <resource>
+      <MedicationStatement>
+        <id value="5da07391-e078-4670-b6ea-a60fc853b9b6"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:29:21.204+00:00"/>
+          <source value="#A0EW8ZiKNyLZ6h2E"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/e948f711-aac8-45f9-8bed-d20a6a6e66a9"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/5110db5f-5523-45cb-9d8e-65be9175df78"/>
+        </subject>
+        <context>
+          <reference value="Encounter/fc4a12e1-eb24-4e06-aa4f-219868e2c2aa"/>
+        </context>
+        <effectiveDateTime value="2017-05-29T20:02:33-05:00"/>
+        <dateAsserted value="2017-05-29T20:02:33-05:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/9205a817-7fa8-458e-a4cc-685ef7a42db1"/>
+        </derivedFrom>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/216133a7-9efd-4d90-8109-4c56550e60af"/>
+    <resource>
+      <MedicationStatement>
+        <id value="216133a7-9efd-4d90-8109-4c56550e60af"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:29:21.204+00:00"/>
+          <source value="#A0EW8ZiKNyLZ6h2E"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/fe269383-8bd5-4702-8115-41f146045f55"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/5110db5f-5523-45cb-9d8e-65be9175df78"/>
+        </subject>
+        <context>
+          <reference value="Encounter/fc4a12e1-eb24-4e06-aa4f-219868e2c2aa"/>
+        </context>
+        <effectiveDateTime value="2017-05-29T20:02:33-05:00"/>
+        <dateAsserted value="2017-05-29T20:02:33-05:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/2fa1317f-594f-4763-8d36-e320cb082c0d"/>
+        </derivedFrom>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/929007ac-f1a1-4121-88ba-b131e543abeb"/>
+    <resource>
+      <MedicationStatement>
+        <id value="929007ac-f1a1-4121-88ba-b131e543abeb"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:28:59.645+00:00"/>
+          <source value="#N7SbkmFcp4cao3uX"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/37236481-2681-431d-babb-ae77a0344e79"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/866b83e5-fef3-499a-b715-8d116b41ed47"/>
+        </subject>
+        <context>
+          <reference value="Encounter/1a650bce-93e3-4aac-97c6-78330ba3fa0a"/>
+        </context>
+        <effectiveDateTime value="2015-06-28T09:46:12-05:00"/>
+        <dateAsserted value="2015-06-28T09:46:12-05:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/26604b9a-7585-4088-95c6-e0cc7e371767"/>
+        </derivedFrom>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/9d5e1fbf-c50f-4fe2-87aa-14575f9d8437"/>
+    <resource>
+      <MedicationStatement>
+        <id value="9d5e1fbf-c50f-4fe2-87aa-14575f9d8437"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:28:59.645+00:00"/>
+          <source value="#N7SbkmFcp4cao3uX"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/dd014a89-cb35-4cba-8284-85628d452a1c"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/866b83e5-fef3-499a-b715-8d116b41ed47"/>
+        </subject>
+        <context>
+          <reference value="Encounter/1a650bce-93e3-4aac-97c6-78330ba3fa0a"/>
+        </context>
+        <effectiveDateTime value="2015-06-28T09:46:12-05:00"/>
+        <dateAsserted value="2015-06-28T09:46:12-05:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/aac19e7e-eb06-4349-bb29-674ea1af48e2"/>
+        </derivedFrom>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/a53b4645-c857-4de3-8b63-e647beb58d92"/>
+    <resource>
+      <MedicationStatement>
+        <id value="a53b4645-c857-4de3-8b63-e647beb58d92"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:28:59.645+00:00"/>
+          <source value="#N7SbkmFcp4cao3uX"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/fe2b5a73-11e9-4e7b-86f8-377a4a4f6380"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/866b83e5-fef3-499a-b715-8d116b41ed47"/>
+        </subject>
+        <context>
+          <reference value="Encounter/1a650bce-93e3-4aac-97c6-78330ba3fa0a"/>
+        </context>
+        <effectiveDateTime value="2015-06-28T09:46:12-05:00"/>
+        <dateAsserted value="2015-06-28T09:46:12-05:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/34212d8b-537d-4efb-9f2d-c390dc86f73f"/>
+        </derivedFrom>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/3a182394-c435-452c-8114-c764102a7486"/>
+    <resource>
+      <MedicationStatement>
+        <id value="3a182394-c435-452c-8114-c764102a7486"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:28:59.645+00:00"/>
+          <source value="#N7SbkmFcp4cao3uX"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/e9165152-dd18-4cd7-81c8-858a1c3cc57d"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/866b83e5-fef3-499a-b715-8d116b41ed47"/>
+        </subject>
+        <context>
+          <reference value="Encounter/1a650bce-93e3-4aac-97c6-78330ba3fa0a"/>
+        </context>
+        <effectiveDateTime value="2015-06-28T09:46:12-05:00"/>
+        <dateAsserted value="2015-06-28T09:46:12-05:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/e79a0eea-e101-4a55-8903-b33b1d8fba33"/>
+        </derivedFrom>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/ec5d8dca-c51a-4960-9697-d4597ca03415"/>
+    <resource>
+      <MedicationStatement>
+        <id value="ec5d8dca-c51a-4960-9697-d4597ca03415"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:28:15.407+00:00"/>
+          <source value="#gPjq93gEWqG9uExy"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationstatement"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="active"/>
+        <medicationReference>
+          <reference value="Medication/d9901c74-18aa-4ef6-bfba-631268f338e1"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1043d25a-8045-4936-b110-bfa6e65ae1d7"/>
+        </subject>
+        <context>
+          <reference value="Encounter/265f0842-496a-4567-a713-bc97aff9d5c3"/>
+        </context>
+        <effectiveDateTime value="2003-10-31T09:45:09-06:00"/>
+        <dateAsserted value="2003-10-31T09:45:09-06:00"/>
+        <derivedFrom>
+          <reference value="MedicationRequest/b0a2ca6a-3a21-4aaa-bb05-a4cdc5038143"/>
+        </derivedFrom>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+          <text value="Chronic congestive heart failure (disorder)"/>
+        </reasonCode>
+        <dosage>
+          <sequence value="1"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="false"/>
+          <doseAndRate>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/dose-rate-type"/>
+                <code value="ordered"/>
+                <display value="Ordered"/>
+              </coding>
+            </type>
+            <doseQuantity>
+              <value value="1"/>
+            </doseQuantity>
+          </doseAndRate>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/265f0842-496a-4567-a713-bc97aff9d5c3"/>
+    <resource>
+      <Encounter>
+        <id value="265f0842-496a-4567-a713-bc97aff9d5c3"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:28:15.407+00:00"/>
+          <source value="#gPjq93gEWqG9uExy"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="finished"/>
+        <class>
+          <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
+          <code value="AMB"/>
+        </class>
+        <type>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="185347001"/>
+            <display value="Encounter for problem"/>
+          </coding>
+          <text value="Encounter for problem"/>
+        </type>
+        <subject>
+          <reference value="Patient/1043d25a-8045-4936-b110-bfa6e65ae1d7"/>
+          <display value="Mrs. Damaris45 Hilpert278"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/0000016f-a1db-e77f-0000-000000000442"/>
+            <display value="Dr. Dorian295 Hegmann834"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2003-10-31T09:45:09-06:00"/>
+          <end value="2003-10-31T10:45:09-06:00"/>
+        </period>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+        </reasonCode>
+        <location>
+          <location>
+            <reference value="Location/5c241d74-8a13-43fb-8cd7-ccd57ba88610"/>
+            <display value="PROVIDENCE SAINT JOSEPH MEDICAL CTR"/>
+          </location>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/d1ae4816-4832-3c80-bc2c-04b0f7e2551a"/>
+          <display value="PROVIDENCE SAINT JOSEPH MEDICAL CTR"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/fb6e59db-9b45-4975-886d-cdc3838ddf14"/>
+    <resource>
+      <Encounter>
+        <id value="fb6e59db-9b45-4975-886d-cdc3838ddf14"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:30:41.564+00:00"/>
+          <source value="#ZcnVBPoYsXP7CYwk"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="finished"/>
+        <class>
+          <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
+          <code value="AMB"/>
+        </class>
+        <type>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="185347001"/>
+            <display value="Encounter for problem"/>
+          </coding>
+          <text value="Encounter for problem"/>
+        </type>
+        <subject>
+          <reference value="Patient/d642022d-6681-4c59-b7d7-53b50aa4672c"/>
+          <display value="Mr. Daniel959 Sisneros410"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/0000016f-a1db-e77f-0000-000000000442"/>
+            <display value="Dr. Dorian295 Hegmann834"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="1999-02-04T14:08:13-06:00"/>
+          <end value="1999-02-04T15:08:13-06:00"/>
+        </period>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+        </reasonCode>
+        <location>
+          <location>
+            <reference value="Location/4c363218-2816-4f2e-887a-40ce0758d281"/>
+            <display value="PROVIDENCE SAINT JOSEPH MEDICAL CTR"/>
+          </location>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/d1ae4816-4832-3c80-bc2c-04b0f7e2551a"/>
+          <display value="PROVIDENCE SAINT JOSEPH MEDICAL CTR"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/5110db5f-5523-45cb-9d8e-65be9175df78"/>
+    <resource>
+      <Patient>
+        <id value="5110db5f-5523-45cb-9d8e-65be9175df78"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:29:21.204+00:00"/>
+          <source value="#A0EW8ZiKNyLZ6h2E"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>Generated by 
+                  <a href="https://github.com/synthetichealth/synthea">Synthea</a>.Version identifier: 7ff8db58
+ .   Person seed: 6757730650478235476  Population seed: 12345
+               </div>
+        </text>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-race">
+          <extension url="ombCategory">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238"/>
+              <code value="2106-3"/>
+              <display value="White"/>
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="White"/>
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity">
+          <extension url="ombCategory">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238"/>
+              <code value="2186-5"/>
+              <display value="Not Hispanic or Latino"/>
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="Not Hispanic or Latino"/>
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName">
+          <valueString value="Bess947 Armstrong51"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex">
+          <valueCode value="F"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/patient-birthPlace">
+          <valueAddress>
+            <city value="Gardena"/>
+            <state value="California"/>
+            <country value="US"/>
+          </valueAddress>
+        </extension>
+        <extension url="http://synthetichealth.github.io/synthea/disability-adjusted-life-years">
+          <valueDecimal value="0.14115009028106093"/>
+        </extension>
+        <extension url="http://synthetichealth.github.io/synthea/quality-adjusted-life-years">
+          <valueDecimal value="16.858849909718938"/>
+        </extension>
+        <identifier>
+          <system value="https://github.com/synthetichealth/synthea"/>
+          <value value="5f993d98-4464-489d-b737-181ec38b7561"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical Record Number"/>
+            </coding>
+            <text value="Medical Record Number"/>
+          </type>
+          <system value="http://hospital.smarthealthit.org"/>
+          <value value="5f993d98-4464-489d-b737-181ec38b7561"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="SS"/>
+              <display value="Social Security Number"/>
+            </coding>
+            <text value="Social Security Number"/>
+          </type>
+          <system value="http://hl7.org/fhir/sid/us-ssn"/>
+          <value value="999-78-5699"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="DL"/>
+              <display value="Driver's License"/>
+            </coding>
+            <text value="Driver's License"/>
+          </type>
+          <system value="urn:oid:2.16.840.1.113883.4.3.25"/>
+          <value value="S99923054"/>
+        </identifier>
+        <name>
+          <use value="official"/>
+          <family value="Jacobs452"/>
+          <given value="Dani520"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="555-361-3520"/>
+          <use value="home"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="2002-04-22"/>
+        <address>
+          <extension url="http://hl7.org/fhir/StructureDefinition/geolocation">
+            <extension url="latitude">
+              <valueDecimal value="34.34854106204179"/>
+            </extension>
+            <extension url="longitude">
+              <valueDecimal value="-118.49166497728687"/>
+            </extension>
+          </extension>
+          <line value="218 Brekke Course Apt 81"/>
+          <city value="Los Angeles"/>
+          <state value="CA"/>
+          <country value="US"/>
+        </address>
+        <maritalStatus>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-MaritalStatus"/>
+            <code value="S"/>
+            <display value="Never Married"/>
+          </coding>
+          <text value="Never Married"/>
+        </maritalStatus>
+        <multipleBirthBoolean value="false"/>
+        <communication>
+          <language>
+            <coding>
+              <system value="urn:ietf:bcp:47"/>
+              <code value="en-US"/>
+              <display value="English"/>
+            </coding>
+            <text value="English"/>
+          </language>
+        </communication>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/52fedd84-e03a-4752-8b08-6c5afabffaec"/>
+    <resource>
+      <Encounter>
+        <id value="52fedd84-e03a-4752-8b08-6c5afabffaec"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:38:07.863+00:00"/>
+          <source value="#H55WMSRqTyP4dPPs"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="finished"/>
+        <class>
+          <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
+          <code value="AMB"/>
+        </class>
+        <type>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="185347001"/>
+            <display value="Encounter for problem"/>
+          </coding>
+          <text value="Encounter for problem"/>
+        </type>
+        <subject>
+          <reference value="Patient/8a4908aa-c7e8-4771-93e2-493af651213c"/>
+          <display value="Mrs. Dawna21 O'Connell601"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/0000016f-a1db-e77f-0000-0000000001b8"/>
+            <display value="Dr. Marcel580 Stanton715"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2003-03-16T07:28:48-06:00"/>
+          <end value="2003-03-16T08:28:48-06:00"/>
+        </period>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+        </reasonCode>
+        <location>
+          <location>
+            <reference value="Location/a4db088b-88fa-4121-8cf0-6a3f3200ce5b"/>
+            <display value="COMMUNITY HOSPITAL OF HUNTINGTON PARK"/>
+          </location>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/9ba59bf7-ef7d-3280-b199-2a01f9cceaef"/>
+          <display value="COMMUNITY HOSPITAL OF HUNTINGTON PARK"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/fc4a12e1-eb24-4e06-aa4f-219868e2c2aa"/>
+    <resource>
+      <Encounter>
+        <id value="fc4a12e1-eb24-4e06-aa4f-219868e2c2aa"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:29:21.204+00:00"/>
+          <source value="#A0EW8ZiKNyLZ6h2E"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="finished"/>
+        <class>
+          <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
+          <code value="AMB"/>
+        </class>
+        <type>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="410620009"/>
+            <display value="Well child visit (procedure)"/>
+          </coding>
+          <text value="Well child visit (procedure)"/>
+        </type>
+        <subject>
+          <reference value="Patient/5110db5f-5523-45cb-9d8e-65be9175df78"/>
+          <display value="Dani520 Jacobs452"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/0000016f-a1db-e77f-0000-000000039a26"/>
+            <display value="Dr. Francisco472 Altenwerth646"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2017-05-29T20:02:33-05:00"/>
+          <end value="2017-05-29T20:17:33-05:00"/>
+        </period>
+        <location>
+          <location>
+            <reference value="Location/8d9dd862-2901-4029-88e3-3228f93e1146"/>
+            <display value="VISION CENTER-AN OPTOMETRIC CORPORATION"/>
+          </location>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/99d71924-b4ed-366c-81a3-20f7b0f624fd"/>
+          <display value="VISION CENTER-AN OPTOMETRIC CORPORATION"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/8a4908aa-c7e8-4771-93e2-493af651213c"/>
+    <resource>
+      <Patient>
+        <id value="8a4908aa-c7e8-4771-93e2-493af651213c"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:38:07.863+00:00"/>
+          <source value="#H55WMSRqTyP4dPPs"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>Generated by 
+                  <a href="https://github.com/synthetichealth/synthea">Synthea</a>.Version identifier: 7ff8db58
+ .   Person seed: -6628422620074615293  Population seed: 12345
+               </div>
+        </text>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-race">
+          <extension url="detailed">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238"/>
+              <code value="2131-1"/>
+              <display value="Other Races"/>
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="Other"/>
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity">
+          <extension url="ombCategory">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238"/>
+              <code value="2135-2"/>
+              <display value="Hispanic or Latino"/>
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="Hispanic or Latino"/>
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName">
+          <valueString value="Graciela518 Ferry570"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex">
+          <valueCode value="F"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/patient-birthPlace">
+          <valueAddress>
+            <city value="Santa Ana"/>
+            <state value="California"/>
+            <country value="US"/>
+          </valueAddress>
+        </extension>
+        <extension url="http://synthetichealth.github.io/synthea/disability-adjusted-life-years">
+          <valueDecimal value="0"/>
+        </extension>
+        <extension url="http://synthetichealth.github.io/synthea/quality-adjusted-life-years">
+          <valueDecimal value="56"/>
+        </extension>
+        <identifier>
+          <system value="https://github.com/synthetichealth/synthea"/>
+          <value value="6868b886-0520-4de7-98ea-3a536882fb9f"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical Record Number"/>
+            </coding>
+            <text value="Medical Record Number"/>
+          </type>
+          <system value="http://hospital.smarthealthit.org"/>
+          <value value="6868b886-0520-4de7-98ea-3a536882fb9f"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="SS"/>
+              <display value="Social Security Number"/>
+            </coding>
+            <text value="Social Security Number"/>
+          </type>
+          <system value="http://hl7.org/fhir/sid/us-ssn"/>
+          <value value="999-37-8625"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="DL"/>
+              <display value="Driver's License"/>
+            </coding>
+            <text value="Driver's License"/>
+          </type>
+          <system value="urn:oid:2.16.840.1.113883.4.3.25"/>
+          <value value="S99971621"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="PPN"/>
+              <display value="Passport Number"/>
+            </coding>
+            <text value="Passport Number"/>
+          </type>
+          <system value="http://standardhealthrecord.org/fhir/StructureDefinition/passportNumber"/>
+          <value value="X50293467X"/>
+        </identifier>
+        <name>
+          <use value="official"/>
+          <family value="O'Connell601"/>
+          <given value="Dawna21"/>
+          <prefix value="Mrs."/>
+        </name>
+        <name>
+          <use value="maiden"/>
+          <family value="Stroman228"/>
+          <given value="Dawna21"/>
+          <prefix value="Mrs."/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="555-152-7192"/>
+          <use value="home"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1946-02-18"/>
+        <deceasedDateTime value="2003-09-14T08:28:48-05:00"/>
+        <address>
+          <extension url="http://hl7.org/fhir/StructureDefinition/geolocation">
+            <extension url="latitude">
+              <valueDecimal value="34.04782851079821"/>
+            </extension>
+            <extension url="longitude">
+              <valueDecimal value="-118.2577177771559"/>
+            </extension>
+          </extension>
+          <line value="860 Lockman Crossroad"/>
+          <city value="Los Angeles"/>
+          <state value="CA"/>
+          <country value="US"/>
+        </address>
+        <maritalStatus>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-MaritalStatus"/>
+            <code value="M"/>
+            <display value="M"/>
+          </coding>
+          <text value="M"/>
+        </maritalStatus>
+        <multipleBirthBoolean value="false"/>
+        <communication>
+          <language>
+            <coding>
+              <system value="urn:ietf:bcp:47"/>
+              <code value="en-US"/>
+              <display value="English"/>
+            </coding>
+            <text value="English"/>
+          </language>
+        </communication>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/ef0f172d-3005-4c8b-8fe3-a2558af2d7ce"/>
+    <resource>
+      <Encounter>
+        <id value="ef0f172d-3005-4c8b-8fe3-a2558af2d7ce"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:30:10.893+00:00"/>
+          <source value="#OA6jOmu0NaLXUWi4"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="finished"/>
+        <class>
+          <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
+          <code value="AMB"/>
+        </class>
+        <type>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="185347001"/>
+            <display value="Encounter for problem"/>
+          </coding>
+          <text value="Encounter for problem"/>
+        </type>
+        <subject>
+          <reference value="Patient/6db861dd-5fad-483a-ab6a-e704e0040366"/>
+          <display value="Mr. Daniel959 Ordóñez148"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/0000016f-a1db-e77f-0000-000000000208"/>
+            <display value="Dr. Agustín529 Armas910"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2014-01-31T14:08:13-06:00"/>
+          <end value="2014-01-31T15:08:13-06:00"/>
+        </period>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="88805009"/>
+            <display value="Chronic congestive heart failure (disorder)"/>
+          </coding>
+        </reasonCode>
+        <location>
+          <location>
+            <reference value="Location/a65ee9c3-0b94-44ae-9163-f725476d9d48"/>
+            <display value="SAINT FRANCIS MEDICAL CENTER"/>
+          </location>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/76e2cc5a-7d44-319c-b621-d8e8180bafb4"/>
+          <display value="SAINT FRANCIS MEDICAL CENTER"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/d642022d-6681-4c59-b7d7-53b50aa4672c"/>
+    <resource>
+      <Patient>
+        <id value="d642022d-6681-4c59-b7d7-53b50aa4672c"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:30:41.564+00:00"/>
+          <source value="#ZcnVBPoYsXP7CYwk"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>Generated by 
+                  <a href="https://github.com/synthetichealth/synthea">Synthea</a>.Version identifier: 7ff8db58
+ .   Person seed: -7808104800255380970  Population seed: 12345
+               </div>
+        </text>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-race">
+          <extension url="detailed">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238"/>
+              <code value="2131-1"/>
+              <display value="Other Races"/>
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="Other"/>
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity">
+          <extension url="ombCategory">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238"/>
+              <code value="2135-2"/>
+              <display value="Hispanic or Latino"/>
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="Hispanic or Latino"/>
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName">
+          <valueString value="Raquel318 Ponce361"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex">
+          <valueCode value="M"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/patient-birthPlace">
+          <valueAddress>
+            <city value="San Juan"/>
+            <state value="Puerto Rico"/>
+            <country value="PR"/>
+          </valueAddress>
+        </extension>
+        <extension url="http://synthetichealth.github.io/synthea/disability-adjusted-life-years">
+          <valueDecimal value="0"/>
+        </extension>
+        <extension url="http://synthetichealth.github.io/synthea/quality-adjusted-life-years">
+          <valueDecimal value="52"/>
+        </extension>
+        <identifier>
+          <system value="https://github.com/synthetichealth/synthea"/>
+          <value value="1aca7fea-77b0-4cbb-ae16-95832d96a486"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical Record Number"/>
+            </coding>
+            <text value="Medical Record Number"/>
+          </type>
+          <system value="http://hospital.smarthealthit.org"/>
+          <value value="1aca7fea-77b0-4cbb-ae16-95832d96a486"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="SS"/>
+              <display value="Social Security Number"/>
+            </coding>
+            <text value="Social Security Number"/>
+          </type>
+          <system value="http://hl7.org/fhir/sid/us-ssn"/>
+          <value value="999-10-3937"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="DL"/>
+              <display value="Driver's License"/>
+            </coding>
+            <text value="Driver's License"/>
+          </type>
+          <system value="urn:oid:2.16.840.1.113883.4.3.25"/>
+          <value value="S99999858"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="PPN"/>
+              <display value="Passport Number"/>
+            </coding>
+            <text value="Passport Number"/>
+          </type>
+          <system value="http://standardhealthrecord.org/fhir/StructureDefinition/passportNumber"/>
+          <value value="X51134413X"/>
+        </identifier>
+        <name>
+          <use value="official"/>
+          <family value="Sisneros410"/>
+          <given value="Daniel959"/>
+          <prefix value="Mr."/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="555-757-4503"/>
+          <use value="home"/>
+        </telecom>
+        <gender value="male"/>
+        <birthDate value="1946-01-08"/>
+        <deceasedDateTime value="1999-08-05T15:08:13-05:00"/>
+        <address>
+          <extension url="http://hl7.org/fhir/StructureDefinition/geolocation">
+            <extension url="latitude">
+              <valueDecimal value="34.226675651245635"/>
+            </extension>
+            <extension url="longitude">
+              <valueDecimal value="-118.44113207450937"/>
+            </extension>
+          </extension>
+          <line value="615 Hills Bypass"/>
+          <city value="Los Angeles"/>
+          <state value="CA"/>
+          <country value="US"/>
+        </address>
+        <maritalStatus>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-MaritalStatus"/>
+            <code value="S"/>
+            <display value="S"/>
+          </coding>
+          <text value="S"/>
+        </maritalStatus>
+        <multipleBirthBoolean value="false"/>
+        <communication>
+          <language>
+            <coding>
+              <system value="urn:ietf:bcp:47"/>
+              <code value="es"/>
+              <display value="Spanish"/>
+            </coding>
+            <text value="Spanish"/>
+          </language>
+        </communication>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/e5629897-bbca-4fef-b42f-9d5a431f094e"/>
+    <resource>
+      <Encounter>
+        <id value="e5629897-bbca-4fef-b42f-9d5a431f094e"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:30:10.893+00:00"/>
+          <source value="#OA6jOmu0NaLXUWi4"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="finished"/>
+        <class>
+          <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
+          <code value="IMP"/>
+        </class>
+        <type>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="308540004"/>
+            <display value="Inpatient stay (finding)"/>
+          </coding>
+          <text value="Inpatient stay (finding)"/>
+        </type>
+        <subject>
+          <reference value="Patient/6db861dd-5fad-483a-ab6a-e704e0040366"/>
+          <display value="Mr. Daniel959 Ordóñez148"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/0000016f-a1db-e77f-0000-000000000208"/>
+            <display value="Dr. Agustín529 Armas910"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2016-01-21T14:08:13-06:00"/>
+          <end value="2016-01-22T14:08:13-06:00"/>
+        </period>
+        <location>
+          <location>
+            <reference value="Location/a65ee9c3-0b94-44ae-9163-f725476d9d48"/>
+            <display value="SAINT FRANCIS MEDICAL CENTER"/>
+          </location>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/76e2cc5a-7d44-319c-b621-d8e8180bafb4"/>
+          <display value="SAINT FRANCIS MEDICAL CENTER"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/e7dd7762-33d1-483d-9ecb-d46acb353d2c"/>
+    <resource>
+      <Encounter>
+        <id value="e7dd7762-33d1-483d-9ecb-d46acb353d2c"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:38:07.863+00:00"/>
+          <source value="#H55WMSRqTyP4dPPs"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="finished"/>
+        <class>
+          <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
+          <code value="IMP"/>
+        </class>
+        <type>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="308540004"/>
+            <display value="Inpatient stay (finding)"/>
+          </coding>
+          <text value="Inpatient stay (finding)"/>
+        </type>
+        <subject>
+          <reference value="Patient/8a4908aa-c7e8-4771-93e2-493af651213c"/>
+          <display value="Mrs. Dawna21 O'Connell601"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/0000016f-a1db-e77f-0000-0000000001b8"/>
+            <display value="Dr. Marcel580 Stanton715"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2003-09-12T08:28:48-05:00"/>
+          <end value="2003-09-13T08:28:48-05:00"/>
+        </period>
+        <location>
+          <location>
+            <reference value="Location/a4db088b-88fa-4121-8cf0-6a3f3200ce5b"/>
+            <display value="COMMUNITY HOSPITAL OF HUNTINGTON PARK"/>
+          </location>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/9ba59bf7-ef7d-3280-b199-2a01f9cceaef"/>
+          <display value="COMMUNITY HOSPITAL OF HUNTINGTON PARK"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/947c8d27-7edd-4ab3-9154-9f77040e57b6"/>
+    <resource>
+      <Encounter>
+        <id value="947c8d27-7edd-4ab3-9154-9f77040e57b6"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:30:41.564+00:00"/>
+          <source value="#ZcnVBPoYsXP7CYwk"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="finished"/>
+        <class>
+          <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
+          <code value="IMP"/>
+        </class>
+        <type>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="308540004"/>
+            <display value="Inpatient stay (finding)"/>
+          </coding>
+          <text value="Inpatient stay (finding)"/>
+        </type>
+        <subject>
+          <reference value="Patient/d642022d-6681-4c59-b7d7-53b50aa4672c"/>
+          <display value="Mr. Daniel959 Sisneros410"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/0000016f-a1db-e77f-0000-000000000442"/>
+            <display value="Dr. Dorian295 Hegmann834"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="1999-08-03T15:08:13-05:00"/>
+          <end value="1999-08-04T15:08:13-05:00"/>
+        </period>
+        <location>
+          <location>
+            <reference value="Location/4c363218-2816-4f2e-887a-40ce0758d281"/>
+            <display value="PROVIDENCE SAINT JOSEPH MEDICAL CTR"/>
+          </location>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/d1ae4816-4832-3c80-bc2c-04b0f7e2551a"/>
+          <display value="PROVIDENCE SAINT JOSEPH MEDICAL CTR"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/6db861dd-5fad-483a-ab6a-e704e0040366"/>
+    <resource>
+      <Patient>
+        <id value="6db861dd-5fad-483a-ab6a-e704e0040366"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:30:10.893+00:00"/>
+          <source value="#OA6jOmu0NaLXUWi4"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>Generated by 
+                  <a href="https://github.com/synthetichealth/synthea">Synthea</a>.Version identifier: 7ff8db58
+ .   Person seed: 2425454740030639284  Population seed: 12345
+               </div>
+        </text>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-race">
+          <extension url="detailed">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238"/>
+              <code value="2131-1"/>
+              <display value="Other Races"/>
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="Other"/>
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity">
+          <extension url="ombCategory">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238"/>
+              <code value="2135-2"/>
+              <display value="Hispanic or Latino"/>
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="Hispanic or Latino"/>
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName">
+          <valueString value="Carolina179 Bañuelos542"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex">
+          <valueCode value="M"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/patient-birthPlace">
+          <valueAddress>
+            <city value="Carolina"/>
+            <state value="Puerto Rico"/>
+            <country value="PR"/>
+          </valueAddress>
+        </extension>
+        <extension url="http://synthetichealth.github.io/synthea/disability-adjusted-life-years">
+          <valueDecimal value="0"/>
+        </extension>
+        <extension url="http://synthetichealth.github.io/synthea/quality-adjusted-life-years">
+          <valueDecimal value="69"/>
+        </extension>
+        <identifier>
+          <system value="https://github.com/synthetichealth/synthea"/>
+          <value value="251b98f1-4f24-4ac7-9f3f-6bac4efe35be"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical Record Number"/>
+            </coding>
+            <text value="Medical Record Number"/>
+          </type>
+          <system value="http://hospital.smarthealthit.org"/>
+          <value value="251b98f1-4f24-4ac7-9f3f-6bac4efe35be"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="SS"/>
+              <display value="Social Security Number"/>
+            </coding>
+            <text value="Social Security Number"/>
+          </type>
+          <system value="http://hl7.org/fhir/sid/us-ssn"/>
+          <value value="999-20-1465"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="DL"/>
+              <display value="Driver's License"/>
+            </coding>
+            <text value="Driver's License"/>
+          </type>
+          <system value="urn:oid:2.16.840.1.113883.4.3.25"/>
+          <value value="S99911747"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="PPN"/>
+              <display value="Passport Number"/>
+            </coding>
+            <text value="Passport Number"/>
+          </type>
+          <system value="http://standardhealthrecord.org/fhir/StructureDefinition/passportNumber"/>
+          <value value="X71144438X"/>
+        </identifier>
+        <name>
+          <use value="official"/>
+          <family value="Ordóñez148"/>
+          <given value="Daniel959"/>
+          <prefix value="Mr."/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="555-579-8705"/>
+          <use value="home"/>
+        </telecom>
+        <gender value="male"/>
+        <birthDate value="1946-01-08"/>
+        <deceasedDateTime value="2016-01-23T14:08:13-06:00"/>
+        <address>
+          <extension url="http://hl7.org/fhir/StructureDefinition/geolocation">
+            <extension url="latitude">
+              <valueDecimal value="33.914924490307335"/>
+            </extension>
+            <extension url="longitude">
+              <valueDecimal value="-118.22131672274233"/>
+            </extension>
+          </extension>
+          <line value="471 Streich Byway"/>
+          <city value="Los Angeles"/>
+          <state value="CA"/>
+          <country value="US"/>
+        </address>
+        <maritalStatus>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-MaritalStatus"/>
+            <code value="S"/>
+            <display value="S"/>
+          </coding>
+          <text value="S"/>
+        </maritalStatus>
+        <multipleBirthBoolean value="false"/>
+        <communication>
+          <language>
+            <coding>
+              <system value="urn:ietf:bcp:47"/>
+              <code value="es"/>
+              <display value="Spanish"/>
+            </coding>
+            <text value="Spanish"/>
+          </language>
+        </communication>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/1a650bce-93e3-4aac-97c6-78330ba3fa0a"/>
+    <resource>
+      <Encounter>
+        <id value="1a650bce-93e3-4aac-97c6-78330ba3fa0a"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:28:59.645+00:00"/>
+          <source value="#N7SbkmFcp4cao3uX"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <status value="finished"/>
+        <class>
+          <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
+          <code value="AMB"/>
+        </class>
+        <type>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="162673000"/>
+            <display value="General examination of patient (procedure)"/>
+          </coding>
+          <text value="General examination of patient (procedure)"/>
+        </type>
+        <subject>
+          <reference value="Patient/866b83e5-fef3-499a-b715-8d116b41ed47"/>
+          <display value="Mr. Dan465 Roob72 JD"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/0000016f-a1db-e77f-0000-00000003aebc"/>
+            <display value="Dr. Corrina72 McDermott739"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2015-06-28T09:46:12-05:00"/>
+          <end value="2015-06-28T10:01:12-05:00"/>
+        </period>
+        <location>
+          <location>
+            <reference value="Location/fc23679b-216f-45b3-b0cf-02137ebfa6c4"/>
+            <display value="AFFILIATED PATHOLOGISTS MEDICAL GROUP, INC."/>
+          </location>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/78aa2935-c70b-32db-8583-ad8b8d8033e3"/>
+          <display value="AFFILIATED PATHOLOGISTS MEDICAL GROUP, INC."/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1043d25a-8045-4936-b110-bfa6e65ae1d7"/>
+    <resource>
+      <Patient>
+        <id value="1043d25a-8045-4936-b110-bfa6e65ae1d7"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:28:15.407+00:00"/>
+          <source value="#gPjq93gEWqG9uExy"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>Generated by 
+                  <a href="https://github.com/synthetichealth/synthea">Synthea</a>.Version identifier: 7ff8db58
+ .   Person seed: 3700906912435053842  Population seed: 12345
+               </div>
+        </text>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-race">
+          <extension url="ombCategory">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238"/>
+              <code value="2054-5"/>
+              <display value="Black or African American"/>
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="Black or African American"/>
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity">
+          <extension url="ombCategory">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238"/>
+              <code value="2186-5"/>
+              <display value="Not Hispanic or Latino"/>
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="Not Hispanic or Latino"/>
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName">
+          <valueString value="Josefina523 Dare640"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex">
+          <valueCode value="F"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/patient-birthPlace">
+          <valueAddress>
+            <city value="Port-au-Prince"/>
+            <state value="Haiti"/>
+            <country value="HT"/>
+          </valueAddress>
+        </extension>
+        <extension url="http://synthetichealth.github.io/synthea/disability-adjusted-life-years">
+          <valueDecimal value="0"/>
+        </extension>
+        <extension url="http://synthetichealth.github.io/synthea/quality-adjusted-life-years">
+          <valueDecimal value="57"/>
+        </extension>
+        <identifier>
+          <system value="https://github.com/synthetichealth/synthea"/>
+          <value value="e62f0cd4-b4fd-4b9b-890d-ece326783d22"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical Record Number"/>
+            </coding>
+            <text value="Medical Record Number"/>
+          </type>
+          <system value="http://hospital.smarthealthit.org"/>
+          <value value="e62f0cd4-b4fd-4b9b-890d-ece326783d22"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="SS"/>
+              <display value="Social Security Number"/>
+            </coding>
+            <text value="Social Security Number"/>
+          </type>
+          <system value="http://hl7.org/fhir/sid/us-ssn"/>
+          <value value="999-67-8017"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="DL"/>
+              <display value="Driver's License"/>
+            </coding>
+            <text value="Driver's License"/>
+          </type>
+          <system value="urn:oid:2.16.840.1.113883.4.3.25"/>
+          <value value="S99975466"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="PPN"/>
+              <display value="Passport Number"/>
+            </coding>
+            <text value="Passport Number"/>
+          </type>
+          <system value="http://standardhealthrecord.org/fhir/StructureDefinition/passportNumber"/>
+          <value value="X80190320X"/>
+        </identifier>
+        <name>
+          <use value="official"/>
+          <family value="Hilpert278"/>
+          <given value="Damaris45"/>
+          <prefix value="Mrs."/>
+        </name>
+        <name>
+          <use value="maiden"/>
+          <family value="Maggio310"/>
+          <given value="Damaris45"/>
+          <prefix value="Mrs."/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="555-416-1845"/>
+          <use value="home"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1946-10-05"/>
+        <deceasedDateTime value="2004-10-27T10:45:09-05:00"/>
+        <address>
+          <extension url="http://hl7.org/fhir/StructureDefinition/geolocation">
+            <extension url="latitude">
+              <valueDecimal value="34.19978094335004"/>
+            </extension>
+            <extension url="longitude">
+              <valueDecimal value="-118.42603050448464"/>
+            </extension>
+          </extension>
+          <line value="1088 Rowe Frontage road Apt 1"/>
+          <city value="Los Angeles"/>
+          <state value="CA"/>
+          <country value="US"/>
+        </address>
+        <maritalStatus>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-MaritalStatus"/>
+            <code value="M"/>
+            <display value="M"/>
+          </coding>
+          <text value="M"/>
+        </maritalStatus>
+        <multipleBirthBoolean value="false"/>
+        <communication>
+          <language>
+            <coding>
+              <system value="urn:ietf:bcp:47"/>
+              <code value="fr"/>
+              <display value="French"/>
+            </coding>
+            <text value="French"/>
+          </language>
+        </communication>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/866b83e5-fef3-499a-b715-8d116b41ed47"/>
+    <resource>
+      <Patient>
+        <id value="866b83e5-fef3-499a-b715-8d116b41ed47"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2020-03-24T19:28:59.645+00:00"/>
+          <source value="#N7SbkmFcp4cao3uX"/>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"/>
+          <tag>
+            <system value="https://smarthealthit.org/tags"/>
+            <code value="Covid19 synthetic population from Synthea"/>
+          </tag>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>Generated by 
+                  <a href="https://github.com/synthetichealth/synthea">Synthea</a>.Version identifier: 7ff8db58
+ .   Person seed: 2189775315856031842  Population seed: 12345
+               </div>
+        </text>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-race">
+          <extension url="ombCategory">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238"/>
+              <code value="2106-3"/>
+              <display value="White"/>
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="White"/>
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity">
+          <extension url="ombCategory">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238"/>
+              <code value="2186-5"/>
+              <display value="Not Hispanic or Latino"/>
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="Not Hispanic or Latino"/>
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName">
+          <valueString value="Katharyn928 Schaefer657"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex">
+          <valueCode value="M"/>
+        </extension>
+        <extension url="http://hl7.org/fhir/StructureDefinition/patient-birthPlace">
+          <valueAddress>
+            <city value="Fresno"/>
+            <state value="California"/>
+            <country value="US"/>
+          </valueAddress>
+        </extension>
+        <extension url="http://synthetichealth.github.io/synthea/disability-adjusted-life-years">
+          <valueDecimal value="0.15119819448457658"/>
+        </extension>
+        <extension url="http://synthetichealth.github.io/synthea/quality-adjusted-life-years">
+          <valueDecimal value="66.84880180551542"/>
+        </extension>
+        <identifier>
+          <system value="https://github.com/synthetichealth/synthea"/>
+          <value value="7197e9f7-cda1-4ac0-8fc4-b3fc828af435"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical Record Number"/>
+            </coding>
+            <text value="Medical Record Number"/>
+          </type>
+          <system value="http://hospital.smarthealthit.org"/>
+          <value value="7197e9f7-cda1-4ac0-8fc4-b3fc828af435"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="SS"/>
+              <display value="Social Security Number"/>
+            </coding>
+            <text value="Social Security Number"/>
+          </type>
+          <system value="http://hl7.org/fhir/sid/us-ssn"/>
+          <value value="999-33-3649"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="DL"/>
+              <display value="Driver's License"/>
+            </coding>
+            <text value="Driver's License"/>
+          </type>
+          <system value="urn:oid:2.16.840.1.113883.4.3.25"/>
+          <value value="S99999455"/>
+        </identifier>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="PPN"/>
+              <display value="Passport Number"/>
+            </coding>
+            <text value="Passport Number"/>
+          </type>
+          <system value="http://standardhealthrecord.org/fhir/StructureDefinition/passportNumber"/>
+          <value value="X41618730X"/>
+        </identifier>
+        <name>
+          <use value="official"/>
+          <family value="Roob72"/>
+          <given value="Dan465"/>
+          <prefix value="Mr."/>
+          <suffix value="JD"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="555-627-5694"/>
+          <use value="home"/>
+        </telecom>
+        <gender value="male"/>
+        <birthDate value="1952-04-13"/>
+        <address>
+          <extension url="http://hl7.org/fhir/StructureDefinition/geolocation">
+            <extension url="latitude">
+              <valueDecimal value="33.894521068095806"/>
+            </extension>
+            <extension url="longitude">
+              <valueDecimal value="-118.2733237766438"/>
+            </extension>
+          </extension>
+          <line value="763 Kris Knoll Apt 76"/>
+          <city value="Los Angeles"/>
+          <state value="CA"/>
+          <country value="US"/>
+        </address>
+        <maritalStatus>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-MaritalStatus"/>
+            <code value="M"/>
+            <display value="M"/>
+          </coding>
+          <text value="M"/>
+        </maritalStatus>
+        <multipleBirthBoolean value="false"/>
+        <communication>
+          <language>
+            <coding>
+              <system value="urn:ietf:bcp:47"/>
+              <code value="en-US"/>
+              <display value="English"/>
+            </coding>
+            <text value="English"/>
+          </language>
+        </communication>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+</Bundle>

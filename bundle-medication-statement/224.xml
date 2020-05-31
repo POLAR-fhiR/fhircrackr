@@ -1,0 +1,3511 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bundle>
+  <id value="15792624-5f41-4e1b-89cd-99bb6d64f628"/>
+  <meta>
+    <lastUpdated value="2020-05-31T19:18:49.635+00:00"/>
+  </meta>
+  <type value="searchset"/>
+  <total value="5700"/>
+  <link>
+    <relation value="self"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=4460&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="next"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=4480&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="previous"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=4440&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/216621"/>
+    <resource>
+      <MedicationStatement>
+        <id value="216621"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T07:19:50.272+00:00"/>
+          <source value="#xwoGdxAS5ujK0niI"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <p>
+              <b>Generated Narrative with Details</b>
+            </p>
+            <p><b>id</b>: example002
+                  </p>
+            <p><b>contained</b>: 
+                  </p>
+            <p><b>status</b>: active
+                  </p>
+            <p><b>statusReason</b>: Liver enzymes abnormal 
+                     <span>(Details : {SNOMED CT code '166643006' = 'Liver enzymes abnormal', given as 'Liver enzymes abnormal'})</span></p>
+            <p><b>medication</b>: id: med0309; Tylenol PM 
+                     <span>(Details : {http://hl7.org/fhir/sid/ndc code '50580-506-02' = 'n/a', given as 'Tylenol PM'})</span>; Film-coated tablet (qualifier value) 
+                     <span>(Details : {SNOMED CT code '385057009' = 'Film-coated tablet', given as 'Film-coated tablet (qualifier value)'})</span></p>
+            <p><b>subject</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>effective</b>: 23/01/2015
+                  </p>
+            <p><b>dateAsserted</b>: 22/02/2015
+                  </p>
+            <p><b>informationSource</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>note</b>: Patient cannot take acetaminophen as per Dr instructions
+                  </p>
+          </div>
+        </text>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <subject>
+          <reference value="Patient/216586"/>
+          <display value="Donald Duck"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/216207"/>
+    <resource>
+      <MedicationStatement>
+        <id value="216207"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T07:07:55.990+00:00"/>
+          <source value="#wUntzKPoSyCkigPu"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <p>
+              <b>Generated Narrative with Details</b>
+            </p>
+            <p><b>id</b>: example002
+                  </p>
+            <p><b>contained</b>: 
+                  </p>
+            <p><b>status</b>: active
+                  </p>
+            <p><b>statusReason</b>: Liver enzymes abnormal 
+                     <span>(Details : {SNOMED CT code '166643006' = 'Liver enzymes abnormal', given as 'Liver enzymes abnormal'})</span></p>
+            <p><b>medication</b>: id: med0309; Tylenol PM 
+                     <span>(Details : {http://hl7.org/fhir/sid/ndc code '50580-506-02' = 'n/a', given as 'Tylenol PM'})</span>; Film-coated tablet (qualifier value) 
+                     <span>(Details : {SNOMED CT code '385057009' = 'Film-coated tablet', given as 'Film-coated tablet (qualifier value)'})</span></p>
+            <p><b>subject</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>effective</b>: 23/01/2015
+                  </p>
+            <p><b>dateAsserted</b>: 22/02/2015
+                  </p>
+            <p><b>informationSource</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>note</b>: Patient cannot take acetaminophen as per Dr instructions
+                  </p>
+          </div>
+        </text>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <subject>
+          <reference value="Patient/216171"/>
+          <display value="Donald Duck"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/216093"/>
+    <resource>
+      <MedicationStatement>
+        <id value="216093"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T07:05:29.270+00:00"/>
+          <source value="#9yLv3eWYHFxQwE2I"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <p>
+              <b>Generated Narrative with Details</b>
+            </p>
+            <p><b>id</b>: example002
+                  </p>
+            <p><b>contained</b>: 
+                  </p>
+            <p><b>status</b>: active
+                  </p>
+            <p><b>statusReason</b>: Liver enzymes abnormal 
+                     <span>(Details : {SNOMED CT code '166643006' = 'Liver enzymes abnormal', given as 'Liver enzymes abnormal'})</span></p>
+            <p><b>medication</b>: id: med0309; Tylenol PM 
+                     <span>(Details : {http://hl7.org/fhir/sid/ndc code '50580-506-02' = 'n/a', given as 'Tylenol PM'})</span>; Film-coated tablet (qualifier value) 
+                     <span>(Details : {SNOMED CT code '385057009' = 'Film-coated tablet', given as 'Film-coated tablet (qualifier value)'})</span></p>
+            <p><b>subject</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>effective</b>: 23/01/2015
+                  </p>
+            <p><b>dateAsserted</b>: 22/02/2015
+                  </p>
+            <p><b>informationSource</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>note</b>: Patient cannot take acetaminophen as per Dr instructions
+                  </p>
+          </div>
+        </text>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <subject>
+          <reference value="Patient/216059"/>
+          <display value="Donald Duck"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/216009"/>
+    <resource>
+      <MedicationStatement>
+        <id value="216009"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T07:03:24.941+00:00"/>
+          <source value="#jk70gb0xdWmUJF1m"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <p>
+              <b>Generated Narrative with Details</b>
+            </p>
+            <p><b>id</b>: example002
+                  </p>
+            <p><b>contained</b>: 
+                  </p>
+            <p><b>status</b>: active
+                  </p>
+            <p><b>statusReason</b>: Liver enzymes abnormal 
+                     <span>(Details : {SNOMED CT code '166643006' = 'Liver enzymes abnormal', given as 'Liver enzymes abnormal'})</span></p>
+            <p><b>medication</b>: id: med0309; Tylenol PM 
+                     <span>(Details : {http://hl7.org/fhir/sid/ndc code '50580-506-02' = 'n/a', given as 'Tylenol PM'})</span>; Film-coated tablet (qualifier value) 
+                     <span>(Details : {SNOMED CT code '385057009' = 'Film-coated tablet', given as 'Film-coated tablet (qualifier value)'})</span></p>
+            <p><b>subject</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>effective</b>: 23/01/2015
+                  </p>
+            <p><b>dateAsserted</b>: 22/02/2015
+                  </p>
+            <p><b>informationSource</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>note</b>: Patient cannot take acetaminophen as per Dr instructions
+                  </p>
+          </div>
+        </text>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <subject>
+          <reference value="Patient/215959"/>
+          <display value="Donald Duck"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/215934"/>
+    <resource>
+      <MedicationStatement>
+        <id value="215934"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T07:01:14.910+00:00"/>
+          <source value="#yOOuQ9JCfbRTOQrb"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <p>
+              <b>Generated Narrative with Details</b>
+            </p>
+            <p><b>id</b>: example002
+                  </p>
+            <p><b>contained</b>: 
+                  </p>
+            <p><b>status</b>: active
+                  </p>
+            <p><b>statusReason</b>: Liver enzymes abnormal 
+                     <span>(Details : {SNOMED CT code '166643006' = 'Liver enzymes abnormal', given as 'Liver enzymes abnormal'})</span></p>
+            <p><b>medication</b>: id: med0309; Tylenol PM 
+                     <span>(Details : {http://hl7.org/fhir/sid/ndc code '50580-506-02' = 'n/a', given as 'Tylenol PM'})</span>; Film-coated tablet (qualifier value) 
+                     <span>(Details : {SNOMED CT code '385057009' = 'Film-coated tablet', given as 'Film-coated tablet (qualifier value)'})</span></p>
+            <p><b>subject</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>effective</b>: 23/01/2015
+                  </p>
+            <p><b>dateAsserted</b>: 22/02/2015
+                  </p>
+            <p><b>informationSource</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>note</b>: Patient cannot take acetaminophen as per Dr instructions
+                  </p>
+          </div>
+        </text>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <subject>
+          <reference value="Patient/215900"/>
+          <display value="Donald Duck"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/215828"/>
+    <resource>
+      <MedicationStatement>
+        <id value="215828"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T06:59:28.293+00:00"/>
+          <source value="#sUG1bmWSZzxMWOoO"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <p>
+              <b>Generated Narrative with Details</b>
+            </p>
+            <p><b>id</b>: example002
+                  </p>
+            <p><b>contained</b>: 
+                  </p>
+            <p><b>status</b>: active
+                  </p>
+            <p><b>statusReason</b>: Liver enzymes abnormal 
+                     <span>(Details : {SNOMED CT code '166643006' = 'Liver enzymes abnormal', given as 'Liver enzymes abnormal'})</span></p>
+            <p><b>medication</b>: id: med0309; Tylenol PM 
+                     <span>(Details : {http://hl7.org/fhir/sid/ndc code '50580-506-02' = 'n/a', given as 'Tylenol PM'})</span>; Film-coated tablet (qualifier value) 
+                     <span>(Details : {SNOMED CT code '385057009' = 'Film-coated tablet', given as 'Film-coated tablet (qualifier value)'})</span></p>
+            <p><b>subject</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>effective</b>: 23/01/2015
+                  </p>
+            <p><b>dateAsserted</b>: 22/02/2015
+                  </p>
+            <p><b>informationSource</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>note</b>: Patient cannot take acetaminophen as per Dr instructions
+                  </p>
+          </div>
+        </text>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <subject>
+          <reference value="Patient/215756"/>
+          <display value="Donald Duck"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/206778"/>
+    <resource>
+      <MedicationStatement>
+        <id value="206778"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T05:48:12.967+00:00"/>
+          <source value="#Dhdo5jR2NDH5wnR9"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <p>
+              <b>Generated Narrative with Details</b>
+            </p>
+            <p><b>id</b>: example002
+                  </p>
+            <p><b>contained</b>: 
+                  </p>
+            <p><b>status</b>: active
+                  </p>
+            <p><b>statusReason</b>: Liver enzymes abnormal 
+                     <span>(Details : {SNOMED CT code '166643006' = 'Liver enzymes abnormal', given as 'Liver enzymes abnormal'})</span></p>
+            <p><b>medication</b>: id: med0309; Tylenol PM 
+                     <span>(Details : {http://hl7.org/fhir/sid/ndc code '50580-506-02' = 'n/a', given as 'Tylenol PM'})</span>; Film-coated tablet (qualifier value) 
+                     <span>(Details : {SNOMED CT code '385057009' = 'Film-coated tablet', given as 'Film-coated tablet (qualifier value)'})</span></p>
+            <p><b>subject</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>effective</b>: 23/01/2015
+                  </p>
+            <p><b>dateAsserted</b>: 22/02/2015
+                  </p>
+            <p><b>informationSource</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>note</b>: Patient cannot take acetaminophen as per Dr instructions
+                  </p>
+          </div>
+        </text>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <subject>
+          <reference value="Patient/206686"/>
+          <display value="Donald Duck"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/199968"/>
+    <resource>
+      <MedicationStatement>
+        <id value="199968"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-04T12:13:44.726+00:00"/>
+          <source value="#C4SGgcYHtG8bt3dm"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <p>
+              <b>Generated Narrative with Details</b>
+            </p>
+            <p><b>id</b>: example002
+                  </p>
+            <p><b>contained</b>: 
+                  </p>
+            <p><b>status</b>: active
+                  </p>
+            <p><b>statusReason</b>: Liver enzymes abnormal 
+                     <span>(Details : {SNOMED CT code '166643006' = 'Liver enzymes abnormal', given as 'Liver enzymes abnormal'})</span></p>
+            <p><b>medication</b>: id: med0309; Tylenol PM 
+                     <span>(Details : {http://hl7.org/fhir/sid/ndc code '50580-506-02' = 'n/a', given as 'Tylenol PM'})</span>; Film-coated tablet (qualifier value) 
+                     <span>(Details : {SNOMED CT code '385057009' = 'Film-coated tablet', given as 'Film-coated tablet (qualifier value)'})</span></p>
+            <p><b>subject</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>effective</b>: 23/01/2015
+                  </p>
+            <p><b>dateAsserted</b>: 22/02/2015
+                  </p>
+            <p><b>informationSource</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>note</b>: Patient cannot take acetaminophen as per Dr instructions
+                  </p>
+          </div>
+        </text>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <subject>
+          <reference value="Patient/199872"/>
+          <display value="Donald Duck"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/182212"/>
+    <resource>
+      <MedicationStatement>
+        <id value="182212"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-04T10:32:05.627+00:00"/>
+          <source value="#yV2Tw67hW6K1cACJ"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <p>
+              <b>Generated Narrative with Details</b>
+            </p>
+            <p><b>id</b>: example002
+                  </p>
+            <p><b>contained</b>: 
+                  </p>
+            <p><b>status</b>: active
+                  </p>
+            <p><b>statusReason</b>: Liver enzymes abnormal 
+                     <span>(Details : {SNOMED CT code '166643006' = 'Liver enzymes abnormal', given as 'Liver enzymes abnormal'})</span></p>
+            <p><b>medication</b>: id: med0309; Tylenol PM 
+                     <span>(Details : {http://hl7.org/fhir/sid/ndc code '50580-506-02' = 'n/a', given as 'Tylenol PM'})</span>; Film-coated tablet (qualifier value) 
+                     <span>(Details : {SNOMED CT code '385057009' = 'Film-coated tablet', given as 'Film-coated tablet (qualifier value)'})</span></p>
+            <p><b>subject</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>effective</b>: 23/01/2015
+                  </p>
+            <p><b>dateAsserted</b>: 22/02/2015
+                  </p>
+            <p><b>informationSource</b>: 
+                     <a>Donald Duck</a></p>
+            <p><b>note</b>: Patient cannot take acetaminophen as per Dr instructions
+                  </p>
+          </div>
+        </text>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <subject>
+          <reference value="Patient/182178"/>
+          <display value="Donald Duck"/>
+        </subject>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/139953"/>
+    <resource>
+      <MedicationStatement>
+        <id value="139953"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-29T15:24:42.276+00:00"/>
+          <source value="#KKuBthlFIr3TytLS"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Zoloft TX"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated tablet (qualifier value)"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 500 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1202"/>
+          <display value="Priya"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1202"/>
+          <display value="Priya"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one tablet One times daily for 15 days"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="15"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/105275"/>
+    <resource>
+      <MedicationStatement>
+        <id value="105275"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-28T10:47:11.917+00:00"/>
+          <source value="#trgl71OZnAKNwmAv"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Clindamycin"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated capsule"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="chloraAcetone 200 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="200"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="capsule"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Mycine 215 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="215"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="capsule"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Body Ache"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1208"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1208"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one capsule one time in a week"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/105270"/>
+    <resource>
+      <MedicationStatement>
+        <id value="105270"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-28T10:43:50.547+00:00"/>
+          <source value="#ygvRdZv4HPKEjV0D"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Doxycycline"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="tablet"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="HydroDoxcy 700 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="700"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Cycline 125 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1207"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1207"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one tablet three times a day for 15 days"/>
+          <timing>
+            <repeat>
+              <frequency value="3"/>
+              <period value="15"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Tab"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/105236"/>
+    <resource>
+      <MedicationStatement>
+        <id value="105236"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-28T10:41:30.910+00:00"/>
+          <source value="#DquH8A8pFBBIoIr1"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Meloxicam S"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="inject powder in injection"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 500 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Heart Disorder"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1207"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1207"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one injection two times in a week"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="15"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="injection"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/30157"/>
+    <resource>
+      <MedicationStatement>
+        <id value="30157"/>
+        <meta>
+          <versionId value="2"/>
+          <lastUpdated value="2019-11-28T10:39:18.104+00:00"/>
+          <source value="#w0c2yp9dW6QfBzmZ"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Tylenol PM"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated tablet (qualifier value)"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 500 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1207"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1207"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one capsule One time a day for 15 days"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="15"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Tab"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/105150"/>
+    <resource>
+      <MedicationStatement>
+        <id value="105150"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-28T10:36:52.340+00:00"/>
+          <source value="#IBDnh3yXLsYhd4H4"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Ibuprofen"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Capsule"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Propazole 510 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Restless Body"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1206"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1206"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one capsule One time a day for 15 days"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="15"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="injection"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/105149"/>
+    <resource>
+      <MedicationStatement>
+        <id value="105149"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-28T10:34:48.250+00:00"/>
+          <source value="#zPLNDJBEW1aVbKG7"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="T Pantoprazole"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated tablet (qualifier value)"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Propazole 510 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Restless Body"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1206"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1206"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one injection One time in a week"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="7"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="injection"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/105142"/>
+    <resource>
+      <MedicationStatement>
+        <id value="105142"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-28T10:32:21.425+00:00"/>
+          <source value="#jvfL6ltuWJC2DCd7"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Zoloft ZX"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated tablet (qualifier value)"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 500 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Stomach Ulcer"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1206"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1206"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one injection One time in 30days"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="30"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/30156"/>
+    <resource>
+      <MedicationStatement>
+        <id value="30156"/>
+        <meta>
+          <versionId value="2"/>
+          <lastUpdated value="2019-11-28T10:31:05.450+00:00"/>
+          <source value="#1jSRWyyFWqnrzIKe"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Tylenol PM"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated tablet (qualifier value)"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 500 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Stomach Pain"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1206"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1206"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one capsule One times daily for 30days"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="30"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/105026"/>
+    <resource>
+      <MedicationStatement>
+        <id value="105026"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-11-28T10:27:38.939+00:00"/>
+          <source value="#64l7iKOao2jIH7qj"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Tramadol"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="inject to injection"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 500 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Restless legs"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1203"/>
+          <display value="Pratik"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1203"/>
+          <display value="Pratik"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one tablet One time daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/30155"/>
+    <resource>
+      <MedicationStatement>
+        <id value="30155"/>
+        <meta>
+          <versionId value="2"/>
+          <lastUpdated value="2019-11-28T10:23:02.917+00:00"/>
+          <source value="#MgiZy1apkPAPCDlj"/>
+        </meta>
+        <contained>
+          <Medication>
+            <id value="med0309"/>
+            <code>
+              <coding>
+                <system value="http://hl7.org/fhir/sid/ndc"/>
+                <code value="50580-506-02"/>
+                <display value="Tylenol PM"/>
+              </coding>
+            </code>
+            <form>
+              <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="385057009"/>
+                <display value="Film-coated tablet (qualifier value)"/>
+              </coding>
+            </form>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="315266"/>
+                  <display value="Acetaminophen 500 MG"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="500"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <ingredient>
+              <itemCodeableConcept>
+                <coding>
+                  <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+                  <code value="901813"/>
+                  <display value="Diphenhydramine Hydrochloride 25 mg"/>
+                </coding>
+              </itemCodeableConcept>
+              <strength>
+                <numerator>
+                  <value value="25"/>
+                  <system value="http://unitsofmeasure.org"/>
+                  <code value="mg"/>
+                </numerator>
+                <denominator>
+                  <value value="1"/>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm"/>
+                  <code value="Tab"/>
+                </denominator>
+              </strength>
+            </ingredient>
+            <batch>
+              <lotNumber value="9494788"/>
+              <expirationDate value="2017-05-22"/>
+            </batch>
+          </Medication>
+        </contained>
+        <status value="active"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="166643006"/>
+            <display value="Liver enzymes abnormal"/>
+          </coding>
+        </statusReason>
+        <medicationReference>
+          <reference value="#med0309"/>
+        </medicationReference>
+        <subject>
+          <reference value="Patient/1203"/>
+          <display value="Pratik"/>
+        </subject>
+        <effectiveDateTime value="2015-01-23"/>
+        <dateAsserted value="2015-02-22"/>
+        <informationSource>
+          <reference value="Patient/1203"/>
+          <display value="Pratik"/>
+        </informationSource>
+        <note>
+          <text value="Patient cannot take acetaminophen as per Dr instructions"/>
+        </note>
+        <dosage>
+          <text value="one capsule three times daily"/>
+          <timing>
+            <repeat>
+              <frequency value="3"/>
+              <period value="10"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <route>
+            <coding>
+              <system value="http://snomed.info/sct"/>
+              <code value="260548002"/>
+              <display value="Oral"/>
+            </coding>
+          </route>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/182178"/>
+    <resource>
+      <Patient>
+        <id value="182178"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-04T10:31:47.193+00:00"/>
+          <source value="#zvAxCcVvCEWGHLfj"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Mrs Katerina 
+                     <b>NGUYEN </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>49476534</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>Unit 7 </span>
+                    <br/>
+                    <span>76 Clydesdale St </span>
+                    <br/>
+                    <span>Como </span>
+                    <span>WA </span>
+                    <span>Australia </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>18 August 1979</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <value value="49476534"/>
+        </identifier>
+        <active value="true"/>
+        <name>
+          <use value="usual"/>
+          <family value="Nguyen"/>
+          <given value="Katerina"/>
+          <prefix value="Mrs"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="0403 823 832"/>
+          <use value="mobile"/>
+          <rank value="1"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9398 1165"/>
+          <use value="home"/>
+          <rank value="2"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9876 5432"/>
+          <use value="work"/>
+          <rank value="3"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <value value="kate.nguyen79@gmail.com"/>
+          <use value="work"/>
+          <rank value="4"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1979-08-18"/>
+        <deceasedBoolean value="true"/>
+        <address>
+          <use value="home"/>
+          <line value="Unit 7"/>
+          <line value="76 Clydesdale St"/>
+          <city value="Como"/>
+          <state value="WA"/>
+          <postalCode value="6152"/>
+          <country value="Australia"/>
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://hl7.org/fhir/ValueSet/patient-contact-relationship"/>
+              <code value="partner"/>
+              <display value="Partner"/>
+            </coding>
+          </relationship>
+          <name>
+            <use value="usual"/>
+            <family value="Nguyen"/>
+            <given value="Jimmy"/>
+            <prefix value="Mr"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="0403 123 456"/>
+            <use value="mobile"/>
+            <rank value="1"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 4564 3214"/>
+            <use value="home"/>
+            <rank value="2"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 9994 5547"/>
+            <use value="work"/>
+            <rank value="3"/>
+          </telecom>
+          <telecom>
+            <system value="email"/>
+            <value value="jim.nguyen79@work.com"/>
+            <use value="work"/>
+            <rank value="4"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <line value="Unit 7"/>
+            <line value="76 Clydesdale St"/>
+            <city value="Como"/>
+            <state value="WA"/>
+            <postalCode value="6152"/>
+            <country value="Australia"/>
+          </address>
+          <gender value="male"/>
+        </contact>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/199872"/>
+    <resource>
+      <Patient>
+        <id value="199872"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-04T12:13:26.584+00:00"/>
+          <source value="#ZNawgtE8rFMcNB8j"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Mrs Katerina 
+                     <b>NGUYEN </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>49476534</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>Unit 7 </span>
+                    <br/>
+                    <span>76 Clydesdale St </span>
+                    <br/>
+                    <span>Como </span>
+                    <span>WA </span>
+                    <span>Australia </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>18 August 1979</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <value value="49476534"/>
+        </identifier>
+        <active value="true"/>
+        <name>
+          <use value="usual"/>
+          <family value="Nguyen"/>
+          <given value="Katerina"/>
+          <prefix value="Mrs"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="0403 823 832"/>
+          <use value="mobile"/>
+          <rank value="1"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9398 1165"/>
+          <use value="home"/>
+          <rank value="2"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9876 5432"/>
+          <use value="work"/>
+          <rank value="3"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <value value="kate.nguyen79@gmail.com"/>
+          <use value="work"/>
+          <rank value="4"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1979-08-18"/>
+        <deceasedBoolean value="true"/>
+        <address>
+          <use value="home"/>
+          <line value="Unit 7"/>
+          <line value="76 Clydesdale St"/>
+          <city value="Como"/>
+          <state value="WA"/>
+          <postalCode value="6152"/>
+          <country value="Australia"/>
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://hl7.org/fhir/ValueSet/patient-contact-relationship"/>
+              <code value="partner"/>
+              <display value="Partner"/>
+            </coding>
+          </relationship>
+          <name>
+            <use value="usual"/>
+            <family value="Nguyen"/>
+            <given value="Jimmy"/>
+            <prefix value="Mr"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="0403 123 456"/>
+            <use value="mobile"/>
+            <rank value="1"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 4564 3214"/>
+            <use value="home"/>
+            <rank value="2"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 9994 5547"/>
+            <use value="work"/>
+            <rank value="3"/>
+          </telecom>
+          <telecom>
+            <system value="email"/>
+            <value value="jim.nguyen79@work.com"/>
+            <use value="work"/>
+            <rank value="4"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <line value="Unit 7"/>
+            <line value="76 Clydesdale St"/>
+            <city value="Como"/>
+            <state value="WA"/>
+            <postalCode value="6152"/>
+            <country value="Australia"/>
+          </address>
+          <gender value="male"/>
+        </contact>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/216171"/>
+    <resource>
+      <Patient>
+        <id value="216171"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T07:07:40.321+00:00"/>
+          <source value="#pBmQXTRpvyJEv3PY"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Mrs Katerina 
+                     <b>NGUYEN </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>49476534</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>Unit 7 </span>
+                    <br/>
+                    <span>76 Clydesdale St </span>
+                    <br/>
+                    <span>Como </span>
+                    <span>WA </span>
+                    <span>Australia </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>18 August 1979</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <value value="49476534"/>
+        </identifier>
+        <active value="true"/>
+        <name>
+          <use value="usual"/>
+          <family value="Nguyen"/>
+          <given value="Katerina"/>
+          <prefix value="Mrs"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="0403 823 832"/>
+          <use value="mobile"/>
+          <rank value="1"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9398 1165"/>
+          <use value="home"/>
+          <rank value="2"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9876 5432"/>
+          <use value="work"/>
+          <rank value="3"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <value value="kate.nguyen79@gmail.com"/>
+          <use value="work"/>
+          <rank value="4"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1979-08-18"/>
+        <deceasedBoolean value="true"/>
+        <address>
+          <use value="home"/>
+          <line value="Unit 7"/>
+          <line value="76 Clydesdale St"/>
+          <city value="Como"/>
+          <state value="WA"/>
+          <postalCode value="6152"/>
+          <country value="Australia"/>
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://hl7.org/fhir/ValueSet/patient-contact-relationship"/>
+              <code value="partner"/>
+              <display value="Partner"/>
+            </coding>
+          </relationship>
+          <name>
+            <use value="usual"/>
+            <family value="Nguyen"/>
+            <given value="Jimmy"/>
+            <prefix value="Mr"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="0403 123 456"/>
+            <use value="mobile"/>
+            <rank value="1"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 4564 3214"/>
+            <use value="home"/>
+            <rank value="2"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 9994 5547"/>
+            <use value="work"/>
+            <rank value="3"/>
+          </telecom>
+          <telecom>
+            <system value="email"/>
+            <value value="jim.nguyen79@work.com"/>
+            <use value="work"/>
+            <rank value="4"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <line value="Unit 7"/>
+            <line value="76 Clydesdale St"/>
+            <city value="Como"/>
+            <state value="WA"/>
+            <postalCode value="6152"/>
+            <country value="Australia"/>
+          </address>
+          <gender value="male"/>
+        </contact>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/216586"/>
+    <resource>
+      <Patient>
+        <id value="216586"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T07:19:33.004+00:00"/>
+          <source value="#6Jhr9xuhgRMuPtDZ"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Mrs Katerina 
+                     <b>NGUYEN </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>49476534</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>Unit 7 </span>
+                    <br/>
+                    <span>76 Clydesdale St </span>
+                    <br/>
+                    <span>Como </span>
+                    <span>WA </span>
+                    <span>Australia </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>18 August 1979</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <value value="49476534"/>
+        </identifier>
+        <active value="true"/>
+        <name>
+          <use value="usual"/>
+          <family value="Nguyen"/>
+          <given value="Katerina"/>
+          <prefix value="Mrs"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="0403 823 832"/>
+          <use value="mobile"/>
+          <rank value="1"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9398 1165"/>
+          <use value="home"/>
+          <rank value="2"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9876 5432"/>
+          <use value="work"/>
+          <rank value="3"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <value value="kate.nguyen79@gmail.com"/>
+          <use value="work"/>
+          <rank value="4"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1979-08-18"/>
+        <deceasedBoolean value="true"/>
+        <address>
+          <use value="home"/>
+          <line value="Unit 7"/>
+          <line value="76 Clydesdale St"/>
+          <city value="Como"/>
+          <state value="WA"/>
+          <postalCode value="6152"/>
+          <country value="Australia"/>
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://hl7.org/fhir/ValueSet/patient-contact-relationship"/>
+              <code value="partner"/>
+              <display value="Partner"/>
+            </coding>
+          </relationship>
+          <name>
+            <use value="usual"/>
+            <family value="Nguyen"/>
+            <given value="Jimmy"/>
+            <prefix value="Mr"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="0403 123 456"/>
+            <use value="mobile"/>
+            <rank value="1"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 4564 3214"/>
+            <use value="home"/>
+            <rank value="2"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 9994 5547"/>
+            <use value="work"/>
+            <rank value="3"/>
+          </telecom>
+          <telecom>
+            <system value="email"/>
+            <value value="jim.nguyen79@work.com"/>
+            <use value="work"/>
+            <rank value="4"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <line value="Unit 7"/>
+            <line value="76 Clydesdale St"/>
+            <city value="Como"/>
+            <state value="WA"/>
+            <postalCode value="6152"/>
+            <country value="Australia"/>
+          </address>
+          <gender value="male"/>
+        </contact>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/215756"/>
+    <resource>
+      <Patient>
+        <id value="215756"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T06:59:09.325+00:00"/>
+          <source value="#beLjTiL1Ov5Vyqcc"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Mrs Katerina 
+                     <b>NGUYEN </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>49476534</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>Unit 7 </span>
+                    <br/>
+                    <span>76 Clydesdale St </span>
+                    <br/>
+                    <span>Como </span>
+                    <span>WA </span>
+                    <span>Australia </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>18 August 1979</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <value value="49476534"/>
+        </identifier>
+        <active value="true"/>
+        <name>
+          <use value="usual"/>
+          <family value="Nguyen"/>
+          <given value="Katerina"/>
+          <prefix value="Mrs"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="0403 823 832"/>
+          <use value="mobile"/>
+          <rank value="1"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9398 1165"/>
+          <use value="home"/>
+          <rank value="2"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9876 5432"/>
+          <use value="work"/>
+          <rank value="3"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <value value="kate.nguyen79@gmail.com"/>
+          <use value="work"/>
+          <rank value="4"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1979-08-18"/>
+        <deceasedBoolean value="true"/>
+        <address>
+          <use value="home"/>
+          <line value="Unit 7"/>
+          <line value="76 Clydesdale St"/>
+          <city value="Como"/>
+          <state value="WA"/>
+          <postalCode value="6152"/>
+          <country value="Australia"/>
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://hl7.org/fhir/ValueSet/patient-contact-relationship"/>
+              <code value="partner"/>
+              <display value="Partner"/>
+            </coding>
+          </relationship>
+          <name>
+            <use value="usual"/>
+            <family value="Nguyen"/>
+            <given value="Jimmy"/>
+            <prefix value="Mr"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="0403 123 456"/>
+            <use value="mobile"/>
+            <rank value="1"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 4564 3214"/>
+            <use value="home"/>
+            <rank value="2"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 9994 5547"/>
+            <use value="work"/>
+            <rank value="3"/>
+          </telecom>
+          <telecom>
+            <system value="email"/>
+            <value value="jim.nguyen79@work.com"/>
+            <use value="work"/>
+            <rank value="4"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <line value="Unit 7"/>
+            <line value="76 Clydesdale St"/>
+            <city value="Como"/>
+            <state value="WA"/>
+            <postalCode value="6152"/>
+            <country value="Australia"/>
+          </address>
+          <gender value="male"/>
+        </contact>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1202"/>
+    <resource>
+      <Patient>
+        <id value="1202"/>
+        <meta>
+          <versionId value="7"/>
+          <lastUpdated value="2020-02-25T13:18:14.080+00:00"/>
+          <source value="#aYt8LZGamLDzoumV"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Jyoti 
+                     <b>Sahu </b> 
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>5911bfd0-687e-4ac9-ab37-04e8815e4f0d</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://hl7.org/fhir/v2/0203"/>
+              <code value="MR"/>
+            </coding>
+          </type>
+          <value value="5911bfd0-687e-4ac9-ab37-04e8815e4f0d"/>
+        </identifier>
+        <name>
+          <family value="Jyoti"/>
+          <given value="Sahu"/>
+        </name>
+        <telecom>
+          <system value="email"/>
+          <value value="jyoti.sahu@gmail.com"/>
+          <use value="work"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="061235222"/>
+          <use value="home"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="0632152212"/>
+          <use value="work"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1980-11-18"/>
+        <address>
+          <city value="US"/>
+        </address>
+        <generalPractitioner>
+          <reference value="Practitioner/1058"/>
+          <display value="Guru-General Practitioner"/>
+        </generalPractitioner>
+        <managingOrganization>
+          <reference value="Organization/1621"/>
+        </managingOrganization>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1203"/>
+    <resource>
+      <Patient>
+        <id value="1203"/>
+        <meta>
+          <versionId value="13"/>
+          <lastUpdated value="2020-05-25T14:14:53.935+00:00"/>
+          <source value="#nQe1yaxht0kjKXn6"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Aaron 
+                     <b>HANK </b> 
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>5911bfd0-687e-4ac9-ab37-04e8815e4f0d</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>UK </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>18 February 1960</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://hl7.org/fhir/v2/0203"/>
+              <code value="MR"/>
+            </coding>
+          </type>
+          <value value="5911bfd0-687e-4ac9-ab37-04e8815e4f0d"/>
+        </identifier>
+        <name>
+          <family value="Hank"/>
+          <given value="Aaron"/>
+        </name>
+        <telecom>
+          <system value="email"/>
+          <value value="hank.aaron@appexinnovation.com"/>
+          <use value="work"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="0612789638"/>
+          <use value="home"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="069562639"/>
+          <use value="work"/>
+        </telecom>
+        <gender value="male"/>
+        <birthDate value="1960-02-18"/>
+        <address>
+          <city value="UK"/>
+        </address>
+        <generalPractitioner>
+          <reference value="Practitioner/1058"/>
+          <display value="Guru-General Practitioner"/>
+        </generalPractitioner>
+        <managingOrganization>
+          <reference value="Organization/1621"/>
+          <display value="PHARMACIE DU GINKGO"/>
+        </managingOrganization>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/215959"/>
+    <resource>
+      <Patient>
+        <id value="215959"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T07:03:06.304+00:00"/>
+          <source value="#hDvuaCBPOciIV9vg"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Mrs Katerina 
+                     <b>NGUYEN </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>49476534</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>Unit 7 </span>
+                    <br/>
+                    <span>76 Clydesdale St </span>
+                    <br/>
+                    <span>Como </span>
+                    <span>WA </span>
+                    <span>Australia </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>18 August 1979</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <value value="49476534"/>
+        </identifier>
+        <active value="true"/>
+        <name>
+          <use value="usual"/>
+          <family value="Nguyen"/>
+          <given value="Katerina"/>
+          <prefix value="Mrs"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="0403 823 832"/>
+          <use value="mobile"/>
+          <rank value="1"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9398 1165"/>
+          <use value="home"/>
+          <rank value="2"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9876 5432"/>
+          <use value="work"/>
+          <rank value="3"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <value value="kate.nguyen79@gmail.com"/>
+          <use value="work"/>
+          <rank value="4"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1979-08-18"/>
+        <deceasedBoolean value="true"/>
+        <address>
+          <use value="home"/>
+          <line value="Unit 7"/>
+          <line value="76 Clydesdale St"/>
+          <city value="Como"/>
+          <state value="WA"/>
+          <postalCode value="6152"/>
+          <country value="Australia"/>
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://hl7.org/fhir/ValueSet/patient-contact-relationship"/>
+              <code value="partner"/>
+              <display value="Partner"/>
+            </coding>
+          </relationship>
+          <name>
+            <use value="usual"/>
+            <family value="Nguyen"/>
+            <given value="Jimmy"/>
+            <prefix value="Mr"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="0403 123 456"/>
+            <use value="mobile"/>
+            <rank value="1"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 4564 3214"/>
+            <use value="home"/>
+            <rank value="2"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 9994 5547"/>
+            <use value="work"/>
+            <rank value="3"/>
+          </telecom>
+          <telecom>
+            <system value="email"/>
+            <value value="jim.nguyen79@work.com"/>
+            <use value="work"/>
+            <rank value="4"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <line value="Unit 7"/>
+            <line value="76 Clydesdale St"/>
+            <city value="Como"/>
+            <state value="WA"/>
+            <postalCode value="6152"/>
+            <country value="Australia"/>
+          </address>
+          <gender value="male"/>
+        </contact>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1206"/>
+    <resource>
+      <Patient>
+        <id value="1206"/>
+        <meta>
+          <versionId value="6"/>
+          <lastUpdated value="2019-11-26T10:09:16.602+00:00"/>
+          <source value="#nlJMQ2LBNx71iQEg"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Rohit 
+                     <b>Victor </b> 
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>5911bfd0-687e-4ac9-ab37-04e8815e4f0d</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://hl7.org/fhir/v2/0203"/>
+              <code value="MR"/>
+            </coding>
+          </type>
+          <value value="5911bfd0-687e-4ac9-ab37-04e8815e4f0d"/>
+        </identifier>
+        <name>
+          <family value="Victor"/>
+          <given value="Rohit"/>
+        </name>
+        <telecom>
+          <system value="email"/>
+          <value value="rohit@appexinnovation.com"/>
+          <use value="work"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="0522352638"/>
+          <use value="home"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="0792152639"/>
+          <use value="work"/>
+        </telecom>
+        <gender value="male"/>
+        <birthDate value="1982-05-10"/>
+        <address>
+          <city value="Mumbai"/>
+        </address>
+        <generalPractitioner>
+          <reference value="Practitioner/1058"/>
+          <display value="Guru-General Practitioner"/>
+        </generalPractitioner>
+        <managingOrganization>
+          <reference value="Organization/1621"/>
+          <display value="CAPE COD HOSPITAL"/>
+        </managingOrganization>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1207"/>
+    <resource>
+      <Patient>
+        <id value="1207"/>
+        <meta>
+          <versionId value="6"/>
+          <lastUpdated value="2019-11-26T10:09:32.524+00:00"/>
+          <source value="#qpq4Eon8B5mZTGQJ"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Pratik 
+                     <b>B </b> 
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>5911bfd0-687e-4ac9-ab37-04e8815e4f0d</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <type>
+            <coding>
+              <system value="http://hl7.org/fhir/v2/0203"/>
+              <code value="MR"/>
+            </coding>
+          </type>
+          <value value="5911bfd0-687e-4ac9-ab37-04e8815e4f0d"/>
+        </identifier>
+        <name>
+          <family value="B"/>
+          <given value="Pratik"/>
+        </name>
+        <telecom>
+          <system value="email"/>
+          <value value="pratikB@appexinnovation.com"/>
+          <use value="work"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="0652352638"/>
+          <use value="home"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="0652152639"/>
+          <use value="work"/>
+        </telecom>
+        <gender value="male"/>
+        <birthDate value="1992-11-10"/>
+        <address>
+          <city value="Mumbai"/>
+        </address>
+        <generalPractitioner>
+          <reference value="Practitioner/1058"/>
+          <display value="Guru-General Practitioner"/>
+        </generalPractitioner>
+        <managingOrganization>
+          <reference value="Organization/1621"/>
+          <display value="CAPE COD HOSPITAL"/>
+        </managingOrganization>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1208"/>
+    <resource>
+      <Patient>
+        <id value="1208"/>
+        <meta>
+          <versionId value="13"/>
+          <lastUpdated value="2020-01-15T13:46:11.299+00:00"/>
+          <source value="#oLXZNGtuhH6uB4pm"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Murali 
+                     <b>A </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>undefined </span>
+                    <br/>
+                    <span>Mumbai </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>10 November 1992</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <name>
+          <family value="A"/>
+          <given value="Murali "/>
+        </name>
+        <gender value="male"/>
+        <birthDate value="1992-11-10"/>
+        <address>
+          <line value="undefined"/>
+          <city value="Mumbai"/>
+          <postalCode value="undefined"/>
+        </address>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/216059"/>
+    <resource>
+      <Patient>
+        <id value="216059"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T07:05:13.620+00:00"/>
+          <source value="#ZIIBoLwDhx8BGFg8"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Mrs Katerina 
+                     <b>NGUYEN </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>49476534</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>Unit 7 </span>
+                    <br/>
+                    <span>76 Clydesdale St </span>
+                    <br/>
+                    <span>Como </span>
+                    <span>WA </span>
+                    <span>Australia </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>18 August 1979</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <value value="49476534"/>
+        </identifier>
+        <active value="true"/>
+        <name>
+          <use value="usual"/>
+          <family value="Nguyen"/>
+          <given value="Katerina"/>
+          <prefix value="Mrs"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="0403 823 832"/>
+          <use value="mobile"/>
+          <rank value="1"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9398 1165"/>
+          <use value="home"/>
+          <rank value="2"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9876 5432"/>
+          <use value="work"/>
+          <rank value="3"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <value value="kate.nguyen79@gmail.com"/>
+          <use value="work"/>
+          <rank value="4"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1979-08-18"/>
+        <deceasedBoolean value="true"/>
+        <address>
+          <use value="home"/>
+          <line value="Unit 7"/>
+          <line value="76 Clydesdale St"/>
+          <city value="Como"/>
+          <state value="WA"/>
+          <postalCode value="6152"/>
+          <country value="Australia"/>
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://hl7.org/fhir/ValueSet/patient-contact-relationship"/>
+              <code value="partner"/>
+              <display value="Partner"/>
+            </coding>
+          </relationship>
+          <name>
+            <use value="usual"/>
+            <family value="Nguyen"/>
+            <given value="Jimmy"/>
+            <prefix value="Mr"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="0403 123 456"/>
+            <use value="mobile"/>
+            <rank value="1"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 4564 3214"/>
+            <use value="home"/>
+            <rank value="2"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 9994 5547"/>
+            <use value="work"/>
+            <rank value="3"/>
+          </telecom>
+          <telecom>
+            <system value="email"/>
+            <value value="jim.nguyen79@work.com"/>
+            <use value="work"/>
+            <rank value="4"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <line value="Unit 7"/>
+            <line value="76 Clydesdale St"/>
+            <city value="Como"/>
+            <state value="WA"/>
+            <postalCode value="6152"/>
+            <country value="Australia"/>
+          </address>
+          <gender value="male"/>
+        </contact>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/206686"/>
+    <resource>
+      <Patient>
+        <id value="206686"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T05:47:54.778+00:00"/>
+          <source value="#P3svz7XS39BeZDdU"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Mrs Katerina 
+                     <b>NGUYEN </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>49476534</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>Unit 7 </span>
+                    <br/>
+                    <span>76 Clydesdale St </span>
+                    <br/>
+                    <span>Como </span>
+                    <span>WA </span>
+                    <span>Australia </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>18 August 1979</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <value value="49476534"/>
+        </identifier>
+        <active value="true"/>
+        <name>
+          <use value="usual"/>
+          <family value="Nguyen"/>
+          <given value="Katerina"/>
+          <prefix value="Mrs"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="0403 823 832"/>
+          <use value="mobile"/>
+          <rank value="1"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9398 1165"/>
+          <use value="home"/>
+          <rank value="2"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9876 5432"/>
+          <use value="work"/>
+          <rank value="3"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <value value="kate.nguyen79@gmail.com"/>
+          <use value="work"/>
+          <rank value="4"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1979-08-18"/>
+        <deceasedBoolean value="true"/>
+        <address>
+          <use value="home"/>
+          <line value="Unit 7"/>
+          <line value="76 Clydesdale St"/>
+          <city value="Como"/>
+          <state value="WA"/>
+          <postalCode value="6152"/>
+          <country value="Australia"/>
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://hl7.org/fhir/ValueSet/patient-contact-relationship"/>
+              <code value="partner"/>
+              <display value="Partner"/>
+            </coding>
+          </relationship>
+          <name>
+            <use value="usual"/>
+            <family value="Nguyen"/>
+            <given value="Jimmy"/>
+            <prefix value="Mr"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="0403 123 456"/>
+            <use value="mobile"/>
+            <rank value="1"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 4564 3214"/>
+            <use value="home"/>
+            <rank value="2"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 9994 5547"/>
+            <use value="work"/>
+            <rank value="3"/>
+          </telecom>
+          <telecom>
+            <system value="email"/>
+            <value value="jim.nguyen79@work.com"/>
+            <use value="work"/>
+            <rank value="4"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <line value="Unit 7"/>
+            <line value="76 Clydesdale St"/>
+            <city value="Como"/>
+            <state value="WA"/>
+            <postalCode value="6152"/>
+            <country value="Australia"/>
+          </address>
+          <gender value="male"/>
+        </contact>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/215900"/>
+    <resource>
+      <Patient>
+        <id value="215900"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-12-05T07:00:58.680+00:00"/>
+          <source value="#lFPzYOnmZAk7XchS"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">Mrs Katerina 
+                     <b>NGUYEN </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>49476534</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>Unit 7 </span>
+                    <br/>
+                    <span>76 Clydesdale St </span>
+                    <br/>
+                    <span>Como </span>
+                    <span>WA </span>
+                    <span>Australia </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>18 August 1979</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <value value="49476534"/>
+        </identifier>
+        <active value="true"/>
+        <name>
+          <use value="usual"/>
+          <family value="Nguyen"/>
+          <given value="Katerina"/>
+          <prefix value="Mrs"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="0403 823 832"/>
+          <use value="mobile"/>
+          <rank value="1"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9398 1165"/>
+          <use value="home"/>
+          <rank value="2"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="08 9876 5432"/>
+          <use value="work"/>
+          <rank value="3"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <value value="kate.nguyen79@gmail.com"/>
+          <use value="work"/>
+          <rank value="4"/>
+        </telecom>
+        <gender value="female"/>
+        <birthDate value="1979-08-18"/>
+        <deceasedBoolean value="true"/>
+        <address>
+          <use value="home"/>
+          <line value="Unit 7"/>
+          <line value="76 Clydesdale St"/>
+          <city value="Como"/>
+          <state value="WA"/>
+          <postalCode value="6152"/>
+          <country value="Australia"/>
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://hl7.org/fhir/ValueSet/patient-contact-relationship"/>
+              <code value="partner"/>
+              <display value="Partner"/>
+            </coding>
+          </relationship>
+          <name>
+            <use value="usual"/>
+            <family value="Nguyen"/>
+            <given value="Jimmy"/>
+            <prefix value="Mr"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="0403 123 456"/>
+            <use value="mobile"/>
+            <rank value="1"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 4564 3214"/>
+            <use value="home"/>
+            <rank value="2"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="08 9994 5547"/>
+            <use value="work"/>
+            <rank value="3"/>
+          </telecom>
+          <telecom>
+            <system value="email"/>
+            <value value="jim.nguyen79@work.com"/>
+            <use value="work"/>
+            <rank value="4"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <line value="Unit 7"/>
+            <line value="76 Clydesdale St"/>
+            <city value="Como"/>
+            <state value="WA"/>
+            <postalCode value="6152"/>
+            <country value="Australia"/>
+          </address>
+          <gender value="male"/>
+        </contact>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+</Bundle>

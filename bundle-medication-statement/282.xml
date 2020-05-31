@@ -1,0 +1,2044 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bundle>
+  <id value="15792624-5f41-4e1b-89cd-99bb6d64f628"/>
+  <meta>
+    <lastUpdated value="2020-05-31T19:18:49.635+00:00"/>
+  </meta>
+  <type value="searchset"/>
+  <total value="5700"/>
+  <link>
+    <relation value="self"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=5620&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="next"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=5640&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <link>
+    <relation value="previous"/>
+    <url value="http://hapi.fhir.org/baseR4?_getpages=15792624-5f41-4e1b-89cd-99bb6d64f628&amp;_getpagesoffset=5600&amp;_count=20&amp;_format=xml&amp;_pretty=true&amp;_bundletype=searchset"/>
+  </link>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/45211"/>
+    <resource>
+      <MedicationStatement>
+        <id value="45211"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-11T03:42:36.462+00:00"/>
+          <source value="#a28976b0b0ba3df2"/>
+        </meta>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="182862001"/>
+            <display value="Drug not taken - dislike taste"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="261000"/>
+            <display value="Codeine phosphate"/>
+          </coding>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/39089"/>
+        </subject>
+        <context>
+          <reference value="Encounter/45200"/>
+        </context>
+        <effectivePeriod>
+          <start value="2009-09-01T04:10:38.000+00:00"/>
+          <end value="2009-09-01T04:10:38.000+00:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2009-09-01T04:10:38"/>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="109006"/>
+            <display value="Anxiety disorder of childhood OR adolescence"/>
+          </coding>
+        </reasonCode>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/45195"/>
+    <resource>
+      <MedicationStatement>
+        <id value="45195"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-11T03:36:31.940+00:00"/>
+          <source value="#0413cf94d3d873b0"/>
+        </meta>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="182862001"/>
+            <display value="Drug not taken - dislike taste"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="261000"/>
+            <display value="Codeine phosphate"/>
+          </coding>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/39089"/>
+        </subject>
+        <context>
+          <reference value="Encounter/45184"/>
+        </context>
+        <effectivePeriod>
+          <start value="2009-09-01T04:10:38.000+00:00"/>
+          <end value="2009-09-01T04:10:38.000+00:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2009-09-01T04:10:38"/>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="109006"/>
+            <display value="Anxiety disorder of childhood OR adolescence"/>
+          </coding>
+        </reasonCode>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/45179"/>
+    <resource>
+      <MedicationStatement>
+        <id value="45179"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-11T03:35:33.532+00:00"/>
+          <source value="#af73dd11f7182b62"/>
+        </meta>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="182862001"/>
+            <display value="Drug not taken - dislike taste"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="261000"/>
+            <display value="Codeine phosphate"/>
+          </coding>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/39089"/>
+        </subject>
+        <context>
+          <reference value="Encounter/45168"/>
+        </context>
+        <effectivePeriod>
+          <start value="2009-09-01T04:10:38.000+00:00"/>
+          <end value="2009-09-01T04:10:38.000+00:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2009-09-01T04:10:38"/>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="109006"/>
+            <display value="Anxiety disorder of childhood OR adolescence"/>
+          </coding>
+        </reasonCode>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/45163"/>
+    <resource>
+      <MedicationStatement>
+        <id value="45163"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-11T03:33:58.559+00:00"/>
+          <source value="#c796d6b4d542c833"/>
+        </meta>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="182862001"/>
+            <display value="Drug not taken - dislike taste"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="261000"/>
+            <display value="Codeine phosphate"/>
+          </coding>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/39089"/>
+        </subject>
+        <context>
+          <reference value="Encounter/45152"/>
+        </context>
+        <effectivePeriod>
+          <start value="2009-09-01T04:10:38.000+00:00"/>
+          <end value="2009-09-01T04:10:38.000+00:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2009-09-01T04:10:38"/>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="109006"/>
+            <display value="Anxiety disorder of childhood OR adolescence"/>
+          </coding>
+        </reasonCode>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/45147"/>
+    <resource>
+      <MedicationStatement>
+        <id value="45147"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-11T03:32:18.050+00:00"/>
+          <source value="#4dc55b7833446349"/>
+        </meta>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="182862001"/>
+            <display value="Drug not taken - dislike taste"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="261000"/>
+            <display value="Codeine phosphate"/>
+          </coding>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/39089"/>
+        </subject>
+        <context>
+          <reference value="Encounter/45136"/>
+        </context>
+        <effectivePeriod>
+          <start value="2009-09-01T04:10:38.000+00:00"/>
+          <end value="2009-09-01T04:10:38.000+00:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2009-09-01T04:10:38"/>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="109006"/>
+            <display value="Anxiety disorder of childhood OR adolescence"/>
+          </coding>
+        </reasonCode>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/45131"/>
+    <resource>
+      <MedicationStatement>
+        <id value="45131"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-11T03:30:06.479+00:00"/>
+          <source value="#3fde521fb1d069ac"/>
+        </meta>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="182862001"/>
+            <display value="Drug not taken - dislike taste"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="261000"/>
+            <display value="Codeine phosphate"/>
+          </coding>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/39089"/>
+        </subject>
+        <context>
+          <reference value="Encounter/45120"/>
+        </context>
+        <effectivePeriod>
+          <start value="2009-09-01T04:10:38.000+00:00"/>
+          <end value="2009-09-01T04:10:38.000+00:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2009-09-01T04:10:38"/>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="109006"/>
+            <display value="Anxiety disorder of childhood OR adolescence"/>
+          </coding>
+        </reasonCode>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/45115"/>
+    <resource>
+      <MedicationStatement>
+        <id value="45115"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-11T03:29:19.269+00:00"/>
+          <source value="#c9f682179507beae"/>
+        </meta>
+        <status value="completed"/>
+        <statusReason>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="182862001"/>
+            <display value="Drug not taken - dislike taste"/>
+          </coding>
+        </statusReason>
+        <category>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/medication-statement-category"/>
+            <code value="inpatient"/>
+            <display value="Inpatient"/>
+          </coding>
+        </category>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="261000"/>
+            <display value="Codeine phosphate"/>
+          </coding>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/39089"/>
+        </subject>
+        <context>
+          <reference value="Encounter/45104"/>
+        </context>
+        <effectivePeriod>
+          <start value="2009-09-01T04:10:38.000+00:00"/>
+          <end value="2009-09-01T04:10:38.000+00:00"/>
+        </effectivePeriod>
+        <dateAsserted value="2009-09-01T04:10:38"/>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="109006"/>
+            <display value="Anxiety disorder of childhood OR adolescence"/>
+          </coding>
+        </reasonCode>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/42090"/>
+    <resource>
+      <MedicationStatement>
+        <id value="42090"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-09T22:44:05.728+00:00"/>
+          <source value="#5f9892f03e43e754"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>prednisone 20mg 2 tabs/day</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="325456002"/>
+            <display value="prednisone 20mg"/>
+          </coding>
+          <text value="prednisone 20mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/42024"/>
+        </subject>
+        <dosage>
+          <text value="2 tabs once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="true"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/42087"/>
+    <resource>
+      <MedicationStatement>
+        <id value="42087"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-09T22:44:05.728+00:00"/>
+          <source value="#5f9892f03e43e754"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>metformin 1000mg twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="411533003"/>
+            <display value="metformin 1000mg"/>
+          </coding>
+          <text value="metformin 1000mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/42024"/>
+        </subject>
+        <dosage>
+          <text value="1 tab twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/42086"/>
+    <resource>
+      <MedicationStatement>
+        <id value="42086"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-09T22:44:05.728+00:00"/>
+          <source value="#5f9892f03e43e754"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>losartan 100mg + hydrochlorothiazide 12.5mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="444639002"/>
+            <display value="losartan 100mg + hydrochlorothiazide 12.5mg"/>
+          </coding>
+          <text value="losartan 100mg + hydrochlorothiazide 12.5mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/42024"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/42096"/>
+    <resource>
+      <MedicationStatement>
+        <id value="42096"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-09T22:44:05.728+00:00"/>
+          <source value="#5f9892f03e43e754"/>
+        </meta>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="321323009"/>
+            <display value="buspirone 5mg"/>
+          </coding>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/42024"/>
+        </subject>
+        <dosage>
+          <text value="3 times daily"/>
+          <timing>
+            <repeat>
+              <frequency value="3"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/42085"/>
+    <resource>
+      <MedicationStatement>
+        <id value="42085"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-09T22:44:05.728+00:00"/>
+          <source value="#5f9892f03e43e754"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>insulin glargine 100units/mL 28 units nocte</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="400847007"/>
+            <display value="insulin glargine 100units/mL injection"/>
+          </coding>
+          <text value="insulin glargine 100units/mL injection"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/42024"/>
+        </subject>
+        <dosage>
+          <text value="28 units before bed"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/42095"/>
+    <resource>
+      <MedicationStatement>
+        <id value="42095"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-09T22:44:05.728+00:00"/>
+          <source value="#5f9892f03e43e754"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>isosorbide mononitrate 20mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="319134001"/>
+            <display value="isosorbide mononitrate 20mg"/>
+          </coding>
+          <text value="isosorbide mononitrate 20mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/42024"/>
+        </subject>
+        <dosage>
+          <text value="once daily at bedtime"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/42084"/>
+    <resource>
+      <MedicationStatement>
+        <id value="42084"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-09T22:44:05.728+00:00"/>
+          <source value="#5f9892f03e43e754"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>gabapentin 600mg twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="323021008"/>
+            <display value="gabapentin 600mg"/>
+          </coding>
+          <text value="gabapentin 600mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/42024"/>
+        </subject>
+        <dosage>
+          <text value="twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/42094"/>
+    <resource>
+      <MedicationStatement>
+        <id value="42094"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-09T22:44:05.728+00:00"/>
+          <source value="#5f9892f03e43e754"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>lisinopril 20mg mane</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="318860005"/>
+            <display value="lisinopril 20mg"/>
+          </coding>
+          <text value="lisinopril 20mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/42024"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/42083"/>
+    <resource>
+      <MedicationStatement>
+        <id value="42083"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-09T22:44:05.728+00:00"/>
+          <source value="#5f9892f03e43e754"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>citalopram 20 mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="321987003"/>
+            <display value="citalopram 20 mg"/>
+          </coding>
+          <text value="citalopram 20 mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/42024"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/42093"/>
+    <resource>
+      <MedicationStatement>
+        <id value="42093"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-09T22:44:05.728+00:00"/>
+          <source value="#5f9892f03e43e754"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>zolpidem 5mg sublingual tablet, 1 nocte</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="442160008"/>
+            <display value="zolpidem 5mg sublingual tablet"/>
+          </coding>
+          <text value="zolpidem 5mg sublingual tablet"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/42024"/>
+        </subject>
+        <dosage>
+          <text value="1 tab before bed"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/42082"/>
+    <resource>
+      <MedicationStatement>
+        <id value="42082"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-09T22:44:05.728+00:00"/>
+          <source value="#5f9892f03e43e754"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>chlortalidone 15 mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="376321007"/>
+            <display value="chlortalidone 15 mg"/>
+          </coding>
+          <text value="chlortalidone 15 mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/42024"/>
+        </subject>
+        <dosage>
+          <text value="once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/42092"/>
+    <resource>
+      <MedicationStatement>
+        <id value="42092"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-09T22:44:05.728+00:00"/>
+          <source value="#5f9892f03e43e754"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>terbinafine 250mg once daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="324718007"/>
+            <display value="terbinafine 250mg"/>
+          </coding>
+          <text value="terbinafine 250mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/42024"/>
+        </subject>
+        <dosage>
+          <text value="1 tab once daily"/>
+          <timing>
+            <repeat>
+              <frequency value="1"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+          <asNeededBoolean value="true"/>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/MedicationStatement/42081"/>
+    <resource>
+      <MedicationStatement>
+        <id value="42081"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-09T22:44:05.728+00:00"/>
+          <source value="#5f9892f03e43e754"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>carvedilol 25 mg twice daily</div>
+        </text>
+        <status value="active"/>
+        <medicationCodeableConcept>
+          <coding>
+            <system value="http://snomed.info/ct"/>
+            <code value="318632005"/>
+            <display value="carvedilol 25 mg"/>
+          </coding>
+          <text value="carvedilol 25 mg"/>
+        </medicationCodeableConcept>
+        <subject>
+          <reference value="Patient/42024"/>
+        </subject>
+        <dosage>
+          <text value="twice daily"/>
+          <timing>
+            <repeat>
+              <frequency value="2"/>
+              <period value="1"/>
+              <periodUnit value="d"/>
+            </repeat>
+          </timing>
+        </dosage>
+      </MedicationStatement>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/45104"/>
+    <resource>
+      <Encounter>
+        <id value="45104"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-11T03:29:19.269+00:00"/>
+          <source value="#c9f682179507beae"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical record number"/>
+            </coding>
+          </type>
+          <value value="12345777"/>
+        </identifier>
+        <status value="finished"/>
+        <class>
+          <code value="inpatient"/>
+        </class>
+        <priority>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-ActPriority"/>
+            <code value="EL"/>
+            <display value="elective"/>
+          </coding>
+        </priority>
+        <subject>
+          <reference value="Patient/39089"/>
+          <display value="LN3062 FN3062 MN3062"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1472"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1473"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1474"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1475"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2010-11-11T11:12:14.456+07:00"/>
+          <end value="2010-11-11T11:12:14.456+07:00"/>
+        </period>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="109006"/>
+            <display value="Anxiety disorder of childhood OR adolescence (disorder)"/>
+          </coding>
+        </reasonCode>
+        <hospitalization>
+          <preAdmissionIdentifier>
+            <use value="official"/>
+            <value value="1234"/>
+          </preAdmissionIdentifier>
+          <admitSource>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/admit-source"/>
+              <code value="hosp-trans"/>
+              <display value="Transferred from other hospital"/>
+            </coding>
+          </admitSource>
+          <reAdmission>
+            <coding>
+              <userSelected value="true"/>
+            </coding>
+          </reAdmission>
+          <dietPreference>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/diet"/>
+              <code value="vegetarian"/>
+              <display value="Vegetarian"/>
+            </coding>
+          </dietPreference>
+          <dischargeDisposition>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/discharge-disposition"/>
+              <code value="aadvice"/>
+              <display value="Left against advice"/>
+            </coding>
+          </dischargeDisposition>
+        </hospitalization>
+        <location>
+          <location>
+            <reference value="Location/45102"/>
+          </location>
+          <physicalType>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/location-physical-type"/>
+              <code value="bu"/>
+              <display value="Building"/>
+            </coding>
+          </physicalType>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/185"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/45120"/>
+    <resource>
+      <Encounter>
+        <id value="45120"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-11T03:30:06.479+00:00"/>
+          <source value="#3fde521fb1d069ac"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical record number"/>
+            </coding>
+          </type>
+          <value value="12345777"/>
+        </identifier>
+        <status value="finished"/>
+        <class>
+          <code value="inpatient"/>
+        </class>
+        <priority>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-ActPriority"/>
+            <code value="EL"/>
+            <display value="elective"/>
+          </coding>
+        </priority>
+        <subject>
+          <reference value="Patient/39089"/>
+          <display value="LN3062 FN3062 MN3062"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1472"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1473"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1474"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1475"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2010-11-11T11:12:14.456+07:00"/>
+          <end value="2010-11-11T11:12:14.456+07:00"/>
+        </period>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="109006"/>
+            <display value="Anxiety disorder of childhood OR adolescence (disorder)"/>
+          </coding>
+        </reasonCode>
+        <hospitalization>
+          <preAdmissionIdentifier>
+            <use value="official"/>
+            <value value="1234"/>
+          </preAdmissionIdentifier>
+          <admitSource>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/admit-source"/>
+              <code value="hosp-trans"/>
+              <display value="Transferred from other hospital"/>
+            </coding>
+          </admitSource>
+          <reAdmission>
+            <coding>
+              <userSelected value="true"/>
+            </coding>
+          </reAdmission>
+          <dietPreference>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/diet"/>
+              <code value="vegetarian"/>
+              <display value="Vegetarian"/>
+            </coding>
+          </dietPreference>
+          <dischargeDisposition>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/discharge-disposition"/>
+              <code value="aadvice"/>
+              <display value="Left against advice"/>
+            </coding>
+          </dischargeDisposition>
+        </hospitalization>
+        <location>
+          <location>
+            <reference value="Location/45118"/>
+          </location>
+          <physicalType>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/location-physical-type"/>
+              <code value="bu"/>
+              <display value="Building"/>
+            </coding>
+          </physicalType>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/185"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/45136"/>
+    <resource>
+      <Encounter>
+        <id value="45136"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-11T03:32:18.050+00:00"/>
+          <source value="#4dc55b7833446349"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical record number"/>
+            </coding>
+          </type>
+          <value value="12345777"/>
+        </identifier>
+        <status value="finished"/>
+        <class>
+          <code value="inpatient"/>
+        </class>
+        <priority>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-ActPriority"/>
+            <code value="EL"/>
+            <display value="elective"/>
+          </coding>
+        </priority>
+        <subject>
+          <reference value="Patient/39089"/>
+          <display value="LN3062 FN3062 MN3062"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1472"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1473"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1474"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1475"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2010-11-11T11:12:14.456+07:00"/>
+          <end value="2010-11-11T11:12:14.456+07:00"/>
+        </period>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="109006"/>
+            <display value="Anxiety disorder of childhood OR adolescence (disorder)"/>
+          </coding>
+        </reasonCode>
+        <hospitalization>
+          <preAdmissionIdentifier>
+            <use value="official"/>
+            <value value="1234"/>
+          </preAdmissionIdentifier>
+          <admitSource>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/admit-source"/>
+              <code value="hosp-trans"/>
+              <display value="Transferred from other hospital"/>
+            </coding>
+          </admitSource>
+          <reAdmission>
+            <coding>
+              <userSelected value="true"/>
+            </coding>
+          </reAdmission>
+          <dietPreference>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/diet"/>
+              <code value="vegetarian"/>
+              <display value="Vegetarian"/>
+            </coding>
+          </dietPreference>
+          <dischargeDisposition>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/discharge-disposition"/>
+              <code value="aadvice"/>
+              <display value="Left against advice"/>
+            </coding>
+          </dischargeDisposition>
+        </hospitalization>
+        <location>
+          <location>
+            <reference value="Location/45134"/>
+          </location>
+          <physicalType>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/location-physical-type"/>
+              <code value="bu"/>
+              <display value="Building"/>
+            </coding>
+          </physicalType>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/185"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/45152"/>
+    <resource>
+      <Encounter>
+        <id value="45152"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-11T03:33:58.559+00:00"/>
+          <source value="#c796d6b4d542c833"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical record number"/>
+            </coding>
+          </type>
+          <value value="12345777"/>
+        </identifier>
+        <status value="finished"/>
+        <class>
+          <code value="inpatient"/>
+        </class>
+        <priority>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-ActPriority"/>
+            <code value="EL"/>
+            <display value="elective"/>
+          </coding>
+        </priority>
+        <subject>
+          <reference value="Patient/39089"/>
+          <display value="LN3062 FN3062 MN3062"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1472"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1473"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1474"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1475"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2010-11-11T11:12:14.456+07:00"/>
+          <end value="2010-11-11T11:12:14.456+07:00"/>
+        </period>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="109006"/>
+            <display value="Anxiety disorder of childhood OR adolescence (disorder)"/>
+          </coding>
+        </reasonCode>
+        <hospitalization>
+          <preAdmissionIdentifier>
+            <use value="official"/>
+            <value value="1234"/>
+          </preAdmissionIdentifier>
+          <admitSource>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/admit-source"/>
+              <code value="hosp-trans"/>
+              <display value="Transferred from other hospital"/>
+            </coding>
+          </admitSource>
+          <reAdmission>
+            <coding>
+              <userSelected value="true"/>
+            </coding>
+          </reAdmission>
+          <dietPreference>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/diet"/>
+              <code value="vegetarian"/>
+              <display value="Vegetarian"/>
+            </coding>
+          </dietPreference>
+          <dischargeDisposition>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/discharge-disposition"/>
+              <code value="aadvice"/>
+              <display value="Left against advice"/>
+            </coding>
+          </dischargeDisposition>
+        </hospitalization>
+        <location>
+          <location>
+            <reference value="Location/45150"/>
+          </location>
+          <physicalType>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/location-physical-type"/>
+              <code value="bu"/>
+              <display value="Building"/>
+            </coding>
+          </physicalType>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/185"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/45168"/>
+    <resource>
+      <Encounter>
+        <id value="45168"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-11T03:35:33.532+00:00"/>
+          <source value="#af73dd11f7182b62"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical record number"/>
+            </coding>
+          </type>
+          <value value="12345777"/>
+        </identifier>
+        <status value="finished"/>
+        <class>
+          <code value="inpatient"/>
+        </class>
+        <priority>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-ActPriority"/>
+            <code value="EL"/>
+            <display value="elective"/>
+          </coding>
+        </priority>
+        <subject>
+          <reference value="Patient/39089"/>
+          <display value="LN3062 FN3062 MN3062"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1472"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1473"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1474"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1475"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2010-11-11T11:12:14.456+07:00"/>
+          <end value="2010-11-11T11:12:14.456+07:00"/>
+        </period>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="109006"/>
+            <display value="Anxiety disorder of childhood OR adolescence (disorder)"/>
+          </coding>
+        </reasonCode>
+        <hospitalization>
+          <preAdmissionIdentifier>
+            <use value="official"/>
+            <value value="1234"/>
+          </preAdmissionIdentifier>
+          <admitSource>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/admit-source"/>
+              <code value="hosp-trans"/>
+              <display value="Transferred from other hospital"/>
+            </coding>
+          </admitSource>
+          <reAdmission>
+            <coding>
+              <userSelected value="true"/>
+            </coding>
+          </reAdmission>
+          <dietPreference>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/diet"/>
+              <code value="vegetarian"/>
+              <display value="Vegetarian"/>
+            </coding>
+          </dietPreference>
+          <dischargeDisposition>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/discharge-disposition"/>
+              <code value="aadvice"/>
+              <display value="Left against advice"/>
+            </coding>
+          </dischargeDisposition>
+        </hospitalization>
+        <location>
+          <location>
+            <reference value="Location/45166"/>
+          </location>
+          <physicalType>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/location-physical-type"/>
+              <code value="bu"/>
+              <display value="Building"/>
+            </coding>
+          </physicalType>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/185"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/45184"/>
+    <resource>
+      <Encounter>
+        <id value="45184"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-11T03:36:31.940+00:00"/>
+          <source value="#0413cf94d3d873b0"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical record number"/>
+            </coding>
+          </type>
+          <value value="12345777"/>
+        </identifier>
+        <status value="finished"/>
+        <class>
+          <code value="inpatient"/>
+        </class>
+        <priority>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-ActPriority"/>
+            <code value="EL"/>
+            <display value="elective"/>
+          </coding>
+        </priority>
+        <subject>
+          <reference value="Patient/39089"/>
+          <display value="LN3062 FN3062 MN3062"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1472"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1473"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1474"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1475"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2010-11-11T11:12:14.456+07:00"/>
+          <end value="2010-11-11T11:12:14.456+07:00"/>
+        </period>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="109006"/>
+            <display value="Anxiety disorder of childhood OR adolescence (disorder)"/>
+          </coding>
+        </reasonCode>
+        <hospitalization>
+          <preAdmissionIdentifier>
+            <use value="official"/>
+            <value value="1234"/>
+          </preAdmissionIdentifier>
+          <admitSource>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/admit-source"/>
+              <code value="hosp-trans"/>
+              <display value="Transferred from other hospital"/>
+            </coding>
+          </admitSource>
+          <reAdmission>
+            <coding>
+              <userSelected value="true"/>
+            </coding>
+          </reAdmission>
+          <dietPreference>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/diet"/>
+              <code value="vegetarian"/>
+              <display value="Vegetarian"/>
+            </coding>
+          </dietPreference>
+          <dischargeDisposition>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/discharge-disposition"/>
+              <code value="aadvice"/>
+              <display value="Left against advice"/>
+            </coding>
+          </dischargeDisposition>
+        </hospitalization>
+        <location>
+          <location>
+            <reference value="Location/45182"/>
+          </location>
+          <physicalType>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/location-physical-type"/>
+              <code value="bu"/>
+              <display value="Building"/>
+            </coding>
+          </physicalType>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/185"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Encounter/45200"/>
+    <resource>
+      <Encounter>
+        <id value="45200"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-11T03:42:36.462+00:00"/>
+          <source value="#a28976b0b0ba3df2"/>
+        </meta>
+        <identifier>
+          <use value="official"/>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical record number"/>
+            </coding>
+          </type>
+          <value value="12345777"/>
+        </identifier>
+        <status value="finished"/>
+        <class>
+          <code value="inpatient"/>
+        </class>
+        <priority>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-ActPriority"/>
+            <code value="EL"/>
+            <display value="elective"/>
+          </coding>
+        </priority>
+        <subject>
+          <reference value="Patient/39089"/>
+          <display value="LN3062 FN3062 MN3062"/>
+        </subject>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1472"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1473"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1474"/>
+          </individual>
+        </participant>
+        <participant>
+          <individual>
+            <reference value="Practitioner/1475"/>
+          </individual>
+        </participant>
+        <period>
+          <start value="2010-11-11T11:12:14.456+07:00"/>
+          <end value="2010-11-11T11:12:14.456+07:00"/>
+        </period>
+        <reasonCode>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="109006"/>
+            <display value="Anxiety disorder of childhood OR adolescence (disorder)"/>
+          </coding>
+        </reasonCode>
+        <hospitalization>
+          <preAdmissionIdentifier>
+            <use value="official"/>
+            <value value="1234"/>
+          </preAdmissionIdentifier>
+          <admitSource>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/admit-source"/>
+              <code value="hosp-trans"/>
+              <display value="Transferred from other hospital"/>
+            </coding>
+          </admitSource>
+          <reAdmission>
+            <coding>
+              <userSelected value="true"/>
+            </coding>
+          </reAdmission>
+          <dietPreference>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/diet"/>
+              <code value="vegetarian"/>
+              <display value="Vegetarian"/>
+            </coding>
+          </dietPreference>
+          <dischargeDisposition>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/discharge-disposition"/>
+              <code value="aadvice"/>
+              <display value="Left against advice"/>
+            </coding>
+          </dischargeDisposition>
+        </hospitalization>
+        <location>
+          <location>
+            <reference value="Location/45198"/>
+          </location>
+          <physicalType>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/location-physical-type"/>
+              <code value="bu"/>
+              <display value="Building"/>
+            </coding>
+          </physicalType>
+        </location>
+        <serviceProvider>
+          <reference value="Organization/185"/>
+        </serviceProvider>
+      </Encounter>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/39089"/>
+    <resource>
+      <Patient>
+        <id value="39089"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-01T10:53:20.578+00:00"/>
+          <source value="#65be93fc3146e3e8"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>
+            <div class="hapiHeaderText">FN3062 MN3062 
+                     <b>LN3062 </b>
+                  </div>
+            <table class="hapiPropertyTable">
+              <tbody>
+                <tr>
+                  <td>Identifier</td>
+                  <td>shwetha1</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <span>Street comp1 comp2 </span>
+                    <br/>
+                    <span>AddLine2 </span>
+                    <br/>
+                    <span>Seattle </span>
+                    <span>WA </span>
+                    <span>USA </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date of birth</td>
+                  <td>
+                    <span>10 October 2001</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </text>
+        <identifier>
+          <use value="usual"/>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="MR"/>
+              <display value="Medical record number"/>
+            </coding>
+          </type>
+          <system value="http://hl7.org/fhir/identifier-type"/>
+          <value value="shwetha1"/>
+        </identifier>
+        <identifier>
+          <use value="official"/>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="PLAC"/>
+              <display value="Placer Identifier"/>
+            </coding>
+          </type>
+          <system value="http://hl7.org/fhir/identifier-type"/>
+          <value value="23062"/>
+        </identifier>
+        <identifier>
+          <use value="official"/>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="PRN"/>
+              <display value="Provider number"/>
+            </coding>
+          </type>
+          <system value="http://hl7.org/fhir/sid/us-ssn"/>
+          <value value="111222333"/>
+        </identifier>
+        <identifier>
+          <use value="secondary"/>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="SNO"/>
+              <display value="Serial Number"/>
+            </coding>
+          </type>
+          <system value="http://hl7.org/fhir/identifier-type"/>
+          <value value="2333"/>
+        </identifier>
+        <identifier>
+          <use value="official"/>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="FILL"/>
+              <display value="Filler Identifier"/>
+            </coding>
+          </type>
+          <system value="https://radboud.nl/id"/>
+          <value value="11111111111"/>
+        </identifier>
+        <identifier>
+          <use value="official"/>
+          <type>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+              <code value="DL"/>
+              <display value="Driver's license number"/>
+            </coding>
+          </type>
+          <system value="https://radboud.nl/identifiers/PatientIdentifier"/>
+          <value value="33333333333"/>
+        </identifier>
+        <name>
+          <use value="usual"/>
+          <family value="LN3062"/>
+          <given value="FN3062"/>
+          <given value="MN3062"/>
+        </name>
+        <name>
+          <use value="usual"/>
+          <family value="Test"/>
+          <given value="Test"/>
+        </name>
+        <telecom>
+          <system value="phone"/>
+          <value value="123-456-1111"/>
+          <use value="home"/>
+        </telecom>
+        <telecom>
+          <system value="phone"/>
+          <value value="098-765-1111"/>
+          <use value="work"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <use value="home"/>
+        </telecom>
+        <telecom>
+          <system value="email"/>
+          <use value="work"/>
+        </telecom>
+        <gender value="male"/>
+        <birthDate value="2001-10-10"/>
+        <deceasedDateTime value="2010-11-11T11:12:14.000+05:30"/>
+        <address>
+          <use value="home"/>
+          <line value="Street comp1 comp2"/>
+          <line value="AddLine2"/>
+          <city value="Seattle"/>
+          <state value="WA"/>
+          <postalCode value="98052"/>
+          <country value="USA"/>
+        </address>
+        <maritalStatus>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-MaritalStatus"/>
+            <code value="M"/>
+            <display value="Married"/>
+          </coding>
+        </maritalStatus>
+        <multipleBirthInteger value="2"/>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v2-0131"/>
+              <code value="N"/>
+              <display value="Next-of-Kin"/>
+            </coding>
+          </relationship>
+          <name>
+            <family value="Jones"/>
+            <given value="Sally"/>
+            <given value="Andy"/>
+          </name>
+          <telecom>
+            <system value="phone"/>
+            <value value="123-456-1111"/>
+            <use value="home"/>
+          </telecom>
+          <telecom>
+            <system value="phone"/>
+            <value value="321-654-2222"/>
+            <use value="work"/>
+          </telecom>
+          <address>
+            <use value="home"/>
+            <line value="Street comp1 comp2"/>
+            <line value="AddLine2"/>
+            <city value="Seattle"/>
+            <state value="WA"/>
+            <postalCode value="98052"/>
+            <country value="USA"/>
+          </address>
+          <gender value="female"/>
+          <organization>
+            <reference value="Organization/185"/>
+          </organization>
+        </contact>
+        <communication>
+          <language>
+            <coding>
+              <system value="urn:ietf:bcp:47"/>
+              <code value="en"/>
+              <display value="English"/>
+            </coding>
+          </language>
+        </communication>
+        <managingOrganization>
+          <reference value="Organization/185"/>
+        </managingOrganization>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl value="http://hapi.fhir.org/baseR4/Patient/42024"/>
+    <resource>
+      <Patient>
+        <id value="42024"/>
+        <meta>
+          <versionId value="1"/>
+          <lastUpdated value="2019-10-09T22:44:02.137+00:00"/>
+          <source value="#00db4de0b3c226ec"/>
+        </meta>
+        <text>
+          <status value="generated"/>
+          <div>Pippa Walker</div>
+        </text>
+        <name>
+          <use value="official"/>
+          <text value="Pippa Walker"/>
+          <family value="Walker"/>
+          <given value="Pippa"/>
+        </name>
+        <gender value="female"/>
+        <birthDate value="1979-10-09"/>
+      </Patient>
+    </resource>
+    <search>
+      <mode value="include"/>
+    </search>
+  </entry>
+</Bundle>

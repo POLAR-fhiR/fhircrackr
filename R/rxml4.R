@@ -111,10 +111,10 @@ tag.attr <- function( xml, xpath ) {
 
 
 
-#' download.single.bundle
+#' get.bundle
 #' @description downloads a fhir bundle via fhir search request and return it as xml file.
 #'
-#' @param fhir.search.request a fhir search request. it must contain _format=xml.
+#' @param url an url of a fhir bundle. it must contain _format=xml.
 #' @param max.attempts the maximal number of attempts to send a request. Default is 5.
 #' @param username a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
 #' @param password a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
@@ -124,19 +124,19 @@ tag.attr <- function( xml, xpath ) {
 #'
 #' @examples
 #' \dontrun{
-#' download.single.bundle( "https://hapi.fhir.org/baseR4/Medication?_format=xml" )
+#' get.bundle( "https://hapi.fhir.org/baseR4/Medication?_format=xml" )
 #' }
-download.single.bundle <- function( fhir.search.request, max.attempts = 5, username = NULL, password = NULL ) {
+get.bundle <- function( url, max.attempts = 5, username = NULL, password = NULL ) {
 
 	#dbg
-	#fhir.search.request="https://hapi.fhir.org/baseR4/Medication?_format=xml"
+	#url="https://hapi.fhir.org/baseR4/Medication?_format=xml"
 
 	for( n in 1 : max.attempts ) {
 
 		#dbg
 		#n <- 1
 
-		cat( paste0( th( n ), " attempt to download: ", fhir.search.request, "\n" ) )
+		cat( paste0( "(", n, "):", url, "\n" ) )
 
 		auth <- NULL
 
@@ -148,7 +148,7 @@ download.single.bundle <- function( fhir.search.request, max.attempts = 5, usern
 				}
 
 				response <- httr::GET(
-					fhir.search.request,
+					url,
 					httr::add_headers( Accept = "application/fhir+xml" ),
 					httr::content_type( "application/fhir+xml;charset=utf-8" ),
 					auth )
@@ -158,7 +158,7 @@ download.single.bundle <- function( fhir.search.request, max.attempts = 5, usern
 				xml2::read_xml( payload, silten = T )
 			}
 
-			#xml2::read_xml( fhir.search.request, silent = T )
+			#xml2::read_xml( url, silent = T )
 		)
 
 		if( class( r )[ 1 ] != "try-error" ) {
@@ -174,10 +174,10 @@ download.single.bundle <- function( fhir.search.request, max.attempts = 5, usern
 
 
 
-#' download.all.bundles
+#' fhir.search
 #' @description downloads all fhir bunde of a fhir search request from a fhir server.
 #'
-#' @param fhir.search.request a fhir search request
+#' @param request a fhir search request
 #' @param max.attempts maximal attempts to connect to a page address
 #' @param username a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
 #' @param password a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
@@ -187,17 +187,21 @@ download.single.bundle <- function( fhir.search.request, max.attempts = 5, usern
 #'
 #' @examples
 #' \dontrun{
-#' bundles <- download.all.bundles( "https://vonk.fire.ly/R4/Medication?_format=xml" )
+#' bundles <- fhir.search( "https://vonk.fire.ly/R4/Medication?_format=xml" )
 #' }
-download.all.bundles <- function( fhir.search.request, max.attempts = 5, username = NULL, password = NULL ) {
+fhir.search <- function( request, max.attempts = 5, username = NULL, password = NULL ) {
 
 	bundles <- list( )
 
-	addr <- fhir.search.request
+	addr <- request
+
+	cnt <- 0
 
 	repeat {
 
-		bundle <- download.single.bundle( addr, max.attempts, username, password )
+		cat( paste0( "bundle[", cnt <- cnt + 1, "]" ) )
+
+		bundle <- get.bundle( addr, max.attempts, username, password )
 
 		if( is.null( bundle ) ) {
 
@@ -302,7 +306,7 @@ read.bundles <- function( directory ) {
 #' \dontrun{
 #' xml2df( xml, design$Patient )
 #' }
-xml2df <- function( xml, dsgn.df, sep = "›" ) {
+xml2df <- function( xml, dsgn.df, sep = "-+-" ) {
 
 	#xml2::xml_ns_strip( xml )
 	#dbg
@@ -339,7 +343,7 @@ xml2df <- function( xml, dsgn.df, sep = "›" ) {
 
 
 
-#' single.bundle.to.data.frames
+#' bundle2dfs
 #' @description converts a fhir bundle to a list of data frames.
 #' design is a named list. Its names are the one of the resulting tables.
 #' The elements of design are lists of 2 elements.
@@ -356,7 +360,7 @@ xml2df <- function( xml, dsgn.df, sep = "›" ) {
 #'
 #' @examples
 #' \dontrun{
-#' single.bundle.to.data.frames(
+#' bundle2dfs(
 #' bundles[[ 1 ]],
 #' design = list(
 #' MEDICATION = list(
@@ -367,7 +371,7 @@ xml2df <- function( xml, dsgn.df, sep = "›" ) {
 #' 	  DISPLAY = "code/coding/display/@value"
 #' 	) ) ) )
 #' 	}
-single.bundle.to.data.frames <- function( bundle, design, sep = "›" ) {
+bundle2dfs <- function( bundle, design, sep = "-+-" ) {
 
 	xml2::xml_ns_strip( bundle )
 
@@ -418,10 +422,10 @@ single.bundle.to.data.frames <- function( bundle, design, sep = "›" ) {
 }
 
 
-#' all.bundles.to.data.frames
-#' @description converts all fhir bundles to a list of data frames
+#' result2dfs
+#' @description converts all fhir bundles (the result of a fhir.search) to a list of data frames
 #'
-#' @param bundles a list of xml text files representing the fhir bundles.
+#' @param result a fhir search result as a list of xml text files.
 #' @param design a structure that specifies which table should contain which entries of the bundle.
 #' @param sep a string to separate pasted multiple entries
 #'
@@ -430,17 +434,17 @@ single.bundle.to.data.frames <- function( bundle, design, sep = "›" ) {
 #'
 #' @examples
 #' \dontrun{
-#' all.bundles.to.data.frames( bundles, design )
+#' result2dfs( bundles, design )
 #' }
-all.bundles.to.data.frames <- function( bundles, design, sep = "›" ) {
+result2dfs <- function( result, design, sep = "-+-" ) {
 
 	bundles.dfs <- lapply(
-		bundles,
+		result,
 		function( bundle ) {
 
 			#dbl
-			#bundle <- bundles[[ 11 ]]
-			single.bundle.to.data.frames( bundle, design, sep )
+			#bundle <- result[[ 11 ]]
+			bundle2dfs( bundle, design, sep )
 		}
 	)
 

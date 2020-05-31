@@ -4,7 +4,7 @@
 \alias{xml2df}
 \title{xml2df}
 \usage{
-xml2df(xml, dsgn.df, sep = "›")
+xml2df(xml, dsgn.df, sep = "-+-")
 }
 \arguments{
 \item{xml}{xml doc or xml node}
