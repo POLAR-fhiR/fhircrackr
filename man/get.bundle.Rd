@@ -23,6 +23,6 @@ downloads a fhir bundle via fhir search request and return it as xml file.
 }
 \examples{
 \dontrun{
-get.bundle( "https://hapi.fhir.org/baseR4/Medication?_format=xml" )
+get.bundle( url = "https://hapi.fhir.org/baseR4/Medication?_count=500&_format=xml" )
 }
 }

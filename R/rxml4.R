@@ -124,7 +124,7 @@ tag.attr <- function( xml, xpath ) {
 #'
 #' @examples
 #' \dontrun{
-#' get.bundle( "https://hapi.fhir.org/baseR4/Medication?_format=xml" )
+#' get.bundle( url = "https://hapi.fhir.org/baseR4/Medication?_count=500&_format=xml" )
 #' }
 get.bundle <- function( url, max.attempts = 5, username = NULL, password = NULL ) {
 
@@ -136,7 +136,7 @@ get.bundle <- function( url, max.attempts = 5, username = NULL, password = NULL 
 		#dbg
 		#n <- 1
 
-		cat( paste0( "(", n, "):", url, "\n" ) )
+		cat( paste0( "(", n, "): ", url, "\n" ) )
 
 		auth <- NULL
 
@@ -147,15 +147,21 @@ get.bundle <- function( url, max.attempts = 5, username = NULL, password = NULL 
 					auth <- httr::authenticate( username, password )
 				}
 
-				response <- httr::GET(
-					url,
-					httr::add_headers( Accept = "application/fhir+xml" ),
-					httr::content_type( "application/fhir+xml;charset=utf-8" ),
-					auth )
+				response <- try(
+					httr::GET(
+						url,
+						httr::add_headers( Accept = "application/fhir+xml" ),
+						httr::content_type( "application/fhir+xml;charset=utf-8" ),
+						auth )
+				)
 
-				payload <- httr::content( response, as = "text", encoding = "UTF-8" )
+				if( class( response )[ 1 ] != "try-error" ) {
 
-				xml2::read_xml( payload, silten = T )
+					payload <- httr::content( response, as = "text", encoding = "UTF-8" )
+
+					xml2::read_xml( payload, silten = T )
+				}
+				else response
 			}
 
 			#xml2::read_xml( url, silent = T )
