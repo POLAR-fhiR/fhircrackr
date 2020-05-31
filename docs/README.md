@@ -90,7 +90,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
      )
   )
 
-  dfs <- all.bundles.to.dataf.rames( bundles, design )
+  dfs <- all.bundles.to.data.frames( bundles, design )
   ```
 
 
