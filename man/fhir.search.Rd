@@ -4,16 +4,16 @@
 \alias{fhir.search}
 \title{fhir.search}
 \usage{
-fhir.search(request, max.attempts = 5, username = NULL, password = NULL)
+fhir.search(request, username = NULL, password = NULL, max.attempts = 5)
 }
 \arguments{
 \item{request}{a fhir search request}
 
-\item{max.attempts}{maximal attempts to connect to a page address}
-
 \item{username}{a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.}
 
 \item{password}{a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.}
+
+\item{max.attempts}{maximal attempts to connect to a page address}
 }
 \value{
 the downloaded bundles as a list of pages in xml format

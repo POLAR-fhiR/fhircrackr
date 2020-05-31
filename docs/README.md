@@ -4,14 +4,14 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
 ## Set of commands:
 
 ### download a single fhir bundle
-- ```get.bundle( url, max.attempts = 5, username = NULL, password = NULL )```  
+- ```get.bundle( url, username, password, max.attempts )```  
 
   Actually one doesn't use this one.  
   Use fhir.search for downloading all bundles at once!  
 
 
 ### get the complete result of a fhir search request as a list of fhir bundles
-- ```fhir.search( request, max.attempts = 5, username = NULL, password = NULL )```  
+- ```fhir.search( request, username, password, max.attempts )```  
 
   e.g.
   ```
