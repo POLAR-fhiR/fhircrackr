@@ -55,7 +55,7 @@ lst <- function( ..., prefix = NULL, suffix = NULL ) {
 }
 
 
-#' concatenate.paths
+#' paste.paths
 #' @description concatenates to paths strings correctly
 #'
 #' @param path1 the left hand part of final path.
@@ -67,14 +67,14 @@ lst <- function( ..., prefix = NULL, suffix = NULL ) {
 #'
 #' @examples
 #' \dontrun{
-#' concatenate.paths( "data", "patients" )
-#' concatenate.paths( "/data", "patients" )
-#' concatenate.paths( "/data/", "patients" )
-#' concatenate.paths( "/data", "/patients" )
-#' concatenate.paths( "/data/", "/patients/" )
-#' concatenate.paths( "data", "patients", "windows" )
+#' paste.paths( "data", "patients" )
+#' paste.paths( "/data", "patients" )
+#' paste.paths( "/data/", "patients" )
+#' paste.paths( "/data", "/patients" )
+#' paste.paths( "/data/", "/patients/" )
+#' paste.paths( "data", "patients", "windows" )
 #' }
-concatenate.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
+paste.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
 
 	os <- tolower( substr( os, 1, 1 ) )
 
@@ -265,7 +265,7 @@ write.bundles <- function( bundles, directory = "result" ) {
 
 	for( n in 1 : length( bundles ) ) {
 
-		xml2::write_xml( bundles[[ n ]], concatenate.paths( directory, paste0( stringr::str_pad( n, width = w, pad = "0" ), ".xml" ) ) )
+		xml2::write_xml( bundles[[ n ]], paste.paths( directory, paste0( stringr::str_pad( n, width = w, pad = "0" ), ".xml" ) ) )
 	}
 }
 
@@ -287,7 +287,7 @@ read.bundles <- function( directory ) {
 
 	xml.files <- dir( directory, "*.xml" )
 
-	lapply( lst( xml.files ), function( x ) xml2::read_xml( concatenate.paths( directory, x ) ) )
+	lapply( lst( xml.files ), function( x ) xml2::read_xml( paste.paths( directory, x ) ) )
 }
 
 
