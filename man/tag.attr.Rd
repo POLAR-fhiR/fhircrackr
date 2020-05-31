@@ -4,12 +4,12 @@
 \alias{tag.attr}
 \title{tag.attr}
 \usage{
-tag.attr(bundle, xpath)
+tag.attr(xml, xpath)
 }
 \arguments{
-\item{bundle}{fhir bundle}
+\item{xml}{a document, node, or node set}
 
-\item{xpath}{the path to the tag's attribute in the xml document.}
+\item{xpath}{a string containing a xpath (1.0) expression}
 }
 \value{
 a single value or vector

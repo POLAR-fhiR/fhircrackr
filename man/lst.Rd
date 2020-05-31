@@ -14,11 +14,13 @@ lst(..., prefix = NULL, suffix = NULL)
 \item{suffix}{a suffix after the result text.}
 }
 \value{
-a named list, where the names are the content surrounded bei prefix and suffix
+a named list, where the names are the content surrounded by a prefix and a suffix
 }
 \description{
-transforms a vector of items to a named list. The names are created the a prefix and a suffix surrounding the items.
+transforms a vector of items to a named list. The names are created with a prefix and a suffix surrounding the items.
 }
 \examples{
+\dontrun{
 lst( LETTERS[ 1 : 5 ], pre = "id[", post = "]" )
+}
 }

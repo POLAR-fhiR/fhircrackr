@@ -16,5 +16,7 @@ a vector of strings
 add the right suffix to a number or a vector of numbers. e.g. 1st 2nd 3rd ...
 }
 \examples{
+\dontrun{
 th( 0 : 4 )
+}
 }

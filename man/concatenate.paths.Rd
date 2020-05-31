@@ -14,16 +14,18 @@ concatenate.paths(path1 = "w", path2 = "d", os = "LiNuX")
 \item{os}{the operating system you'r operating on: windows or linux.}
 }
 \value{
-a
+a string
 }
 \description{
 concatenates to paths strings correctly
 }
 \examples{
+\dontrun{
 concatenate.paths( "data", "patients" )
 concatenate.paths( "/data", "patients" )
 concatenate.paths( "/data/", "patients" )
 concatenate.paths( "/data", "/patients" )
 concatenate.paths( "/data/", "/patients/" )
 concatenate.paths( "data", "patients", "windows" )
+}
 }

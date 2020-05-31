@@ -12,7 +12,9 @@ usethis::use_package( "utils" )
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' th( 0 : 4 )
+#' }
 th <- function( n ) {
 
 	n.th <- n < 1 | 3 < n
@@ -40,7 +42,9 @@ th <- function( n ) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' lst( LETTERS[ 1 : 5 ], pre = "id[", post = "]" )
+#' }
 lst <- function( ..., prefix = NULL, suffix = NULL ) {
 
 	v <- as.list( c( ... ) )
@@ -58,16 +62,18 @@ lst <- function( ..., prefix = NULL, suffix = NULL ) {
 #' @param path2 the right hand part of final path.
 #' @param os the operating system you'r operating on: windows or linux.
 #'
-#' @return a
+#' @return a string
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' concatenate.paths( "data", "patients" )
 #' concatenate.paths( "/data", "patients" )
 #' concatenate.paths( "/data/", "patients" )
 #' concatenate.paths( "/data", "/patients" )
 #' concatenate.paths( "/data/", "/patients/" )
 #' concatenate.paths( "data", "patients", "windows" )
+#' }
 concatenate.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
 
 	os <- tolower( substr( os, 1, 1 ) )
@@ -81,7 +87,31 @@ concatenate.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
 }
 
 
-#' download.bundle
+
+#' tag.attr
+#'@description extracts an attribute from tags.
+#'
+#' @param xml a document, node, or node set
+#' @param xpath a string containing a xpath (1.0) expression
+#'
+#' @return a single value or vector
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' tag.attr( bundles[[ 1 ]], xpath = ".//total/@value" )
+#' }
+tag.attr <- function( xml, xpath ) {
+
+	addr   <- sub( "/@[a-zA-Z0-9]+$", "", xpath )
+	attrib <- sub( "^.*/@", "", xpath )
+
+	xml2::xml_attr( xml2::xml_find_all( xml, addr ), attrib )
+}
+
+
+
+#' download.single.bundle
 #' @description downloads a fhir bundle via fhir search request and return it as xml file.
 #'
 #' @param fhir.search.request a fhir search request. it must contain _format=xml.
@@ -94,9 +124,9 @@ concatenate.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
 #'
 #' @examples
 #' \dontrun{
-#' download.bundle( "https://hapi.fhir.org/baseR4/Medication?_format=xml" )
+#' download.single.bundle( "https://hapi.fhir.org/baseR4/Medication?_format=xml" )
 #' }
-download.bundle <- function( fhir.search.request, max.attempts = 5, username=NULL, password=NULL ) {
+download.single.bundle <- function( fhir.search.request, max.attempts = 5, username = NULL, password = NULL ) {
 
 	#dbg
 	#fhir.search.request="https://hapi.fhir.org/baseR4/Medication?_format=xml"
@@ -125,7 +155,7 @@ download.bundle <- function( fhir.search.request, max.attempts = 5, username=NUL
 
 				payload <- httr::content( response, as = "text", encoding = "UTF-8" )
 
-				xml2::read_xml( payload )
+				xml2::read_xml( payload, silten = T )
 			}
 
 			#xml2::read_xml( fhir.search.request, silent = T )
@@ -144,8 +174,7 @@ download.bundle <- function( fhir.search.request, max.attempts = 5, username=NUL
 
 
 
-
-#' download.bundles
+#' download.all.bundles
 #' @description downloads all fhir bunde of a fhir search request from a fhir server.
 #'
 #' @param fhir.search.request a fhir search request
@@ -158,30 +187,30 @@ download.bundle <- function( fhir.search.request, max.attempts = 5, username=NUL
 #'
 #' @examples
 #' \dontrun{
-#' bundles <- download.bundles( "https://vonk.fire.ly/R4/Medication?_format=xml" )
+#' bundles <- download.all.bundles( "https://vonk.fire.ly/R4/Medication?_format=xml" )
 #' }
-download.bundles <- function( fhir.search.request, max.attempts = 5, username = NULL, password = NULL ) {
+download.all.bundles <- function( fhir.search.request, max.attempts = 5, username = NULL, password = NULL ) {
 
-	xmls <- list( )
+	bundles <- list( )
 
 	addr <- fhir.search.request
 
 	repeat {
 
-		xml <- download.bundle( addr, max.attempts, username, password )
+		bundle <- download.single.bundle( addr, max.attempts, username, password )
 
-		if( is.null( xml ) ) {
+		if( is.null( bundle ) ) {
 
 			cat( "download interrupted.\n" )
 
 			break
 		}
 
-		xml2::xml_ns_strip( xml )
+		xml2::xml_ns_strip( bundle )
 
-		xmls[[ addr ]] <- xml
+		bundles[[ addr ]] <- bundle
 
-		links <- xml2::xml_find_all( xml, "link" )
+		links <- xml2::xml_find_all( bundle, "link" )
 
 		rels.nxt  <- xml2::xml_attr( xml2::xml_find_first( links, "./relation" ), "value" ) == "next"
 
@@ -204,8 +233,9 @@ download.bundles <- function( fhir.search.request, max.attempts = 5, username = 
 		}
 	}
 
-	xmls
+	bundles
 }
+
 
 
 #' write.bundles
@@ -236,6 +266,7 @@ write.bundles <- function( bundles, directory = "result" ) {
 }
 
 
+
 #' read.bundles
 #' @description reads all bundles stored as xml files from a directory
 #'
@@ -256,7 +287,59 @@ read.bundles <- function( directory ) {
 }
 
 
-#' bundle.to.dataframes
+
+#' xml2df
+#' @description converts a xml doc or xml node to one data frame
+#'
+#' @param xml xml doc or xml node
+#' @param dsgn.df a design for a single data frame
+#' @param sep a string to separate pasted multiple entries
+#'
+#' @return a data frame
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' xml2df( xml, design$Patient )
+#' }
+xml2df <- function( xml, dsgn.df, sep = "›" ) {
+
+	#xml2::xml_ns_strip( xml )
+	#dbg
+	#dsgn.df  <- design[[ 1 ]]
+	#df.xpaths  <- dsgn.df[[ 1 ]]
+	df.columns <- dsgn.df[[ 2 ]]
+
+	#( entries <- xml2::xml_find_all( bundle, "/Specimen" ) ) #entry )
+	#( xml <- xml2::xml_find_all( entries[ 1 ], df.xpath ) )
+
+	s <- sapply(
+		lst( names( df.columns ) ),
+		function( column.name )  {
+
+			#dbg
+			#column.name <- names( df.columns )[ 1 ]
+
+			i.srch <- df.columns[[ column.name ]]
+
+			#addr   <- sub( "/@[a-zA-Z_0-9]+$", "", i.srch )
+			#attrib <- sub( "^.*/@", "", i.srch )
+
+			#val  <- xml2::xml_attr( xml2::xml_find_all( xml, addr ), attrib )
+			val  <- tag.attr( xml, i.srch )
+
+			if( is.na( val ) || length( val ) < 1 ) NA
+			else if( 1 < length( val ) ) paste0( val, collapse = sep )
+			else val
+		}
+	)
+
+	as.data.frame( as.list( s ), stringsAsFactors = F )
+}
+
+
+
+#' single.bundle.to.data.frames
 #' @description converts a fhir bundle to a list of data frames.
 #' design is a named list. Its names are the one of the resulting tables.
 #' The elements of design are lists of 2 elements.
@@ -266,13 +349,14 @@ read.bundles <- function( directory ) {
 #'
 #' @param bundle a xml text file the represents a fhir bundle.
 #' @param design a structure that specifies which table should contain which entries of the bundle.
+#' @param sep a string to separate pasted multiple entries
 #'
 #' @return a list of data frames
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' bundle.to.dataframes(
+#' single.bundle.to.data.frames(
 #' bundles[[ 1 ]],
 #' design = list(
 #' MEDICATION = list(
@@ -283,163 +367,103 @@ read.bundles <- function( directory ) {
 #' 	  DISPLAY = "code/coding/display/@value"
 #' 	) ) ) )
 #' 	}
-bundle.to.dataframes <- function( bundle, design, sep = "›" ) {
+single.bundle.to.data.frames <- function( bundle, design, sep = "›" ) {
+
+	xml2::xml_ns_strip( bundle )
 
 	#dbg
 	#bundle <- bundles[[ length( bundle ) ]]
 
 	if( is.null( bundle ) ) return( NULL )
 
-	xml2::xml_ns_strip( bundle )
-
 	lapply(
 		lst( names( design ) ),
-		function( n.e ) {
+		function( df.name ) {
 
 			#dbg
-			#n.e <- names( design )[ 1 ]
+			#df.name <- names( design )[ 1 ]
 
-			cat( n.e )
+			cat( df.name )
 
-			e <- design[[ n.e ]]
+			dsgn.df  <- design[[ df.name ]]
+			df.xpaths  <- dsgn.df[[ 1 ]]
+			df.columns <- dsgn.df[[ 2 ]]
 
-			entry <- e[[ 1 ]]
-			items <- e[[ 2 ]]
+			xml.nodeset <- xml2::xml_find_all( bundle, df.xpaths )
 
-			bundle.entry <- xml2::xml_find_all( bundle, entry )
+			df <- if( 1 < length( xml.nodeset ) ) {
 
-			if( length( bundle.entry ) < 1 ) {
+				dfs <- lapply(
+					xml.nodeset,
+					function( node ) {
 
-				r <- NULL
-			}
-			else if( 1 < length( bundle.entry ) ) {
+						cat( "." )
 
-				r <- Reduce(
-					rbind,
-					lapply(
-						bundle.entry,
-						function( tg ) {
-
-							#dbg
-							#tg <- bundle.entry[[ 1 ]]
-
-							s <- sapply(
-								names( items ),
-								function( i.n )  {
-
-									#dbg
-									#i.n <- names( items )[ 1 ]
-
-									i.srch <- items[[ i.n ]]
-
-									addr <- sub( "/@[a-zA-Z0-9]+$", "", i.srch )
-									item <- sub( "^.*/@", "", i.srch )
-									val  <- xml2::xml_attr( xml2::xml_find_all( tg, addr ), item )
-
-									if( is.character( val ) ) {
-
-										if( length( val ) < 1 ) val <- NA
-
-										else if( 1 < length( val ) ) val <- paste0( val, collapse = sep )
-									}
-
-									val
-								}
-							)
-
-							cat( "." )
-
-							s
-						}
-					)
-				)
-
-				cat( "\n" )
-
-				as.data.frame( r, stringsAsFactors = F )
-			}
-			else {
-
-				s <- lapply(
-					names( items ),
-					function( i.n )  {
-
-						#dbg
-						#i.n <- names( items )[ 1 ]
-
-						i.srch <- items[[ i.n ]]
-
-						addr <- sub( "/@[a-zA-Z0-9]+$", "", i.srch )
-						item <- sub( "^.*/@", "", i.srch )
-						val  <- xml2::xml_attr( xml2::xml_find_all( bundle.entry[ 1 ], addr ), item )
-
-						if( is.character( val ) ) {
-
-							if( length( val ) < 1 ) val <- NA
-
-							else if( 1 < length( val ) ) val <- paste0( val, collapse = sep )
-						}
-
-						val
+						xml2df( node, dsgn.df, sep )
 					}
 				)
 
-				cat( "." )
-
-				s <- as.data.frame( s, stringsAsFactors = F )
-
-				names( s ) <- names( items )
-
-				s
+				if( 1 < length( dfs ) ) Reduce( rbind.data.frame, dfs )
+				else if( 1 == length( dfs ) ) dfs[[ 1 ]]
+				else NULL
 			}
+			else if( 1 == length( xml.nodeset ) ) as.list( xml2df( xml.nodeset[ 1 ], dsgn.df, sep ) )
+			else NULL
+
+			cat( "\n" )
+
+			as.data.frame( df, stringsAsFactors = F )
 		}
 	)
 }
 
 
-#' bundles.to.dataframes
+#' all.bundles.to.data.frames
 #' @description converts all fhir bundles to a list of data frames
 #'
 #' @param bundles a list of xml text files representing the fhir bundles.
 #' @param design a structure that specifies which table should contain which entries of the bundle.
+#' @param sep a string to separate pasted multiple entries
 #'
 #' @return a list of data frames.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' bundles.to.dataframes( bundles, design )
+#' all.bundles.to.data.frames( bundles, design )
 #' }
-bundles.to.dataframes <- function( bundles, design, sep = "›" ) {
+all.bundles.to.data.frames <- function( bundles, design, sep = "›" ) {
 
-	bundle.dfs <- lapply(
+	bundles.dfs <- lapply(
 		bundles,
-		function( x ) {
+		function( bundle ) {
 
-			bundle.to.dataframes( x, design, sep )
+			#dbl
+			#bundle <- bundles[[ 11 ]]
+			single.bundle.to.data.frames( bundle, design, sep )
 		}
 	)
 
-	if( 1 < length( bundle.dfs ) ) {
+	d <- if( 1 < length( bundles.dfs ) ) {
 
-		d <- lapply(
+		lapply(
 			lst( names( design ) ),
 			function( n ) {
 
 				#dbg
 				#n<-names( design )[ 1 ]
-
-				r <- Reduce(
-					rbind,
-					lapply(
-						bundle.dfs,
-						function( dfs ) {
-							#dbg
-							#dfs <- bundle.dfs[[ 1 ]]
-							dfs[[ n ]]
-						}
-					)
+				dfs.n <- lapply(
+					bundles.dfs,
+					function( dfs ) {
+						#dbg
+						#dfs <- bundles.dfs[[ 1 ]]
+						dfs[[ n ]]
+					}
 				)
+
+				r <- if( 1 < length( dfs.n ) ) Reduce( rbind.data.frame, dfs.n )
+				else if( 1 == length( dfs.n ) ) dfs.n[[ 1 ]]
+				else NULL
 
 				as.data.frame(
 					r,
@@ -450,84 +474,12 @@ bundles.to.dataframes <- function( bundles, design, sep = "›" ) {
 			}
 		)
 	}
-	else if( 1 == length( bunddle.dfs ) ) {
-
-		d <- bundle.dfs[[ 1 ]]
-	}
-	else d <- NULL
+	else if( 1 == length( bundles.dfs ) ) bundles.dfs[[ 1 ]]
+	else NULL
 
 	cat( "\n" )
 
 	d
-}
-#
-#
-# b <- download.bundles( "https://vonk.fire.ly/R4/Observation?_include=Observation:encounter&_include=Observation:patient&_format=xml&_pretty=true&_count=1000000")
-#
-# d <- list(
-# 	Besuch = list(
-# 		".//Observation",
-# 		list(
-# 			OID     = "id/@value",
-# 			PID     = "subject/reference/@value",
-# 			WERT    = "valueQuantity/value/@value",
-# 			EINHEIT = "valueQuantity/unit/@value",
-# 			TEXT    = "code/text/@value",
-# 			CODE    = "code/coding/code/@value",
-# 			DATUM   = "effectiveDateTime/@value"
-# 		)
-# 	),
-# 	Aufnahme = list(
-# 		".//Encounter",
-# 		list(
-# 			EID           = "id/@value",
-# 			PATIENTEN.ID  = "subject/reference/@value",
-# 			TEILNEHMER.ID = "participant/individual/reference/@value",
-# 			BEGINN        = "period/start/@value",
-# 			ENDE          = "period/end/@value",
-# 			SYSTEM        = "class/system/@value",
-# 			CODE          = "class/code/@value",
-# 			DISPLAY       = "class/display/@value"
-# 		)
-# 	),
-# 	Patient = list(
-# 		".//Patient",
-# 		list(
-# 			PID             = "id/@value",
-# 			NAME.VERWENDUNG = "name/use/@value",
-# 			VORNAME         = "name/given/@value",
-# 			NACHNAME        = "name/family/@value",
-# 			SEX             = "gender/@value",
-# 			BIRTHDAY        = "birthDate/@value"
-# 		)
-# 	)
-# )
-#
-# dfs <- bundle.to.dataframes( b, d )
-# dfs$Besuch
-
-
-#' tag.attr
-#'@description extracts an attribute from tags.
-#'
-#' @param bundle fhir bundle
-#' @param xpath the path to the tag's attribute in the xml document.
-#'
-#' @return a single value or vector
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' tag.attr( bundles[[ 1 ]], xpath = ".//total/@value" )
-#' }
-tag.attr <- function( bundle, xpath ) {
-
-	addr <- sub( "/@[a-zA-Z0-9]+$", "", xpath )
-	item <- sub( "^.*/@", "", xpath )
-
-	xp <- concatenate.paths( "/Bundle", addr )
-
-	xml2::xml_attr( xml2::xml_find_all( bundle, xp ), item )
 }
 
 
@@ -535,6 +487,7 @@ tag.attr <- function( bundle, xpath ) {
 #' @description coerce a data frame's columns
 #'
 #' @param df a data frame with strings as column entries
+#' @param stringsAsFactors strings as factors
 #'
 #' @return a data frame with coerced types
 #' @export
