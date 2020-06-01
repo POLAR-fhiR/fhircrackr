@@ -459,11 +459,12 @@ result2dfs <- function( result, design, sep = "-+-" ) {
 				else if( 1 == length( dfs.n ) ) dfs.n[[ 1 ]]
 				else NULL
 
-				as.data.frame(
+				if( is.null( r ) ) NULL
+				else as.data.frame(
 					r,
 					fix.empty.names = T,
-					stringsAsFactors = FALSE,
-					row.names = 1 : nrow( r )
+					stringsAsFactors = F,
+					row.names = seq_len( nrow( r ) )
 				)
 			}
 		)
