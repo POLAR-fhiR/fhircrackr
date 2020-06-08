@@ -333,7 +333,7 @@ xml2df <- function( xml, dsgn.df, sep = "-+-" ) {
 
 
 
-#' bundle2dfs
+#' single.bundle2dfs
 #' @description converts a fhir bundle to a list of data frames.
 #' design is a named list. Its names are the one of the resulting tables.
 #' The elements of design are lists of 2 elements.
@@ -350,7 +350,7 @@ xml2df <- function( xml, dsgn.df, sep = "-+-" ) {
 #'
 #' @examples
 #' \dontrun{
-#' bundle2dfs(
+#' single.bundle2dfs(
 #' bundles[[ 1 ]],
 #' design = list(
 #' MEDICATION = list(
@@ -361,7 +361,7 @@ xml2df <- function( xml, dsgn.df, sep = "-+-" ) {
 #' 	  DISPLAY = "code/coding/display/@value"
 #' 	) ) ) )
 #' 	}
-bundle2dfs <- function( bundle, design, sep = "-+-" ) {
+single.bundle2dfs <- function( bundle, design, sep = "-+-" ) {
 
 	xml2::xml_ns_strip( bundle )
 
@@ -412,10 +412,10 @@ bundle2dfs <- function( bundle, design, sep = "-+-" ) {
 }
 
 
-#' result2dfs
+#' all.bundles2dfs
 #' @description converts all fhir bundles (the result of a get.all.bundles) to a list of data frames
 #'
-#' @param result a fhir search result as a list of xml text files.
+#' @param bundles a fhir search result as a list of xml text files.
 #' @param design a structure that specifies which table should contain which entries of the bundle.
 #' @param sep a string to separate pasted multiple entries
 #'
@@ -424,17 +424,17 @@ bundle2dfs <- function( bundle, design, sep = "-+-" ) {
 #'
 #' @examples
 #' \dontrun{
-#' result2dfs( bundles, design )
+#' all.bundles2dfs( bundles, design )
 #' }
-result2dfs <- function( result, design, sep = "-+-" ) {
+all.bundles2dfs <- function( bundles, design, sep = "-+-" ) {
 
 	bundles.dfs <- lapply(
-		result,
+		bundles,
 		function( bundle ) {
 
 			#dbl
-			#bundle <- result[[ 11 ]]
-			bundle2dfs( bundle, design, sep )
+			#bundle <- bundles[[ 11 ]]
+			single.bundle2dfs( bundle, design, sep )
 		}
 	)
 
