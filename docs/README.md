@@ -25,13 +25,13 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
 
 
 ### write all bundles of a fhir search result as xml files to directory
-- ```write.bundles( bundles, directory )```  
+- ```save.bundles( bundles, directory )```  
 
   e.g. ```write.bundles( result, "bundle-medication-statement" )```
 
 
 ### read all bundles of a fhir search result as xml files from directory
-- ```read.bundles( directory )```  
+- ```load.bundles( directory )```  
 
   e.g. ```bundles <- read.bundles( "bundle-medication-statement" )```
 

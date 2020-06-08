@@ -232,7 +232,7 @@ get.bundles <- function( request, username = NULL, password = NULL, max.attempts
 
 
 
-#' write.bundles
+#' save.bundles
 #' @description writes all fhir bundle as numbered xml files into a directory.
 #'
 #' @param bundles a list of xml text files representing the pages of a fhir bundle.
@@ -243,9 +243,9 @@ get.bundles <- function( request, username = NULL, password = NULL, max.attempts
 #'
 #' @examples
 #' \dontrun{
-#' write.bundles( bundles, "result" )
+#' save.bundles( bundles, "result" )
 #' }
-write.bundles <- function( bundles, directory = "result" ) {
+save.bundles <- function( bundles, directory = "result" ) {
 
 	w <- 1 + floor( log10( length( bundles ) ) )
 
@@ -261,7 +261,7 @@ write.bundles <- function( bundles, directory = "result" ) {
 
 
 
-#' read.bundles
+#' load.bundles
 #' @description reads all bundles stored as xml files from a directory
 #'
 #' @param directory the location the data are stored.
@@ -271,9 +271,9 @@ write.bundles <- function( bundles, directory = "result" ) {
 #'
 #' @examples
 #' \dontrun{
-#' bundles.bak <- read.bundles( "result" )
+#' bundles.bak <- load.bundles( "result" )
 #' }
-read.bundles <- function( directory ) {
+load.bundles <- function( directory ) {
 
 	xml.files <- dir( directory, "*.xml" )
 

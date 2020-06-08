@@ -1,0 +1,55 @@
+<Specimen xmlns="http://hl7.org/fhir">
+  <id value="0-specimen"/>
+  <meta>
+    <profile value="https://fhir.bbmri.de/StructureDefinition/Specimen"/>
+  </meta>
+  <text>
+    <status value="generated"/>
+    <div xmlns="http://www.w3.org/1999/xhtml"><p><b>Generated Narrative</b></p><p><b>id</b>: 0-specimen</p><p><b>meta</b>: </p><p><b>type</b>: <span title="Codes: {https://fhir.bbmri.de/CodeSystem/SampleMaterialType whole-blood}">Whole blood</span></p><p><b>subject</b>: <a href="Patient-0.html">Generated Summary: id: 0; gender: male; birthDate: 1989-11-18; deceased: Jan 27, 2009, 12:00:00 AM</a></p><h3>Collections</h3><table class="grid"><tr><td>-</td><td><b>Collected[x]</b></td><td><b>BodySite</b></td><td><b>FastingStatus[x]</b></td></tr><tr><td>*</td><td>Jun 17, 2005, 12:00:00 AM</td><td><span title="Codes: {urn:oid:1.3.6.1.4.1.19376.1.3.11.36 C26.8}">C26.8</span></td><td><span title="Codes: {http://terminology.hl7.org/CodeSystem/v2-0916 NF}">The patient indicated they did not fast prior to the procedure.</span></td></tr></table></div>
+  </text>
+  <extension url="https://fhir.bbmri.de/StructureDefinition/StorageTemperature">
+    <valueCodeableConcept>
+      <coding>
+        <system value="https://fhir.bbmri.de/CodeSystem/StorageTemperature"/>
+        <code value="temperature2to10"/>
+      </coding>
+    </valueCodeableConcept>
+  </extension>
+  <extension url="https://fhir.bbmri.de/StructureDefinition/Custodian">
+    <valueReference>
+      <reference value="Organization/exampleCollection"/>
+    </valueReference>
+  </extension>
+  <extension url="https://fhir.bbmri.de/StructureDefinition/SampleDiagnosis">
+    <valueCodeableConcept>
+      <coding>
+        <system value="https://fhir.bbmri.de/CodeSystem/OtherSampleDiagnosis"/>
+        <code value="unknown"/>
+      </coding>
+    </valueCodeableConcept>
+  </extension>
+  <type>
+    <coding>
+      <system value="https://fhir.bbmri.de/CodeSystem/SampleMaterialType"/>
+      <code value="whole-blood"/>
+    </coding>
+  </type>
+  <subject>
+    <reference value="Patient/0"/>
+  </subject>
+  <collection>
+    <collectedDateTime value="2005-06-17"/>
+    <bodySite>
+      <coding>
+        <system value="urn:oid:1.3.6.1.4.1.19376.1.3.11.36"/>
+        <code value="C26.8"/>
+      </coding>
+    </bodySite>
+    <fastingStatusCodeableConcept>
+      <coding>
+        <system value="http://terminology.hl7.org/CodeSystem/v2-0916"/>
+        <code value="NF"/>
+      </coding>
+    </fastingStatusCodeableConcept>
+  </collection>
+</Specimen>
