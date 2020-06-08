@@ -135,4 +135,4 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
   ```
   
 ### get conformance info about the fhir server
--  ```conformance( "https://vonk.fire.ly/R4" )```
+-  ```conformance( "https://hapi.fhir.org/baseR4" )```

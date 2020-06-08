@@ -498,16 +498,16 @@ coerce.types <- function( df, stringsAsFactors = F ) {
 
 
 #' conformance
-#' @description get the conformance information of a fhir server.
+#' @description get the conformance information about a fhir server.
 #'
-#' @param url the url of the fhir server
+#' @param url the url of the fhir server endpoint.
 #'
 #' @return a data frame.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' conformance( "https://vonk.fire.ly/R4" )
+#' conformance( "https://hapi.fhir.org/baseR4" )
 #' }
 conformance <- function( url ) {
 
@@ -519,7 +519,7 @@ conformance <- function( url ) {
 		Conformance = list(
 			".//resource",
 			list(
-				ext.url           = "extenstion/@url",
+				ext.url           = "extension/@url",
 				ext.decVal        = "extension/valueDecimal/@value",
 				type              = "type/@value",
 				profile           = "profile/@value",
