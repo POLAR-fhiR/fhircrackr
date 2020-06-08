@@ -4,18 +4,18 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
 ## Set of commands:
 
 ### download a single fhir bundle
-- ```get.single.bundle( request, username, password, max.attempts )```  
+- ```get.bundle( request, username, password, max.attempts )```  
 
   Actually one doesn't use this one.  
-  Use get.all.bundles() for downloading all bundles at once!  
+  Use get.bundles() for downloading all bundles at once!  
 
 
 ### get the complete result of a fhir search request as a list of fhir bundles
-- ```get.all.bundles( request, username, password, max.attempts )```  
+- ```get.bundles( request, username, password, max.attempts )```  
 
   e.g.
   ```
-  result <- get.all.bundles(
+  result <- get.bundles(
     paste0(
       "https://hapi.fhir.org/baseR4/MedicationStatement?",
     "_include=MedicationStatement:context&",
@@ -40,18 +40,18 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
 - ```xml2df( xml, dsgn.df, sep = "›" )```
   
   Actually one doesn't use this one.  
-  Use all.bundles2dfs() for converting all bundles to all data frames at once!  
+  Use bundles2dfs() for converting all bundles to all data frames at once!  
 
 
 ### convert one bundle to data frames specified in design
-- ```single.bundle2dfs( bundle, design, sep = "›" )```  
+- ```bundle2dfs( bundle, design, sep = "›" )```  
 
   Actually one doesn't use this one.  
-  Use all.bundle2dfs() for converting a all bundles of a fhir search request to all required data frames at once!  
+  Use bundle2dfs() for converting a all bundles of a fhir search request to all required data frames at once!  
 
 
 ### convert all bundles to all data frames at once
-- ```all.bundles2dfs( result, design )```
+- ```bundles2dfs( result, design )```
 
   e.g. create 3 data frames with a set of items of interest  
   ```
