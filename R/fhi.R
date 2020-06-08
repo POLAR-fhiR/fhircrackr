@@ -296,7 +296,7 @@ load.bundles <- function( directory ) {
 #' \dontrun{
 #' xml2df( xml, design$Patient )
 #' }
-xml2df <- function( xml, dsgn.df, sep = "-+-" ) {
+xml2df <- function( xml, dsgn.df, sep = " -+- " ) {
 
 	#xml2::xml_ns_strip( xml )
 	#dbg
@@ -361,7 +361,7 @@ xml2df <- function( xml, dsgn.df, sep = "-+-" ) {
 #' 	  DISPLAY = "code/coding/display/@value"
 #' 	) ) ) )
 #' 	}
-bundle2dfs <- function( bundle, design, sep = "-+-" ) {
+bundle2dfs <- function( bundle, design, sep = " -+- " ) {
 
 	xml2::xml_ns_strip( bundle )
 
@@ -426,7 +426,7 @@ bundle2dfs <- function( bundle, design, sep = "-+-" ) {
 #' \dontrun{
 #' bundles2dfs( bundles, design )
 #' }
-bundles2dfs <- function( bundles, design, sep = "-+-" ) {
+bundles2dfs <- function( bundles, design, sep = " -+- " ) {
 
 	bundles.dfs <- lapply(
 		bundles,
@@ -494,4 +494,46 @@ bundles2dfs <- function( bundles, design, sep = "-+-" ) {
 coerce.types <- function( df, stringsAsFactors = F ) {
 
 	utils::type.convert( df, as.is = ! stringsAsFactors )
+}
+
+
+#' conformance
+#' @description get the conformance information of a fhir server.
+#'
+#' @param url the url of the fhir server
+#'
+#' @return a data frame.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' conformance( "https://vonk.fire.ly/R4" )
+#' }
+conformance <- function( url ) {
+
+	cnf <- fhiR::get.bundle( paste.paths( url, "/metadata?_format=xml&_pretty=true" ) )
+
+	xml2::xml_ns_strip( cnf )
+
+	design <- list(
+		Conformance = list(
+			".//resource",
+			list(
+				ext.url           = "extenstion/@url",
+				ext.decVal        = "extension/valueDecimal/@value",
+				type              = "type/@value",
+				profile           = "profile/@value",
+				interaction       = "interaction/code/@value",
+				searchParam.name  = "searchParam/name/@value",
+				searchParam.type  = "searchParam/type/@value",
+				versioning        = "versioning/@value",
+				conditionalCreate = "conditionalCreate/@value",
+				conditionalUpdate = "conditionalUpdate/@value",
+				conditionalDelete = "conditionalDelete/@value",
+				searchInclude     = "searchInclude/@value"
+			)
+		)
+	)
+
+	fhiR::bundle2dfs( cnf, design )[[ 1 ]]
 }

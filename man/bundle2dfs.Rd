@@ -4,7 +4,7 @@
 \alias{bundle2dfs}
 \title{bundle2dfs}
 \usage{
-bundle2dfs(bundle, design, sep = "-+-")
+bundle2dfs(bundle, design, sep = " -+- ")
 }
 \arguments{
 \item{bundle}{a xml text file the represents a fhir bundle.}
