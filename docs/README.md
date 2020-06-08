@@ -116,7 +116,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
 
   tag.attr(
     xml2::xml_ns_strip( 
-      fhir.search( "https://hapi.fhir.org/baseR4/MedicationStatement/?_summary=count&_format=xml" )[[ 1 ]]
+      get.bundles( "https://hapi.fhir.org/baseR4/MedicationStatement/?_summary=count&_format=xml" )[[ 1 ]]
     ),
     ".//total/@value"
   )
