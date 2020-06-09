@@ -171,6 +171,7 @@ get.bundle <- function( request, username = NULL, password = NULL, max.attempts 
 #' @param username a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
 #' @param password a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
 #' @param max.attempts maximal attempts to connect to a page address
+#' @param max.bundle.number maximal number of bundles to get. Defaults to NULL meaning all available bundles are downloaded.
 #'
 #' @return the downloaded bundles as a list of pages in xml format
 #' @export
@@ -179,7 +180,7 @@ get.bundle <- function( request, username = NULL, password = NULL, max.attempts 
 #' \dontrun{
 #' bundles <- get.bundles( "https://vonk.fire.ly/R4/Medication?_format=xml" )
 #' }
-get.bundles <- function( request, username = NULL, password = NULL, max.attempts = 5 ) {
+get.bundles <- function( request, username = NULL, password = NULL, max.attempts = 5, max.bundle.number=NULL ) {
 
 	bundles <- list( )
 
@@ -203,6 +204,13 @@ get.bundles <- function( request, username = NULL, password = NULL, max.attempts
 		xml2::xml_ns_strip( bundle )
 
 		bundles[[ addr ]] <- bundle
+
+		if( !is.null( max.bundle.number ) && cnt==max.bundle.number ) {
+
+			cat( "\ndownload completed\n" )
+
+			break
+		}
 
 		links <- xml2::xml_find_all( bundle, "link" )
 
