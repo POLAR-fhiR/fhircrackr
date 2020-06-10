@@ -4,7 +4,15 @@
 \alias{get.bundles}
 \title{get.bundles}
 \usage{
-get.bundles(request, username = NULL, password = NULL, max.attempts = 5)
+get.bundles(
+  request,
+  username = NULL,
+  password = NULL,
+  max.bundles = Inf,
+  verbose = T,
+  max.attempts = 5,
+  delay.between.attempts = 10
+)
 }
 \arguments{
 \item{request}{a fhir search request}
@@ -13,7 +21,13 @@ get.bundles(request, username = NULL, password = NULL, max.attempts = 5)
 
 \item{password}{a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.}
 
-\item{max.attempts}{maximal attempts to connect to a page address}
+\item{max.bundles}{maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
+
+\item{verbose}{print downloading progress to console? Defaults to TRUE.}
+
+\item{max.attempts}{maximal attempts to connect to a page address. Default is 5.}
+
+\item{delay.between.attempts}{a delay in seconds between two attempts.}
 }
 \value{
 the downloaded bundles as a list of pages in xml format

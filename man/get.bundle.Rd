@@ -4,16 +4,27 @@
 \alias{get.bundle}
 \title{get.bundle}
 \usage{
-get.bundle(request, username = NULL, password = NULL, max.attempts = 5)
+get.bundle(
+  request,
+  username = NULL,
+  password = NULL,
+  verbose = T,
+  max.attempts = 5,
+  delay.between.attempts = 10
+)
 }
 \arguments{
-\item{request}{an request for a fhir bundle. it must contain _format=xml.}
+\item{request}{a request for a fhir bundle. it must contain _format=xml.}
 
 \item{username}{a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.}
 
 \item{password}{a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.}
 
+\item{verbose}{print downloading information to console? Defaults to TRUE.}
+
 \item{max.attempts}{the maximal number of attempts to send a request. Default is 5.}
+
+\item{delay.between.attempts}{a delay in seconds between two attempts.}
 }
 \value{
 the downloaded bundle in xml format.
