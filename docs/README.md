@@ -4,14 +4,16 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
 ## Set of commands:
 
 ### download a single fhir bundle
-- ```get.bundle( request, username, password, max.attempts )```  
+- ```get.bundle(  request, username, password, max.bundles, ... )```  
 
   Actually one doesn't use this one.  
   Use get.bundles() for downloading all bundles at once!  
 
 
 ### get the complete result of a fhir search request as a list of fhir bundles
-- ```get.bundles( request, username, password, max.attempts )```  
+- ```
+   get.bundles( request, username, password, max.bundles, ... )
+  ```  
 
   e.g.
   ```
@@ -38,7 +40,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
 
 ### convert a xml doc or xml node to one data frame
 - ```xml2df( xml, dsgn.df, sep = "›" )```
-  
+
   Actually one doesn't use this one.  
   Use bundles2dfs() for converting all bundles to all data frames at once!  
 
@@ -106,7 +108,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
   e.g. how many medication statements are available?
   ```
   tag.attr(
-    xml2::xml_ns_strip( 
+    xml2::xml_ns_strip(
       get.bundle( "https://hapi.fhir.org/baseR4/MedicationStatement/?_summary=count&_format=xml" )
     ),
     "/Bundle/total/@value"
@@ -115,7 +117,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
   # or
 
   tag.attr(
-    xml2::xml_ns_strip( 
+    xml2::xml_ns_strip(
       get.bundles( "https://hapi.fhir.org/baseR4/MedicationStatement/?_summary=count&_format=xml" )[[ 1 ]]
     ),
     ".//total/@value"
@@ -133,6 +135,6 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
     nname = fhiR::tag.attr( b, ".//name/family/@value" )
   )
   ```
-  
+
 ### get conformance info about the fhir server
 -  ```conformance( "https://hapi.fhir.org/baseR4" )```
