@@ -117,9 +117,9 @@ tag.attr <- function( xml, xpath ) {
 #' @param request a request for a fhir bundle. it must contain _format=xml.
 #' @param username a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
 #' @param password a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
-#' @param max.attempts the maximal number of attempts to send a request. Default is 5.
 #' @param verbose print downloading information to console? Defaults to TRUE.
-
+#' @param max.attempts the maximal number of attempts to send a request. Default is 5.
+#' @param delay.between.attempts a delay in seconds between two attempts.
 #'
 #' @return the downloaded bundle in xml format.
 #' @export
@@ -128,7 +128,7 @@ tag.attr <- function( xml, xpath ) {
 #' \dontrun{
 #' get.bundle( request = "https://hapi.fhir.org/baseR4/Medication?_count=500&_format=xml" )
 #' }
-get.bundle <- function( request, username = NULL, password = NULL, max.attempts = 5 ,verbose=TRUE) {
+get.bundle <- function( request, username = NULL, password = NULL, verbose = T, max.attempts = 5, delay.between.attempts = 10 ) {
 
 	#dbg
 	#request="https://hapi.fhir.org/baseR4/Medication?_format=xml"
@@ -138,7 +138,7 @@ get.bundle <- function( request, username = NULL, password = NULL, max.attempts 
 		#dbg
 		#n <- 1
 
-		if(verbose){ cat( paste0( "(", n, "): ", request, "\n" ) ) }
+		if( verbose ) cat( paste0( "(", n, "): ", request, "\n" ) )
 
 		auth <- if( ! is.null( username ) & ! is.null( password ) ) httr::authenticate( username, password )
 		else NULL
@@ -148,7 +148,8 @@ get.bundle <- function( request, username = NULL, password = NULL, max.attempts 
 				request,
 				httr::add_headers( Accept = "application/fhir+xml" ),
 				httr::content_type( "application/fhir+xml;charset=utf-8" ),
-				auth )
+				auth
+			)
 		)
 
 		if( class( response )[ 1 ] != "try-error" ) {
@@ -172,9 +173,10 @@ get.bundle <- function( request, username = NULL, password = NULL, max.attempts 
 #' @param request a fhir search request
 #' @param username a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
 #' @param password a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
-#' @param max.attempts maximal attempts to connect to a page address
 #' @param max.bundles maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
 #' @param verbose print downloading progress to console? Defaults to TRUE.
+#' @param max.attempts maximal attempts to connect to a page address. Default is 5.
+#' @param delay.between.attempts a delay in seconds between two attempts.
 #'
 #' @return the downloaded bundles as a list of pages in xml format
 #' @export
@@ -183,7 +185,7 @@ get.bundle <- function( request, username = NULL, password = NULL, max.attempts 
 #' \dontrun{
 #' bundles <- get.bundles( "https://vonk.fire.ly/R4/Medication?_format=xml" )
 #' }
-get.bundles <- function( request, username = NULL, password = NULL, max.attempts = 5, max.bundles=Inf, verbose=TRUE ) {
+get.bundles <- function( request, username = NULL, password = NULL, max.bundles = Inf, verbose = T, max.attempts = 5, delay.between.attempts = 10 ) {
 
 	bundles <- list( )
 
@@ -193,9 +195,9 @@ get.bundles <- function( request, username = NULL, password = NULL, max.attempts
 
 	repeat {
 
-		if(verbose){cat( paste0( "bundle[", cnt <- cnt + 1, "]" ) )}
+		if( verbose ) cat( paste0( "bundle[", cnt <- cnt + 1, "]" ) )
 
-		bundle <- get.bundle( addr, username, password, max.attempts, verbose )
+		bundle <- get.bundle( request = addr, username = username, password = password, verbose = verbose, max.attempts = max.attempts, delay.between.attempts = delay.between.attempts )
 
 		if( is.null( bundle ) ) {
 
@@ -212,18 +214,19 @@ get.bundles <- function( request, username = NULL, password = NULL, max.attempts
 
 		rels.nxt  <- xml2::xml_attr( xml2::xml_find_first( links, "./relation" ), "value" ) == "next"
 
-		if( cnt==max.bundles ) {
+		if( cnt == max.bundles ) {
 
-			if(any( ! is.na( rels.nxt ) & rels.nxt )){
+			if( any( ! is.na( rels.nxt ) & rels.nxt ) ) {
 
 				message( "\nDownload completed. Number of downloaded bundles was limited to ",
-							cnt,
-							" bundles, this is less than the total number of bundles available.\n"  )
+						 cnt,
+						 " bundles, this is less than the total number of bundles available.\n"
+				)
 
-			}else{
+			}
+			else {
 
 				message( "\nDownload completed. All available bundles were downloaded.\n" )
-
 			}
 
 			break
@@ -400,7 +403,7 @@ bundle2dfs <- function( bundle, design, sep = " -+- " ) {
 
 			cat( df.name )
 
-			dsgn.df  <- design[[ df.name ]]
+			dsgn.df    <- design[[ df.name ]]
 			df.xpaths  <- dsgn.df[[ 1 ]]
 			df.columns <- dsgn.df[[ 2 ]]
 

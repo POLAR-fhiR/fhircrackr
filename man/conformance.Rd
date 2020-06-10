@@ -7,16 +7,16 @@
 conformance(url)
 }
 \arguments{
-\item{url}{the url of the fhir server}
+\item{url}{the url of the fhir server endpoint.}
 }
 \value{
 a data frame.
 }
 \description{
-get the conformance information of a fhir server.
+get the conformance information about a fhir server.
 }
 \examples{
 \dontrun{
-conformance( "https://vonk.fire.ly/R4" )
+conformance( "https://hapi.fhir.org/baseR4" )
 }
 }
