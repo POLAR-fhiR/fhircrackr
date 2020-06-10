@@ -180,7 +180,7 @@ get.bundle <- function( request, username = NULL, password = NULL, max.attempts 
 #' \dontrun{
 #' bundles <- get.bundles( "https://vonk.fire.ly/R4/Medication?_format=xml" )
 #' }
-get.bundles <- function( request, username = NULL, password = NULL, max.attempts = 5, max.bundle.number=NULL ) {
+get.bundles <- function( request, username = NULL, password = NULL, max.attempts = 5, max.bundles=NULL ) {
 
 	bundles <- list( )
 
@@ -205,20 +205,30 @@ get.bundles <- function( request, username = NULL, password = NULL, max.attempts
 
 		bundles[[ addr ]] <- bundle
 
-		if( !is.null( max.bundle.number ) && cnt==max.bundle.number ) {
-
-			cat( "\ndownload completed\n" )
-
-			break
-		}
-
 		links <- xml2::xml_find_all( bundle, "link" )
 
 		rels.nxt  <- xml2::xml_attr( xml2::xml_find_first( links, "./relation" ), "value" ) == "next"
 
+		if( !is.null( max.bundles ) && cnt==max.bundles ) {
+
+			if(any( ! is.na( rels.nxt ) & rels.nxt )){
+
+				cat( "\nDownload completed. Number of downloaded bundles was limited to",
+							cnt,
+							"bundles, this is less than the total number of bundles available.\n"  )
+
+			}else{
+
+				cat( "\nDownload completed. All available bundles were downloaded.\n" )
+
+			}
+
+			break
+		}
+
 		if( ! any( ! is.na( rels.nxt ) & rels.nxt ) ) {
 
-			cat( "\ndownload completed\n" )
+			cat( "\nDownload completed. All available bundles were downloaded.\n" )
 
 			break
 		}
@@ -229,7 +239,7 @@ get.bundles <- function( request, username = NULL, password = NULL, max.attempts
 
 		if( is.null( addr ) || is.na( addr ) || length( addr ) < 1 || addr == "" ) {
 
-			cat( "\ndownload completed\n" )
+			cat( "\nDownload completed. All available bundles were downloaded.\n" )
 
 			break
 		}
