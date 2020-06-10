@@ -99,7 +99,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
      )
   )
 
-  dfs <- all.bundles2dfs( result, design )
+  dfs <- bundles2dfs( result, design )
   ```
 
 ### extract an attribute from bundle tags
