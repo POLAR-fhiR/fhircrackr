@@ -4,7 +4,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
 ## Set of commands:
 
 ### download a single fhir bundle
-- ```get.bundle(  request, username, password, max.bundles, ... )```  
+- ```get.bundle(  request, username, password, ... )```  
 
   Actually one doesn't use this one.  
   Use get.bundles() for downloading all bundles at once!  
@@ -49,7 +49,7 @@ fhiR is a package for convenient downloading fhir resources in xml format and co
 - ```bundle2dfs( bundle, design, sep = "›" )```  
 
   Actually one doesn't use this one.  
-  Use bundle2dfs() for converting a all bundles of a fhir search request to all required data frames at once!  
+  Use bundles2dfs() for converting a all bundles of a fhir search request to all required data frames at once!  
 
 
 ### convert all bundles to all data frames at once
