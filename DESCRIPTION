@@ -3,9 +3,9 @@ Type: Package
 Title: fhiR
 Version: 0.1.0
 Author: Thomas Peschel
-Maintainer: <tpeschel@imise.uni-leipzig.de>
+Maintainer: Thomas Peschel <tpeschel@imise.uni-leipzig.de>
 Description: A convenient Package for working with HL7 FHIR Resources.
-License: file LICENSE
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.0
