@@ -4,7 +4,11 @@
 \alias{conformance}
 \title{conformance}
 \usage{
-conformance(url = "https://hapi.fhir.org/baseR4", sep = " -+- ")
+conformance(
+  url = "https://hapi.fhir.org/baseR4",
+  sep = " -+- ",
+  remove.empty.columns = T
+)
 }
 \arguments{
 \item{url}{the url of the fhir server endpoint.}
