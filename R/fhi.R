@@ -612,7 +612,7 @@ conformance <- function( url = "https://hapi.fhir.org/baseR4", sep = " -+- ", re
 			dfs,
 			function( df ) {
 
-				df[ , sapply( df, function( col ) 0 < sum( ! is.na( col ) ) ), drop = T ]
+				df[ , sapply( df, function( col ) 0 < sum( ! is.na( col ) ) ), drop = F ]
 			}
 		)
 	}
