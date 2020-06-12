@@ -127,12 +127,12 @@ test_that(
 
 
 #########################################################################################################
-context( "conformance()" )
+context( "capability.statement()" )
 
 cnf <- capability.statement( "https://hapi.fhir.org/baseR4", sep = " ~ ", remove.empty.columns = T )
 
 test_that(
-	"conformance() works", {
+	"capability.statement() works", {
 		expect_equal( is.null( cnf ), F )
 		expect_equal( is.data.frame( dfs[[ 1 ]] ), T )
 	}
