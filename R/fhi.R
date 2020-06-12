@@ -525,37 +525,6 @@ coerce.types <- function( df, stringsAsFactors = F ) {
 }
 
 
-extract.all <- function( xml, tag ) {
-
-	xml2::xml_ns_strip( xml )
-
-	tg <- xml2::xml_find_all( xml, tag )
-
-	l <- xml2::as_list( xml )
-
-	is.list( l$CapabilityStatement$id )
-
-
-	m <- unlist( l, recursive = 1 )
-	l
-
-	un.list <- function( l ) {
-
-		if( length( l ) < 1 ) attributes( l )
-		#else if( length( l ) == 1 ) attributes( l )
-		else sapply( l, un.list )
-	}
-
-	unlist( un.list( l ) )
-}
-
-xml <- get.bundle( "https://vonk.fire.ly/R4/metadata?_format=xml" )
-tag <- "/CapabilityStatement"
-
-unlist( xml2::as_list( xml ) )
-
-
-
 #' conformance
 #' @description get the conformance information about a fhir server.
 #'
@@ -643,7 +612,7 @@ conformance <- function( url = "https://hapi.fhir.org/baseR4", sep = " -+- ", re
 			dfs,
 			function( df ) {
 
-				df[ , sapply( df, function( col ) 0 < sum( ! is.na( col ) ) ) ]
+				df[ , sapply( df, function( col ) 0 < sum( ! is.na( col ) ) ), drop = T ]
 			}
 		)
 	}
