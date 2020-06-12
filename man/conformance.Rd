@@ -4,10 +4,12 @@
 \alias{conformance}
 \title{conformance}
 \usage{
-conformance(url)
+conformance(url = "https://hapi.fhir.org/baseR4", sep = " -+- ")
 }
 \arguments{
 \item{url}{the url of the fhir server endpoint.}
+
+\item{sep}{a string to separate pasted multiple entries}
 }
 \value{
 a data frame.
