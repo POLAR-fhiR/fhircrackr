@@ -129,7 +129,7 @@ test_that(
 #########################################################################################################
 context( "conformance()" )
 
-cnf <- conformance( "https://hapi.fhir.org/baseR4" )
+cnf <- capability.statement( "https://hapi.fhir.org/baseR4", sep = " ~ ", remove.empty.columns = T )
 
 test_that(
 	"conformance() works", {

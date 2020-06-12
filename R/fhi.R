@@ -440,7 +440,6 @@ bundle2dfs <- function( bundle, design, sep = " -+- " ) {
 	)
 }
 
-
 #' bundles2dfs
 #' @description converts all fhir bundles (the result of a get.bundles) to a list of data frames
 #'
@@ -526,27 +525,67 @@ coerce.types <- function( df, stringsAsFactors = F ) {
 }
 
 
-#' conformance
-#' @description get the conformance information about a fhir server.
+#' capability.statement
+#' @description get the capability statement about a fhir server.
 #'
 #' @param url the url of the fhir server endpoint.
+#' @param sep a string to separate pasted multiple entries
 #'
 #' @return a data frame.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' conformance( "https://hapi.fhir.org/baseR4" )
+#' capability.statement( "https://hapi.fhir.org/baseR4" )
 #' }
-conformance <- function( url ) {
+capability.statement <- function( url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.empty.columns = T ) {
 
-	cnf <- fhiR::get.bundle( paste.paths( url, "/metadata?_format=xml&_pretty=true" ) )
+	cnf <- fhiR::get.bundle( fhiR::paste.paths( url, "/metadata?_format=xml&_pretty=true" ) )
 
 	xml2::xml_ns_strip( cnf )
 
 	design <- list(
-		Conformance = list(
-			".//resource",
+		META = list(
+			"/CapabilityStatement",
+			list(
+				id               = "id/@value",
+				meta.versionId   = "meta.versionId/@value",
+				meta.lastUpdated = "meta/@value",
+				language         = "language/@value",
+				url              = "url/@value",
+				version          = "version/@value",
+				name             = "name/@value",
+				status           = "status/@value",
+				experimental     = "experimental/@value",
+				date             = "date/@value",
+				publisher        = "publisher/@value",
+				contact.name     = "contact/name/@value",
+				contact.telecom.system = "contact/telecom/system/@value",
+				contact.telecom.value  = "contact/telecom/value/@value",
+				contact.telecom.use    =  "contact/telecom/use/@value",
+				kind                   = "kind/@value",
+				status    = "status/@value",
+				date      = "date/@value",
+				publisher = "publisher/@value",
+				kind      = "kind/@value",
+				software.name = "software/name/@value",
+				software.version = "software/version/@value",
+				implementation.description = "implementation/description/@value",
+				implementation.url         = "implementation/url/@value",
+				fhirVersion                = "fhirVersion/@value",
+				fhirVersion.format         = "format/@value"
+			)
+		),
+		REST.META = list(
+			"/CapabilityStatement/rest",
+			list(
+				extension.url      = "extension/@url",
+				extension.valueUri = "extension/valueUri/@value",
+				mode               = "mode/@value"
+			)
+		),
+		REST = list(
+			"/CapabilityStatement/rest/resource",
 			list(
 				ext.url           = "extension/@url",
 				ext.decVal        = "extension/valueDecimal/@value",
@@ -555,6 +594,7 @@ conformance <- function( url ) {
 				interaction       = "interaction/code/@value",
 				searchParam.name  = "searchParam/name/@value",
 				searchParam.type  = "searchParam/type/@value",
+				searchParam.documentation = "searchParam/documentation/@value",
 				versioning        = "versioning/@value",
 				conditionalCreate = "conditionalCreate/@value",
 				conditionalUpdate = "conditionalUpdate/@value",
@@ -564,5 +604,18 @@ conformance <- function( url ) {
 		)
 	)
 
-	fhiR::bundle2dfs( cnf, design )[[ 1 ]]
+	dfs <- fhiR::bundle2dfs( bundle = cnf, design = design, sep = sep )
+
+	if( remove.empty.columns ) {
+
+		dfs <- lapply(
+			dfs,
+			function( df ) {
+
+				df[ , sapply( df, function( col ) 0 < sum( ! is.na( col ) ) ), drop = F ]
+			}
+		)
+	}
+
+	dfs
 }

@@ -2,8 +2,8 @@
 
 export(bundle2dfs)
 export(bundles2dfs)
+export(capability.statement)
 export(coerce.types)
-export(conformance)
 export(get.bundle)
 export(get.bundles)
 export(load.bundles)
