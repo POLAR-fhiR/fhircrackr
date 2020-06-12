@@ -154,14 +154,23 @@ get.bundle <- function( request, username = NULL, password = NULL, verbose = T, 
 				httr::add_headers( Accept = "application/fhir+xml" ),
 				httr::content_type( "application/fhir+xml;charset=utf-8" ),
 				auth
-			)
+			),
+			silent = T
 		)
 
 		if( class( response )[ 1 ] != "try-error" ) {
 
-			payload <- try( httr::content( response, as = "text", encoding = "UTF-8" ) )
+			payload <- try( httr::content( response, as = "text", encoding = "UTF-8" ), silent = T )
 
-			if( class( payload ) != "try-error" ) return( xml2::read_xml( payload ) )
+			if( class( payload )[ 1 ] != "try-error" ) {
+
+				xml <- try( xml2::read_xml( payload ), silent = T )
+
+				if( class( xml )[ 1 ] != "try-error" ) {
+
+					return( xml )
+				}
+			}
 		}
 
 		Sys.sleep( 10 )
@@ -227,7 +236,6 @@ get.bundles <- function( request, username = NULL, password = NULL, max.bundles 
 						 cnt,
 						 " bundles, this is less than the total number of bundles available.\n"
 				)
-
 			}
 			else {
 
@@ -540,9 +548,16 @@ coerce.types <- function( df, stringsAsFactors = F ) {
 #' }
 capability.statement <- function( url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.empty.columns = T ) {
 
-	cnf <- fhiR::get.bundle( fhiR::paste.paths( url, "/metadata?_format=xml&_pretty=true" ) )
+	caps <- fhiR::get.bundle( fhiR::paste.paths( url, "/metadata?_format=xml&_pretty=true" ) )
 
-	xml2::xml_ns_strip( cnf )
+	if( is.null( caps ) ) {
+
+		message( "Capability Statement could not be downloaded." )
+
+		return( NULL )
+	}
+
+	xml2::xml_ns_strip( caps )
 
 	design <- list(
 		META = list(
@@ -604,7 +619,7 @@ capability.statement <- function( url = "https://hapi.fhir.org/baseR4", sep = " 
 		)
 	)
 
-	dfs <- fhiR::bundle2dfs( bundle = cnf, design = design, sep = sep )
+	dfs <- fhiR::bundle2dfs( bundle = caps, design = design, sep = sep )
 
 	if( remove.empty.columns ) {
 
