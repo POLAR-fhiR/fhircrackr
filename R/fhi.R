@@ -525,8 +525,8 @@ coerce.types <- function( df, stringsAsFactors = F ) {
 }
 
 
-#' conformance
-#' @description get the conformance information about a fhir server.
+#' capability.statement
+#' @description get the capability statement about a fhir server.
 #'
 #' @param url the url of the fhir server endpoint.
 #' @param sep a string to separate pasted multiple entries
@@ -536,16 +536,16 @@ coerce.types <- function( df, stringsAsFactors = F ) {
 #'
 #' @examples
 #' \dontrun{
-#' conformance( "https://hapi.fhir.org/baseR4" )
+#' capability.statement( "https://hapi.fhir.org/baseR4" )
 #' }
-conformance <- function( url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.empty.columns = T ) {
+capability.statement <- function( url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.empty.columns = T ) {
 
 	cnf <- fhiR::get.bundle( fhiR::paste.paths( url, "/metadata?_format=xml&_pretty=true" ) )
 
 	xml2::xml_ns_strip( cnf )
 
 	design <- list(
-		CONFORMANCE = list(
+		META = list(
 			"/CapabilityStatement",
 			list(
 				id               = "id/@value",
