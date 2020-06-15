@@ -15,25 +15,25 @@ get.bundles(
 )
 }
 \arguments{
-\item{request}{a fhir search request}
+\item{request}{A string containing the full fhir search request.}
 
-\item{username}{a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.}
+\item{username}{A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.}
 
-\item{password}{a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.}
+\item{password}{A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.}
 
-\item{max.bundles}{maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
+\item{max.bundles}{Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
 
-\item{verbose}{print downloading progress to console? Defaults to TRUE.}
+\item{verbose}{A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.}
 
-\item{max.attempts}{maximal attempts to connect to a page address. Default is 5.}
+\item{max.attempts}{A numeric scalar. The maximal number of attempts to send a request, defaults to 5.}
 
-\item{delay.between.attempts}{a delay in seconds between two attempts.}
+\item{delay.between.attempts}{A scalar numeric specifying the delay in seconds between two attempts. Defaults to 10.}
 }
 \value{
-the downloaded bundles as a list of pages in xml format
+A list of bundles in xml format.
 }
 \description{
-downloads all fhir bunde of a fhir search request from a fhir server.
+Downloads all fhir bundles of a fhir search request from a fhir server.
 }
 \examples{
 \dontrun{

@@ -7,13 +7,13 @@
 th(n)
 }
 \arguments{
-\item{n}{a number or a vector of numbers.}
+\item{n}{A numeric vector containing one or more numbers.}
 }
 \value{
-a vector of strings
+A character vector containing the converted numbers as strings.
 }
 \description{
-add the right suffix to a number or a vector of numbers. e.g. 1st 2nd 3rd ...
+Add the right suffix to a number or a vector of numbers. e.g. 1st 2nd 3rd ...
 }
 \examples{
 \dontrun{

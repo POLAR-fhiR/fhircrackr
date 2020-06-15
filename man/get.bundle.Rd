@@ -2,7 +2,7 @@
 % Please edit documentation in R/fhi.R
 \name{get.bundle}
 \alias{get.bundle}
-\title{get.bundle}
+\title{get_bundle}
 \usage{
 get.bundle(
   request,
@@ -14,23 +14,23 @@ get.bundle(
 )
 }
 \arguments{
-\item{request}{a request for a fhir bundle. it must contain _format=xml.}
+\item{request}{A string containing the full fhir search request.}
 
-\item{username}{a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.}
+\item{username}{A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.}
 
-\item{password}{a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.}
+\item{password}{A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.}
 
-\item{verbose}{print downloading information to console? Defaults to TRUE.}
+\item{verbose}{A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.}
 
-\item{max.attempts}{the maximal number of attempts to send a request. Default is 5.}
+\item{max.attempts}{A numeric scalar. The maximal number of attempts to send a request, defaults to 5.}
 
-\item{delay.between.attempts}{a delay in seconds between two attempts.}
+\item{delay.between.attempts}{A scalar numeric specifying the delay in seconds between two attempts. Defaults to 10.}
 }
 \value{
-the downloaded bundle in xml format.
+The downloaded bundle in xml format.
 }
 \description{
-downloads a single fhir bundle via fhir search request and return it as xml file.
+Downloads a single fhir bundle via fhir search request and return it as a xml object.
 }
 \examples{
 \dontrun{

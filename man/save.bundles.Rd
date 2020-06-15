@@ -7,15 +7,15 @@
 save.bundles(bundles, directory = "result")
 }
 \arguments{
-\item{bundles}{a list of xml text files representing the pages of a fhir bundle.}
+\item{bundles}{A list of xml objects representing the pages of a fhir bundle.}
 
-\item{directory}{the location to store the data.}
+\item{directory}{A string containing the path to the folder to store the data in.}
 }
 \value{
-nothing to return.
+Nothing to return.
 }
 \description{
-writes all fhir bundle as numbered xml files into a directory.
+Writes all fhir bundles as numbered xml files into a directory.
 }
 \examples{
 \dontrun{

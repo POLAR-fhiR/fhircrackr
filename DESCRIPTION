@@ -4,9 +4,9 @@ Title: Handling HL7 FHIR resources in R
 Version: 0.1.0
 Authors@R: c(
     person("Thomas", "Peschel", email = "tpeschel@imise.uni-leipzig.de", role = c("aut","cre")),
-    person("Jens", "Przybilla", email = "jprzybilla@imise.uni-leipzig.de", role = "aut")),
-    person("Julia", "Gantner", email = "julia.gantner@med.uni-jena.de", role = c("aut")),
-    person("Frank", "Meineke", email = "'frank.meineke@imise.uni-leipzig.de", role = c("aut")))
+    person("Jens", "Przybilla", email = "jprzybilla@imise.uni-leipzig.de", role = "aut"),
+    person("Julia", "Gantner", email = "julia.gantner@med.uni-jena.de", role = "aut"),
+    person("Frank", "Meineke", email = "'frank.meineke@imise.uni-leipzig.de", role = "aut"))
 Description:  fhiR is a package that conveniently downloads fhir resources in xml format 
     and converts them to R data frames. It uses fhir-search to download bundles 
     from a fhir server, provides functions to save and read xml-files containing such bundles 

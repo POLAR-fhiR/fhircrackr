@@ -7,17 +7,21 @@
 bundles2dfs(bundles, design, sep = " -+- ")
 }
 \arguments{
-\item{bundles}{a fhir search result as a list of xml text files.}
+\item{bundles}{A fhir search result as returned by \code{\link{get.bundles}}.}
 
-\item{design}{a structure that specifies which table should contain which entries of the bundle.}
+\item{design}{A named list specifiying which data.frame should contain which entries of the bundle.
+The names correspond to the names of the resulting data.frames. Each element of design is a list of length 2 where
+the first element is a XPath expression to locate the entry in a fhir bundle page and second element is a named list
+with XPath expressions of locations to the values of the items in the bundle page. The names of this second element named
+list are the comlumn names of the resulting data.frames.}
 
-\item{sep}{a string to separate pasted multiple entries}
+\item{sep}{A string to separate pasted multiple entries.}
 }
 \value{
-a list of data frames.
+A list of data framesas specified by \code{design}.
 }
 \description{
-converts all fhir bundles (the result of a get.bundles) to a list of data frames
+Converts all fhir bundles (the result of \code{\link{get.bundles}}) to a list of data frames.
 }
 \examples{
 \dontrun{

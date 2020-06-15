@@ -7,15 +7,15 @@
 coerce.types(df, stringsAsFactors = F)
 }
 \arguments{
-\item{df}{a data frame with strings as column entries}
+\item{df}{A data frame with strings as column entries.}
 
-\item{stringsAsFactors}{strings as factors}
+\item{stringsAsFactors}{Strings as factors.}
 }
 \value{
-a data frame with coerced types
+A data frame with coerced types.
 }
 \description{
-coerce a data frame's columns
+Coerce a data frame's columns.
 }
 \examples{
 \dontrun{

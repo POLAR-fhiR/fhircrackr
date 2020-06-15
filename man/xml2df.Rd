@@ -7,17 +7,17 @@
 xml2df(xml, dsgn.df, sep = " -+- ")
 }
 \arguments{
-\item{xml}{xml doc or xml node}
+\item{xml}{An xml doc or xml node object.}
 
-\item{dsgn.df}{a design for a single data frame}
+\item{dsgn.df}{A design for a single data frame.}
 
-\item{sep}{a string to separate pasted multiple entries}
+\item{sep}{A string used to separate pasted multiple entries}
 }
 \value{
-a data frame
+A data frame containing the data specified in \code{dsgn.df}.
 }
 \description{
-converts a xml doc or xml node to one data frame
+Converts an xml doc or xml node object to one data frame.
 }
 \examples{
 \dontrun{

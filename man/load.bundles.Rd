@@ -7,13 +7,13 @@
 load.bundles(directory)
 }
 \arguments{
-\item{directory}{the location the data are stored.}
+\item{directory}{A string containing the path to the folder were the data are stored.}
 }
 \value{
-the bundles as a list of xml text files.
+A list of bundles in xml format.
 }
 \description{
-reads all bundles stored as xml files from a directory
+Reads all bundles stored as xml files from a directory.
 }
 \examples{
 \dontrun{

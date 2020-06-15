@@ -11,17 +11,17 @@ capability.statement(
 )
 }
 \arguments{
-\item{url}{the url of the fhir server endpoint.}
+\item{url}{The url of the fhir server endpoint.}
 
-\item{sep}{a string to separate pasted multiple entries}
+\item{sep}{A string to separate pasted multiple entries}
 
-\item{remove.empty.columns}{remove empty columns}
+\item{remove.empty.columns}{Logical Scalar. Remove empty columns?}
 }
 \value{
-a data frame.
+A data frame with the capability statement.
 }
 \description{
-get the capability statement about a fhir server.
+Get the capability statement about a fhir server.
 }
 \examples{
 \dontrun{

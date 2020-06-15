@@ -7,15 +7,15 @@
 tag.attr(xml, xpath)
 }
 \arguments{
-\item{xml}{a document, node, or node set}
+\item{xml}{A xml document, node, or node set.}
 
-\item{xpath}{a string containing a xpath (1.0) expression}
+\item{xpath}{A string containing a xpath (1.0) expression}
 }
 \value{
-a single value or vector
+A character vector containing the attribute.
 }
 \description{
-extracts an attribute from tags.
+Extracts an attribute from tags in a xml object.
 }
 \examples{
 \dontrun{

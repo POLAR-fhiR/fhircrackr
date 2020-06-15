@@ -9,20 +9,19 @@ bundle2dfs(bundle, design, sep = " -+- ")
 \arguments{
 \item{bundle}{a xml text file the represents a fhir bundle.}
 
-\item{design}{a structure that specifies which table should contain which entries of the bundle.}
+\item{design}{A named list specifiying which data.frame should contain which entries of the bundle.
+The names correspond to the names of the resulting data.frames. Each element of design is a list of length 2 where
+the first element is a XPath expression to locate the entry in a fhir bundle page and second element is a named list
+with XPath expressions of locations to the values of the items in the bundle page. The names of this second element named
+list are the comlumn names of the resulting data.frames.}
 
-\item{sep}{a string to separate pasted multiple entries}
+\item{sep}{A string to separate pasted multiple entries.}
 }
 \value{
-a list of data frames
+A list of data frames as specified by \code{design}
 }
 \description{
-converts a fhir bundle to a list of data frames.
-design is a named list. Its names are the one of the resulting tables.
-The elements of design are lists of 2 elements.
-The first one is a XPath expression to locate the entry in a fhir bundle page.
-The second one is a named list with XPath expressions of locations to the values of the items in the bundle page.
-The names are the column names of the resultung data frames
+Converts a fhir bundle to a list of data frames.
 }
 \examples{
 \dontrun{
