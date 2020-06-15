@@ -1,11 +1,11 @@
-#usethis::use_package( "xml2" )
-#usethis::use_package( "stringr" )
-#usethis::use_package( "httr" )
-#usethis::use_package( "utils" )
-library( "xml2" )
-library( "stringr" )
-library( "httr" )
-library( "utils" )
+usethis::use_package( "xml2" )
+usethis::use_package( "stringr" )
+usethis::use_package( "httr" )
+usethis::use_package( "utils" )
+# library( "xml2" )
+# library( "stringr" )
+# library( "httr" )
+# library( "utils" )
 
 
 #' th
