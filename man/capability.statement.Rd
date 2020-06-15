@@ -14,6 +14,8 @@ capability.statement(
 \item{url}{the url of the fhir server endpoint.}
 
 \item{sep}{a string to separate pasted multiple entries}
+
+\item{remove.empty.columns}{remove empty columns}
 }
 \value{
 a data frame.

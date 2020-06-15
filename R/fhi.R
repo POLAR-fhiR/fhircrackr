@@ -538,6 +538,7 @@ coerce.types <- function( df, stringsAsFactors = F ) {
 #'
 #' @param url the url of the fhir server endpoint.
 #' @param sep a string to separate pasted multiple entries
+#' @param remove.empty.columns remove empty columns
 #'
 #' @return a data frame.
 #' @export
