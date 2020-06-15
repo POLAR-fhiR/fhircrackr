@@ -1,10 +1,17 @@
 Package: fhiR
 Type: Package
-Title: fhiR
+Title: Handling HL7 FHIR resources in R
 Version: 0.1.0
-Author: Thomas Peschel
-Maintainer: Thomas Peschel <tpeschel@imise.uni-leipzig.de>
-Description: A convenient Package for working with HL7 FHIR Resources.
+Authors@R: c(
+    person("Thomas", "Peschel", email = "tpeschel@imise.uni-leipzig.de", role = c("aut","cre")),
+    person("Jens", "Przybilla", email = "jprzybilla@imise.uni-leipzig.de", role = "aut")),
+    person("Julia", "Gantner", email = "julia.gantner@med.uni-jena.de", role = c("aut")),
+    person("Frank", "Meineke", email = "'frank.meineke@imise.uni-leipzig.de", role = c("aut")))
+Description:  fhiR is a package that conveniently downloads fhir resources in xml format 
+    and converts them to R data frames. It uses fhir-search to download bundles 
+    from a fhir server, provides functions to save and read xml-files containing such bundles 
+    and allows flattening the bundles to data.frames using XPath expressions.
+BugReports: https://github.com/POLAR-fhiR/fhiR/issues
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
