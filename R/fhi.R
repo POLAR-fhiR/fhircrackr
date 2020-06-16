@@ -9,11 +9,6 @@ usethis::use_package( "utils" )
 #' @param n A numeric vector containing one or more numbers.
 #'
 #' @return A character vector containing the converted numbers as strings.
-#'
-#' @examples
-#' th( 0 : 4 )
-
-
 th <- function( n ) {
 
 	n.th <- n < 1 | 3 < n
@@ -38,11 +33,6 @@ th <- function( n ) {
 #' @param suffix A string taken as the suffix for the names of the list elements.
 #'
 #' @return A named list, where the names are the content surrounded by a prefix and a suffix.
-#'
-#' @examples
-#' lst( LETTERS[ 1 : 5 ], prefix = "id[", suffix = "]" )
-
-
 lst <- function( ..., prefix = NULL, suffix = NULL ) {
 
 	v <- as.list( c( ... ) )
@@ -61,6 +51,7 @@ lst <- function( ..., prefix = NULL, suffix = NULL ) {
 #' @param os A string specifying theoperating system you're operating on: windows or linux.
 #'
 #' @return A string containing the concatenated path.
+#' @export
 #'
 #' @examples
 #' paste_paths( "data", "patients" )
@@ -302,7 +293,7 @@ load_bundles <- function( directory ) {
 
 	xml.files <- dir( directory, "*.xml" )
 
-	lapply( lst( xml.files ), function( x ) xml2::read_xml( paste.paths( directory, x ) ) )
+	lapply( lst( xml.files ), function( x ) xml2::read_xml( paste_paths( directory, x ) ) )
 }
 
 
@@ -371,6 +362,7 @@ xml2df <- function( xml, dsgn.df, sep = " -+- " ) {
 #' @param sep A string to separate pasted multiple entries.
 #'
 #' @return A list of data frames as specified by \code{design}
+#' @export
 #'
 #' @examples
 #' \dontrun{

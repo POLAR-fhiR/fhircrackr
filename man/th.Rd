@@ -15,6 +15,3 @@ A character vector containing the converted numbers as strings.
 \description{
 Add the right suffix to a number or a vector of numbers. e.g. 1st 2nd 3rd ...
 }
-\examples{
-th( 0 : 4 )
-}

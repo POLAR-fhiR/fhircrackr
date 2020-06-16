@@ -33,7 +33,7 @@ test_that(
 
 
 #########################################################################################################
-context( "get.bundle()" )
+context( "get_bundle()" )
 
 design <- list(
 
@@ -45,12 +45,12 @@ design <- list(
 	)
 )
 
-bundle <- fhiR::get.bundle( "https://hapi.fhir.org/baseR4/Patient?_revinclude=*&_pretty=true&_count=10" )
+bundle <- fhiR::get_bundle( "https://hapi.fhir.org/baseR4/Patient?_revinclude=*&_pretty=true&_count=10" )
 xml2::xml_ns_strip( bundle )
 bundle.tag <- xml2::xml_find_all( bundle, "/Bundle" )
 
 test_that(
-	"get.bundle downloads a valid bundle", {
+	"get_bundle downloads a valid bundle", {
 		expect_equal( is.null( bundle ), F )
 		expect_equal( isClass( "xml_node", bundle ), T )
 		expect_equal( is.list( bundle.tag ), T )
@@ -60,12 +60,12 @@ test_that(
 
 
 #########################################################################################################
-context( "get.bundles()" )
+context( "fhir_search()" )
 
-bundles <- fhiR::get.bundles( "https://vonk.fire.ly/R4/Patient?_pretty=true&_count=100000" )
+bundles <- fhiR::fhir_search( "https://vonk.fire.ly/R4/Patient?_pretty=true&_count=100000" )
 
 test_that(
-	"get.bundles downloads a valid bundle list", {
+	"fhir_search downloads a valid bundle list", {
 		expect_equal( is.null( bundles ), F )
 		expect_equal( is.list( bundles ), T )
 		expect_equal( 0 < length( bundles ), T )
@@ -75,12 +75,12 @@ test_that(
 
 
 #########################################################################################################
-context( "save.bundles()" )
+context( "save_bundles()" )
 
-fhiR::save.bundles( bundles, "myBundles" )
+fhiR::save_bundles( bundles, "myBundles" )
 
 test_that(
-	"save.bundles stores all bundles as xml files in the required directory", {
+	"save_bundles stores all bundles as xml files in the required directory", {
 		expect_equal( any( "myBundles" %in% dir( ) ), T )
 		expect_equal( 0 < length( dir( "myBundles" ) ), T )
 	}
@@ -88,12 +88,12 @@ test_that(
 
 
 #########################################################################################################
-context( "load.bundles()" )
+context( "load_bundles()" )
 
-myBundles <- fhiR::load.bundles( "myBundles" )
+myBundles <- fhiR::load_bundles( "myBundles" )
 
 test_that(
-	"load.bundles reads all bundles as xml files from the given directory", {
+	"load_bundles reads all bundles as xml files from the given directory", {
 		expect_equal( is.null( myBundles ), F )
 		expect_equal( is.list( myBundles ), T )
 		expect_equal( 0 < length( myBundles ), T )
@@ -103,7 +103,7 @@ test_that(
 
 
 #########################################################################################################
-context( "bundle2dfs()" )
+context( "fhir2dfs()" )
 
 design <- list(
 
@@ -115,10 +115,10 @@ design <- list(
 	)
 )
 
-dfs <- fhiR::bundle2dfs( bundle, design )
+dfs <- fhiR::fhir2dfs( myBundles, design )
 
 test_that(
-	"bundle2dfs creates all required data frames", {
+	"fhir2dfs creates all required data frames", {
 		expect_equal( is.null( dfs ), F )
 		expect_equal( is.list( dfs ), T )
 		expect_equal( is.data.frame( dfs[[ 1 ]] ), T )
@@ -127,12 +127,12 @@ test_that(
 
 
 #########################################################################################################
-context( "capability.statement()" )
+context( "capability_statement()" )
 
-cnf <- capability.statement( "https://hapi.fhir.org/baseR4", sep = " ~ ", remove.empty.columns = T )
+cnf <- capability_statement( "https://hapi.fhir.org/baseR4", sep = " ~ ", remove.empty.columns = T )
 
 test_that(
-	"capability.statement() works", {
+	"capability_statement() works", {
 		expect_equal( is.null( cnf ), F )
 		expect_equal( is.data.frame( dfs[[ 1 ]] ), T )
 	}

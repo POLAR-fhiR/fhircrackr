@@ -19,6 +19,3 @@ A named list, where the names are the content surrounded by a prefix and a suffi
 \description{
 Transforms a vector of items to a named list. The names are created with a prefix and a suffix surrounding the items.
 }
-\examples{
-lst( LETTERS[ 1 : 5 ], prefix = "id[", suffix = "]" )
-}
