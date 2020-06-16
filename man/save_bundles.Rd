@@ -19,6 +19,6 @@ Writes all fhir bundles as numbered xml files into a directory.
 }
 \examples{
 \dontrun{
-save_bundles( bundles, "result" )
+save_bundles(bundles, "result")
 }
 }

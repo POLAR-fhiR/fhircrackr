@@ -25,6 +25,6 @@ Get the capability statement about a fhir server.
 }
 \examples{
 \dontrun{
-capability_statement( "https://hapi.fhir.org/baseR4" )
+capability_statement("https://hapi.fhir.org/baseR4")
 }
 }

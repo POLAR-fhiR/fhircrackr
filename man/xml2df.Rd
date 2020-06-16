@@ -21,6 +21,6 @@ Converts an xml doc or xml node object to one data frame.
 }
 \examples{
 \dontrun{
-xml2df( xml, design$Patient )
+xml2df(xml, design$Patient)
 }
 }

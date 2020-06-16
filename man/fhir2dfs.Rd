@@ -25,6 +25,6 @@ Converts all fhir bundles (the result of \code{\link{fhir_search}}) to a list of
 }
 \examples{
 \dontrun{
-fhir2dfs( bundles, design )
+fhir2dfs(bundles, design)
 }
 }

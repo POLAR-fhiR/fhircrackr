@@ -19,6 +19,6 @@ Coerce a data frame's columns.
 }
 \examples{
 \dontrun{
-coerce_types( dfs$Besuch )
+coerce_types(dfs$Besuch)
 }
 }

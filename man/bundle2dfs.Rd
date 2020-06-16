@@ -26,7 +26,7 @@ Converts a fhir bundle to a list of data frames.
 \examples{
 \dontrun{
 bundle2dfs(
-bundles[[ 1 ]],
+bundles[[1]],
 design = list(
 MEDICATION = list(
  tag     = ".//Medication",
@@ -34,6 +34,6 @@ MEDICATION = list(
 	  SYSTEM  = "code/coding/system/@value",
 	  CODE    = "code/coding/code/@value",
 	  DISPLAY = "code/coding/display/@value"
-	) ) ) )
+	))))
 	}
 }
