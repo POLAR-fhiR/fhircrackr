@@ -17,6 +17,6 @@ Reads all bundles stored as xml files from a directory.
 }
 \examples{
 \dontrun{
-bundles.bak <- load_bundles( "result" )
+bundles.bak <- load_bundles("result")
 }
 }

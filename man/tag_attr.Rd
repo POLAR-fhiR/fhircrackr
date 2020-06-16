@@ -19,6 +19,6 @@ Extracts an attribute from tags in a xml object.
 }
 \examples{
 \dontrun{
-tag_attr( bundles[[ 1 ]], xpath = ".//total/@value" )
+tag_attr(bundles[[1]], xpath = ".//total/@value")
 }
 }

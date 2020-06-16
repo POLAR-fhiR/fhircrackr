@@ -34,6 +34,6 @@ Downloads a single fhir bundle via fhir search request and return it as a xml ob
 }
 \examples{
 \dontrun{
-get_bundle( request = "https://hapi.fhir.org/baseR4/Medication?_count=500&_format=xml" )
+get_bundle(request = "https://hapi.fhir.org/baseR4/Medication?_count=500&_format=xml")
 }
 }
