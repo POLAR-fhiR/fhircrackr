@@ -2,24 +2,18 @@ usethis::use_package( "xml2" )
 usethis::use_package( "stringr" )
 usethis::use_package( "httr" )
 usethis::use_package( "utils" )
-# library( "xml2" )
-# library( "stringr" )
-# library( "httr" )
-# library( "utils" )
 
-
-#' th
-#' @description add the right suffix to a number or a vector of numbers. e.g. 1st 2nd 3rd ...
+#' Create count strings
+#' @description Add the right suffix to a number or a vector of numbers. e.g. 1st 2nd 3rd ...
 #'
-#' @param n a number or a vector of numbers.
+#' @param n A numeric vector containing one or more numbers.
 #'
-#' @return a vector of strings
-#' @export
+#' @return A character vector containing the converted numbers as strings.
 #'
 #' @examples
-#' \dontrun{
 #' th( 0 : 4 )
-#' }
+
+
 th <- function( n ) {
 
 	n.th <- n < 1 | 3 < n
@@ -36,20 +30,19 @@ th <- function( n ) {
 }
 
 
-#' lst
-#'@description transforms a vector of items to a named list. The names are created with a prefix and a suffix surrounding the items.
+#' Transform vector to named list
+#'@description Transforms a vector of items to a named list. The names are created with a prefix and a suffix surrounding the items.
 #'
-#' @param ... a scalar or a vector of scalars.
-#' @param prefix a prefix in front of the result text.
-#' @param suffix a suffix after the result text.
+#' @param ... A vector that can be coerced to a character.
+#' @param prefix A string taken as the prefix for the names of the list elements.
+#' @param suffix A string taken as the suffix for the names of the list elements.
 #'
-#' @return a named list, where the names are the content surrounded by a prefix and a suffix
-#' @export
+#' @return A named list, where the names are the content surrounded by a prefix and a suffix.
 #'
 #' @examples
-#' \dontrun{
-#' lst( LETTERS[ 1 : 5 ], pre = "id[", post = "]" )
-#' }
+#' lst( LETTERS[ 1 : 5 ], prefix = "id[", suffix = "]" )
+
+
 lst <- function( ..., prefix = NULL, suffix = NULL ) {
 
 	v <- as.list( c( ... ) )
@@ -60,26 +53,24 @@ lst <- function( ..., prefix = NULL, suffix = NULL ) {
 }
 
 
-#' paste.paths
-#' @description concatenates to paths strings correctly
+#' Concatenate paths
+#' @description Concatenates to path string correctly.
 #'
-#' @param path1 the left hand part of final path.
-#' @param path2 the right hand part of final path.
-#' @param os the operating system you'r operating on: windows or linux.
+#' @param path1 A string specifying the left hand part of final path.
+#' @param path2 A string specifying the right hand part of final path.
+#' @param os A string specifying theoperating system you're operating on: windows or linux.
 #'
-#' @return a string
-#' @export
+#' @return A string containing the concatenated path.
 #'
 #' @examples
-#' \dontrun{
-#' paste.paths( "data", "patients" )
-#' paste.paths( "/data", "patients" )
-#' paste.paths( "/data/", "patients" )
-#' paste.paths( "/data", "/patients" )
-#' paste.paths( "/data/", "/patients/" )
-#' paste.paths( "data", "patients", "windows" )
-#' }
-paste.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
+#' paste_paths( "data", "patients" )
+#' paste_paths( "/data", "patients" )
+#' paste_paths( "/data/", "patients" )
+#' paste_paths( "/data", "/patients" )
+#' paste_paths( "/data/", "/patients/" )
+#' paste_paths( "data", "patients", "windows" )
+
+paste_paths <- function( path1="w", path2="d", os = "LiNuX" ) {
 
 	os <- tolower( substr( os, 1, 1 ) )
 
@@ -93,20 +84,21 @@ paste.paths <- function( path1="w", path2="d", os = "LiNuX" ) {
 
 
 
-#' tag.attr
-#'@description extracts an attribute from tags.
+#' Extract paths
+#'@description Extracts an attribute from tags in a xml object.
 #'
-#' @param xml a document, node, or node set
-#' @param xpath a string containing a xpath (1.0) expression
+#' @param xml A xml document, node, or node set.
+#' @param xpath A string containing a xpath (1.0) expression
 #'
-#' @return a single value or vector
+#' @return A character vector containing the attribute.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' tag.attr( bundles[[ 1 ]], xpath = ".//total/@value" )
+#' tag_attr( bundles[[ 1 ]], xpath = ".//total/@value" )
 #' }
-tag.attr <- function( xml, xpath ) {
+
+tag_attr <- function( xml, xpath ) {
 
 	addr   <- sub( "/@[a-zA-Z0-9]+$", "", xpath )
 	attrib <- sub( "^.*/@", "", xpath )
@@ -116,24 +108,25 @@ tag.attr <- function( xml, xpath ) {
 
 
 
-#' get.bundle
-#' @description downloads a single fhir bundle via fhir search request and return it as xml file.
+#' Download single fhir bundle
+#' @description Downloads a single fhir bundle via fhir search request and return it as a xml object.
 #'
-#' @param request a request for a fhir bundle. it must contain _format=xml.
-#' @param username a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
-#' @param password a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
-#' @param verbose print downloading information to console? Defaults to TRUE.
-#' @param max.attempts the maximal number of attempts to send a request. Default is 5.
-#' @param delay.between.attempts a delay in seconds between two attempts.
+#' @param request A string containing the full fhir search request.
+#' @param username A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
+#' @param password A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
+#' @param max.attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
+#' @param verbose A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.
+#' @param delay.between.attempts A scalar numeric specifying the delay in seconds between two attempts. Defaults to 10.
+
 #'
-#' @return the downloaded bundle in xml format.
+#' @return The downloaded bundle in xml format.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' get.bundle( request = "https://hapi.fhir.org/baseR4/Medication?_count=500&_format=xml" )
+#' get_bundle( request = "https://hapi.fhir.org/baseR4/Medication?_count=500&_format=xml" )
 #' }
-get.bundle <- function( request, username = NULL, password = NULL, verbose = T, max.attempts = 5, delay.between.attempts = 10 ) {
+get_bundle <- function( request, username = NULL, password = NULL, verbose = T, max.attempts = 5, delay.between.attempts = 10 ) {
 
 	#dbg
 	#request="https://hapi.fhir.org/baseR4/Medication?_format=xml"
@@ -181,25 +174,20 @@ get.bundle <- function( request, username = NULL, password = NULL, verbose = T, 
 
 
 
-#' get.bundles
-#' @description downloads all fhir bunde of a fhir search request from a fhir server.
+#' Download fhir search result
+#' @description Downloads all fhir bundles of a fhir search request from a fhir server.
 #'
-#' @param request a fhir search request
-#' @param username a string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
-#' @param password a string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
-#' @param max.bundles maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
-#' @param verbose print downloading progress to console? Defaults to TRUE.
-#' @param max.attempts maximal attempts to connect to a page address. Default is 5.
-#' @param delay.between.attempts a delay in seconds between two attempts.
+#' @inheritParams get_bundle
+#' @param max.bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
 #'
-#' @return the downloaded bundles as a list of pages in xml format
+#' @return A list of bundles in xml format.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' bundles <- get.bundles( "https://vonk.fire.ly/R4/Medication?_format=xml" )
+#' bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max.bundles=10)
 #' }
-get.bundles <- function( request, username = NULL, password = NULL, max.bundles = Inf, verbose = T, max.attempts = 5, delay.between.attempts = 10 ) {
+fhir_search <- function( request, username = NULL, password = NULL, max.bundles = Inf, verbose = T, max.attempts = 5, delay.between.attempts = 10 ) {
 
 	bundles <- list( )
 
@@ -211,7 +199,7 @@ get.bundles <- function( request, username = NULL, password = NULL, max.bundles 
 
 		if( verbose ) cat( paste0( "bundle[", cnt <- cnt + 1, "]" ) )
 
-		bundle <- get.bundle( request = addr, username = username, password = password, verbose = verbose, max.attempts = max.attempts, delay.between.attempts = delay.between.attempts )
+		bundle <- get_bundle( request = addr, username = username, password = password, verbose = verbose, max.attempts = max.attempts, delay.between.attempts = delay.between.attempts )
 
 		if( is.null( bundle ) ) {
 
@@ -269,20 +257,20 @@ get.bundles <- function( request, username = NULL, password = NULL, max.bundles 
 
 
 
-#' save.bundles
-#' @description writes all fhir bundle as numbered xml files into a directory.
+#' Save bundles as xml-files
+#' @description Writes all fhir bundles as numbered xml files into a directory.
 #'
-#' @param bundles a list of xml text files representing the pages of a fhir bundle.
-#' @param directory the location to store the data.
+#' @param bundles A list of xml objects representing the pages of a fhir bundle.
+#' @param directory A string containing the path to the folder to store the data in.
 #'
-#' @return nothing to return.
+#' @return Nothing to return.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' save.bundles( bundles, "result" )
+#' save_bundles( bundles, "result" )
 #' }
-save.bundles <- function( bundles, directory = "result" ) {
+save_bundles <- function( bundles, directory = "result" ) {
 
 	w <- 1 + floor( log10( length( bundles ) ) )
 
@@ -292,25 +280,25 @@ save.bundles <- function( bundles, directory = "result" ) {
 
 	for( n in 1 : length( bundles ) ) {
 
-		xml2::write_xml( bundles[[ n ]], paste.paths( directory, paste0( stringr::str_pad( n, width = w, pad = "0" ), ".xml" ) ) )
+		xml2::write_xml( bundles[[ n ]], paste_paths( directory, paste0( stringr::str_pad( n, width = w, pad = "0" ), ".xml" ) ) )
 	}
 }
 
 
 
-#' load.bundles
-#' @description reads all bundles stored as xml files from a directory
+#' Load bundles from xml-files
+#' @description Reads all bundles stored as xml files from a directory.
 #'
-#' @param directory the location the data are stored.
+#' @param directory A string containing the path to the folder were the data are stored.
 #'
-#' @return the bundles as a list of xml text files.
+#' @return A list of bundles in xml format.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' bundles.bak <- load.bundles( "result" )
+#' bundles.bak <- load_bundles( "result" )
 #' }
-load.bundles <- function( directory ) {
+load_bundles <- function( directory ) {
 
 	xml.files <- dir( directory, "*.xml" )
 
@@ -319,14 +307,14 @@ load.bundles <- function( directory ) {
 
 
 
-#' xml2df
-#' @description converts a xml doc or xml node to one data frame
+#' Flatten xml objects.
+#' @description Converts an xml doc or xml node object to one data frame.
 #'
-#' @param xml xml doc or xml node
-#' @param dsgn.df a design for a single data frame
-#' @param sep a string to separate pasted multiple entries
+#' @param xml An xml doc or xml node object.
+#' @param dsgn.df A design for a single data frame.
+#' @param sep A string used to separate pasted multiple entries
 #'
-#' @return a data frame
+#' @return A data frame containing the data specified in \code{dsgn.df}.
 #' @export
 #'
 #' @examples
@@ -357,7 +345,7 @@ xml2df <- function( xml, dsgn.df, sep = " -+- " ) {
 			#attrib <- sub( "^.*/@", "", i.srch )
 
 			#val  <- xml2::xml_attr( xml2::xml_find_all( xml, addr ), attrib )
-			val  <- tag.attr( xml, i.srch )
+			val  <- tag_attr( xml, i.srch )
 
 			if( is.na( val ) || length( val ) < 1 ) NA
 			else if( 1 < length( val ) ) paste0( val, collapse = sep )
@@ -370,20 +358,19 @@ xml2df <- function( xml, dsgn.df, sep = " -+- " ) {
 
 
 
-#' bundle2dfs
-#' @description converts a fhir bundle to a list of data frames.
-#' design is a named list. Its names are the one of the resulting tables.
-#' The elements of design are lists of 2 elements.
-#' The first one is a XPath expression to locate the entry in a fhir bundle page.
-#' The second one is a named list with XPath expressions of locations to the values of the items in the bundle page.
-#' The names are the column names of the resultung data frames
+#' Flatten single fhir bundle
+#' @description Converts a fhir bundle to a list of data frames.
+
 #'
 #' @param bundle a xml text file the represents a fhir bundle.
-#' @param design a structure that specifies which table should contain which entries of the bundle.
-#' @param sep a string to separate pasted multiple entries
+#' @param design A named list specifiying which data.frame should contain which entries of the bundle.
+#' The names correspond to the names of the resulting data.frames. Each element of design is a list of length 2 where
+#' the first element is a XPath expression to locate the entry in a fhir bundle page and second element is a named list
+#' with XPath expressions of locations to the values of the items in the bundle page. The names of this second element named
+#' list are the column names of the resulting data.frames.
+#' @param sep A string to separate pasted multiple entries.
 #'
-#' @return a list of data frames
-#' @export
+#' @return A list of data frames as specified by \code{design}
 #'
 #' @examples
 #' \dontrun{
@@ -448,21 +435,20 @@ bundle2dfs <- function( bundle, design, sep = " -+- " ) {
 	)
 }
 
-#' bundles2dfs
-#' @description converts all fhir bundles (the result of a get.bundles) to a list of data frames
+#' Flatten list of fhir bundles
+#' @description Converts all fhir bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
 #'
-#' @param bundles a fhir search result as a list of xml text files.
-#' @param design a structure that specifies which table should contain which entries of the bundle.
-#' @param sep a string to separate pasted multiple entries
+#' @param bundles A fhir search result as returned by \code{\link{fhir_search}}.
+#' @inheritParams bundle2dfs
 #'
-#' @return a list of data frames.
+#' @return A list of data framesas specified by \code{design}.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' bundles2dfs( bundles, design )
+#' fhir2dfs( bundles, design )
 #' }
-bundles2dfs <- function( bundles, design, sep = " -+- " ) {
+fhir2dfs <- function( bundles, design, sep = " -+- " ) {
 
 	bundles.dfs <- lapply(
 		bundles,
@@ -514,42 +500,41 @@ bundles2dfs <- function( bundles, design, sep = " -+- " ) {
 }
 
 
-#' coerce.types
-#' @description coerce a data frame's columns
+#' Coerce columns
+#' @description Coerce a data frame's columns.
 #'
-#' @param df a data frame with strings as column entries
-#' @param stringsAsFactors strings as factors
+#' @param df A data frame with strings as column entries.
+#' @param stringsAsFactors Strings as factors.
 #'
-#' @return a data frame with coerced types
-#' @export
+#' @return A data frame with coerced types.
 #'
 #' @examples
 #' \dontrun{
-#' coerce.types( dfs$Besuch )
+#' coerce_types( dfs$Besuch )
 #' }
-coerce.types <- function( df, stringsAsFactors = F ) {
+coerce_types <- function( df, stringsAsFactors = F ) {
 
 	utils::type.convert( df, as.is = ! stringsAsFactors )
 }
 
 
-#' capability.statement
-#' @description get the capability statement about a fhir server.
+#' Get capability statement
+#' @description Get the capability statement about a fhir server.
 #'
-#' @param url the url of the fhir server endpoint.
-#' @param sep a string to separate pasted multiple entries
-#' @param remove.empty.columns remove empty columns
+#' @param url The url of the fhir server endpoint.
+#' @param sep A string to separate pasted multiple entries
+#' @param remove.empty.columns Logical Scalar. Remove empty columns?
 #'
-#' @return a data frame.
+#' @return A data frame with the capability statement.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' capability.statement( "https://hapi.fhir.org/baseR4" )
+#' capability_statement( "https://hapi.fhir.org/baseR4" )
 #' }
-capability.statement <- function( url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.empty.columns = T ) {
+capability_statement <- function( url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.empty.columns = T ) {
 
-	caps <- fhiR::get.bundle( fhiR::paste.paths( url, "/metadata?_format=xml&_pretty=true" ) )
+	caps <- fhiR::get_bundle( fhiR::paste_paths( url, "/metadata?_format=xml&_pretty=true" ) )
 
 	if( is.null( caps ) ) {
 

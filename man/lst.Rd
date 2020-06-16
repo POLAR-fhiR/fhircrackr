@@ -2,25 +2,23 @@
 % Please edit documentation in R/fhi.R
 \name{lst}
 \alias{lst}
-\title{lst}
+\title{Transform vector to named list}
 \usage{
 lst(..., prefix = NULL, suffix = NULL)
 }
 \arguments{
-\item{...}{a scalar or a vector of scalars.}
+\item{...}{A vector that can be coerced to a character.}
 
-\item{prefix}{a prefix in front of the result text.}
+\item{prefix}{A string taken as the prefix for the names of the list elements.}
 
-\item{suffix}{a suffix after the result text.}
+\item{suffix}{A string taken as the suffix for the names of the list elements.}
 }
 \value{
-a named list, where the names are the content surrounded by a prefix and a suffix
+A named list, where the names are the content surrounded by a prefix and a suffix.
 }
 \description{
-transforms a vector of items to a named list. The names are created with a prefix and a suffix surrounding the items.
+Transforms a vector of items to a named list. The names are created with a prefix and a suffix surrounding the items.
 }
 \examples{
-\dontrun{
-lst( LETTERS[ 1 : 5 ], pre = "id[", post = "]" )
-}
+lst( LETTERS[ 1 : 5 ], prefix = "id[", suffix = "]" )
 }
