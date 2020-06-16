@@ -37,6 +37,6 @@ Downloads all fhir bundles of a fhir search request from a fhir server.
 }
 \examples{
 \dontrun{
-bundles <- fhir_search( "https://vonk.fire.ly/R4/Medication?_format=xml" )
+bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max.bundles=10)
 }
 }
