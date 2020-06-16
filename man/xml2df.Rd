@@ -2,7 +2,7 @@
 % Please edit documentation in R/fhi.R
 \name{xml2df}
 \alias{xml2df}
-\title{xml2df}
+\title{Flatten xml objects.}
 \usage{
 xml2df(xml, dsgn.df, sep = " -+- ")
 }

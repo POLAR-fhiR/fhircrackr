@@ -2,7 +2,7 @@
 % Please edit documentation in R/fhi.R
 \name{bundle2dfs}
 \alias{bundle2dfs}
-\title{bundle2dfs}
+\title{Flatten single fhir bundle}
 \usage{
 bundle2dfs(bundle, design, sep = " -+- ")
 }
@@ -13,7 +13,7 @@ bundle2dfs(bundle, design, sep = " -+- ")
 The names correspond to the names of the resulting data.frames. Each element of design is a list of length 2 where
 the first element is a XPath expression to locate the entry in a fhir bundle page and second element is a named list
 with XPath expressions of locations to the values of the items in the bundle page. The names of this second element named
-list are the comlumn names of the resulting data.frames.}
+list are the column names of the resulting data.frames.}
 
 \item{sep}{A string to separate pasted multiple entries.}
 }

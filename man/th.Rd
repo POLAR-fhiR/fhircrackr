@@ -2,7 +2,7 @@
 % Please edit documentation in R/fhi.R
 \name{th}
 \alias{th}
-\title{th}
+\title{Create count strings}
 \usage{
 th(n)
 }
@@ -16,7 +16,5 @@ A character vector containing the converted numbers as strings.
 Add the right suffix to a number or a vector of numbers. e.g. 1st 2nd 3rd ...
 }
 \examples{
-\dontrun{
 th( 0 : 4 )
-}
 }

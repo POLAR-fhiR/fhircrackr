@@ -2,18 +2,18 @@
 % Please edit documentation in R/fhi.R
 \name{bundles2dfs}
 \alias{bundles2dfs}
-\title{bundles2dfs}
+\title{Flatten list of fhir bundles}
 \usage{
 bundles2dfs(bundles, design, sep = " -+- ")
 }
 \arguments{
-\item{bundles}{A fhir search result as returned by \code{\link{get.bundles}}.}
+\item{bundles}{A fhir search result as returned by \code{\link{fhir_search}}.}
 
 \item{design}{A named list specifiying which data.frame should contain which entries of the bundle.
 The names correspond to the names of the resulting data.frames. Each element of design is a list of length 2 where
 the first element is a XPath expression to locate the entry in a fhir bundle page and second element is a named list
 with XPath expressions of locations to the values of the items in the bundle page. The names of this second element named
-list are the comlumn names of the resulting data.frames.}
+list are the column names of the resulting data.frames.}
 
 \item{sep}{A string to separate pasted multiple entries.}
 }
@@ -21,7 +21,7 @@ list are the comlumn names of the resulting data.frames.}
 A list of data framesas specified by \code{design}.
 }
 \description{
-Converts all fhir bundles (the result of \code{\link{get.bundles}}) to a list of data frames.
+Converts all fhir bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
 }
 \examples{
 \dontrun{
