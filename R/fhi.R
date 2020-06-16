@@ -371,7 +371,6 @@ xml2df <- function( xml, dsgn.df, sep = " -+- " ) {
 #' @param sep A string to separate pasted multiple entries.
 #'
 #' @return A list of data frames as specified by \code{design}
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -447,9 +446,9 @@ bundle2dfs <- function( bundle, design, sep = " -+- " ) {
 #'
 #' @examples
 #' \dontrun{
-#' bundles2dfs( bundles, design )
+#' fhir2dfs( bundles, design )
 #' }
-bundles2dfs <- function( bundles, design, sep = " -+- " ) {
+fhir2dfs <- function( bundles, design, sep = " -+- " ) {
 
 	bundles.dfs <- lapply(
 		bundles,
