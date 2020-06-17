@@ -3,8 +3,6 @@
 #start this example with
 #Rscript example.R 
 
-rm( list = ls( ) )
-
 tables_design <- list(
 	Patients = list(
 		".//Patient",
