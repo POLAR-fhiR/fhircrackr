@@ -4,7 +4,7 @@
 \alias{xml2df}
 \title{Flatten xml objects.}
 \usage{
-xml2df(xml, dsgn.df, sep = " -+- ")
+xml2df(xml, dsgn.df, sep = " -+- ", ns = "http://hl7.org/fhir")
 }
 \arguments{
 \item{xml}{An xml doc or xml node object.}
@@ -12,6 +12,8 @@ xml2df(xml, dsgn.df, sep = " -+- ")
 \item{dsgn.df}{A design for a single data frame.}
 
 \item{sep}{A string used to separate pasted multiple entries}
+
+\item{ns}{A string containing the namespace.}
 }
 \value{
 A data frame containing the data specified in \code{dsgn.df}.

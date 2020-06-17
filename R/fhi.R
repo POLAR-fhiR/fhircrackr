@@ -60,7 +60,6 @@ lst <- function(..., prefix = NULL, suffix = NULL) {
 #' paste_paths("/data", "/patients")
 #' paste_paths("/data/", "/patients/")
 #' paste_paths("data", "patients", "windows")
-
 paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 
 	os <- tolower(substr(os, 1, 1))
@@ -74,12 +73,43 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 }
 
 
+get_ns <- function( xml, ns = "http://hl7.org/fhir" ) {
+
+	n <- xml2::xml_ns( xml )
+
+	names( n )[ n == ns ][ 1 ]
+}
+
+get_fhir_ns <- function( xml ) {
+
+	get_ns( xml )
+}
+
+add_namespace <- function( xpath, ns.id ) {
+
+	a <- paste0( ns.id, ":\\2" )
+
+	gsub(
+		"(\\[)([^@/])",
+		paste0("\\[", a),
+		gsub(
+			"(/)([^@/])",
+			paste0("/", a),
+			gsub(
+				"(^)([^\\.\\*@/])",
+				a,
+				xpath
+			)
+		)
+	)
+}
 
 #' Extract paths
-#'@description Extracts an attribute from tags in a xml object.
+#' @description Extracts an attribute from tags in a xml object.
 #'
 #' @param xml A xml document, node, or node set.
-#' @param xpath A string containing a xpath (1.0) expression
+#' @param xpath A string containing a xpath (1.0) expression.
+#' @param ns A string containing the namespace.
 #'
 #' @return A character vector containing the attribute.
 #' @export
@@ -88,15 +118,29 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 #' \dontrun{
 #' tag_attr(bundles[[1]], xpath = ".//total/@value")
 #' }
+tag_attr <- function(xml, xpath, ns = "http://hl7.org/fhir") {
 
-tag_attr <- function(xml, xpath) {
+	# xpath <- "//*[gender/@value='male']/gender/@value"
+	# xpath <- "//*/@value[.='male']"
+	# xpath <- ".//Patient/gender[@value='male']/@value"
+	# xpath <- "//Patient/gender/@value"
 
-	addr   <- sub("/@[a-zA-Z0-9]+$", "", xpath)
-	attrib <- sub("^.*/@", "", xpath)
+#	(xpath <- gsub( "(/)([^@/])", paste0("/", get_ns(xml, ns), ":\\2"), xpath))
 
-	xml2::xml_attr(xml2::xml_find_all(xml, addr), attrib)
+	ns.id <- get_ns(xml, ns)
+
+	xpath <- add_namespace(xpath, ns.id)
+
+	xml. <- xml2::xml_find_all(xml, xpath)
+
+	xml2::xml_text( xml. )
+
+	# d <- as.data.frame( as.list( xml2::xml_text( xml. ) ), stringsAsFactors = F )
+	#
+	# names( d ) <- xml2::xml_name( xml. )
+	#
+	# d
 }
-
 
 
 #' Download single fhir bundle
@@ -108,7 +152,6 @@ tag_attr <- function(xml, xpath) {
 #' @param max.attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
 #' @param verbose A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.
 #' @param delay.between.attempts A scalar numeric specifying the delay in seconds between two attempts. Defaults to 10.
-
 #'
 #' @return The downloaded bundle in xml format.
 #' @export
@@ -207,13 +250,15 @@ fhir_search <- function(request, username = NULL, password = NULL, max.bundles =
 			break
 		}
 
-		xml2::xml_ns_strip(bundle)
+		#xml2::xml_ns_strip(bundle)
 
 		bundles[[addr]] <- bundle
 
-		links <- xml2::xml_find_all(bundle, "link")
+		ns <- get_fhir_ns( bundle )
 
-		rels.nxt  <- xml2::xml_attr(xml2::xml_find_first(links, "./relation"), "value") == "next"
+		links <- xml2::xml_find_all(bundle, paste0( ns, ":link"))
+
+		rels.nxt  <- xml2::xml_attr(xml2::xml_find_first(links, paste0( "./", ns, ":relation")), "value") == "next"
 
 		if (cnt == max.bundles) {
 
@@ -239,7 +284,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max.bundles =
 			break
 		}
 
-		urls  <- xml2::xml_attr(xml2::xml_find_first(links, "./url"), "value")
+		urls  <- xml2::xml_attr(xml2::xml_find_first(links, paste0("./", ns, ":url")), "value")
 
 		addr <- urls[rels.nxt][1]
 
@@ -312,6 +357,7 @@ load_bundles <- function(directory) {
 #' @param xml An xml doc or xml node object.
 #' @param dsgn.df A design for a single data frame.
 #' @param sep A string used to separate pasted multiple entries
+#' @param ns A string containing the namespace.
 #'
 #' @return A data frame containing the data specified in \code{dsgn.df}.
 #' @export
@@ -320,7 +366,7 @@ load_bundles <- function(directory) {
 #' \dontrun{
 #' xml2df(xml, design$Patient)
 #' }
-xml2df <- function(xml, dsgn.df, sep = " -+- ") {
+xml2df <- function(xml, dsgn.df, sep = " -+- ", ns = "http://hl7.org/fhir") {
 
 	#xml2::xml_ns_strip( xml )
 	#dbg
@@ -344,7 +390,7 @@ xml2df <- function(xml, dsgn.df, sep = " -+- ") {
 			#attrib <- sub( "^.*/@", "", i.srch )
 
 			#val  <- xml2::xml_attr( xml2::xml_find_all( xml, addr ), attrib )
-			val  <- tag_attr(xml, i.srch)
+			val  <- tag_attr(xml = xml, xpath = i.srch, ns = ns )
 
 			if(is.na(val) || length(val) < 1 ) {
 
@@ -378,6 +424,7 @@ xml2df <- function(xml, dsgn.df, sep = " -+- ") {
 #' with XPath expressions of locations to the values of the items in the bundle page. The names of this second element named
 #' list are the column names of the resulting data.frames.
 #' @param sep A string to separate pasted multiple entries.
+#' @param ns A string containing the namespace.
 #'
 #' @return A list of data frames as specified by \code{design}
 #' @export
@@ -395,14 +442,16 @@ xml2df <- function(xml, dsgn.df, sep = " -+- ") {
 #' 	  DISPLAY = "code/coding/display/@value"
 #' 	))))
 #' 	}
-bundle2dfs <- function(bundle, design, sep = " -+- ") {
+bundle2dfs <- function(bundle, design, sep = " -+- ", ns = "http://hl7.org/fhir") {
 
-	xml2::xml_ns_strip(bundle)
+	#xml2::xml_ns_strip(bundle)
 
 	#dbg
 	#bundle <- bundles[[ length( bundle ) ]]
 
 	if(is.null(bundle)) {return(NULL)}
+
+	ns.id <- get_ns(bundle, ns)
 
 	lapply(
 		lst(names(design)),
@@ -417,6 +466,8 @@ bundle2dfs <- function(bundle, design, sep = " -+- ") {
 			df.xpaths  <- dsgn.df[[1]]
 			df.columns <- dsgn.df[[2]]
 
+			df.xpaths <- add_namespace(xpath = df.xpaths, ns.id = ns.id)
+
 			xml.nodeset <- xml2::xml_find_all(bundle, df.xpaths)
 
 			df <- if (1 < length(xml.nodeset)) {
@@ -424,6 +475,9 @@ bundle2dfs <- function(bundle, design, sep = " -+- ") {
 				dfs <- lapply(
 					xml.nodeset,
 					function(node) {
+
+						#dbg
+						#node <- xml.nodeset[[ 1 ]]
 
 						cat(".")
 
@@ -480,7 +534,7 @@ fhir2dfs <- function(bundles, design, sep = " -+- ") {
 		function(bundle) {
 
 			#dbl
-			#bundle <- bundles[[ 11 ]]
+			#bundle <- bundles[[ 3 ]]
 			bundle2dfs(bundle, design, sep)
 		}
 	)
@@ -591,7 +645,7 @@ capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " -
 		return(NULL)
 	}
 
-	xml2::xml_ns_strip(caps)
+	#xml2::xml_ns_strip(caps)
 
 	design <- list(
 		META = list(
@@ -653,7 +707,7 @@ capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " -
 		)
 	)
 
-	dfs <- fhiR::bundle2dfs(bundle = caps, design = design, sep = sep)
+	dfs <- bundle2dfs(bundle = caps, design = design, sep = sep)
 
 	if(remove.empty.columns) {
 
@@ -668,3 +722,4 @@ capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " -
 
 	dfs
 }
+
