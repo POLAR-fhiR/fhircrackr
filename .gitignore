@@ -16,6 +16,9 @@
 
 # Output files from R CMD check
 /*.Rcheck/
+*.data
+*.csv
+*.xml
 
 # RStudio files
 .Rproj.user/
