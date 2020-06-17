@@ -19,6 +19,7 @@
 *.data
 *.csv
 *.xml
+*.Rdata
 
 # RStudio files
 .Rproj.user/
