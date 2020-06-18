@@ -6,7 +6,7 @@ You can download the development version using `devtools::install_github("POLAR-
 ## Prerequisites
 For the moment, this package focuses mostly on downloading and flattening resources from a fhir server. This requires some prerequisites:
 
-- The endpoint of the fhir server you want to access. If you don't have you own fhir server, you can use one of the publicly available servers, such as http://hapi.fhir.org/baseR4 or http://fhir.hl7.de:8080/. In the following the endpoint of you fhir server will generally referred to as [base].
+- The endpoint of the fhir server you want to access. If you don't have you own fhir server, you can use one of the publicly available servers, such as http://hapi.fhir.org/baseR4 or http://fhir.hl7.de:8080/. In the following the endpoint of your fhir server will generally referred to as [base].
 
 - To download ressources from the server, you should be familiar with [fhir search requests](https://www.hl7.org/fhir/search.html). Fhir search allows you to download sets of resources that match very specific requirements. As this package mainly takes care of the downloading and flattening part, we will mostly use very simple examples of fhir search requests of the form `[base]/[type]?parameter(s)`, where `[type]` refers to the type of resource you are looking for and `parameter(s)` characterise specific properties those resources should have.
 `http://hapi.fhir.org/baseR4/Patient?gender=female` for example downloads all Patient resources from the fhir server at `http://hapi.fhir.org/baseR4/` that represent female patients.
@@ -85,13 +85,13 @@ View(df$Patients)
 
 `fhir2dfs()` takes a list of bundles as returned by `fhir_search()` and a list `design` defining the data to be extracted from the resources and returns a list of data frames.
 
-`design` should be a named list, where each element of `design` corresponds to one data frame that will created. The element names of `design` are going to be the names of the data.frames in the result of the function.
+`design` should be a named list, where each element of `design` corresponds to one data frame that will be created. The element names of `design` are going to be the names of the data.frames in the result of the function.
 
 It makes sense to create one data frame per type of resource (MedicationStatement and Patient in this case). Lets have a look at the element `Medication`from the above example of `design` to understand how it works:
 
 `Medication` is a list of length 2, where the first element is an XPath expression selecting the nodes (i.e. resources) matching a MedicationStatement, so this element is used to define the type of resource in this data frame.
 
-The second element is again a list, this time a named list. Each element corresponds to one variable (i.e. coloumn) in the resulting data frame. The name (e.g. `Status`) will be the column name, the column values will be taken from the attribut defined by the following XPath (e.g. `"status/@value"`).
+The second element is again a list, this time a named list. Each element corresponds to one variable (i.e. column) in the resulting data frame. The name (e.g. `Status`) will be the column name, the column values will be taken from the attribut defined by the following XPath expression (e.g. `"status/@value"`).
 
 The abstract form `design` should therefore have is:
 
