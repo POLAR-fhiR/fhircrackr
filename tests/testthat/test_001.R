@@ -128,12 +128,12 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "capability_statement()" )
 
-cnf <- capability_statement( "https://hapi.fhir.org/baseR4", sep = " ~ ", remove.empty.columns = T )
+caps <- capability_statement( "https://hapi.fhir.org/baseR4", sep = " ~ ", remove.empty.columns = T )
 
 testthat::test_that(
 	"capability_statement() works", {
-		testthat::expect_equal( is.null( cnf ), F )
-		testthat::expect_equal( is.data.frame( dfs[[ 1 ]] ), T )
+		testthat::expect_false( is.null( caps ) )
+		testthat::expect_true( is.data.frame( caps$REST ) )
 	}
 )
 

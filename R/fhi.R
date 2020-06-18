@@ -104,6 +104,7 @@ add_namespace <- function( xpath, ns.id ) {
 	)
 }
 
+
 #' Extract paths
 #' @description Extracts an attribute from tags in a xml object.
 #'
@@ -125,7 +126,7 @@ tag_attr <- function(xml, xpath, ns = "http://hl7.org/fhir") {
 	# xpath <- ".//Patient/gender[@value='male']/@value"
 	# xpath <- "//Patient/gender/@value"
 
-#	(xpath <- gsub( "(/)([^@/])", paste0("/", get_ns(xml, ns), ":\\2"), xpath))
+	#	(xpath <- gsub( "(/)([^@/])", paste0("/", get_ns(xml, ns), ":\\2"), xpath))
 
 	ns.id <- get_ns(xml, ns)
 
