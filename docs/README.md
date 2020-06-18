@@ -46,19 +46,20 @@ If you want to do statistical analyses, the xml format the resources come in is 
 #download MedicationStatement resources and associated Patient resources
 bundles <- fhir_search("https://hapi.fhir.org/baseR4/MedicationStatement?_include=MedicationStatement:subject", max.bundles=5)
 
+
 #define which elements of the resources are of interest
 design <- list(
 
   MedicationStatements = list(
     ".//MedicationStatement",
     list(
-      STATUS                = "status/@value",
-      MEDICATION.SYSTEM     = "medicationCodeableConcept/coding/system/@value",
-      MEDICATION.CODE       = "medicationCodeableConcept/coding/code/@value",
-      MEDICATION.DISPLAY    = "medicationCodeableConcept/coding/display/@value",
-      PATIENT               = "subject/reference/@value",
-      START                 = "effectivePeriod/start/@value",
-      END                   = "effectivePeriod/end/@value"
+      STATUS             = "status/@value",
+      MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system/@value",
+      MEDICATION.CODE    = "medicationCodeableConcept/coding/code/@value",
+      MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display/@value",
+      PATIENT            = "subject/reference/@value",
+      START              = "effectivePeriod/start/@value",
+      END                = "effectivePeriod/end/@value"
     )
   ),
 
@@ -78,9 +79,8 @@ dfs <- fhir2dfs(bundles, design)
 
 #Inspect results
 View(df$Patients)
-
-
 ```
+
 `fhir2dfs()` takes a list of bundles as returned by `fhir_search()` and a list `design` defining the data to be extracted from the resources and returns a list of data frames.
 
 `design` should be a named list, where each element of `design` corresponds to one data frame that will created. The element names of `design` are going to be the names of the data.frames in the result of the function.
@@ -93,7 +93,7 @@ The second element is again a list, this time a named list. Each element corresp
 
 The abstract form `design` should therefore have is:
 
-```
+```r
 list(
 
   <Name of first data frame> = list(
@@ -127,13 +127,13 @@ design <- list(
   MedicationStatements = list(
     ".//MedicationStatement",
     list(
-      STATUS                = "status/@value",
-      MEDICATION.SYSTEM     = "medicationCodeableConcept/coding/system/@value",
-      MEDICATION.CODE       = "medicationCodeableConcept/coding/code/@value",
-      MEDICATION.DISPLAY    = "medicationCodeableConcept/coding/display/@value",
-      PATIENT               = "subject/reference/@value",
-      START                 = "effectivePeriod/start/@value",
-      END                   = "effectivePeriod/end/@value"
+      STATUS             = "status/@value",
+      MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system/@value",
+      MEDICATION.CODE    = "medicationCodeableConcept/coding/code/@value",
+      MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display/@value",
+      PATIENT            = "subject/reference/@value",
+      START              = "effectivePeriod/start/@value",
+      END                = "effectivePeriod/end/@value"
     )
   ),
 
@@ -173,7 +173,8 @@ To read bundles saved with `save_bundles()` back into R, you can use `load_bundl
 
 ```r
 bundles <- load_bundles("MyDirectory")
-```
+```  
+
 `load_bundles()` takes the name of the directory (or path to it) as its only argument. All xml-files in this directory will be read into R and returned as a list of bundles in xml format just as returned by `fhir_search()`.
 
 
@@ -201,11 +202,11 @@ cap <- capability_statement("http://hapi.fhir.org/baseR4/")
 
 
 ### Convert a xml doc or xml node to one data frame
-```
+```r
 xml2df( xml, design.for.one.data.frame, sep = "›" )
 ```
 e.g. for a female patients data frame
-```
+```r
 design.patients <- list(
 
   ".//Patient[gender=female]",
