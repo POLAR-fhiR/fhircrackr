@@ -1,0 +1,247 @@
+---
+title: "fhiR: Handling HL7 FHIR resources in R"
+
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{fhiR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+`fhiR` is a package designed to help analyzing HL7 FHIR resources. 
+
+FHIR stands for *Fast Healthcare Interoperability Resources* and  is a standard describing data formats and elements (known as "resources") as well as an application programming interface (API) for exchanging electronic health records. The standard was created by the Health Level Seven International (HL7) health-care standards organization. For more information on the FHIR standard, visit https://www.hl7.org/fhir/.
+
+While FHIR is a very useful standard to describe and exchange medical data in an interoperable way, it is not very useful for statistical analyses of said data. This is due to the fact that FHIR data is stored in many nested and interlinked resources instead of matrix-like structures.
+
+Thus, to be able to do statistical analyses a tool is needed that allows converting these nested resources into data frames. This process of flattening FHIR resources is not trivial, as the unpredictable degree of nesting and connectedness of the resources makes generic solutions to this problem not feasible.
+
+We therefore implemented a package that makes it possible to download FHIR resources from a server into R and to flatten these resources into (multiple) data frames.
+
+The package is still under development. The CRAN version of the package contains all functions that are already stable, for more recent (but potentially unstable) developments, the development version of the package can be downloaded from GitHub using `devtools::install_github("POLAR-fhiR/fhiR")`.
+
+## Prerequisites
+The complexity of the problem requires a couple of prerequisites both regarding knowledge and access to data. We will shortly list the  preconditions to using the `fhiR` package here:  
+
+1. First of all, you need the endpoint of the fhir server you want to access. If you don't have you own fhir server, you can use one of the publicly available servers, such as http://hapi.fhir.org/baseR4 or http://fhir.hl7.de:8080/.The endpoint of a fhir server is often referred to as [base].
+
+2. To download ressources from the server, you should be familiar with [FHIR search requests](https://www.hl7.org/fhir/search.html). Fhir search allows you to download sets of resources that match very specific requirements. As the focus of this package is dealing with FHIR resources in R, rather than the intricacies of FHIR search, we will mostly use simple examples of FHIR search requests. Most of them will have the form `[base]/[type]?parameter(s)`, where `[type]` refers to the type of resource you are looking for and `parameter(s)` characterise specific properties those resources should have.
+`http://hapi.fhir.org/baseR4/Patient?gender=female` for example downloads all Patient resources from the fhir server at `http://hapi.fhir.org/baseR4/` that represent female patients.
+
+3. In the first step, `fhiR` downloads the resources in xml format into R. To specify which elements from the FHIR resources you want in your data frame, you should have at least some familiarity with XPath expressions. A good tutorial on XPath expressions can be found [here](https://www.w3schools.com/xml/xpath_intro.asp).
+
+In the following we'll go through a typical workflow with fhiR step by step. 
+
+## Download and flatten fhir resources from a server
+
+### Example 1: Download Patient resources 
+We will start with a very simple example and use `fhir_search()` to download Patient resources from a publicly available HAPI server after we've loaded the package with `library(fhiR)`:
+
+```{r, results=F, message=F}
+library(fhiR)
+patient_bundles <- fhir_search(request="http://hapi.fhir.org/baseR4/Patient?", max.bundles=2)
+
+```
+
+The minimum information `fhir_search()` requires is a string containing the full FHIR search request in the argument `request`. 
+In general, a fhir search request returns a *bundle* of the resources you requested. If there are a lot of resources matching your request, the search result isn't returned in one big bundle but distributed over several of them. If the argument `max.bundles` is set to its default `Inf`, `fhir_search()` will return all available bundles, meaning all resources matching your request. If you set it to `2` as in the above example, the download will stop after the first two bundles. Note that in this case, the result *may not contain all* the resources from the server matching your request.
+
+If you want to connect to a fhir server that uses basic authentification, you can supply the arguments `username` and `password`. 
+
+Because endpoints can sometimes be hard to reach, `fhir_search()` will start five attempts to connect to the endpoint before it gives up. With the arguments `max.attempts` and `delay.between.attempts` you can control this number as well the time interval between attempts.
+
+As you can see in the next block of code, `fhir_search()` returns a list of xml objects where each list element represents one bundle of resources, so a list of two xml objects in our case:
+
+```{r}
+str(patient_bundles)
+```
+
+We know that inside these xml objects there is the patient data somewhere. To get it out, we will use `fhir2dfs()`:
+
+```{r}
+#define which elements of the resources are of interest
+df_design <- list(
+
+  Patients = list(
+    ".//Patient",
+    list( 
+			PID           = "id/@value", 
+			NAME.USE      = "name/use/@value", 
+			NAME.GIVEN    = "name/given/@value", 
+			NAME.FAMILY   = "name/family/@value",
+			GENDER        = "gender/@value", 
+			BIRTHDAY      = "birthDate/@value" 
+		)
+  )
+  
+)
+
+#Convert resources
+list_of_tables <- fhir2dfs(patient_bundles, df_design)
+
+head(list_of_tables$Patients)
+```
+
+`fhir2dfs()` takes a list of bundles as returned by `fhir_search()` and the argument `design` defining the data to be extracted from the resources and returns a list of data frames.
+
+`design` should be a named list, where each element of `design` corresponds to one data frame that will be created. The element names of `design` are going to be the names of the data frames in the result of the function.
+
+It makes sense to create one data frame per type of resource. Because we have just downloaded one resource type (Patient), `design` is a list of length 1 and the result also contains just one data frame. Lets have a closer look at the above example of `design` to understand how it works:
+
+`design` contains one element called `Patients`, so one data frame called Patients will be created. `Patients` is a list of length 2, where the first element is an XPath expression selecting the nodes (i.e. resources) matching a Patient resource, so this element is used to define the type of resource in this data frame.
+
+The second element is again a list, this time a named list. Each element corresponds to one variable (i.e. column) in the resulting data frame. The name (e.g. `GENDER`) will be the column name, while the column values will be taken from the attribut defined by the corresponding XPath expression (e.g. `"gender/@value"`).
+
+Of course this is an example for just one resource type. If you are interested in several types of resources, `design` will have more elements and the result will be a list of several data frames.
+
+The abstract form `design` should therefore have is:
+
+```{}
+list(
+
+  <Name of first data frame> = list(
+    <XPath to resource type>,
+    list(
+      <column name 1> = <XPath to attribute>
+      <column name 2> = <XPath to attribute>
+      ...
+    )
+  ),
+
+  <Name of second data frame> = list(
+    <XPath to resource type>,
+    list(
+      <column name 1> = <XPath to attribute>
+      <column name 2> = <XPath to attribute>
+      ...
+    )
+  ),
+  ...
+)
+```
+
+### Example 2: Download MedicationStatement and corresponding Patient resources
+In reality your FHIR search requests are probably going to be slightly more complex than just asking for Patient resources. Consider the following example where we want to download MedicationStatements refering to a certain medication we specify with its loinc code and also the Patient resources the MedicationStatements are linked to.
+
+When the FHIR search request gets longer, it can be helpful to build up the request piece by piece like this:
+
+```{r}
+search_request  <- paste0(
+  "https://hapi.fhir.org/baseR4/", #server endpoint
+  "MedicationStatement?", #look for MedicationsStatements
+  "code=http://snomed.info/ct|429374003", #only choose resources with this loinc code
+  "&_include=MedicationStatement:subject") #include the corresponding Patient resources
+```
+
+Then we can download the resources:
+
+```{r, results=F, message=F}
+medication_bundles <- fhir_search(search_request, max.bundles = 3)
+```
+
+And convert them into to data frames, one for the MedicationStatements and one for the Patients:
+
+```{r}
+df_design <- list(
+  
+	MedicationStatement = list(
+	  
+		".//MedicationStatement",
+		
+		list(
+			AID                = "id/@value",
+			STATUS.TEXT        ="text/status/@value",
+			STATUS             = "status/@value",
+			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system/@value",
+			MEDICATION.CODE    = "medicationCodeableConcept/coding/code/@value",
+			MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display/@value",
+			DOSAGE             = "dosage/text/@value",
+			PATIENT            = "subject/reference/@value",
+			LAST.UPDATE        = "meta/lastUpdated/@value"
+		)
+		
+	),
+	
+	
+	Patients = list(
+	  
+		".//Patient",
+		
+		list( 
+			PID          = "id/@value", 
+			NAME.USE     = "name/use/@value", 
+			NAME.GIVEN   = "name/given/@value", 
+			NAME.FAMILY  = "name/family/@value",
+			GENDER       = "gender/@value", 
+			BIRTHDAY     = "birthDate/@value" 
+		)
+		
+	)
+	
+)
+
+
+list_of_tables <- fhir2dfs(medication_bundles, df_design)
+
+head(list_of_tables$MedicationStatement)
+
+head(list_of_tables$Patients)
+```
+
+## Saving and loading downloaded bundles
+Since `fhir2dfs()` discards of all the data not specified in `design` it makes sense to store the original search result for reproducibility and in case you realise later on that you need elements from the resources that you haven't extracted at first.
+
+`save_bundles()` takes a list of bundles in form of xml objects (as returned by `fhir_search()`) and writes them into the directory specified in the argument `directory`. Each bundle is saved as a seperate xml-file. If the folder defined in `directory` doesn't exist, it is created in the current working directory.
+
+```{r}
+#save bundles as xml files
+save_bundles(patient_bundles, directory="MyDirectory")
+```
+
+To read bundles saved with `save_bundles()` back into R, you can use `load_bundles()`:
+
+```{r}
+bundles <- load_bundles("MyDirectory")
+```  
+
+`load_bundles()` takes the name of the directory (or path to it) as its only argument. All xml-files in this directory will be read into R and returned as a list of bundles in xml format just as returned by `fhir_search()`.
+
+
+## Other functions
+
+### Extract an attribute from bundle tags
+Sometimes it is useful to see how the attributes you extract with an XPath expression look like before you build the design for `fhir2dfs()`. This is possible with the function `tag.attr()`.
+
+`tag.attr()` takes a bundle in form of an xml object (not a list of xml objects, so you have to get it out of the list after using `fhir_search()`) and a XPath expression as its arguments. It returns a vector of all available values corresponding to the XPath expression. Note that missing values *do not appear* in the result, so you should never try to build a data frame from different `tag.attr()` results on the same bundle, as these will have different lengths and will not align horizontally!
+
+```{r}
+#Extract attribute
+tag_attr(patient_bundles[[1]],".//gender/@value")
+```
+
+
+### Download capability statement
+The [capability statement](https://www.hl7.org/fhir/capabilitystatement.html) documents  a set of capabilities (behaviors) of a FHIR Server for a particular version of FHIR. You can download this statement using the function `capabiliy_statement()`:
+
+```{r, results=F}
+cap <- capability_statement("http://hapi.fhir.org/baseR4/")
+```
+
+`capabiliy_statement()` takes a FHIR server endpoint and returns a list of data frames containing all information from the capability statement of this server.
+
+You can then access the parts that interest you, for example:
+
+```{r}
+cap$META$software.version
+```
+
+
