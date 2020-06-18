@@ -1,6 +1,8 @@
 # fhiR
 fhiR is a package that conveniently downloads fhir resources in xml format and converts them to R data frames. It uses fhir-search to download bundles from a fhir server, provides functions to save and read xml-files containing such bundles and allows flattening the bundles to data.frames using XPath expressions.
 
+You can download the development version using `devtools::install_github("POLAR-fhiR/fhiR")`.
+
 ## Prerequisites
 For the moment, this package focuses mostly on downloading and flattening resources from a fhir server. This requires some prerequisites:
 
@@ -202,14 +204,16 @@ cap <- capability_statement("http://hapi.fhir.org/baseR4/")
 
 
 ### Convert a xml doc or xml node to one data frame
+
 ```r
-xml2df( xml, design.for.one.data.frame, sep = "›" )
-```
-e.g. for a female patients data frame
-```r
+#Download bundle and extract first patient resource
+bundle <- get_bundle("http://hapi.fhir.org/baseR4/Patient?")
+xml2::xml_ns_strip(bundle)
+patient_resource <- xml_find_first(bundle, "//Patient")
+
 design.patients <- list(
 
-  ".//Patient[gender=female]",
+  ".//Patient",
 
   list(
     NAME.GIVEN  = "name/given/@value",
@@ -219,7 +223,7 @@ design.patients <- list(
   )
 )
 
-df <- xml2df( xml, design.patients, sep = "›" )
+df <- xml2df(patient_resource, design.patients)
 ```
 
-This function works similarly to `bundle2dfs()` but can extract only one single data.frame. This is actually a helper function for `bundle2dfs()` and `fhir2dfs()` and will in the long run not be in the exported namespace of the package.
+This function works similarly to `bundle2dfs()` but is used to extract only a single data.frame from a single resource. This is actually a helper function for `bundle2dfs()` and `fhir2dfs()` and will in the long run not be in the exported namespace of the package.
