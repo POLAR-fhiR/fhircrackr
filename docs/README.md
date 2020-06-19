@@ -6,10 +6,10 @@ You can download the development version using `devtools::install_github("POLAR-
 ## Prerequisites
 For the moment, this package focuses mostly on downloading and flattening resources from a fhir server. This requires some prerequisites:
 
-- The endpoint of the fhir server you want to access. If you don't have you own fhir server, you can use one of the publicly available servers, such as http://hapi.fhir.org/baseR4 or http://fhir.hl7.de:8080/. In the following the endpoint of your fhir server will generally referred to as [base].
+- The endpoint of the fhir server you want to access. If you don't have you own fhir server, you can use one of the publicly available servers, such as [https://hapi.fhir.org/baseR4](https://hapi.fhir.org/baseR4) or [http://fhir.hl7.de:8080](http://fhir.hl7.de:8080). In the following the endpoint of your fhir server will generally referred to as [base].
 
 - To download ressources from the server, you should be familiar with [fhir search requests](https://www.hl7.org/fhir/search.html). Fhir search allows you to download sets of resources that match very specific requirements. As this package mainly takes care of the downloading and flattening part, we will mostly use very simple examples of fhir search requests of the form `[base]/[type]?parameter(s)`, where `[type]` refers to the type of resource you are looking for and `parameter(s)` characterise specific properties those resources should have.
-`http://hapi.fhir.org/baseR4/Patient?gender=female` for example downloads all Patient resources from the fhir server at `http://hapi.fhir.org/baseR4/` that represent female patients.
+`https://hapi.fhir.org/baseR4/Patient?gender=female` for example downloads all Patient resources from the fhir server at `https://hapi.fhir.org/baseR4/` that represent female patients.
 
 - To specify which elements from the fhir resources you want in your data frame, you should have at least some familiarity with XPath expressions, because this package downloads the resources in xml-format. A good tutorial for XPath can be found [here](https://www.w3schools.com/xml/xpath_intro.asp).
 
@@ -18,10 +18,10 @@ For the moment, this package focuses mostly on downloading and flattening resour
 ### Example 1: Using fhir_search()
 
 ```r
-bundles <- fhir_search("http://hapi.fhir.org/baseR4/Patient?gender=female", max.bundles=5)
+bundles <- fhir_search("https://hapi.fhir.org/baseR4/Patient?gender=female", max.bundles=5)
 ```
 
-To download resources from a fhir server into R, you use the function `fhir_search()`. This function requires you to state a full fhir search request such as `http://hapi.fhir.org/baseR4/Patient?gender=female` in the argument `request`.
+To download resources from a fhir server into R, you use the function `fhir_search()`. This function requires you to state a full fhir search request such as `https://hapi.fhir.org/baseR4/Patient?gender=female` in the argument `request`.
 
 If you want to connect to a fhir server that uses basic authentification, you can supply the arguments `username` and `password`. Because endpoints can sometimes be hard to reach, `fhir_search()` will start five attempts to connect to the endpoint before it gives up. With the arguments `max.attempts` and `delay.between.attempts` you can control this number as well the time interval between attempts.
 
@@ -162,7 +162,7 @@ Since `fhir2dfs()`and `bundle2dfs()` discard of all the data not specified in `d
 
 ```r
 #download bundles from fhir server
-bundles <- fhir_search("http://hapi.fhir.org/baseR4/Patient?gender=female", max.bundles=5)
+bundles <- fhir_search("https://hapi.fhir.org/baseR4/Patient?gender=female", max.bundles=5)
 
 #save bundles as xml files
 save_bundles(bundles, directory="MyDirectory")
@@ -183,22 +183,22 @@ bundles <- load_bundles("MyDirectory")
 ## Other functions
 
 ### Extract an attribute from bundle tags
-Sometimes it is useful to see how the attributes you extract with an XPath expression look like before you build the design for `fhir2dfs()`. This is possible with the function `tag.attr()`:
+Sometimes it is useful to see how the attributes you extract with an XPath expression look like before you build the design for `fhir2dfs()`. This is possible with the function `tag_attr()`:
 
 ```r
 #download bundles from fhir server
-bundles <- fhir_search("http://hapi.fhir.org/baseR4/Patient?gender=female", max.bundles=1)
+bundles <- fhir_search("https://hapi.fhir.org/baseR4/Patient?gender=female", max.bundles=1)
 
 #Extract attribute
 tag_attr(bundles[[1]],".//name/given/@value")
 ```
-`tag.attr()` takes a bundle in form of an xml object and an XPath expression as its arguments. It returns a vector of all available values corresponding to the XPath expression. Note that missing values *do not appear* in the result, so you should never try to build a data.frame from different `tag.attr()` results on the same bundle, as these will have different lengths and will not align horizontally!
+`tag_attr()` takes a bundle in form of an xml object and an XPath expression as its arguments. It returns a vector of all available values corresponding to the XPath expression. Note that missing values *do not appear* in the result, so you should never try to build a data.frame from different `tag_attr()` results on the same bundle, as these will have different lengths and will not align horizontally!
 
 ### Download capability statement
 The [capability statement](https://www.hl7.org/fhir/capabilitystatement.html) documents  a set of capabilities (behaviors) of a FHIR Server for a particular version of FHIR.
 
 ```r
-cap <- capability_statement("http://hapi.fhir.org/baseR4/")
+cap <- capability_statement("https://hapi.fhir.org/baseR4")
 ```
 `capabiliy_statement()` takes a fhir endpoint and returns a list of data frames containing all information from the capability statement of this server.
 
@@ -207,7 +207,7 @@ cap <- capability_statement("http://hapi.fhir.org/baseR4/")
 
 ```r
 #Download bundle and extract first patient resource
-bundle <- get_bundle("http://hapi.fhir.org/baseR4/Patient?")
+bundle <- get_bundle("https://hapi.fhir.org/baseR4/Patient?")
 xml2::xml_ns_strip(bundle)
 patient_resource <- xml_find_first(bundle, "//Patient")
 
