@@ -82,7 +82,6 @@ df_design <- list(
 			BIRTHDAY      = "birthDate/@value"
 		)
   )
-
 )
 
 #Convert resources
@@ -105,7 +104,7 @@ Of course this is an example for just one resource type. If you are interested i
 
 The abstract form `design` should therefore have is:
 
-```{}
+```{r}
 list(
 
   <Name of first data frame> = list(
@@ -168,9 +167,7 @@ df_design <- list(
 			PATIENT            = "subject/reference/@value",
 			LAST.UPDATE        = "meta/lastUpdated/@value"
 		)
-
 	),
-
 
 	Patients = list(
 
@@ -184,9 +181,7 @@ df_design <- list(
 			GENDER       = "gender/@value",
 			BIRTHDAY     = "birthDate/@value"
 		)
-
 	)
-
 )
 
 
@@ -221,7 +216,7 @@ bundles <- load_bundles("MyDirectory")
 ### Extract an attribute from bundle tags
 Sometimes it is useful to see how the attributes you extract with an XPath expression look like before you build the design for `fhir2dfs()`. This is possible with the function `tag_attr()`.
 
-`tag_attr()` takes a bundle in form of an xml object (not a list of xml objects, so you have to get it out of the list after using `fhir_search()`) and a XPath expression as its arguments. It returns a vector of all available values corresponding to the XPath expression. Note that missing values *do not appear* in the result, so you should never try to build a data frame from different `tag.attr()` results on the same bundle, as these will have different lengths and will not align horizontally!
+`tag_attr()` takes a bundle in form of an xml object (not a list of xml objects, so you have to get it out of the list after using `fhir_search()`) and a XPath expression as its arguments. It returns a vector of all available values corresponding to the XPath expression. Note that missing values *do not appear* in the result, so you should never try to build a data frame from different `tag_attr()` results on the same bundle, as these will have different lengths and will not align horizontally!
 
 ```{r}
 #Extract attribute
