@@ -132,7 +132,10 @@ caps <- capability_statement( "https://hapi.fhir.org/baseR4", sep = " ~ ")
 testthat::test_that(
 	"capability_statement() works", {
 		testthat::expect_false( is.null( caps ) )
-		testthat::expect_true( is.data.frame( caps ) )
+		testthat::expect_true( is.list( caps ) )
+		testthat::expect_true( is.data.frame( caps[[ 1 ]] ) )
+		testthat::expect_true( is.data.frame( caps[[ 2 ]] ) )
+		testthat::expect_true( is.data.frame( caps[[ 3 ]] ) )
 	}
 )
 

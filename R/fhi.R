@@ -523,13 +523,19 @@ bundle2dfs <- function(bundle, design, sep = " -+- ", ns.id = NULL) {
 		function(df.name) {
 
 			#dbg
-			#df.name <- names( design )[ 1 ]
+			#df.name <- names( design )[ 3 ]
 
 			cat(df.name)
 
 			dsgn.df    <- design[[df.name]]
 			df.xpaths  <- dsgn.df[[1]]
-			df.columns <- dsgn.df[[2]]
+
+			if( length( dsgn.df ) == 1 ) {
+
+				return( bundle2df_auto( bundle, xpath = dsgn.df[[ 1 ]], sep, ns.id ) )
+			}
+
+			df.columns <- if ( 1 < length( dsgn.df ) ) dsgn.df[[2]]
 
 			df.xpaths <- use_ns_id(xpath = df.xpaths, ns.id = ns.id)
 
@@ -557,7 +563,6 @@ bundle2dfs <- function(bundle, design, sep = " -+- ", ns.id = NULL) {
 				} else if (1 == length(dfs)){
 
 					dfs[[1]]
-
 				}
 			} else if (1 == length(xml.nodeset)){
 
@@ -680,9 +685,9 @@ fhir2dfs <- function(bundles, design, sep = " -+- ", ns.id = NULL) {
 #'
 #' @examples
 #' \dontrun{
-#' xml2df_auto(xml, xpath="//resource")
+#' bundle2df_auto(xml, xpath="//resource")
 #' }
-xml2df_auto <- function(xml, xpath, sep = " -+- ", ns.id = NULL) {
+bundle2df_auto <- function(xml, xpath, sep = " -+- ", ns.id = NULL) {
 
 	if(is.null(xml)) {
 
@@ -742,7 +747,7 @@ xml2df_auto <- function(xml, xpath, sep = " -+- ", ns.id = NULL) {
 }
 
 
-#' Flatten a bundles list automatically
+#' Flatten a bundles list automatically to on singe data frame.
 #'
 #' @param bundles A bundles list.
 #' @param xpath A xpath to the root node.
@@ -791,7 +796,7 @@ fhir2df_auto <- function(bundles, xpath="//resource", sep = " -+- ", ns.id = NUL
 			#ns.id <- get_fhir_ns(x)
 
 			cat( xpath )
-			xml2df_auto( xml = x, xpath, sep = sep, ns.id = ns.id)
+			bundle2df_auto( xml = x, xpath, sep = sep, ns.id = ns.id)
 		}
 	)
 
@@ -858,13 +863,12 @@ capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " -
 				extension.valueUri = "extension/valueUri/@value",
 				mode               = "mode/@value"
 			)
-		)
+		),
+		REST = list( "/CapabilityStatement/rest/resource")
 	)
 
 
 	dfs <- fhiR::bundle2dfs(bundle = caps, design = design, sep = sep)
-
-	dfs$REST <- xml2df_auto(xml = caps, xpath = "/CapabilityStatement/rest/resource" )
 
 	if(remove.empty.columns) {
 

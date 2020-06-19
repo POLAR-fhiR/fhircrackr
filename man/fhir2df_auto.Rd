@@ -2,7 +2,7 @@
 % Please edit documentation in R/fhi.R
 \name{fhir2df_auto}
 \alias{fhir2df_auto}
-\title{Flatten a bundles list automatically}
+\title{Flatten a bundles list automatically to on singe data frame.}
 \usage{
 fhir2df_auto(bundles, xpath = "//resource", sep = " -+- ", ns.id = NULL)
 }
@@ -21,7 +21,7 @@ A data frame containing the all nodes entries.
 
 }
 \description{
-Flatten a bundles list automatically
+Flatten a bundles list automatically to on singe data frame.
 }
 \examples{
 \dontrun{
