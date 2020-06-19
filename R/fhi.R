@@ -72,22 +72,21 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 	paste0(sub("/$" , "", path1), "/", sub("^/", "", path2))
 }
 
-
-get_ns <- function( xml, ns = "http://hl7.org/fhir" ) {
+get_ns <- function(xml, ns = "http://hl7.org/fhir") {
 
 	n <- xml2::xml_ns( xml )
 
 	names( n )[ n == ns ][ 1 ]
 }
 
-get_fhir_ns <- function( xml ) {
+get_fhir_ns <- function(xml) {
 
 	get_ns( xml )
 }
 
-add_namespace <- function( xpath, ns.id ) {
+use_ns_id <- function(xpath, ns.id) {
 
-	a <- paste0( ns.id, ":\\2" )
+	a <- paste0(ns.id, ":\\2")
 
 	gsub(
 		"(\\[)([^@/])",
@@ -104,13 +103,65 @@ add_namespace <- function( xpath, ns.id ) {
 	)
 }
 
+rec <- function( x, fun = attributes, max.level = 0x100 ) {
+
+	if( max.level < 1 ) return( NULL )
+
+	if( is.list( x ) ) {
+
+		if( length( x ) < 1 ) {
+
+			fun( x )
+		}
+		else {
+
+			lapply( x, rec, fun, max.level - 1 )
+		}
+	}
+	else fun( x )
+}
+
+rbind3 <- function( list = rest.list ) {
+
+	unique.names <- unique(
+		Reduce(
+			union,
+			sapply(
+				list,
+				function( l ) {
+					names( l )
+				}
+			)
+		)
+	)
+
+	d  <- data.frame( as.list( character( length( unique.names ) ) ), stringsAsFactors = F )
+
+	names( d ) <- unique.names
+
+	for( l in list ) {
+
+		#dbg
+		#l <- list[[ 1 ]]
+
+		n <- nrow( d )
+
+		d[ n + 1, ] <- d[ 1, ]
+
+		d[ n + 1, names( l ) ] <- l[ , names( l ) ]
+	}
+
+	if( 1 < nrow( d ) ) d <- d[ 2 : nrow( d ), ]
+
+	d
+}
 
 #' Extract paths
 #' @description Extracts an attribute from tags in a xml object.
 #'
 #' @param xml A xml document, node, or node set.
 #' @param xpath A string containing a xpath (1.0) expression.
-#' @param ns A string containing the namespace.
+#' @param ns.id A string containing the namespace id.
 #'
 #' @return A character vector containing the attribute.
 #' @export
@@ -119,7 +170,23 @@ add_namespace <- function( xpath, ns.id ) {
 #' \dontrun{
 #' tag_attr(bundles[[1]], xpath = ".//total/@value")
 #' }
-tag_attr <- function(xml, xpath, ns = "http://hl7.org/fhir") {
+tag_attr <- function(xml, xpath, ns.id = NULL) {
+
+	if(is.null(xml)) {
+
+		warning("Argument xml is NULL, returning NULL.")
+
+		return(NULL)
+	}
+
+	if(is.null(xpath)) {
+
+		warning("Argument xpath is NULL, returning NULL.")
+
+		return(NULL)
+	}
+
+	if(is.null(ns.id)) ns.id <- get_fhir_ns(xml)
 
 	# xpath <- "//*[gender/@value='male']/gender/@value"
 	# xpath <- "//*/@value[.='male']"
@@ -128,13 +195,11 @@ tag_attr <- function(xml, xpath, ns = "http://hl7.org/fhir") {
 
 	#	(xpath <- gsub( "(/)([^@/])", paste0("/", get_ns(xml, ns), ":\\2"), xpath))
 
-	ns.id <- get_ns(xml, ns)
-
-	xpath <- add_namespace(xpath, ns.id)
+	xpath <- use_ns_id(xpath, ns.id)
 
 	xml. <- xml2::xml_find_all(xml, xpath)
 
-	xml2::xml_text( xml. )
+	xml2::xml_text(xml.)
 
 	# d <- as.data.frame( as.list( xml2::xml_text( xml. ) ), stringsAsFactors = F )
 	#
@@ -176,13 +241,7 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = T, m
 		auth <- if (!is.null(username) & !is.null(password)){
 
 			httr::authenticate(username, password)
-
-		} else {
-
-			NULL
-
 		}
-
 
 		response <- try(
 			httr::GET(
@@ -255,11 +314,11 @@ fhir_search <- function(request, username = NULL, password = NULL, max.bundles =
 
 		bundles[[addr]] <- bundle
 
-		ns <- get_fhir_ns( bundle )
+		ns.id <- get_fhir_ns( bundle )
 
-		links <- xml2::xml_find_all(bundle, paste0( ns, ":link"))
+		links <- xml2::xml_find_all(bundle, use_ns_id("link", ns.id))
 
-		rels.nxt  <- xml2::xml_attr(xml2::xml_find_first(links, paste0( "./", ns, ":relation")), "value") == "next"
+		rels.nxt  <- xml2::xml_attr(xml2::xml_find_first(links, use_ns_id("./relation", ns.id)), "value") == "next"
 
 		if (cnt == max.bundles) {
 
@@ -285,7 +344,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max.bundles =
 			break
 		}
 
-		urls  <- xml2::xml_attr(xml2::xml_find_first(links, paste0("./", ns, ":url")), "value")
+		urls  <- xml2::xml_attr(xml2::xml_find_first(links, use_ns_id("./url",ns.id)), "value")
 
 		addr <- urls[rels.nxt][1]
 
@@ -358,7 +417,7 @@ load_bundles <- function(directory) {
 #' @param xml An xml doc or xml node object.
 #' @param dsgn.df A design for a single data frame.
 #' @param sep A string used to separate pasted multiple entries
-#' @param ns A string containing the namespace.
+#' @param ns.id A string containing the namespace id.
 #'
 #' @return A data frame containing the data specified in \code{dsgn.df}.
 #' @export
@@ -367,12 +426,29 @@ load_bundles <- function(directory) {
 #' \dontrun{
 #' xml2df(xml, design$Patient)
 #' }
-xml2df <- function(xml, dsgn.df, sep = " -+- ", ns = "http://hl7.org/fhir") {
+xml2df <- function(xml, dsgn.df, sep = " -+- ", ns.id = NULL) {
 
 	#xml2::xml_ns_strip( xml )
 	#dbg
 	#dsgn.df  <- design[[ 1 ]]
 	#df.xpaths  <- dsgn.df[[ 1 ]]
+
+	if(is.null(xml)) {
+
+		warning("Argument xml is NULL, returning NULL.")
+
+		return(NULL)
+	}
+
+	if(is.null(dsgn.df)) {
+
+		warning("Argument dsgn.df is NULL, returning NULL.")
+
+		return(NULL)
+	}
+
+	if(is.null(ns.id)) ns.id <- get_fhir_ns(xml)
+
 	df.columns <- dsgn.df[[2]]
 
 	#( entries <- xml2::xml_find_all( bundle, "/Specimen" ) ) #entry )
@@ -391,7 +467,7 @@ xml2df <- function(xml, dsgn.df, sep = " -+- ", ns = "http://hl7.org/fhir") {
 			#attrib <- sub( "^.*/@", "", i.srch )
 
 			#val  <- xml2::xml_attr( xml2::xml_find_all( xml, addr ), attrib )
-			val  <- tag_attr(xml = xml, xpath = i.srch, ns = ns )
+			val  <- tag_attr(xml = xml, xpath = i.srch, ns.id = ns.id)
 
 			if(is.na(val) || length(val) < 1 ) {
 
@@ -404,7 +480,6 @@ xml2df <- function(xml, dsgn.df, sep = " -+- ", ns = "http://hl7.org/fhir") {
 			} else {
 
 				val
-
 			}
 		}
 	)
@@ -425,7 +500,7 @@ xml2df <- function(xml, dsgn.df, sep = " -+- ", ns = "http://hl7.org/fhir") {
 #' with XPath expressions of locations to the values of the items in the bundle page. The names of this second element named
 #' list are the column names of the resulting data.frames.
 #' @param sep A string to separate pasted multiple entries.
-#' @param ns A string containing the namespace.
+#' @param ns.id A string containing the namespace id.
 #'
 #' @return A list of data frames as specified by \code{design}
 #' @export
@@ -443,16 +518,28 @@ xml2df <- function(xml, dsgn.df, sep = " -+- ", ns = "http://hl7.org/fhir") {
 #' 	  DISPLAY = "code/coding/display/@value"
 #' 	))))
 #' 	}
-bundle2dfs <- function(bundle, design, sep = " -+- ", ns = "http://hl7.org/fhir") {
+bundle2dfs <- function(bundle, design, sep = " -+- ", ns.id = NULL) {
 
 	#xml2::xml_ns_strip(bundle)
 
 	#dbg
 	#bundle <- bundles[[ length( bundle ) ]]
 
-	if(is.null(bundle)) {return(NULL)}
+	if(is.null(bundle)) {
 
-	ns.id <- get_ns(bundle, ns)
+		warning("Argument bundle is NULL, returning NULL.")
+
+		return(NULL)
+	}
+
+	if(is.null(design)) {
+
+		warning("Argument desing is NULL, returning NULL.")
+
+		return(NULL)
+	}
+
+	if(is.null(ns.id)) ns.id <- get_fhir_ns(bundle)
 
 	lapply(
 		lst(names(design)),
@@ -467,7 +554,7 @@ bundle2dfs <- function(bundle, design, sep = " -+- ", ns = "http://hl7.org/fhir"
 			df.xpaths  <- dsgn.df[[1]]
 			df.columns <- dsgn.df[[2]]
 
-			df.xpaths <- add_namespace(xpath = df.xpaths, ns.id = ns.id)
+			df.xpaths <- use_ns_id(xpath = df.xpaths, ns.id = ns.id)
 
 			xml.nodeset <- xml2::xml_find_all(bundle, df.xpaths)
 
@@ -482,30 +569,22 @@ bundle2dfs <- function(bundle, design, sep = " -+- ", ns = "http://hl7.org/fhir"
 
 						cat(".")
 
-						xml2df(node, dsgn.df, sep)
+						xml2df(node, dsgn.df, sep, ns.id)
 					}
 				)
 
 				if (1 < length(dfs)){
 
-					Reduce( rbind.data.frame, dfs )
+					Reduce(rbind.data.frame, dfs)
 
 				} else if (1 == length(dfs)){
 
 					dfs[[1]]
 
-				} else {
-
-					NULL
-
 				}
 			} else if (1 == length(xml.nodeset)){
 
-				as.list(xml2df(xml.nodeset[1], dsgn.df, sep))
-
-			} else {
-
-				NULL
+				as.list(xml2df(xml.nodeset[1], dsgn.df, sep, ns.id))
 			}
 
 			cat("\n")
@@ -528,7 +607,30 @@ bundle2dfs <- function(bundle, design, sep = " -+- ", ns = "http://hl7.org/fhir"
 #' \dontrun{
 #' fhir2dfs(bundles, design)
 #' }
-fhir2dfs <- function(bundles, design, sep = " -+- ") {
+fhir2dfs <- function(bundles, design, sep = " -+- ", ns.id = NULL) {
+
+	if (is.null(bundles)) {
+
+		warning("Argument bundles is NULL, returning NULL.")
+
+		return(NULL)
+	}
+
+	if (length(bundles)<1) {
+
+		warning("Length of bundles is 0, returning NULL.")
+
+		return(NULL)
+	}
+
+	if (is.null(design)) {
+
+		warning("Argument desing is NULL, returning NULL.")
+
+		return(NULL)
+	}
+
+	if ( is.null( ns.id ) ) ns.id <- get_fhir_ns( bundles[[ 1 ]] )
 
 	bundles.dfs <- lapply(
 		bundles,
@@ -536,7 +638,7 @@ fhir2dfs <- function(bundles, design, sep = " -+- ") {
 
 			#dbl
 			#bundle <- bundles[[ 3 ]]
-			bundle2dfs(bundle, design, sep)
+			bundle2dfs(bundle, design = design, sep = sep, ns.id = ns.id)
 		}
 	)
 
@@ -564,18 +666,9 @@ fhir2dfs <- function(bundles, design, sep = " -+- ") {
 				} else if (1 == length(dfs.n)) {
 
 					dfs.n[[1]]
-
-				} else {
-
-					NULL
-
 				}
 
-				if (is.null(r)) {
-
-					NULL
-
-				} else {
+				if (!is.null(r)) {
 
 					as.data.frame(
 						r,
@@ -583,17 +676,12 @@ fhir2dfs <- function(bundles, design, sep = " -+- ") {
 						stringsAsFactors = F,
 						row.names = seq_len(nrow(r))
 					)
-
 				}
 			}
 		)
 	} else if (1 == length(bundles.dfs)){
 
 		bundles.dfs[[ 1 ]]
-
-	} else {
-
-		NULL
 
 	}
 
@@ -621,12 +709,107 @@ coerce_types <- function(df, stringsAsFactors = F) {
 }
 
 
+xtrct_all <- function(xml, xpath, sep = " -+- ", ns.id = NULL) {
+
+	if(is.null(xml)) {
+
+		warning("Argument xml is NULL, returning NULL.")
+
+		return(NULL)
+	}
+
+	if(is.null(xpath)) {
+
+		warning("Argument xpath is NULL, returning NULL.")
+
+		return(NULL)
+	}
+
+	if ( is.null( ns.id ) ) ns.id <- get_fhir_ns( xml )
+
+	xml.rest <- xml2::xml_find_all( xml, use_ns_id( xpath, ns.id ) )
+
+	rest.list <- lapply(
+		xml.rest,
+		function( r ) {
+
+			#dbg
+			#r <- xml.rest[[ 2 ]]
+
+			s <- lapply( xml2::as_list( r ), rec, attributes )
+
+			t <- as.list( unlist( s ) )
+
+			d <- as.data.frame( t, stringsAsFactors = F )
+
+			n <- names( d )
+
+			st <- n[ grep( "\\.[^0-9]+$", n ) ]
+
+			l <- lapply(
+				lst( st ),
+				function( m ) {
+
+					#m <- st[[ 2 ]]
+
+					paste0( d[ 1, n[ grep( m, n, perl = T ) ] ], collapse = sep )
+				}
+			)
+
+			as.data.frame( l, stringsAsFactors = F )#Reduce( cbind, l )
+		}
+	)
+
+	rbind3(list = rest.list)
+}
+
+xtrct_all_from_all_bundles <- function( xml.list, xpath, sep = " -+- ", ns.id = NULL) {
+
+	if(is.null(xml.list)) {
+
+		warning("Argument xml.list is NULL, returning NULL.")
+
+		return(NULL)
+	}
+
+	if (length(xml.list)<1) {
+
+		warning("Length of xml.list is 0, returning NULL.")
+
+		return(NULL)
+	}
+
+	if(is.null(xpath)) {
+
+		warning("Argument xpath is NULL, returning NULL.")
+
+		return(NULL)
+	}
+
+	if ( is.null( ns.id ) ) ns.id <- get_fhir_ns( xml.list[[ 1 ]] )
+
+	#dbg
+	#xml.list <- xmls
+
+	l <- lapply(
+		xml.list,
+		function( x ) {
+
+			#x <- xml.list[[ 1 ]]
+			#ns.id <- get_fhir_ns(x)
+			xtrct_all( xml = x, xpath, sep = sep, ns.id = ns.id)
+		}
+	)
+
+	rbind3( l )
+}
+
+
 #' Get capability statement
 #' @description Get the capability statement about a fhir server.
 #'
 #' @param url The url of the fhir server endpoint.
 #' @param sep A string to separate pasted multiple entries
-#' @param remove.empty.columns Logical Scalar. Remove empty columns?
 #'
 #' @return A data frame with the capability statement.
 #' @export
@@ -635,92 +818,10 @@ coerce_types <- function(df, stringsAsFactors = F) {
 #' \dontrun{
 #' capability_statement("https://hapi.fhir.org/baseR4")
 #' }
-capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.empty.columns = T) {
+capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ") {
 
 	caps <- fhiR::get_bundle(fhiR::paste_paths(url, "/metadata?_format=xml&_pretty=true"))
 
-	if(is.null(caps)) {
-
-		message("Capability Statement could not be downloaded.")
-
-		return(NULL)
-	}
-
-	#xml2::xml_ns_strip(caps)
-
-	design <- list(
-		META = list(
-			"/CapabilityStatement",
-			list(
-				id               = "id/@value",
-				meta.versionId   = "meta.versionId/@value",
-				meta.lastUpdated = "meta/@value",
-				language         = "language/@value",
-				url              = "url/@value",
-				version          = "version/@value",
-				name             = "name/@value",
-				status           = "status/@value",
-				experimental     = "experimental/@value",
-				date             = "date/@value",
-				publisher        = "publisher/@value",
-				contact.name     = "contact/name/@value",
-				contact.telecom.system = "contact/telecom/system/@value",
-				contact.telecom.value  = "contact/telecom/value/@value",
-				contact.telecom.use    =  "contact/telecom/use/@value",
-				kind                   = "kind/@value",
-				status    = "status/@value",
-				date      = "date/@value",
-				publisher = "publisher/@value",
-				kind      = "kind/@value",
-				software.name = "software/name/@value",
-				software.version = "software/version/@value",
-				implementation.description = "implementation/description/@value",
-				implementation.url         = "implementation/url/@value",
-				fhirVersion                = "fhirVersion/@value",
-				fhirVersion.format         = "format/@value"
-			)
-		),
-		REST.META = list(
-			"/CapabilityStatement/rest",
-			list(
-				extension.url      = "extension/@url",
-				extension.valueUri = "extension/valueUri/@value",
-				mode               = "mode/@value"
-			)
-		),
-		REST = list(
-			"/CapabilityStatement/rest/resource",
-			list(
-				ext.url           = "extension/@url",
-				ext.decVal        = "extension/valueDecimal/@value",
-				type              = "type/@value",
-				profile           = "profile/@value",
-				interaction       = "interaction/code/@value",
-				searchParam.name  = "searchParam/name/@value",
-				searchParam.type  = "searchParam/type/@value",
-				searchParam.documentation = "searchParam/documentation/@value",
-				versioning        = "versioning/@value",
-				conditionalCreate = "conditionalCreate/@value",
-				conditionalUpdate = "conditionalUpdate/@value",
-				conditionalDelete = "conditionalDelete/@value",
-				searchInclude     = "searchInclude/@value"
-			)
-		)
-	)
-
-	dfs <- bundle2dfs(bundle = caps, design = design, sep = sep)
-
-	if(remove.empty.columns) {
-
-		dfs <- lapply(
-			dfs,
-			function( df ) {
-
-				df[ , sapply( df, function( col ) 0 < sum( ! is.na( col ) ) ), drop = F ]
-			}
-		)
-	}
-
-	dfs
+	xtrct_all(caps, "//resource")
 }
 

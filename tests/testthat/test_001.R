@@ -16,7 +16,6 @@ design <- list(
 	)
 )
 
-
 resource <- xml2::xml_find_all( xmlfile, design$Specimen[[ 1 ]] )
 
 df <- xml2df( xml = resource, dsgn.df = design$Specimen )
@@ -128,12 +127,12 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "capability_statement()" )
 
-caps <- capability_statement( "https://hapi.fhir.org/baseR4", sep = " ~ ", remove.empty.columns = T )
+caps <- capability_statement( "https://hapi.fhir.org/baseR4", sep = " ~ ")
 
 testthat::test_that(
 	"capability_statement() works", {
 		testthat::expect_false( is.null( caps ) )
-		testthat::expect_true( is.data.frame( caps$REST ) )
+		testthat::expect_true( is.data.frame( caps ) )
 	}
 )
 
