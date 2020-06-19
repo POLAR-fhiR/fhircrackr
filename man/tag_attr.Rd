@@ -4,14 +4,14 @@
 \alias{tag_attr}
 \title{Extract paths}
 \usage{
-tag_attr(xml, xpath, ns = "http://hl7.org/fhir")
+tag_attr(xml, xpath, ns.id = NULL)
 }
 \arguments{
 \item{xml}{A xml document, node, or node set.}
 
 \item{xpath}{A string containing a xpath (1.0) expression.}
 
-\item{ns}{A string containing the namespace.}
+\item{ns.id}{A string containing the namespace id.}
 }
 \value{
 A character vector containing the attribute.

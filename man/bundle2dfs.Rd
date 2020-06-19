@@ -4,7 +4,7 @@
 \alias{bundle2dfs}
 \title{Flatten single fhir bundle}
 \usage{
-bundle2dfs(bundle, design, sep = " -+- ", ns = "http://hl7.org/fhir")
+bundle2dfs(bundle, design, sep = " -+- ", ns.id = NULL)
 }
 \arguments{
 \item{bundle}{a xml text file the represents a fhir bundle.}
@@ -17,7 +17,7 @@ list are the column names of the resulting data.frames.}
 
 \item{sep}{A string to separate pasted multiple entries.}
 
-\item{ns}{A string containing the namespace.}
+\item{ns.id}{A string containing the namespace id.}
 }
 \value{
 A list of data frames as specified by \code{design}

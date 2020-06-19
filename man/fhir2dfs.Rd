@@ -4,7 +4,7 @@
 \alias{fhir2dfs}
 \title{Flatten list of fhir bundles}
 \usage{
-fhir2dfs(bundles, design, sep = " -+- ")
+fhir2dfs(bundles, design, sep = " -+- ", ns.id = NULL)
 }
 \arguments{
 \item{bundles}{A fhir search result as returned by \code{\link{fhir_search}}.}
@@ -16,6 +16,8 @@ with XPath expressions of locations to the values of the items in the bundle pag
 list are the column names of the resulting data.frames.}
 
 \item{sep}{A string to separate pasted multiple entries.}
+
+\item{ns.id}{A string containing the namespace id.}
 }
 \value{
 A list of data framesas specified by \code{design}.

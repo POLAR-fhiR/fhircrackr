@@ -2,6 +2,7 @@
 
 export(bundle2dfs)
 export(capability_statement)
+export(fhir2df_auto)
 export(fhir2dfs)
 export(fhir_search)
 export(get_bundle)
@@ -10,3 +11,4 @@ export(paste_paths)
 export(save_bundles)
 export(tag_attr)
 export(xml2df)
+export(xml2df_auto)

@@ -1,30 +1,3 @@
-usethis::use_package("xml2")
-usethis::use_package("stringr")
-usethis::use_package("httr")
-usethis::use_package("utils")
-
-#' Create count strings
-#' @description Add the right suffix to a number or a vector of numbers. e.g. 1st 2nd 3rd ...
-#'
-#' @param n A numeric vector containing one or more numbers.
-#'
-#' @return A character vector containing the converted numbers as strings.
-th <- function(n) {
-
-	n.th <- n < 1 | 3 < n
-	n.1st <- n == 1
-	n.2nd <- n == 2
-	n.3rd <- n == 3
-
-	n[n.th] <- paste0(n[n.th], "th")
-	n[n.1st] <- "1st"
-	n[n.2nd] <- "2nd"
-	n[n.3rd] <- "3rd"
-
-	n
-}
-
-
 #' Transform vector to named list
 #'@description Transforms a vector of items to a named list. The names are created with a prefix and a suffix surrounding the items.
 #'
@@ -121,7 +94,7 @@ rec <- function( x, fun = attributes, max.level = 0x100 ) {
 	else fun( x )
 }
 
-rbind3 <- function( list = rest.list ) {
+rbind3 <- function( list ) {
 
 	unique.names <- unique(
 		Reduce(
@@ -146,9 +119,11 @@ rbind3 <- function( list = rest.list ) {
 
 		n <- nrow( d )
 
-		d[ n + 1, ] <- d[ 1, ]
+		m <- nrow( l )
 
-		d[ n + 1, names( l ) ] <- l[ , names( l ) ]
+		d[ ( n + 1 ) : ( n + m ), ] <- d[ 1, ]
+
+		d[ ( n + 1 ) : ( n + m ), names( l ) ] <- l[ , names( l ) ]
 	}
 
 	if( 1 < nrow( d ) ) d <- d[ 2 : nrow( d ), ]
@@ -416,7 +391,7 @@ load_bundles <- function(directory) {
 #'
 #' @param xml An xml doc or xml node object.
 #' @param dsgn.df A design for a single data frame.
-#' @param sep A string used to separate pasted multiple entries
+#' @param sep A string used to separate pasted multiple entries.
 #' @param ns.id A string containing the namespace id.
 #'
 #' @return A data frame containing the data specified in \code{dsgn.df}.
@@ -457,6 +432,8 @@ xml2df <- function(xml, dsgn.df, sep = " -+- ", ns.id = NULL) {
 	s <- sapply(
 		lst(names(df.columns)),
 		function(column.name)  {
+
+			#cat( paste0( column.name, "\n" ) )
 
 			#dbg
 			#column.name <- names( df.columns )[ 1 ]
@@ -691,25 +668,21 @@ fhir2dfs <- function(bundles, design, sep = " -+- ", ns.id = NULL) {
 }
 
 
-#' Coerce columns
-#' @description Coerce a data frame's columns.
+#' Flatten a xml node set automatically
 #'
-#' @param df A data frame with strings as column entries.
-#' @param stringsAsFactors Strings as factors.
+#' @param xml A xml document.
+#' @param xpath A xpath to the root node.
+#' @param sep A separator for multiple entries.
+#' @param ns.id A string containing the namespace id.
 #'
-#' @return A data frame with coerced types.
+#' @return A data frame containing the all nodes entries.
+#' @export
 #'
 #' @examples
 #' \dontrun{
-#' coerce_types(dfs$Besuch)
+#' xml2df_auto(xml, xpath="//resource")
 #' }
-coerce_types <- function(df, stringsAsFactors = F) {
-
-	utils::type.convert(df, as.is = !stringsAsFactors)
-}
-
-
-xtrct_all <- function(xml, xpath, sep = " -+- ", ns.id = NULL) {
+xml2df_auto <- function(xml, xpath, sep = " -+- ", ns.id = NULL) {
 
 	if(is.null(xml)) {
 
@@ -727,14 +700,16 @@ xtrct_all <- function(xml, xpath, sep = " -+- ", ns.id = NULL) {
 
 	if ( is.null( ns.id ) ) ns.id <- get_fhir_ns( xml )
 
-	xml.rest <- xml2::xml_find_all( xml, use_ns_id( xpath, ns.id ) )
+	xml.list <- xml2::xml_find_all( xml, use_ns_id( xpath, ns.id ) )
 
-	rest.list <- lapply(
-		xml.rest,
+	df.list <- lapply(
+		xml.list,
 		function( r ) {
 
 			#dbg
-			#r <- xml.rest[[ 2 ]]
+			#r <- xml.list[[ 2 ]]
+
+			cat( "." )
 
 			s <- lapply( xml2::as_list( r ), rec, attributes )
 
@@ -744,37 +719,57 @@ xtrct_all <- function(xml, xpath, sep = " -+- ", ns.id = NULL) {
 
 			n <- names( d )
 
-			st <- n[ grep( "\\.[^0-9]+$", n ) ]
+			un <- n[ grep( "\\.[^0-9]+$", n ) ]
 
 			l <- lapply(
-				lst( st ),
+				lst( un ),
 				function( m ) {
 
-					#m <- st[[ 2 ]]
+					#dbg
+					#m <- un[[ 11 ]]
 
-					paste0( d[ 1, n[ grep( m, n, perl = T ) ] ], collapse = sep )
+					paste0( d[ , n[ gsub( "\\.[0-9]+$", "", n ) == m ] ], collapse = sep )
 				}
 			)
 
-			as.data.frame( l, stringsAsFactors = F )#Reduce( cbind, l )
+			as.data.frame( l, stringsAsFactors = F )
 		}
 	)
 
-	rbind3(list = rest.list)
+	cat( "\n" )
+
+	rbind3(list = df.list)
 }
 
-xtrct_all_from_all_bundles <- function( xml.list, xpath, sep = " -+- ", ns.id = NULL) {
 
-	if(is.null(xml.list)) {
+#' Flatten a bundles list automatically
+#'
+#' @param bundles A bundles list.
+#' @param xpath A xpath to the root node.
+#' @param sep A separator for multiple entries.
+#' @param ns.id A string containing the namespace id.
+#'
+#' @return A data frame containing the all nodes entries.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' fhir2df_auto(xml, xpath="//resource")
+#' }
+fhir2df_auto <- function(bundles, xpath="//resource", sep = " -+- ", ns.id = NULL) {
 
-		warning("Argument xml.list is NULL, returning NULL.")
+	if(is.null(bundles)) {
+
+		warning("Argument bundles is NULL, returning NULL.")
 
 		return(NULL)
 	}
 
-	if (length(xml.list)<1) {
+	if (length(bundles)<1) {
 
-		warning("Length of xml.list is 0, returning NULL.")
+		warning("Length of bundles is 0, returning NULL.")
 
 		return(NULL)
 	}
@@ -786,22 +781,23 @@ xtrct_all_from_all_bundles <- function( xml.list, xpath, sep = " -+- ", ns.id = 
 		return(NULL)
 	}
 
-	if ( is.null( ns.id ) ) ns.id <- get_fhir_ns( xml.list[[ 1 ]] )
-
-	#dbg
-	#xml.list <- xmls
+	if ( is.null( ns.id ) ) ns.id <- get_fhir_ns( bundles[[ 1 ]] )
 
 	l <- lapply(
-		xml.list,
+		bundles,
 		function( x ) {
 
-			#x <- xml.list[[ 1 ]]
+			#x <- bundles[[ 1 ]]
 			#ns.id <- get_fhir_ns(x)
-			xtrct_all( xml = x, xpath, sep = sep, ns.id = ns.id)
+
+			cat( xpath )
+			xml2df_auto( xml = x, xpath, sep = sep, ns.id = ns.id)
 		}
 	)
 
-	rbind3( l )
+	cat( "\n" )
+
+	rbind3( list = l )
 }
 
 
@@ -810,6 +806,7 @@ xtrct_all_from_all_bundles <- function( xml.list, xpath, sep = " -+- ", ns.id = 
 #'
 #' @param url The url of the fhir server endpoint.
 #' @param sep A string to separate pasted multiple entries
+#' @param remove.empty.columns Logical Scalar. Remove empty columns?
 #'
 #' @return A data frame with the capability statement.
 #' @export
@@ -818,10 +815,68 @@ xtrct_all_from_all_bundles <- function( xml.list, xpath, sep = " -+- ", ns.id = 
 #' \dontrun{
 #' capability_statement("https://hapi.fhir.org/baseR4")
 #' }
-capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ") {
+capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.empty.columns = T) {
 
 	caps <- fhiR::get_bundle(fhiR::paste_paths(url, "/metadata?_format=xml&_pretty=true"))
 
-	xtrct_all(caps, "//resource")
+	design <- list(
+		META = list(
+			"/CapabilityStatement",
+			list(
+				id               = "id/@value",
+				meta.versionId   = "meta.versionId/@value",
+				meta.lastUpdated = "meta/@value",
+				language         = "language/@value",
+				url              = "url/@value",
+				version          = "version/@value",
+				name             = "name/@value",
+				status           = "status/@value",
+				experimental     = "experimental/@value",
+				date             = "date/@value",
+				publisher        = "publisher/@value",
+				contact.name     = "contact/name/@value",
+				contact.telecom.system = "contact/telecom/system/@value",
+				contact.telecom.value  = "contact/telecom/value/@value",
+				contact.telecom.use    =  "contact/telecom/use/@value",
+				kind                   = "kind/@value",
+				status    = "status/@value",
+				date      = "date/@value",
+				publisher = "publisher/@value",
+				kind      = "kind/@value",
+				software.name = "software/name/@value",
+				software.version = "software/version/@value",
+				implementation.description = "implementation/description/@value",
+				implementation.url         = "implementation/url/@value",
+				fhirVersion                = "fhirVersion/@value",
+				fhirVersion.format         = "format/@value"
+			)
+		),
+		REST.META = list(
+			"/CapabilityStatement/rest",
+			list(
+				extension.url      = "extension/@url",
+				extension.valueUri = "extension/valueUri/@value",
+				mode               = "mode/@value"
+			)
+		)
+	)
+
+
+	dfs <- fhiR::bundle2dfs(bundle = caps, design = design, sep = sep)
+
+	dfs$REST <- xml2df_auto(xml = caps, xpath = "/CapabilityStatement/rest/resource" )
+
+	if(remove.empty.columns) {
+
+		dfs <- lapply(
+			dfs,
+			function( df ) {
+
+				df[ , sapply( df, function( col ) 0 < sum( ! is.na( col ) ) ), drop = F ]
+			}
+		)
+	}
+
+	dfs
 }
 
