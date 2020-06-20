@@ -21,13 +21,16 @@ get_fhir_ns <- function(xml) {
 
 use_ns_id <- function(xpath, ns.id) {
 
-	pattern <- "\\'.+\\'"
-
-	strings <- stringr::str_extract_all(xpath, pattern)
-
-	xpath.without.strings <- gsub(pattern,"ENTFERNTER_STRING",xpath)
-
 	repl <- paste0(ns.id, ":\\2")
+
+	pattern <- if (0<length(grep("'", xpath))) "\\'.+\\'" else if(0<length(grep('"', xpath))) '\\".+\\"'
+
+	if (!is.null(pattern)) {
+
+		strings <- stringr::str_extract_all(xpath, pattern)
+
+		xpath <- gsub(pattern,"ENTFERNTER_STRING",xpath)
+	}
 
 	d <- gsub(
 		"(\\[)([^@/])",
@@ -38,17 +41,19 @@ use_ns_id <- function(xpath, ns.id) {
 			gsub(
 				"(^)([^\\.\\*@/])",
 				repl,
-				xpath.without.strings
+				xpath
 			)
 		)
 	)
 
-	for( s in strings ) {
+	if (!is.null(pattern)) {
+		for( s in strings ) {
 
-		#dbg
-		#s<-strings[[1]]
+			#dbg
+			#s<-strings[[1]]
 
-		if (0<length(s)) d <- sub("ENTFERNTER_STRING",s,d)
+			if (0<length(s)) d <- sub("ENTFERNTER_STRING",s,d)
+		}
 	}
 
 	d
@@ -98,8 +103,6 @@ rbind_list_of_data_frames <- function( list ) {
 		n <- nrow( d )
 
 		m <- nrow( l )
-
-#		d[ ( n + 1 ) : ( n + m ), ] <- d[ 1, ]
 
 		d[ ( n + 1 ) : ( n + m ), names( l ) ] <- l[ , names( l ), drop = F]
 	}
@@ -216,7 +219,12 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = T, m
 #' Download fhir search result
 #' @description Downloads all fhir bundles of a fhir search request from a fhir server.
 #'
-#' @inheritParams get_bundle
+#' @param request A string containing the full fhir search request.
+#' @param username A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
+#' @param password A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
+#' @param max.attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
+#' @param verbose A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.
+#' @param delay.between.attempts A scalar numeric specifying the delay in seconds between two attempts. Defaults to 10.
 #' @param max.bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
 #'
 #' @return A list of bundles in xml format.
@@ -347,7 +355,7 @@ load_bundles <- function(directory) {
 }
 
 
-xtrc_all_columns <- function( child, sep = " -+- " ) {
+xtrct_all_columns <- function( child, sep = " -+- " ) {
 
 	s <- lapply(xml2::as_list(child), rec, attributes)
 
@@ -374,7 +382,7 @@ xtrc_all_columns <- function( child, sep = " -+- " ) {
 }
 
 
-xtrc_columns <- function( child, df.columns, sep = " -+- ", ns.id = NULL) {
+xtrct_columns <- function( child, df.columns, sep = " -+- ", ns.id = NULL) {
 
 	l <- lapply(
 		lst(names(df.columns)),
@@ -445,11 +453,11 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", ns.id = NULL) {
 			cat( "." )
 
 			if (length(design.df)<2) {
-				xtrc_all_columns(child,sep)
+				xtrct_all_columns(child,sep)
 			}
 			else{
 				df.columns <- design.df[[2]]
-				xtrc_columns( child, df.columns, sep = sep, ns.id = ns.id)
+				xtrct_columns( child, df.columns, sep = sep, ns.id = ns.id)
 			}
 		}
 	)
