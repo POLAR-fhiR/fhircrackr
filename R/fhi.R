@@ -33,7 +33,7 @@ use_ns_id <- function(xpath, ns.id) {
 	}
 
 	d <- gsub(
-		"(\\[)([^@/])",
+		"(\\[)([^@/{1,2}\\.])",
 		paste0("\\[", repl),
 		gsub(
 			"(/)([^@/])",
@@ -141,6 +141,30 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 
 	paste0(sub("/$" , "", path1), "/", sub("^/", "", path2))
 }
+
+xpath_get <- function(xml, xpath, ns.id = NULL) {
+
+	if(is.null(xml)) {
+
+		warning("Argument xml is NULL, returning NULL.")
+
+		return(NULL)
+	}
+
+	if(is.null(xpath)) {
+
+		warning("Argument xpath is NULL, returning NULL.")
+
+		return(NULL)
+	}
+
+	if(is.null(ns.id)) {ns.id <- get_fhir_ns(xml)}
+
+	xpath <- use_ns_id(xpath, ns.id)
+
+	xml2::xml_find_all(xml, xpath)
+}
+
 
 get_attributes <- function(xml, xpath, ns.id = NULL) {
 
@@ -587,47 +611,57 @@ capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " -
 	caps <- fhir_search(request = paste_paths(url, "/metadata?_format=xml&_pretty=true"))
 
 	design <- list(
-		META = list(
-			"/CapabilityStatement",
-			list(
-				id               = "id/@value",
-				meta.versionId   = "meta.versionId/@value",
-				meta.lastUpdated = "meta/@value",
-				language         = "language/@value",
-				url              = "url/@value",
-				version          = "version/@value",
-				name             = "name/@value",
-				status           = "status/@value",
-				experimental     = "experimental/@value",
-				date             = "date/@value",
-				publisher        = "publisher/@value",
-				contact.name     = "contact/name/@value",
-				contact.telecom.system = "contact/telecom/system/@value",
-				contact.telecom.value  = "contact/telecom/value/@value",
-				contact.telecom.use    =  "contact/telecom/use/@value",
-				kind                   = "kind/@value",
-				status    = "status/@value",
-				date      = "date/@value",
-				publisher = "publisher/@value",
-				kind      = "kind/@value",
-				software.name = "software/name/@value",
-				software.version = "software/version/@value",
-				implementation.description = "implementation/description/@value",
-				implementation.url         = "implementation/url/@value",
-				fhirVersion                = "fhirVersion/@value",
-				fhirVersion.format         = "format/@value"
-			)
-		),
-		REST.META = list(
-			"/CapabilityStatement/rest",
-			list(
-				extension.url      = "extension/@url",
-				extension.valueUri = "extension/valueUri/@value",
-				mode               = "mode/@value"
-			)
-		),
-		REST = list( "/CapabilityStatement/rest/resource")
+		META      = list( "/CapabilityStatement", "./*/@value", 1 ),
+		REST.META = list( "/CapabilityStatement/rest", "./*/@value", 3 ),
+		REST      = list( "/CapabilityStatement/rest/resource")
 	)
+	design <- list(
+		META      = list( "/CapabilityStatement", "//@value", 1 ),
+		REST.META = list( "/CapabilityStatement/rest", 2, 3 ),
+		REST      = list( "/CapabilityStatement/rest/resource")
+	)
+	# design <- list(
+	# 	META = list(
+	# 		"/CapabilityStatement",
+	# 		list(
+	# 			id               = "id/@value",
+	# 			meta.versionId   = "meta.versionId/@value",
+	# 			meta.lastUpdated = "meta/@value",
+	# 			language         = "language/@value",
+	# 			url              = "url/@value",
+	# 			version          = "version/@value",
+	# 			name             = "name/@value",
+	# 			status           = "status/@value",
+	# 			experimental     = "experimental/@value",
+	# 			date             = "date/@value",
+	# 			publisher        = "publisher/@value",
+	# 			contact.name     = "contact/name/@value",
+	# 			contact.telecom.system = "contact/telecom/system/@value",
+	# 			contact.telecom.value  = "contact/telecom/value/@value",
+	# 			contact.telecom.use    =  "contact/telecom/use/@value",
+	# 			kind                   = "kind/@value",
+	# 			status    = "status/@value",
+	# 			date      = "date/@value",
+	# 			publisher = "publisher/@value",
+	# 			kind      = "kind/@value",
+	# 			software.name = "software/name/@value",
+	# 			software.version = "software/version/@value",
+	# 			implementation.description = "implementation/description/@value",
+	# 			implementation.url         = "implementation/url/@value",
+	# 			fhirVersion                = "fhirVersion/@value",
+	# 			fhirVersion.format         = "format/@value"
+	# 		)
+	# 	),
+	# 	REST.META = list(
+	# 		"/CapabilityStatement/rest",
+	# 		list(
+	# 			extension.url      = "extension/@url",
+	# 			extension.valueUri = "extension/valueUri/@value",
+	# 			mode               = "mode/@value"
+	# 		)
+	# 	),
+	# 	REST = list( "/CapabilityStatement/rest/resource")
+	# )
 
 	dfs <- crack(bundles = caps, design = design, sep = sep)
 
