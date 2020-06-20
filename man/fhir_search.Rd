@@ -15,19 +15,7 @@ fhir_search(
 )
 }
 \arguments{
-\item{request}{A string containing the full fhir search request.}
-
-\item{username}{A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.}
-
-\item{password}{A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.}
-
 \item{max.bundles}{Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
-
-\item{verbose}{A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.}
-
-\item{max.attempts}{A numeric scalar. The maximal number of attempts to send a request, defaults to 5.}
-
-\item{delay.between.attempts}{A scalar numeric specifying the delay in seconds between two attempts. Defaults to 10.}
 }
 \value{
 A list of bundles in xml format.

@@ -1,5 +1,5 @@
 #########################################################################################################
-testthat::context( "xml2df()" )
+testthat::context( "crack()" )
 
 xmlfile <- xml2::read_xml( "specimen.xml" )
 
@@ -8,7 +8,7 @@ xmlfile <- xml2::read_xml( "specimen.xml" )
 design <- list(
 
 	Specimen = list(
-		".//d1:extension[./@url='https://fhir.bbmri.de/StructureDefinition/StorageTemperature']",
+		".//extension[@url='https://fhir.bbmri.de/StructureDefinition/StorageTemperature']",
 		list(
 			VCS  = "valueCodeableConcept/coding/system/@value",
 			CODE = "valueCodeableConcept/coding/code/@value"
@@ -16,43 +16,16 @@ design <- list(
 	)
 )
 
-resource <- xml2::xml_find_all( xmlfile, design$Specimen[[ 1 ]] )
-
-df <- xml2df( xml = resource, dsgn.df = design$Specimen )
+df <- fhiR::crack(bundles = list(xmlfile), design)
 
 testthat::test_that(
-	"xml2df creates a valid data frame", {
-		testthat::expect_equal( is.null( df ), F )
-		testthat::expect_equal( is.data.frame( df ), T )
-		testthat::expect_equal( nrow( df ), 1 )
-		testthat::expect_equal( df$VCS[ 1 ],  "https://fhir.bbmri.de/CodeSystem/StorageTemperature" )
-		testthat::expect_equal( df$CODE[ 1 ], "temperature2to10" )
-	}
-)
-
-
-#########################################################################################################
-testthat::context( "get_bundle()" )
-
-design <- list(
-
-	Pat = list(
-		".//Patient",
-		list(
-			name = "name/family/@value"
-		)
-	)
-)
-
-bundle     <- get_bundle( "https://hapi.fhir.org/baseR4/Patient?_revinclude=*&_pretty=true&_count=10" )
-bundle.tag <- xml2::xml_find_all( bundle, "/d1:Bundle" )
-
-testthat::test_that(
-	"get_bundle downloads a valid bundle", {
-		testthat::expect_equal( is.null( bundle ), F )
-		testthat::expect_equal( isClass( "xml_node", bundle ), T )
-		testthat::expect_equal( is.list( bundle.tag ), T )
-		testthat::expect_equal( substr( bundle.tag[[ 1 ]], 1, 7 ) == "<Bundle", T )
+	"crack creates a valid data frame", {
+		testthat::expect_false( is.null( df ) )
+		testthat::expect_false( is.null( df$Specimen ) )
+		testthat::expect_true( is.data.frame( df$Specimen ) )
+		testthat::expect_equal( nrow( df$Specimen ), 1 )
+		testthat::expect_equal( df$Specimen$VCS[ 1 ],  "https://fhir.bbmri.de/CodeSystem/StorageTemperature" )
+		testthat::expect_equal( df$Specimen$CODE[ 1 ], "temperature2to10" )
 	}
 )
 
@@ -60,7 +33,7 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "fhir_search()" )
 
-bundles <- fhir_search( request = "https://vonk.fire.ly/R4/Patient?_pretty=true&_count=100000", max.bundles = 10 )
+bundles <- fhiR::fhir_search( request = "https://vonk.fire.ly/R4/Patient?_pretty=true&_count=100000", max.bundles = 10 )
 
 testthat::test_that(
 	"fhir_search downloads a valid bundle list", {
@@ -75,7 +48,7 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "save_bundles()" )
 
-save_bundles( bundles, "myBundles" )
+fhiR::save_bundles( bundles, "myBundles" )
 
 testthat::test_that(
 	"save_bundles stores all bundles as xml files in the required directory", {
@@ -88,7 +61,7 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "load_bundles()" )
 
-myBundles <- load_bundles( "myBundles" )
+myBundles <- fhiR::load_bundles( "myBundles" )
 
 testthat::test_that(
 	"load_bundles reads all bundles as xml files from the given directory", {
@@ -101,7 +74,7 @@ testthat::test_that(
 
 
 #########################################################################################################
-testthat::context( "fhir2dfs()" )
+testthat::context( "crack()" )
 
 design <- list(
 
@@ -113,7 +86,7 @@ design <- list(
 	)
 )
 
-dfs <- fhir2dfs( bundles = myBundles, design = design, sep = "»" )
+dfs <- fhiR::crack( bundles = myBundles, design = design, sep = "»" )
 
 testthat::test_that(
 	"fhir2dfs creates all required data frames", {
