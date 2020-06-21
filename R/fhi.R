@@ -39,7 +39,8 @@ rbind_list_of_data_frames <- function( list ) {
 		)
 	)
 
-	d  <- data.frame( as.list( character( length( unique.names ) ) ), stringsAsFactors = F )
+	#d  <- data.frame( as.list( character( length( unique.names ) ) ), stringsAsFactors = F )
+	d <- as.data.frame(lapply(seq_along(unique.names),function(dummy)character(0)), stringsAsFactors = F)
 
 	names( d ) <- unique.names
 
@@ -55,7 +56,7 @@ rbind_list_of_data_frames <- function( list ) {
 		d[ ( n + 1 ) : ( n + m ), names( l ) ] <- l[ , names( l ), drop = F]
 	}
 
-	if( 1 < nrow( d ) ) d <- d[ 2 : nrow( d ), , drop = F]
+	#if( 1 < nrow( d ) ) d <- d[ 2 : nrow( d ), , drop = F]
 
 	d
 }
@@ -315,7 +316,7 @@ xtrct_all_columns <- function( child, sep = " -+- ", add_ids = F, xpath = ".//@*
 	xp.child  <- xml2::xml_path( child )
 	xp.remain <- xml2::xml_path( tree )
 	xp.rel    <- substr( xp.remain, nchar( xp.child ) + 2, nchar( xp.remain ) )
-	xp.cols   <- gsub("/", ".", gsub("[@]", "", unique( gsub( "\\[[0-9]+\\]", "", xp.rel))))
+	xp.cols   <- gsub("/", ".", gsub("@", "", unique( gsub( "\\[[0-9]+\\]", "", xp.rel))))
 
 	d <- lapply(1:length(xp.cols),function(dummy)character(0))
 
@@ -349,7 +350,6 @@ xtrct_all_columns <- function( child, sep = " -+- ", add_ids = F, xpath = ".//@*
 	)
 
 	if( add_ids ) {
-
 
 		val  <- paste0( "{",o[ 1, ], "}", val)
 	}
@@ -526,7 +526,7 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_ids = F) {
 		return(NULL)
 	}
 
-	rbind_list_of_data_frames(
+	ret <- rbind_list_of_data_frames(
 		lapply(
 			seq_len(length(bundles)),
 			function( i ) {
@@ -534,7 +534,7 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_ids = F) {
 				#dbg
 				#i<-1
 
-				cat( i )
+				cat( "\n", i )
 
 				bundle <- bundles[[ i ]]
 
@@ -542,6 +542,10 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_ids = F) {
 			}
 		)
 	)
+
+	cat( "\n" )
+
+	ret
 }
 
 
@@ -568,7 +572,7 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", add_ids = F) {
 		return(NULL)
 	}
 
-	lapply(
+	l <- lapply(
 		lst(names(design)),
 		function(n) {
 
@@ -577,11 +581,15 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", add_ids = F) {
 
 			design.df <- design[[n]]
 
-			cat(paste0("\n", n, "\n"))
+			cat("\n", n)
 
 			bundles2df(bundles = bundles, design.df = design.df, sep = sep, add_ids)
 		}
 	)
+
+	cat("\n")
+
+	l
 }
 
 
