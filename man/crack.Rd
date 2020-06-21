@@ -4,7 +4,7 @@
 \alias{crack}
 \title{Crack it!}
 \usage{
-crack(bundles, design, sep = " -+- ", ns.id = NULL)
+crack(bundles, design, sep = " -+- ", add_ids = F)
 }
 \arguments{
 \item{bundles}{A list of fhir bundles as xml docs.}
@@ -17,7 +17,7 @@ list are the column names of the resulting data.frames.}
 
 \item{sep}{A string to separate pasted multiple entries.}
 
-\item{ns.id}{A string containing the namespace id.}
+\item{add_ids}{= Logigal Scalar. Should indices be added to multiple entries?}
 }
 \value{
 A list of data frames as specified by \code{design}

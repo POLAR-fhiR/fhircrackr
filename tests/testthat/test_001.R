@@ -3,12 +3,10 @@ testthat::context( "crack()" )
 
 xmlfile <- xml2::read_xml( "specimen.xml" )
 
-#xml2::xml_ns_strip( xmlfile )
-
 design <- list(
 
 	Specimen = list(
-		".//extension[@url='https://fhir.bbmri.de/StructureDefinition/StorageTemperature']",
+		"//extension[@url='https://fhir.bbmri.de/StructureDefinition/StorageTemperature']",
 		list(
 			VCS  = "valueCodeableConcept/coding/system/@value",
 			CODE = "valueCodeableConcept/coding/code/@value"

@@ -7,58 +7,6 @@ lst <- function(..., prefix = NULL, suffix = NULL) {
 	v
 }
 
-get_ns <- function(xml, ns = "http://hl7.org/fhir") {
-
-	n <- xml2::xml_ns( xml )
-
-	names( n )[ n == ns ][ 1 ]
-}
-
-get_fhir_ns <- function(xml) {
-
-	get_ns( xml )
-}
-
-use_ns_id <- function(xpath, ns.id) {
-
-	repl <- paste0(ns.id, ":\\2")
-
-	pattern <- if (0<length(grep("'", xpath))) "\\'.+\\'" else if(0<length(grep('"', xpath))) '\\".+\\"'
-
-	if (!is.null(pattern)) {
-
-		strings <- stringr::str_extract_all(xpath, pattern)
-
-		xpath <- gsub(pattern,"ENTFERNTER_STRING",xpath)
-	}
-
-	d <- gsub(
-		"(\\[)([^@/{1,2}\\.])",
-		paste0("\\[", repl),
-		gsub(
-			"(/)([^@/])",
-			paste0("/", repl),
-			gsub(
-				"(^)([^\\.\\*@/])",
-				repl,
-				xpath
-			)
-		)
-	)
-
-	if (!is.null(pattern)) {
-		for( s in strings ) {
-
-			#dbg
-			#s<-strings[[1]]
-
-			if (0<length(s)) d <- sub("ENTFERNTER_STRING",s,d)
-		}
-	}
-
-	d
-}
-
 rec <- function( x, fun = attributes, max.level = 0x100 ) {
 
 	if( max.level < 1 ) return( NULL )
@@ -140,55 +88,6 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 	}
 
 	paste0(sub("/$" , "", path1), "/", sub("^/", "", path2))
-}
-
-xpath_get <- function(xml, xpath, ns.id = NULL) {
-
-	if(is.null(xml)) {
-
-		warning("Argument xml is NULL, returning NULL.")
-
-		return(NULL)
-	}
-
-	if(is.null(xpath)) {
-
-		warning("Argument xpath is NULL, returning NULL.")
-
-		return(NULL)
-	}
-
-	if(is.null(ns.id)) {ns.id <- get_fhir_ns(xml)}
-
-	xpath <- use_ns_id(xpath, ns.id)
-
-	xml2::xml_find_all(xml, xpath)
-}
-
-
-get_attributes <- function(xml, xpath, ns.id = NULL) {
-
-	if(is.null(xml)) {
-
-		warning("Argument xml is NULL, returning NULL.")
-
-		return(NULL)
-	}
-
-	if(is.null(xpath)) {
-
-		warning("Argument xpath is NULL, returning NULL.")
-
-		return(NULL)
-	}
-
-	if(is.null(ns.id)) {ns.id <- get_fhir_ns(xml)}
-
-	xpath <- use_ns_id(xpath, ns.id)
-
-	xml.  <- xml2::xml_find_all(xml, xpath)
-
-	xml2::xml_text(xml.)
 }
 
 get_bundle <- function(request, username = NULL, password = NULL, verbose = T, max.attempts = 5, delay.between.attempts = 10) {
@@ -280,13 +179,13 @@ fhir_search <- function(request, username = NULL, password = NULL, max.bundles =
 			break
 		}
 
+		xml2::xml_ns_strip( bundle )
+
 		bundles[[addr]] <- bundle
 
-		ns.id <- get_fhir_ns( bundle )
+		links <- xml2::xml_find_all(bundle, "link")
 
-		links <- xml2::xml_find_all(bundle, use_ns_id("link", ns.id))
-
-		rels.nxt  <- xml2::xml_attr(xml2::xml_find_first(links, use_ns_id("./relation", ns.id)), "value") == "next"
+		rels.nxt  <- xml2::xml_attr(xml2::xml_find_first(links, "./relation"), "value") == "next"
 
 		if (cnt == max.bundles) {
 
@@ -313,7 +212,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max.bundles =
 			break
 		}
 
-		urls  <- xml2::xml_attr(xml2::xml_find_first(links, use_ns_id("./url",ns.id)), "value")
+		urls  <- xml2::xml_attr(xml2::xml_find_first(links, "./url"), "value")
 
 		addr <- urls[rels.nxt][1]
 
@@ -379,57 +278,167 @@ load_bundles <- function(directory) {
 }
 
 
-xtrct_all_columns <- function( child, sep = " -+- " ) {
+# xtrct_all_columns <- function( child, sep = " -+- " ) {
+#
+# 	s <- lapply(xml2::as_list(child), rec, attributes)
+#
+# 	t <- as.list(unlist(s))
+#
+# 	d <- as.data.frame(t, stringsAsFactors = F)
+#
+# 	n <- names(d)
+#
+# 	un <- n[grep( "\\.[^0-9]+$", n)]
+#
+# 	l <- lapply(
+# 		lst(un),
+# 		function(m) {
+#
+# 			#dbg
+# 			#m <- un[[ 11 ]]
+#
+# 			d. <- d[ , n[gsub("\\.[0-9]+$", "", n) == m] ]
+# 			paste0("{",seq_len(length(d.)), "}", d., collapse = sep)
+# 			#paste0(seq_along(val), "[", val, "]")
+#
+# 		}
+# 	)
+#
+# 	as.data.frame(l, stringsAsFactors = F)
+# }
 
-	s <- lapply(xml2::as_list(child), rec, attributes)
 
-	t <- as.list(unlist(s))
+xtrct_all_columns <- function( child, sep = " -+- ", add_ids = F, xpath = ".//@*") {
 
-	d <- as.data.frame(t, stringsAsFactors = F)
+	tree <- xml2::xml_find_all(child, xpath)
 
-	n <- names(d)
+	xp.child  <- xml2::xml_path( child )
+	xp.remain <- xml2::xml_path( tree )
+	xp.rel    <- substr( xp.remain, nchar( xp.child ) + 2, nchar( xp.remain ) )
+	xp.cols   <- gsub("/", ".", gsub("[@]", "", unique( gsub( "\\[[0-9]+\\]", "", xp.rel))))
 
-	un <- n[grep( "\\.[^0-9]+$", n)]
+	d <- lapply(1:length(xp.cols),function(dummy)character(0))
 
-	l <- lapply(
-		lst(un),
-		function(m) {
+	names( d ) <- xp.cols
+
+	val  <- xml2::xml_text(tree)
+
+	s <- stringr::str_split( xp.rel, "/" )
+
+	o <- sapply(
+		seq_along( s ),
+		function( i ) {
 
 			#dbg
-			#m <- un[[ 11 ]]
+			#i<-1
 
-			paste0(d[ , n[gsub("\\.[0-9]+$", "", n) == m] ], collapse = sep)
+			s. <- s[[ i ]]
+
+			i.f <- ! grepl( "\\[[0-9]+\\]", s. )
+
+			if( any( i.f ) ) {
+
+				s.[ i.f ] <- paste0( s.[ i.f ], "[1]" )
+			}
+
+			c(
+				gsub(".1$", "", paste0(gsub( "[^0-9]", "", s. ), collapse = "." )),
+				gsub( "@", "", gsub( "\\[[0-9]+\\]", "", paste0(s., collapse = "." )))
+			)
 		}
 	)
 
-	as.data.frame(l, stringsAsFactors = F)
+	if( add_ids ) {
+
+
+		val  <- paste0( "{",o[ 1, ], "}", val)
+	}
+
+	for( col in xp.cols ) {
+
+		#dbg
+		#col <- xp.cols[1]
+
+		d[[ col ]] <- paste0( val[ col == o[ 2, ] ], collapse = sep )
+	}
+
+	as.data.frame(d, stringsAsFactors = F)
 }
 
+xtrct_columns <- function( child, df.columns, sep = " -+- ", add_ids = F) {
 
-xtrct_columns <- function( child, df.columns, sep = " -+- ", ns.id = NULL) {
+	xp <- xml2::xml_path( child )
 
 	l <- lapply(
 		lst(names(df.columns)),
 		function(column.name)  {
 
 			#dbg
-			#column.name <- names( df.columns )[ 1 ]
+			#column.name <- names( df.columns )[ 2 ]
 
 			i.srch <- df.columns[[column.name]]
+			#TODO: mask via flags 1:n
+			loc <- xml2::xml_find_all(x = child, xpath = i.srch)
 
-			val  <- get_attributes(xml = child, xpath = i.srch, ns.id = ns.id)
+			val  <- xml2::xml_text(loc)
 
-			if(is.na(val) || length(val) < 1 ) {
+			if( add_ids ) {
 
-				NA
+				loc.xp <- xml2::xml_path( loc )
 
-			} else if (1 < length(val)) {
+				loc.xp.rel <- substr( loc.xp, nchar( xp ) + 2, nchar( loc.xp ) )
 
-				paste0(val, collapse = sep)
+				s <- stringr::str_split( loc.xp.rel, "/" )
 
-			} else {
+				o <- sapply(
+					seq_along( s ),
+					function( i ) {
 
-				val
+						#dbg
+						#i<-1
+
+						s. <- s[[ i ]]
+
+						i.f <- ! grepl( "\\[[0-9]+\\]", s. )
+
+						if( any( i.f ) ) {
+
+							s.[ i.f ] <- paste0( s.[ i.f ], "[1]" )
+						}
+
+						gsub(".1$", "", paste0(gsub( "[^0-9]", "", s. ), collapse = "." ))
+					}
+				)
+
+				if(is.na(val) || length(val) < 1 ) {
+
+					NA
+
+				} else if (1 < length(val)) {
+
+					paste0("{",o,"}", val, collapse = sep)
+					#paste0(val, collapse = sep)
+
+				} else {
+
+					paste0("{",o,"}", val, collapse = sep)
+				}
+			}
+			else {
+
+				if(is.na(val) || length(val) < 1 ) {
+
+					NA
+
+				} else if (1 < length(val)) {
+
+					paste0(val, collapse = sep)
+					#paste0(val, collapse = sep)
+
+				} else {
+
+					paste0(val, collapse = sep)
+				}
 			}
 		}
 	)
@@ -438,7 +447,7 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", ns.id = NULL) {
 }
 
 
-bundle2df <- function(bundle, design.df, sep = " -+- ", ns.id = NULL) {
+bundle2df <- function(bundle, design.df, sep = " -+- ", add_ids = F) {
 
 	if (is.null(bundle)) {
 
@@ -461,27 +470,31 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", ns.id = NULL) {
 		return(NULL)
 	}
 
-	if (is.null(ns.id)) ns.id <- get_fhir_ns(bundle)
+	xml2::xml_ns_strip(bundle)
 
 	xpath <- design.df[[1]]
 
-	children <- xml2::xml_find_all(bundle, use_ns_id(xpath, ns.id))
+	children <- xml2::xml_find_all(bundle, xpath)
 
 	df.list <- lapply(
 		children,
 		function(child) {
 
 			#dbg
-			#child <- children[[ 2 ]]
+			#child <- children[[ 1 ]]
 
 			cat( "." )
 
-			if (length(design.df)<2) {
-				xtrct_all_columns(child,sep)
+			if (1<length(design.df) && is.list(design.df[[2]])) {
+
+				df.columns <- design.df[[2]]
+
+				xtrct_columns( child, df.columns, sep = sep, add_ids = add_ids)
 			}
 			else{
-				df.columns <- design.df[[2]]
-				xtrct_columns( child, df.columns, sep = sep, ns.id = ns.id)
+
+				xp <- if(1<length(design.df)) design.df[[2]] else ".//@*"
+				xtrct_all_columns(child = child, sep = sep, add_ids = add_ids, xpath = xp)
 			}
 		}
 	)
@@ -490,7 +503,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", ns.id = NULL) {
 }
 
 
-bundles2df <- function(bundles, design.df, sep = " -+- ", ns.id = NULL) {
+bundles2df <- function(bundles, design.df, sep = " -+- ", add_ids = F) {
 
 	if (is.null(bundles)) {
 
@@ -525,14 +538,14 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", ns.id = NULL) {
 
 				bundle <- bundles[[ i ]]
 
-				bundle2df( bundle, design.df, sep, ns.id)
+				bundle2df( bundle, design.df, sep, add_ids)
 			}
 		)
 	)
 }
 
 
-bundles2dfs <- function(bundles, design, sep = " -+- ", ns.id = NULL) {
+bundles2dfs <- function(bundles, design, sep = " -+- ", add_ids = F) {
 
 	if (is.null(bundles)) {
 
@@ -560,13 +573,13 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", ns.id = NULL) {
 		function(n) {
 
 			#dbg
-			#n <- names(design)[1]
+			#n <- names(design)[3]
 
 			design.df <- design[[n]]
 
 			cat(paste0("\n", n, "\n"))
 
-			bundles2df(bundles = bundles, design.df = design.df, sep = sep, ns.id = ns.id)
+			bundles2df(bundles = bundles, design.df = design.df, sep = sep, add_ids)
 		}
 	)
 }
@@ -581,14 +594,14 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", ns.id = NULL) {
 #' with XPath expressions of locations to the values of the items in the bundle page. The names of this second element named
 #' list are the column names of the resulting data.frames.
 #' @param sep A string to separate pasted multiple entries.
-#' @param ns.id A string containing the namespace id.
+#' @param add_ids = Logigal Scalar. Should indices be added to multiple entries?
 #'
 #' @return A list of data frames as specified by \code{design}
 #'
 #' @export
-crack <- function(bundles, design, sep = " -+- ", ns.id = NULL) {
+crack <- function(bundles, design, sep = " -+- ", add_ids = F) {
 
-	bundles2dfs(bundles, design, sep = " -+- ", ns.id = NULL)
+	bundles2dfs(bundles, design, sep, add_ids)
 }
 
 
@@ -610,58 +623,21 @@ capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " -
 
 	caps <- fhir_search(request = paste_paths(url, "/metadata?_format=xml&_pretty=true"))
 
-	design <- list(
-		META      = list( "/CapabilityStatement", "./*/@value", 1 ),
-		REST.META = list( "/CapabilityStatement/rest", "./*/@value", 3 ),
-		REST      = list( "/CapabilityStatement/rest/resource")
-	)
-	design <- list(
-		META      = list( "/CapabilityStatement", "//@value", 1 ),
-		REST.META = list( "/CapabilityStatement/rest", 2, 3 ),
-		REST      = list( "/CapabilityStatement/rest/resource")
-	)
 	# design <- list(
-	# 	META = list(
-	# 		"/CapabilityStatement",
-	# 		list(
-	# 			id               = "id/@value",
-	# 			meta.versionId   = "meta.versionId/@value",
-	# 			meta.lastUpdated = "meta/@value",
-	# 			language         = "language/@value",
-	# 			url              = "url/@value",
-	# 			version          = "version/@value",
-	# 			name             = "name/@value",
-	# 			status           = "status/@value",
-	# 			experimental     = "experimental/@value",
-	# 			date             = "date/@value",
-	# 			publisher        = "publisher/@value",
-	# 			contact.name     = "contact/name/@value",
-	# 			contact.telecom.system = "contact/telecom/system/@value",
-	# 			contact.telecom.value  = "contact/telecom/value/@value",
-	# 			contact.telecom.use    =  "contact/telecom/use/@value",
-	# 			kind                   = "kind/@value",
-	# 			status    = "status/@value",
-	# 			date      = "date/@value",
-	# 			publisher = "publisher/@value",
-	# 			kind      = "kind/@value",
-	# 			software.name = "software/name/@value",
-	# 			software.version = "software/version/@value",
-	# 			implementation.description = "implementation/description/@value",
-	# 			implementation.url         = "implementation/url/@value",
-	# 			fhirVersion                = "fhirVersion/@value",
-	# 			fhirVersion.format         = "format/@value"
-	# 		)
-	# 	),
-	# 	REST.META = list(
-	# 		"/CapabilityStatement/rest",
-	# 		list(
-	# 			extension.url      = "extension/@url",
-	# 			extension.valueUri = "extension/valueUri/@value",
-	# 			mode               = "mode/@value"
-	# 		)
-	# 	),
-	# 	REST = list( "/CapabilityStatement/rest/resource")
+	# 	META      = list( "/CapabilityStatement", "./*/@value", 1 ),
+	# 	REST.META = list( "/CapabilityStatement/rest", "./*/@value", 3 ),
+	# 	REST      = list( "/CapabilityStatement/rest/resource")
 	# )
+	# design <- list(
+	# 	META      = list( "/CapabilityStatement", "//@value", 1 ),
+	# 	REST.META = list( "/CapabilityStatement/rest", 2, 3 ),
+	# 	REST      = list( "/CapabilityStatement/rest/resource")
+	# )
+	design <- list(
+		META      = list("/CapabilityStatement", "./*/@*"),
+		REST.META = list("/CapabilityStatement/rest", "./*/@*"),
+		REST      = list("/CapabilityStatement/rest/resource")
+	)
 
 	dfs <- crack(bundles = caps, design = design, sep = sep)
 
