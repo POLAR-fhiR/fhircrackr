@@ -7,7 +7,7 @@
 fhir_load(directory)
 }
 \arguments{
-\item{directory}{A string containing the path to the folder were the data are stored.}
+\item{directory}{A string containing the path to the folder were the files are stored.}
 }
 \value{
 A list of bundles in xml format.
@@ -16,7 +16,12 @@ A list of bundles in xml format.
 Reads all bundles stored as xml files from a directory.
 }
 \examples{
-\dontrun{
-bundles.bak <- fhir_load("result")
-}
+#unserialize example bundle
+bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+
+#save to folder named "result"
+fhir_save(bundles, "result")
+
+#read from folder "result"
+read_bundles <- fhir_load("result")
 }

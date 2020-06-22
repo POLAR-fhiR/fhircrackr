@@ -7,17 +7,17 @@
 paste_paths(path1 = "w", path2 = "d", os = "LiNuX")
 }
 \arguments{
-\item{path1}{A string specifying the left hand part of final path.}
+\item{path1}{A string specifying the left hand part of the resulting path.}
 
-\item{path2}{A string specifying the right hand part of final path.}
+\item{path2}{A string specifying the right hand part of the resulting path.}
 
-\item{os}{A string specifying theoperating system you're operating on: windows or linux.}
+\item{os}{A string specifying the operating system you're operating on: windows or linux.}
 }
 \value{
 A string containing the concatenated path.
 }
 \description{
-Concatenates to path string correctly.
+Concatenates two strings to path string correctly.
 }
 \examples{
 paste_paths("data", "patients")

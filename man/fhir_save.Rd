@@ -2,23 +2,23 @@
 % Please edit documentation in R/fhircrackr.R
 \name{fhir_save}
 \alias{fhir_save}
-\title{Save bundles as xml-files}
+\title{Save FHIR bundles as xml-files}
 \usage{
 fhir_save(bundles, directory = "result")
 }
 \arguments{
-\item{bundles}{A list of xml objects representing the pages of a fhir bundle.}
+\item{bundles}{A list of xml objects representing the FHIR bundles.}
 
 \item{directory}{A string containing the path to the folder to store the data in.}
 }
-\value{
-Nothing to return.
-}
 \description{
-Writes all fhir bundles as numbered xml files into a directory.
+Writes a list of FHIR bundles as numbered xml files into a directory.
 }
 \examples{
-\dontrun{
+#unserialize example bundle
+bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+
+#save to folder named "result"
 fhir_save(bundles, "result")
-}
+
 }
