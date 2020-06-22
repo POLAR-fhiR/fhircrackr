@@ -377,7 +377,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_ids = F) {
 
 				res <- xtrct_columns( child, df.columns, sep = sep, add_ids = add_ids)
 
-				if( nrow(res) < 1 ) cat( "." ) else cat( "°" )
+				if( nrow(res) < 1 ) cat( "." ) else cat( "x" )
 			}
 			else{
 
@@ -385,7 +385,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_ids = F) {
 
 				res <- xtrct_all_columns(child = child, sep = sep, add_ids = add_ids, xpath = xp)
 
-				if( nrow(res) < 1 ) cat( "." ) else cat( "°" )
+				if( nrow(res) < 1 ) cat( "." ) else cat( "x" )
 			}
 
 			res
