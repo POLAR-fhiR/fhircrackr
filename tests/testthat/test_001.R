@@ -1,14 +1,12 @@
 #########################################################################################################
-context( "xml2df()" )
+testthat::context( "crack()" )
 
 xmlfile <- xml2::read_xml( "specimen.xml" )
-
-xml2::xml_ns_strip( xmlfile )
 
 design <- list(
 
 	Specimen = list(
-		".//extension[./@url='https://fhir.bbmri.de/StructureDefinition/StorageTemperature']",
+		"//extension[@url='https://fhir.bbmri.de/StructureDefinition/StorageTemperature']",
 		list(
 			VCS  = "valueCodeableConcept/coding/system/@value",
 			CODE = "valueCodeableConcept/coding/code/@value"
@@ -16,94 +14,65 @@ design <- list(
 	)
 )
 
+df <- fhiR::crack(bundles = list(xmlfile), design)
 
-resource <- xml2::xml_find_all( xmlfile, design$Specimen[[ 1 ]] )
-
-df <- fhiR::xml2df( xml = resource, dsgn.df =  design$Specimen )
-
-test_that(
-	"xml2df creates a valid data frame", {
-		expect_equal( is.null( df ), F )
-		expect_equal( is.data.frame( df ), T )
-		expect_equal( nrow( df ), 1 )
-		expect_equal( df$VCS[ 1 ],  "https://fhir.bbmri.de/CodeSystem/StorageTemperature" )
-		expect_equal( df$CODE[ 1 ], "temperature2to10" )
+testthat::test_that(
+	"crack creates a valid data frame", {
+		testthat::expect_false( is.null( df ) )
+		testthat::expect_false( is.null( df$Specimen ) )
+		testthat::expect_true( is.data.frame( df$Specimen ) )
+		testthat::expect_equal( nrow( df$Specimen ), 1 )
+		testthat::expect_equal( df$Specimen$VCS[ 1 ],  "https://fhir.bbmri.de/CodeSystem/StorageTemperature" )
+		testthat::expect_equal( df$Specimen$CODE[ 1 ], "temperature2to10" )
 	}
 )
 
 
 #########################################################################################################
-context( "get_bundle()" )
+testthat::context( "fhir_search()" )
 
-design <- list(
+bundles <- fhiR::fhir_search( request = "https://vonk.fire.ly/R4/Patient?_pretty=true&_count=100000", max.bundles = 10 )
 
-	Pat = list(
-		".//Patient",
-		list(
-			name = "name/family/@value"
-		)
-	)
-)
-
-bundle <- fhiR::get_bundle( "https://hapi.fhir.org/baseR4/Patient?_revinclude=*&_pretty=true&_count=10" )
-xml2::xml_ns_strip( bundle )
-bundle.tag <- xml2::xml_find_all( bundle, "/Bundle" )
-
-test_that(
-	"get_bundle downloads a valid bundle", {
-		expect_equal( is.null( bundle ), F )
-		expect_equal( isClass( "xml_node", bundle ), T )
-		expect_equal( is.list( bundle.tag ), T )
-		expect_equal( substr( bundle.tag[[ 1 ]], 1, 8 ) == "<Bundle>", T )
-	}
-)
-
-
-#########################################################################################################
-context( "fhir_search()" )
-
-bundles <- fhiR::fhir_search( "https://vonk.fire.ly/R4/Patient?_pretty=true&_count=100000" )
-
-test_that(
+testthat::test_that(
 	"fhir_search downloads a valid bundle list", {
-		expect_equal( is.null( bundles ), F )
-		expect_equal( is.list( bundles ), T )
-		expect_equal( 0 < length( bundles ), T )
-		expect_equal( isClass( "xml_node", bundles[[ 1 ]] ), T )
+		testthat::expect_equal( is.null( bundles ), F )
+		testthat::expect_equal( is.list( bundles ), T )
+		testthat::expect_equal( 0 < length( bundles ), T )
+		testthat::expect_equal( isClass( "xml_node", bundles[[ 1 ]] ), T )
 	}
 )
 
 
 #########################################################################################################
-context( "save_bundles()" )
+testthat::context( "save_bundles()" )
 
 fhiR::save_bundles( bundles, "myBundles" )
 
-test_that(
+testthat::test_that(
 	"save_bundles stores all bundles as xml files in the required directory", {
-		expect_equal( any( "myBundles" %in% dir( ) ), T )
-		expect_equal( 0 < length( dir( "myBundles" ) ), T )
+		testthat::expect_equal( any( "myBundles" %in% dir( ) ), T )
+		testthat::expect_equal( 0 < length( dir( "myBundles" ) ), T )
 	}
 )
 
 
 #########################################################################################################
-context( "load_bundles()" )
+testthat::context( "load_bundles()" )
 
 myBundles <- fhiR::load_bundles( "myBundles" )
 
-test_that(
+testthat::test_that(
 	"load_bundles reads all bundles as xml files from the given directory", {
-		expect_equal( is.null( myBundles ), F )
-		expect_equal( is.list( myBundles ), T )
-		expect_equal( 0 < length( myBundles ), T )
-		expect_equal( isClass( "xml_node", myBundles[[ 1 ]] ), T )
+		testthat::expect_equal( is.null( myBundles ), F )
+		testthat::expect_equal( is.list( myBundles ), T )
+		testthat::expect_equal( 0 < length( myBundles ), T )
+		testthat::expect_equal( isClass( "xml_node", myBundles[[ 1 ]] ), T )
 	}
 )
 
 
 #########################################################################################################
-context( "fhir2dfs()" )
+testthat::context( "crack()" )
 
 design <- list(
 
@@ -115,26 +84,29 @@ design <- list(
 	)
 )
 
-dfs <- fhiR::fhir2dfs( myBundles, design )
+dfs <- fhiR::crack( bundles = myBundles, design = design, sep = "»" )
 
-test_that(
+testthat::test_that(
 	"fhir2dfs creates all required data frames", {
-		expect_equal( is.null( dfs ), F )
-		expect_equal( is.list( dfs ), T )
-		expect_equal( is.data.frame( dfs[[ 1 ]] ), T )
+		testthat::expect_equal( is.null( dfs ), F )
+		testthat::expect_equal( is.list( dfs ), T )
+		testthat::expect_equal( is.data.frame( dfs[[ 1 ]] ), T )
 	}
 )
 
 
 #########################################################################################################
-context( "capability_statement()" )
+testthat::context( "capability_statement()" )
 
-cnf <- capability_statement( "https://hapi.fhir.org/baseR4", sep = " ~ ", remove.empty.columns = T )
+caps <- capability_statement( "https://hapi.fhir.org/baseR4", sep = " ~ ")
 
-test_that(
+testthat::test_that(
 	"capability_statement() works", {
-		expect_equal( is.null( cnf ), F )
-		expect_equal( is.data.frame( dfs[[ 1 ]] ), T )
+		testthat::expect_false( is.null( caps ) )
+		testthat::expect_true( is.list( caps ) )
+		testthat::expect_true( is.data.frame( caps[[ 1 ]] ) )
+		testthat::expect_true( is.data.frame( caps[[ 2 ]] ) )
+		testthat::expect_true( is.data.frame( caps[[ 3 ]] ) )
 	}
 )
 
