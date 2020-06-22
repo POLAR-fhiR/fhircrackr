@@ -127,7 +127,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max.bundles =
 #'
 #' @examples
 #' #unserialize example bundle
-#' bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+#' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #save to folder named "result"
 #' fhir_save(bundles, "result")
@@ -158,7 +158,7 @@ fhir_save <- function(bundles, directory = "result") {
 #'
 #' @examples
 #' #unserialize example bundle
-#' bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+#' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #save to folder named "result"
 #' fhir_save(bundles, "result")
@@ -199,7 +199,7 @@ fhir_load <- function(directory) {
 #'
 #' @examples
 #' #unserialize example bundle
-#' bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+#' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #define attributes to extract
 #' df_design <- list(
@@ -285,7 +285,36 @@ fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.
 	dfs
 }
 
+#' Serialize a FHIR Bundle list
+#'
+#' @description  Serializes a list of FHIR bundles to allow for saving in .rda or .RData format without losing integrity of pointers
+#' @param bundles A list of xml objects representing FHIR bundles as returned by \code{\link{fhir_search}}
+#' @return A list of serialized xml objects
+#' @export
+#' @examples
+#' bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max.bundles=3)
+#' bundles_for_saving <- fhir_serialize(bundles)
 
+
+fhir_serialize <- function(bundles) {
+
+	lapply(bundles, xml2::xml_serialize, connection=NULL)
+}
+
+#' Serialize a FHIR Bundle list
+#'
+#' @description Unserializes a list of FHIR bundles that have been serialized to allow for saving in .rda or .RData format.
+#' @param bundles A list of xml objects representing FHIR bundles as returned by \code{\link{fhir_search}}
+#' @return A list of serialized xml objects
+#' @export
+#' @examples
+#' bundles <- fhir_unserialize(medication_bundles)
+
+fhir_unserialize <- function(bundles) {
+
+	lapply(bundles, xml2::xml_unserialize)
+
+}
 ##### Documentation for medication_bundles data set ######
 
 #' Exemplary FHIR bundles
@@ -302,9 +331,9 @@ fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.
 #' @format List of length 3 containing \emph{serialized} "xml_document" objects, each representing one bundle from a
 #' FHIR search request. \emph{They have to be unserialized before use, see Usage!}
 #'
-#' @usage
+#' @examples
 #' #unserialize xml objects before doing anything else with them!
-#' medication_bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+#' medication_bundles <- fhir_unserialize(medication_bundles)
 #'
 #'
 #' @source \url{https://hapi.fhir.org/baseR4/MedicationStatement?code=http://snomed.info/ct|429374003&_include=MedicationStatement:subject}

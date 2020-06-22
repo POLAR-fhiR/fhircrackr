@@ -37,7 +37,7 @@ Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of
 }
 \examples{
 #unserialize example bundle
-bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+bundles <- fhir_unserialize(medication_bundles)
 
 #define attributes to extract
 df_design <- list(

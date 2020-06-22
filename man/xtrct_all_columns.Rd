@@ -19,3 +19,14 @@ from the resouce}
 \description{
 Extracts all available values from a single resource
 }
+\examples{
+#unserialize example bundle
+bundles <- fhir_unserialize(medication_bundles)
+
+#extract child
+child <- xml2::xml_find_first(bundles[[1]], ".//MedicationStatement")
+
+#Extract all columns
+result <- fhircrackr:::xtrct_all_columns(child)
+
+}

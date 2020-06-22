@@ -19,3 +19,20 @@ from the resouce}
 \description{
 Extracts defined values from a single resource
 }
+\examples{
+#unserialize example bundle
+bundles <- fhir_unserialize(medication_bundles)
+
+#extract child
+child <- xml2::xml_find_first(bundles[[1]], ".//MedicationStatement")
+
+#define columns
+cols <-list(
+	SYSTEM  = "medicationCodeableConcept/coding/system/@value",
+	CODE    = "medicationCodeableConcept/coding/code/@value",
+	DISPLAY = "medicationCodeableConcept/coding/display/@value"
+)
+
+#Extract columns
+result <- fhircrackr:::xtrct_columns(child, cols)
+}

@@ -22,7 +22,7 @@ Convert several bundles to one data frame
 }
 \examples{
 #unserialize example bundle
-bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+bundles <- fhir_unserialize(medication_bundles)
 
 #define design
 design <- list(

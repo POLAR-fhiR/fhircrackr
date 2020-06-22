@@ -22,7 +22,7 @@ Extracts one data frame out of one bundle
 }
 \examples{
 #unserialize example bundle
-bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+bundles <- fhir_unserialize(medication_bundles)
 
 #extract first bundle
 bundle <- bundles[[1]]
