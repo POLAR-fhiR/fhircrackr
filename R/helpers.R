@@ -37,7 +37,6 @@ rbind_list_of_data_frames <- function( list ) {
 		)
 	)
 
-	#d  <- data.frame( as.list( character( length( unique.names ) ) ), stringsAsFactors = F )
 	d <- as.data.frame(lapply(seq_along(unique.names),function(dummy)character(0)), stringsAsFactors = F)
 
 	names( d ) <- unique.names
@@ -204,8 +203,8 @@ xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices
 #'
 #' Extracts defined values from a single resource
 #'
-#' @param  child A xml child object, representing one FHIR resource
-#' @param  df.columns The part of design from \code{\link{fhir_crack}} describing which elements to extract
+#' @param child A xml child object, representing one FHIR resource
+#' @param df.columns The part of design from \code{\link{fhir_crack}} describing which elements to extract
 #' from the resouce
 #' @param sep A string to separate pasted multiple entries.
 #' @param add_indices A Logical Scalar.
@@ -243,7 +242,7 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_indices = F, br
 
 			loc <- xml2::xml_find_all(x = child, xpath = i.srch)
 
-			val  <- xml2::xml_text(loc)
+			val <- xml2::xml_text(loc)
 
 			if( add_indices ) {
 
@@ -273,25 +272,11 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_indices = F, br
 					}
 				)
 
-#				if(is.na(val) || length(val) < 1 ) {
-
-#					NA
-
-#				} else {
-
-					paste0(brackets[1], o, brackets[2], val, collapse = sep)
-#				}
+				paste0(brackets[1], o, brackets[2], val, collapse = sep)
 			}
 			else {
 
-#				if(is.na(val) || length(val) < 1) {
-
-#					NA
-
-#				} else {
-
-					paste0(val, collapse = sep)
-#				}
+				paste0(val, collapse = sep)
 			}
 		}
 	)
