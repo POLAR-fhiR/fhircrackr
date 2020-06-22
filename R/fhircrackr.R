@@ -240,10 +240,10 @@ fhir_search <- function(request, username = NULL, password = NULL, max.bundles =
 #'
 #' @examples
 #' \dontrun{
-#' save_bundles(bundles, "result")
+#' fhir_save(bundles, "result")
 #' }
 
-save_bundles <- function(bundles, directory = "result") {
+fhir_save <- function(bundles, directory = "result") {
 
 	w <- 1 + floor(log10(length(bundles)))
 
@@ -268,10 +268,10 @@ save_bundles <- function(bundles, directory = "result") {
 #'
 #' @examples
 #' \dontrun{
-#' bundles.bak <- load_bundles("result")
+#' bundles.bak <- fhir_load("result")
 #' }
 
-load_bundles <- function(directory) {
+fhir_load <- function(directory) {
 
 	xml.files <- dir(directory, "*.xml")
 
@@ -593,7 +593,7 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", add_ids = F) {
 }
 
 
-#' Crack it!
+#' fhir_crack it!
 #'
 #' @param bundles A list of fhir bundles as xml docs.
 #' @param design A named list specifiying which data.frame should contain which entries of the bundle.
@@ -607,7 +607,7 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", add_ids = F) {
 #' @return A list of data frames as specified by \code{design}
 #'
 #' @export
-crack <- function(bundles, design, sep = " -+- ", add_ids = F) {
+fhir_crack <- function(bundles, design, sep = " -+- ", add_ids = F) {
 
 	bundles2dfs(bundles, design, sep, add_ids)
 }
@@ -625,9 +625,9 @@ crack <- function(bundles, design, sep = " -+- ", add_ids = F) {
 #'
 #' @examples
 #' \dontrun{
-#' capability_statement("https://hapi.fhir.org/baseR4")
+#' fhir_cs("https://hapi.fhir.org/baseR4")
 #' }
-capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.empty.columns = T) {
+fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.empty.columns = T) {
 
 	caps <- fhir_search(request = paste_paths(url, "/metadata?_format=xml&_pretty=true"))
 
@@ -647,7 +647,7 @@ capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " -
 		REST      = list("/CapabilityStatement/rest/resource")
 	)
 
-	dfs <- crack(bundles = caps, design = design, sep = sep)
+	dfs <- fhir_crack(bundles = caps, design = design, sep = sep)
 
 	if(remove.empty.columns) {
 

@@ -1,4 +1,4 @@
-Package: fhiR
+Package: fhircrackr
 Type: Package
 Title: Handling HL7 FHIR resources in R
 Version: 0.1.0
@@ -11,7 +11,7 @@ Description: fhiR is a package that conveniently downloads fhir resources in xml
     and converts them to R data frames. It uses fhir-search to download bundles 
     from a fhir server, provides functions to save and read xml-files containing such bundles 
     and allows flattening the bundles to data.frames using XPath expressions.
-BugReports: https://github.com/POLAR-fhiR/fhiR/issues
+BugReports: https://github.com/POLAR-fhiR/fhircrackr/issues
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

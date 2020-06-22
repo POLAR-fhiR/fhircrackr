@@ -14,7 +14,7 @@ design <- list(
 	)
 )
 
-df <- fhiR::crack(bundles = list(xmlfile), design)
+df <- fhiR::fhir_crack(bundles = list(xmlfile), design)
 
 testthat::test_that(
 	"crack creates a valid data frame", {
@@ -44,12 +44,12 @@ testthat::test_that(
 
 
 #########################################################################################################
-testthat::context( "save_bundles()" )
+testthat::context( "fhir_save" )
 
-fhiR::save_bundles( bundles, "myBundles" )
+fhiR::fhir_save( bundles, "myBundles" )
 
 testthat::test_that(
-	"save_bundles stores all bundles as xml files in the required directory", {
+	"fhir_save stores all bundles as xml files in the required directory", {
 		testthat::expect_equal( any( "myBundles" %in% dir( ) ), T )
 		testthat::expect_equal( 0 < length( dir( "myBundles" ) ), T )
 	}
@@ -57,12 +57,12 @@ testthat::test_that(
 
 
 #########################################################################################################
-testthat::context( "load_bundles()" )
+testthat::context( "fhir_load()" )
 
-myBundles <- fhiR::load_bundles( "myBundles" )
+myBundles <- fhiR::fhir_load( "myBundles" )
 
 testthat::test_that(
-	"load_bundles reads all bundles as xml files from the given directory", {
+	"fhir_load reads all bundles as xml files from the given directory", {
 		testthat::expect_equal( is.null( myBundles ), F )
 		testthat::expect_equal( is.list( myBundles ), T )
 		testthat::expect_equal( 0 < length( myBundles ), T )
@@ -72,7 +72,7 @@ testthat::test_that(
 
 
 #########################################################################################################
-testthat::context( "crack()" )
+testthat::context( "fhir_crack()" )
 
 design <- list(
 
@@ -84,10 +84,10 @@ design <- list(
 	)
 )
 
-dfs <- fhiR::crack( bundles = myBundles, design = design, sep = "»" )
+dfs <- fhiR::fhir_crack( bundles = myBundles, design = design, sep = "»" )
 
 testthat::test_that(
-	"fhir2dfs creates all required data frames", {
+	"fhir_crack creates all required data frames", {
 		testthat::expect_equal( is.null( dfs ), F )
 		testthat::expect_equal( is.list( dfs ), T )
 		testthat::expect_equal( is.data.frame( dfs[[ 1 ]] ), T )
@@ -96,12 +96,12 @@ testthat::test_that(
 
 
 #########################################################################################################
-testthat::context( "capability_statement()" )
+testthat::context( "fhir_cs()" )
 
-caps <- capability_statement( "https://hapi.fhir.org/baseR4", sep = " ~ ")
+caps <- fhir_cs( "https://hapi.fhir.org/baseR4", sep = " ~ ")
 
 testthat::test_that(
-	"capability_statement() works", {
+	"fhir_cs() works", {
 		testthat::expect_false( is.null( caps ) )
 		testthat::expect_true( is.list( caps ) )
 		testthat::expect_true( is.data.frame( caps[[ 1 ]] ) )
