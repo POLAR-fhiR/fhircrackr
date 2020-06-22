@@ -9,7 +9,7 @@ bundles2df(
   design.df,
   sep = " -+- ",
   add_indices = F,
-  indices_brackets = c("<", ">")
+  brackets = c("<", ">")
 )
 }
 \arguments{
@@ -23,7 +23,7 @@ second element is either a XPath expression or a named list containing column na
 
 \item{add_indices}{A Logical Scalar.}
 
-\item{indices_brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
+\item{brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
 }
 \description{
 Convert several bundles to one data frame

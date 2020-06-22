@@ -130,7 +130,7 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = T, m
 #' @param sep A String to separate pasted multiple entries.
 #' @param xpath A String to locate data in tree via xpath.
 #' @param add_indices A Logical Scalar.
-#' @param indices_brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
 #'
 #' @examples
 #' #unserialize example bundle
@@ -142,7 +142,7 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = T, m
 #' #Extract all columns
 #' result <- fhircrackr:::xtrct_all_columns(child)
 #'
-xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices = F, indices_brackets = c( "<", ">")) {
+xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices = F, brackets = c( "<", ">")) {
 
 	tree <- xml2::xml_find_all(child, xpath)
 
@@ -186,7 +186,7 @@ xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices
 
 	if (add_indices) {
 
-		val  <- paste0(indices_brackets[1], o[ 1, ], indices_brackets[2], val)
+		val  <- paste0(brackets[1], o[ 1, ], brackets[2], val)
 	}
 
 	for( col in xp.cols ) {
@@ -209,7 +209,7 @@ xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices
 #' from the resouce
 #' @param sep A string to separate pasted multiple entries.
 #' @param add_indices A Logical Scalar.
-#' @param indices_brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
 #'
 #' @examples
 #' #unserialize example bundle
@@ -228,7 +228,7 @@ xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices
 #' #Extract columns
 #' result <- fhircrackr:::xtrct_columns(child, cols)
 
-xtrct_columns <- function( child, df.columns, sep = " -+- ", add_indices = F, indices_brackets = c( "<", ">")) {
+xtrct_columns <- function( child, df.columns, sep = " -+- ", add_indices = F, brackets = c( "<", ">")) {
 
 	xp <- xml2::xml_path( child )
 
@@ -279,7 +279,7 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_indices = F, in
 
 #				} else {
 
-					paste0(indices_brackets[1], o, indices_brackets[2], val, collapse = sep)
+					paste0(brackets[1], o, brackets[2], val, collapse = sep)
 #				}
 			}
 			else {
@@ -306,7 +306,7 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_indices = F, in
 #' second element is either a XPath expression or a named list containing column names and XPath expressions
 #' @param sep A string to separate pasted multiple entries.
 #' @param add_indices A Logical Scalar.
-#' @param indices_brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
 #'
 #' @examples
 #' #unserialize example bundle
@@ -328,7 +328,7 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_indices = F, in
 #'
 #' #convert bundle to data frame
 #' result <- fhircrackr:::bundle2df(bundle, design)
-bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, indices_brackets = c( "<", ">")) {
+bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">")) {
 
 	if (is.null(bundle)) {
 
@@ -368,7 +368,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, indices
 
 				df.columns <- design.df[[2]]
 
-				res <- xtrct_columns( child, df.columns, sep = sep, add_indices = add_indices, indices_brackets = indices_brackets)
+				res <- xtrct_columns( child, df.columns, sep = sep, add_indices = add_indices, brackets = brackets)
 
 				if( all(sapply(res, is.na))) cat( "x" ) else cat( "." )
 			}
@@ -376,7 +376,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, indices
 
 				xp <- if(1<length(design.df)) design.df[[2]] else ".//@*"
 
-				res <- xtrct_all_columns(child = child, sep = sep, xpath = xp, add_indices = add_indices, indices_brackets = indices_brackets)
+				res <- xtrct_all_columns(child = child, sep = sep, xpath = xp, add_indices = add_indices, brackets = brackets)
 
 				if( nrow(res) < 1 ) cat( "x" ) else cat( "." )
 			}
@@ -396,7 +396,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, indices
 #' second element is either a XPath expression or a named list containing column names and XPath expressions
 #' @param sep A string to separate pasted multiple entries.
 #' @param add_indices A Logical Scalar.
-#' @param indices_brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
 #'
 #' @examples
 #' #unserialize example bundle
@@ -416,7 +416,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, indices
 #' #convert bundles to data frame
 #' result <- fhircrackr:::bundles2df(bundles, design)
 
-bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, indices_brackets = c( "<", ">")) {
+bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">")) {
 
 	if (is.null(bundles)) {
 
@@ -451,7 +451,7 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, indic
 
 				bundle <- bundles[[ i ]]
 
-				bundle2df( bundle, design.df, sep, add_indices = add_indices, indices_brackets = indices_brackets)
+				bundle2df( bundle, design.df, sep, add_indices = add_indices, brackets = brackets)
 			}
 		)
 	)
@@ -484,7 +484,7 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, indic
 #' @param sep A string to separate pasted multiple entries.
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
 #' @param add_indices A Logical Scalar.
-#' @param indices_brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
 #' @return A list of data frames as specified by \code{design}.
 #' @export
 #'
@@ -523,7 +523,7 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, indic
 #' #convert fhir to data frames
 #' list_of_tables <- fhircrackr:::bundles2dfs(bundles, df_design)
 
-bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, indices_brackets = c( "<", ">")) {
+bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">")) {
 
 	if (is.null(bundles)) {
 
@@ -548,9 +548,9 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 
 	if (add_indices) {
 
-		if (is.null(indices_brackets)) indices_brackets <- c("<", ">")
+		if (is.null(brackets)) brackets <- c("<", ">")
 
-		if (length(indices_brackets) < 2) indices_brackets[2] <- indices_brackets[1]
+		if (length(brackets) < 2) brackets[2] <- brackets[1]
 	}
 
 	dfs <- lapply(
@@ -564,7 +564,7 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 
 			cat("\n", n)
 
-			bundles2df(bundles = bundles, design.df = design.df, sep = sep, add_indices = add_indices, indices_brackets = indices_brackets)
+			bundles2df(bundles = bundles, design.df = design.df, sep = sep, add_indices = add_indices, brackets = brackets)
 		}
 	)
 

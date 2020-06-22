@@ -195,7 +195,7 @@ fhir_load <- function(directory) {
 #' @param sep A string to separate pasted multiple entries.
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
 #' @param add_indices A Logical Scalar.
-#' @param indices_brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
 #' @return A list of data frames as specified by \code{design}.
 #' @export
 #'
@@ -241,9 +241,9 @@ fhir_load <- function(directory) {
 #' @return A list of data frames as specified by \code{design}
 #'
 #' @export
-fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, indices_brackets = c( "<", ">")) {
+fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">")) {
 
-	bundles2dfs(bundles = bundles, design = design, sep = sep, remove_empty_columns, add_indices = add_indices, indices_brackets = indices_brackets)
+	bundles2dfs(bundles = bundles, design = design, sep = sep, remove_empty_columns, add_indices = add_indices, brackets = brackets)
 }
 
 
@@ -254,7 +254,7 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 #' @param sep A string to separate pasted multiple entries
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
 #' @param add_indices A Logical Scalar.
-#' @param indices_brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
 #'
 #' @return A list of data frames containing the information from the statement
 #' @export
@@ -263,7 +263,7 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 #'
 #' cap <- fhir_cs("https://hapi.fhir.org/baseR4")
 #'
-fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_empty_columns = T, add_indices = F, indices_brackets = c( "<", ">")) {
+fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_empty_columns = T, add_indices = F, brackets = c( "<", ">")) {
 
 	caps <- fhir_search(request = paste_paths(url, "/metadata?_format=xml&_pretty=true"))
 
@@ -273,7 +273,7 @@ fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_
 		REST      = list("/CapabilityStatement/rest/resource")
 	)
 
-	fhir_crack(bundles = caps, design = design, sep = sep, remove_empty_columns = remove_empty_columns, add_indices = add_indices, indices_brackets = indices_brackets)
+	fhir_crack(bundles = caps, design = design, sep = sep, remove_empty_columns = remove_empty_columns, add_indices = add_indices, brackets = brackets)
 }
 
 #' Serialize a FHIR Bundle list

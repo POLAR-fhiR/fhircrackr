@@ -10,7 +10,7 @@ fhir_crack(
   sep = " -+- ",
   remove_empty_columns = F,
   add_indices = F,
-  indices_brackets = c("<", ">")
+  brackets = c("<", ">")
 )
 }
 \arguments{
@@ -36,7 +36,7 @@ For a more detailed explanation see the package vignette.}
 
 \item{add_indices}{A Logical Scalar.}
 
-\item{indices_brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
+\item{brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
 }
 \value{
 A list of data frames as specified by \code{design}.

@@ -9,7 +9,7 @@ xtrct_all_columns(
   sep = " -+- ",
   xpath = ".//@*",
   add_indices = F,
-  indices_brackets = c("<", ">")
+  brackets = c("<", ">")
 )
 }
 \arguments{
@@ -22,7 +22,7 @@ from the resouce}
 
 \item{add_indices}{A Logical Scalar.}
 
-\item{indices_brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
+\item{brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
 }
 \description{
 Extracts all available values from a single resource

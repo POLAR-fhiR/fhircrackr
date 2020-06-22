@@ -9,7 +9,7 @@ fhir_cs(
   sep = " -+- ",
   remove_empty_columns = T,
   add_indices = F,
-  indices_brackets = c("<", ">")
+  brackets = c("<", ">")
 )
 }
 \arguments{
@@ -21,7 +21,7 @@ fhir_cs(
 
 \item{add_indices}{A Logical Scalar.}
 
-\item{indices_brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
+\item{brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
 }
 \value{
 A list of data frames containing the information from the statement
