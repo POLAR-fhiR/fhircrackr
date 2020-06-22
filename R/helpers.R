@@ -126,10 +126,10 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = T, m
 #' Extracts all available values from a single resource
 #'
 #' @param child A xml child object, representing one FHIR resource
-#' @param df.columns The part of design from \code{\link{fhir_crack}} describing which elements to extract
 #' from the resouce
-#' @param sep A string to separate pasted multiple entries.
+#' @param sep A String to separate pasted multiple entries.
 #' @param add_ids Logical Scalar. Should indices be added to multiple entries?
+#' @param xpath A String to locate data in tree via xpath.
 #'
 #' @example
 #' #unserialize example bundle
@@ -144,6 +144,8 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = T, m
 xtrct_all_columns <- function(child, sep = " -+- ", add_ids = F, xpath = ".//@*") {
 
 	tree <- xml2::xml_find_all(child, xpath)
+
+	if( length(tree) < 1 ) return(data.frame())
 
 	xp.child  <- xml2::xml_path( child )
 	xp.remain <- xml2::xml_path( tree )
@@ -369,19 +371,24 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_ids = F) {
 			#dbg
 			#child <- children[[ 1 ]]
 
-			cat( "." )
-
 			if (1<length(design.df) && is.list(design.df[[2]])) {
 
 				df.columns <- design.df[[2]]
 
-				xtrct_columns( child, df.columns, sep = sep, add_ids = add_ids)
+				res <- xtrct_columns( child, df.columns, sep = sep, add_ids = add_ids)
+
+				if( nrow(res) < 1 ) cat( "." ) else cat( "x" )
 			}
 			else{
 
 				xp <- if(1<length(design.df)) design.df[[2]] else ".//@*"
-				xtrct_all_columns(child = child, sep = sep, add_ids = add_ids, xpath = xp)
+
+				res <- xtrct_all_columns(child = child, sep = sep, add_ids = add_ids, xpath = xp)
+
+				if( nrow(res) < 1 ) cat( "." ) else cat( "x" )
 			}
+
+			res
 		}
 	)
 

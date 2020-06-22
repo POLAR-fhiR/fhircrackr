@@ -7,14 +7,14 @@
 xtrct_all_columns(child, sep = " -+- ", add_ids = F, xpath = ".//@*")
 }
 \arguments{
-\item{child}{A xml child object, representing one FHIR resource}
+\item{child}{A xml child object, representing one FHIR resource
+from the resouce}
 
-\item{sep}{A string to separate pasted multiple entries.}
+\item{sep}{A String to separate pasted multiple entries.}
 
 \item{add_ids}{Logical Scalar. Should indices be added to multiple entries?}
 
-\item{df.columns}{The part of design from \code{\link{fhir_crack}} describing which elements to extract
-from the resouce}
+\item{xpath}{A String to locate data in tree via xpath.}
 }
 \description{
 Extracts all available values from a single resource
