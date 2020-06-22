@@ -14,7 +14,7 @@ design <- list(
 	)
 )
 
-df <- fhiR::fhir_crack(bundles = list(xmlfile), design)
+df <- fhir_crack(bundles = list(xmlfile), design)
 
 testthat::test_that(
 	"crack creates a valid data frame", {
@@ -31,7 +31,7 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "fhir_search()" )
 
-bundles <- fhiR::fhir_search( request = "https://vonk.fire.ly/R4/Patient?_pretty=true&_count=100000", max.bundles = 10 )
+bundles <- fhir_search( request = "https://vonk.fire.ly/R4/Patient?_pretty=true&_count=100000", max.bundles = 10 )
 
 testthat::test_that(
 	"fhir_search downloads a valid bundle list", {
@@ -46,7 +46,7 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "fhir_save" )
 
-fhiR::fhir_save( bundles, "myBundles" )
+fhir_save( bundles, "myBundles" )
 
 testthat::test_that(
 	"fhir_save stores all bundles as xml files in the required directory", {
@@ -59,7 +59,7 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "fhir_load()" )
 
-myBundles <- fhiR::fhir_load( "myBundles" )
+myBundles <- fhir_load( "myBundles" )
 
 testthat::test_that(
 	"fhir_load reads all bundles as xml files from the given directory", {
@@ -84,7 +84,7 @@ design <- list(
 	)
 )
 
-dfs <- fhiR::fhir_crack( bundles = myBundles, design = design, sep = "»" )
+dfs <- fhir_crack( bundles = myBundles, design = design, sep = "»" )
 
 testthat::test_that(
 	"fhir_crack creates all required data frames", {

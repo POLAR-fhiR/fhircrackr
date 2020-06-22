@@ -185,7 +185,7 @@ xtrct_all_columns <- function(child, sep = " -+- ", add_ids = F, xpath = ".//@*"
 
 	if( add_ids ) {
 
-		val  <- paste0( "{",o[ 1, ], "}", val)
+		val  <- paste0( "<", o[ 1, ], ">", val)
 	}
 
 	for( col in xp.cols ) {
@@ -275,14 +275,9 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_ids = F) {
 
 					NA
 
-				} else if (1 < length(val)) {
-
-					paste0("{",o,"}", val, collapse = sep)
-					#paste0(val, collapse = sep)
-
 				} else {
 
-					paste0("{",o,"}", val, collapse = sep)
+					paste0("<", o, ">", val, collapse = sep)
 				}
 			}
 			else {
@@ -290,11 +285,6 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_ids = F) {
 				if(is.na(val) || length(val) < 1 ) {
 
 					NA
-
-				} else if (1 < length(val)) {
-
-					paste0(val, collapse = sep)
-					#paste0(val, collapse = sep)
 
 				} else {
 
