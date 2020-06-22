@@ -17,7 +17,7 @@ Reads all bundles stored as xml files from a directory.
 }
 \examples{
 #unserialize example bundle
-bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+bundles <- fhir_unserialize(medication_bundles)
 
 #save to folder named "result"
 fhir_save(bundles, "result")

@@ -7,6 +7,6 @@ search_request  <- paste0(
 
 bundles <- fhir_search(search_request, max.bundles = 3)
 
-medication_bundles<-lapply(bundles, xml2::xml_serialize, connection=NULL)
+medication_bundles<-fhir_serialize(bundles)
 
 usethis::use_data(medication_bundles, overwrite = TRUE)

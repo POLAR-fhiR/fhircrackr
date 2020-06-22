@@ -13,8 +13,7 @@ FHIR search request. \emph{They have to be unserialized before use, see Usage!}
 [Downloaded 06-22-20]
 }
 \usage{
-#unserialize xml objects before doing anything else with them!
-medication_bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+medication_bundles
 }
 \description{
 This data example can be used to explore some of the functions from the fhircrackr package
@@ -26,5 +25,11 @@ It contains 3 bundles with MedicationStatement resources representing Medication
 429374003 and the respective Patient resources that are linked to these MedicationStatements.
 
 It corresponds to Example 2 of downloading and flattening FHIR resources from the vignette of the package.
+}
+\examples{
+#unserialize xml objects before doing anything else with them!
+medication_bundles <- fhir_unserialize(medication_bundles)
+
+
 }
 \keyword{datasets}

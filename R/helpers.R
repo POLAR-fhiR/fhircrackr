@@ -131,15 +131,15 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = T, m
 #' @param add_ids Logical Scalar. Should indices be added to multiple entries?
 #' @param xpath A String to locate data in tree via xpath.
 #'
-#' @example
+#' @examples
 #' #unserialize example bundle
-#' bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+#' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #extract child
 #' child <- xml2::xml_find_first(bundles[[1]], ".//MedicationStatement")
 #'
 #' #Extract all columns
-#' result <- fhircrackr:::xtrct_all_columns(child, cols)
+#' result <- fhircrackr:::xtrct_all_columns(child)
 #'
 xtrct_all_columns <- function(child, sep = " -+- ", add_ids = F, xpath = ".//@*") {
 
@@ -209,9 +209,9 @@ xtrct_all_columns <- function(child, sep = " -+- ", add_ids = F, xpath = ".//@*"
 #' @param sep A string to separate pasted multiple entries.
 #' @param add_ids Logical Scalar. Should indices be added to multiple entries?
 #'
-#' @example
+#' @examples
 #' #unserialize example bundle
-#' bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+#' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #extract child
 #' child <- xml2::xml_find_first(bundles[[1]], ".//MedicationStatement")
@@ -317,7 +317,7 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_ids = F) {
 #'
 #' @examples
 #' #unserialize example bundle
-#' bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+#' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #extract first bundle
 #' bundle <- bundles[[1]]
@@ -377,7 +377,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_ids = F) {
 
 				res <- xtrct_columns( child, df.columns, sep = sep, add_ids = add_ids)
 
-				if( nrow(res) < 1 ) cat( "." ) else cat( "x" )
+				if( nrow(res) < 1 ) cat( "x" ) else cat( "." )
 			}
 			else{
 
@@ -385,7 +385,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_ids = F) {
 
 				res <- xtrct_all_columns(child = child, sep = sep, add_ids = add_ids, xpath = xp)
 
-				if( nrow(res) < 1 ) cat( "." ) else cat( "x" )
+				if( nrow(res) < 1 ) cat( "x" ) else cat( "." )
 			}
 
 			res
@@ -406,7 +406,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_ids = F) {
 #'
 #' @examples
 #' #unserialize example bundle
-#' bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+#' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #define design
 #' design <- list(
@@ -492,7 +492,7 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_ids = F) {
 #'
 #' @examples
 #' #unserialize example bundle
-#' bundles <- lapply(medication_bundles, xml2::xml_unserialize)
+#' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #define attributes to extract
 #' df_design <- list(
