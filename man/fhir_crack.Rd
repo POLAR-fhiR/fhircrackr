@@ -4,7 +4,14 @@
 \alias{fhir_crack}
 \title{Flatten list of FHIR bundles}
 \usage{
-fhir_crack(bundles, design, sep = " -+- ", add_ids = F)
+fhir_crack(
+  bundles,
+  design,
+  sep = " -+- ",
+  remove_empty_columns = F,
+  add_indices = F,
+  indices_brackets = c("<", ">")
+)
 }
 \arguments{
 \item{bundles}{A FHIR search result as returned by \code{\link{fhir_search}}.}
@@ -25,7 +32,11 @@ For a more detailed explanation see the package vignette.}
 
 \item{sep}{A string to separate pasted multiple entries.}
 
-\item{add_ids}{Logical Scalar. Should indices be added to multiple entries?}
+\item{remove_empty_columns}{Logical scalar. Remove empty columns?}
+
+\item{add_indices}{A Logical Scalar.}
+
+\item{indices_brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
 }
 \value{
 A list of data frames as specified by \code{design}.

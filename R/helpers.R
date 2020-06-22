@@ -63,21 +63,21 @@ rbind_list_of_data_frames <- function( list ) {
 #' @param request A string containing the full FHIR search request.
 #' @param username A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
 #' @param password A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
-#' @param max.attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
+#' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
 #' @param verbose A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.
-#' @param delay.between.attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
+#' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
 #'
 #' @return The downloaded bundle in xml format.
 #'
 #' @examples
 #' bundle<-fhircrackr:::get_bundle(request = "https://hapi.fhir.org/baseR4/Patient?")
 
-get_bundle <- function(request, username = NULL, password = NULL, verbose = T, max.attempts = 5, delay.between.attempts = 10) {
+get_bundle <- function(request, username = NULL, password = NULL, verbose = T, max_attempts = 5, delay_between_attempts = 10) {
 
 	#dbg
 	#request="https://hapi.fhir.org/baseR4/Medication?_format=xml"
 
-	for(n in 1 : max.attempts) {
+	for(n in 1 : max_attempts) {
 
 		#dbg
 		#n <- 1
@@ -114,7 +114,7 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = T, m
 			}
 		}
 
-		Sys.sleep(10)
+		Sys.sleep(delay_between_attempts)
 	}
 
 	NULL
@@ -128,8 +128,9 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = T, m
 #' @param child A xml child object, representing one FHIR resource
 #' from the resouce
 #' @param sep A String to separate pasted multiple entries.
-#' @param add_ids Logical Scalar. Should indices be added to multiple entries?
 #' @param xpath A String to locate data in tree via xpath.
+#' @param add_indices A Logical Scalar.
+#' @param indices_brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
 #'
 #' @examples
 #' #unserialize example bundle
@@ -141,7 +142,7 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = T, m
 #' #Extract all columns
 #' result <- fhircrackr:::xtrct_all_columns(child)
 #'
-xtrct_all_columns <- function(child, sep = " -+- ", add_ids = F, xpath = ".//@*") {
+xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices = F, indices_brackets = c( "<", ">")) {
 
 	tree <- xml2::xml_find_all(child, xpath)
 
@@ -183,9 +184,9 @@ xtrct_all_columns <- function(child, sep = " -+- ", add_ids = F, xpath = ".//@*"
 		}
 	)
 
-	if( add_ids ) {
+	if (add_indices) {
 
-		val  <- paste0( "<", o[ 1, ], ">", val)
+		val  <- paste0(indices_brackets[1], o[ 1, ], indices_brackets[2], val)
 	}
 
 	for( col in xp.cols ) {
@@ -193,7 +194,7 @@ xtrct_all_columns <- function(child, sep = " -+- ", add_ids = F, xpath = ".//@*"
 		#dbg
 		#col <- xp.cols[1]
 
-		d[[ col ]] <- paste0( val[ col == o[ 2, ] ], collapse = sep )
+		d[[ col ]] <- paste0(val[ col == o[ 2, ] ], collapse = sep)
 	}
 
 	as.data.frame(d, stringsAsFactors = F)
@@ -207,7 +208,8 @@ xtrct_all_columns <- function(child, sep = " -+- ", add_ids = F, xpath = ".//@*"
 #' @param  df.columns The part of design from \code{\link{fhir_crack}} describing which elements to extract
 #' from the resouce
 #' @param sep A string to separate pasted multiple entries.
-#' @param add_ids Logical Scalar. Should indices be added to multiple entries?
+#' @param add_indices A Logical Scalar.
+#' @param indices_brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
 #'
 #' @examples
 #' #unserialize example bundle
@@ -226,7 +228,7 @@ xtrct_all_columns <- function(child, sep = " -+- ", add_ids = F, xpath = ".//@*"
 #' #Extract columns
 #' result <- fhircrackr:::xtrct_columns(child, cols)
 
-xtrct_columns <- function( child, df.columns, sep = " -+- ", add_ids = F) {
+xtrct_columns <- function( child, df.columns, sep = " -+- ", add_indices = F, indices_brackets = c( "<", ">")) {
 
 	xp <- xml2::xml_path( child )
 
@@ -243,7 +245,7 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_ids = F) {
 
 			val  <- xml2::xml_text(loc)
 
-			if( add_ids ) {
+			if( add_indices ) {
 
 				loc.xp <- xml2::xml_path( loc )
 
@@ -271,25 +273,25 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_ids = F) {
 					}
 				)
 
-				if(is.na(val) || length(val) < 1 ) {
+#				if(is.na(val) || length(val) < 1 ) {
 
-					NA
+#					NA
 
-				} else {
+#				} else {
 
-					paste0("<", o, ">", val, collapse = sep)
-				}
+					paste0(indices_brackets[1], o, indices_brackets[2], val, collapse = sep)
+#				}
 			}
 			else {
 
-				if(is.na(val) || length(val) < 1) {
+#				if(is.na(val) || length(val) < 1) {
 
-					NA
+#					NA
 
-				} else {
+#				} else {
 
 					paste0(val, collapse = sep)
-				}
+#				}
 			}
 		}
 	)
@@ -303,7 +305,8 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_ids = F) {
 #' or 2, where the first element is a XPath expression to the ressource and the (optional)
 #' second element is either a XPath expression or a named list containing column names and XPath expressions
 #' @param sep A string to separate pasted multiple entries.
-#' @param add_ids Logical Scalar. Should indices be added to multiple entries?
+#' @param add_indices A Logical Scalar.
+#' @param indices_brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
 #'
 #' @examples
 #' #unserialize example bundle
@@ -325,7 +328,7 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_ids = F) {
 #'
 #' #convert bundle to data frame
 #' result <- fhircrackr:::bundle2df(bundle, design)
-bundle2df <- function(bundle, design.df, sep = " -+- ", add_ids = F) {
+bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, indices_brackets = c( "<", ">")) {
 
 	if (is.null(bundle)) {
 
@@ -365,15 +368,15 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_ids = F) {
 
 				df.columns <- design.df[[2]]
 
-				res <- xtrct_columns( child, df.columns, sep = sep, add_ids = add_ids)
+				res <- xtrct_columns( child, df.columns, sep = sep, add_indices = add_indices, indices_brackets = indices_brackets)
 
-				if( nrow(res) < 1 ) cat( "x" ) else cat( "." )
+				if( all(sapply(res, is.na))) cat( "x" ) else cat( "." )
 			}
 			else{
 
 				xp <- if(1<length(design.df)) design.df[[2]] else ".//@*"
 
-				res <- xtrct_all_columns(child = child, sep = sep, add_ids = add_ids, xpath = xp)
+				res <- xtrct_all_columns(child = child, sep = sep, xpath = xp, add_indices = add_indices, indices_brackets = indices_brackets)
 
 				if( nrow(res) < 1 ) cat( "x" ) else cat( "." )
 			}
@@ -392,7 +395,8 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_ids = F) {
 #' or 2, where the first element is a XPath expression to the ressource and the (optional)
 #' second element is either a XPath expression or a named list containing column names and XPath expressions
 #' @param sep A string to separate pasted multiple entries.
-#' @param add_ids Logical Scalar. Should indices be added to multiple entries?
+#' @param add_indices A Logical Scalar.
+#' @param indices_brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
 #'
 #' @examples
 #' #unserialize example bundle
@@ -412,7 +416,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_ids = F) {
 #' #convert bundles to data frame
 #' result <- fhircrackr:::bundles2df(bundles, design)
 
-bundles2df <- function(bundles, design.df, sep = " -+- ", add_ids = F) {
+bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, indices_brackets = c( "<", ">")) {
 
 	if (is.null(bundles)) {
 
@@ -447,7 +451,7 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_ids = F) {
 
 				bundle <- bundles[[ i ]]
 
-				bundle2df( bundle, design.df, sep, add_ids)
+				bundle2df( bundle, design.df, sep, add_indices = add_indices, indices_brackets = indices_brackets)
 			}
 		)
 	)
@@ -478,7 +482,9 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_ids = F) {
 #' For a more detailed explanation see the package vignette.
 #'
 #' @param sep A string to separate pasted multiple entries.
-#' @param add_ids Logical Scalar. Should indices be added to multiple entries?
+#' @param remove_empty_columns Logical scalar. Remove empty columns?
+#' @param add_indices A Logical Scalar.
+#' @param indices_brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
 #' @return A list of data frames as specified by \code{design}.
 #' @export
 #'
@@ -517,7 +523,7 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_ids = F) {
 #' #convert fhir to data frames
 #' list_of_tables <- fhircrackr:::bundles2dfs(bundles, df_design)
 
-bundles2dfs <- function(bundles, design, sep = " -+- ", add_ids = F) {
+bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, indices_brackets = c( "<", ">")) {
 
 	if (is.null(bundles)) {
 
@@ -540,7 +546,14 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", add_ids = F) {
 		return(NULL)
 	}
 
-	l <- lapply(
+	if (add_indices) {
+
+		if (is.null(indices_brackets)) indices_brackets <- c("<", ">")
+
+		if (length(indices_brackets) < 2) indices_brackets[2] <- indices_brackets[1]
+	}
+
+	dfs <- lapply(
 		lst(names(design)),
 		function(n) {
 
@@ -551,13 +564,22 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", add_ids = F) {
 
 			cat("\n", n)
 
-			bundles2df(bundles = bundles, design.df = design.df, sep = sep, add_ids)
+			bundles2df(bundles = bundles, design.df = design.df, sep = sep, add_indices = add_indices, indices_brackets = indices_brackets)
 		}
 	)
 
 	cat("\n")
 
-	l
+	if(remove_empty_columns) {
+
+		dfs <- lapply(
+			dfs,
+			function( df ) {
+
+				df[ , sapply( df, function( col ) 0 < sum( ! is.na( col ) ) ), drop = F ]
+			}
+		)
+	}
+
+	dfs
 }
-
-

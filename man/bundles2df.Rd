@@ -4,7 +4,13 @@
 \alias{bundles2df}
 \title{Convert several bundles to one data frame}
 \usage{
-bundles2df(bundles, design.df, sep = " -+- ", add_ids = F)
+bundles2df(
+  bundles,
+  design.df,
+  sep = " -+- ",
+  add_indices = F,
+  indices_brackets = c("<", ">")
+)
 }
 \arguments{
 \item{bundles}{A list of xml objects containing FHIR bundles}
@@ -15,7 +21,9 @@ second element is either a XPath expression or a named list containing column na
 
 \item{sep}{A string to separate pasted multiple entries.}
 
-\item{add_ids}{Logical Scalar. Should indices be added to multiple entries?}
+\item{add_indices}{A Logical Scalar.}
+
+\item{indices_brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
 }
 \description{
 Convert several bundles to one data frame

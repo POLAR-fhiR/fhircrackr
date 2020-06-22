@@ -4,7 +4,13 @@
 \alias{bundle2df}
 \title{Extracts one data frame out of one bundle}
 \usage{
-bundle2df(bundle, design.df, sep = " -+- ", add_ids = F)
+bundle2df(
+  bundle,
+  design.df,
+  sep = " -+- ",
+  add_indices = F,
+  indices_brackets = c("<", ">")
+)
 }
 \arguments{
 \item{bundle}{A xml object containing one FHIR bundle}
@@ -15,7 +21,9 @@ second element is either a XPath expression or a named list containing column na
 
 \item{sep}{A string to separate pasted multiple entries.}
 
-\item{add_ids}{Logical Scalar. Should indices be added to multiple entries?}
+\item{add_indices}{A Logical Scalar.}
+
+\item{indices_brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
 }
 \description{
 Extracts one data frame out of one bundle

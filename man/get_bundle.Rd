@@ -9,8 +9,8 @@ get_bundle(
   username = NULL,
   password = NULL,
   verbose = T,
-  max.attempts = 5,
-  delay.between.attempts = 10
+  max_attempts = 5,
+  delay_between_attempts = 10
 )
 }
 \arguments{
@@ -22,9 +22,9 @@ get_bundle(
 
 \item{verbose}{A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.}
 
-\item{max.attempts}{A numeric scalar. The maximal number of attempts to send a request, defaults to 5.}
+\item{max_attempts}{A numeric scalar. The maximal number of attempts to send a request, defaults to 5.}
 
-\item{delay.between.attempts}{A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.}
+\item{delay_between_attempts}{A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.}
 }
 \value{
 The downloaded bundle in xml format.

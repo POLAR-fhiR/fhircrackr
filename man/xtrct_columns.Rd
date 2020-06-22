@@ -4,7 +4,13 @@
 \alias{xtrct_columns}
 \title{Extract columns}
 \usage{
-xtrct_columns(child, df.columns, sep = " -+- ", add_ids = F)
+xtrct_columns(
+  child,
+  df.columns,
+  sep = " -+- ",
+  add_indices = F,
+  indices_brackets = c("<", ">")
+)
 }
 \arguments{
 \item{child}{A xml child object, representing one FHIR resource}
@@ -14,7 +20,9 @@ from the resouce}
 
 \item{sep}{A string to separate pasted multiple entries.}
 
-\item{add_ids}{Logical Scalar. Should indices be added to multiple entries?}
+\item{add_indices}{A Logical Scalar.}
+
+\item{indices_brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
 }
 \description{
 Extracts defined values from a single resource

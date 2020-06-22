@@ -8,10 +8,10 @@ fhir_search(
   request,
   username = NULL,
   password = NULL,
-  max.bundles = Inf,
+  max_bundles = Inf,
   verbose = T,
-  max.attempts = 5,
-  delay.between.attempts = 10
+  max_attempts = 5,
+  delay_between_attempts = 10
 )
 }
 \arguments{
@@ -21,13 +21,13 @@ fhir_search(
 
 \item{password}{A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.}
 
-\item{max.bundles}{Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
+\item{max_bundles}{Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
 
 \item{verbose}{A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.}
 
-\item{max.attempts}{A numeric scalar. The maximal number of attempts to send a request, defaults to 5.}
+\item{max_attempts}{A numeric scalar. The maximal number of attempts to send a request, defaults to 5.}
 
-\item{delay.between.attempts}{A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.}
+\item{delay_between_attempts}{A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.}
 }
 \value{
 A list of bundles in xml format.
@@ -36,5 +36,5 @@ A list of bundles in xml format.
 Downloads all fhir bundles of a fhir search request from a fhir server.
 }
 \examples{
-bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max.bundles=3)
+bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)
 }
