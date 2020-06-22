@@ -4,7 +4,13 @@
 \alias{xtrct_all_columns}
 \title{Extract all columns}
 \usage{
-xtrct_all_columns(child, sep = " -+- ", add_ids = F, xpath = ".//@*")
+xtrct_all_columns(
+  child,
+  sep = " -+- ",
+  xpath = ".//@*",
+  add_indices = F,
+  indices_brackets = c("<", ">")
+)
 }
 \arguments{
 \item{child}{A xml child object, representing one FHIR resource
@@ -12,9 +18,11 @@ from the resouce}
 
 \item{sep}{A String to separate pasted multiple entries.}
 
-\item{add_ids}{Logical Scalar. Should indices be added to multiple entries?}
-
 \item{xpath}{A String to locate data in tree via xpath.}
+
+\item{add_indices}{A Logical Scalar.}
+
+\item{indices_brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
 }
 \description{
 Extracts all available values from a single resource

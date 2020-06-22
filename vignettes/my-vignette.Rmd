@@ -48,12 +48,12 @@ We will start with a very simple example and use `fhir_search()` to download Pat
 
 ```{r, results=F, message=F}
 library(fhircrackr)
-patient_bundles <- fhir_search(request="http://hapi.fhir.org/baseR4/Patient?", max.bundles=2)
+patient_bundles <- fhir_search(request="http://hapi.fhir.org/baseR4/Patient?", max_bundles=2)
 
 ```
 
 The minimum information `fhir_search()` requires is a string containing the full FHIR search request in the argument `request`.
-In general, a fhir search request returns a *bundle* of the resources you requested. If there are a lot of resources matching your request, the search result isn't returned in one big bundle but distributed over several of them. If the argument `max.bundles` is set to its default `Inf`, `fhir_search()` will return all available bundles, meaning all resources matching your request. If you set it to `2` as in the above example, the download will stop after the first two bundles. Note that in this case, the result *may not contain all* the resources from the server matching your request.
+In general, a fhir search request returns a *bundle* of the resources you requested. If there are a lot of resources matching your request, the search result isn't returned in one big bundle but distributed over several of them. If the argument `max_bundles` is set to its default `Inf`, `fhir_search()` will return all available bundles, meaning all resources matching your request. If you set it to `2` as in the above example, the download will stop after the first two bundles. Note that in this case, the result *may not contain all* the resources from the server matching your request.
 
 If you want to connect to a fhir server that uses basic authentification, you can supply the arguments `username` and `password`.
 
@@ -186,7 +186,7 @@ search_request  <- paste0(
 Then we can download the resources:
 
 ```{r, results=F, message=F}
-medication_bundles <- fhir_search(search_request, max.bundles = 3)
+medication_bundles <- fhir_search(search_request, max_bundles = 3)
 ```
 
 And convert them into to data frames, one for the MedicationStatements and one for the Patients:
@@ -199,8 +199,8 @@ design <- list(
 		".//MedicationStatement",
 
 		list(
-			AID                = "id/@value",
-			STATUS.TEXT        ="text/status/@value",
+			MS.ID              = "id/@value",
+			STATUS.TEXT        = "text/status/@value",
 			STATUS             = "status/@value",
 			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system/@value",
 			MEDICATION.CODE    = "medicationCodeableConcept/coding/code/@value",

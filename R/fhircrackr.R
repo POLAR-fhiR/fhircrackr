@@ -36,18 +36,18 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 #' @param request A string containing the full FHIR search request.
 #' @param username A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
 #' @param password A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
-#' @param max.attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
+#' @param max_bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
 #' @param verbose A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.
-#' @param delay.between.attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
-#' @param max.bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
+#' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
+#' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
 #'
 #' @return A list of bundles in xml format.
 #' @export
 #'
 #' @examples
-#' bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max.bundles=3)
+#' bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)
 
-fhir_search <- function(request, username = NULL, password = NULL, max.bundles = Inf, verbose = T, max.attempts = 5, delay.between.attempts = 10) {
+fhir_search <- function(request, username = NULL, password = NULL, max_bundles = Inf, verbose = T, max_attempts = 5, delay_between_attempts = 10) {
 
 	bundles <- list()
 
@@ -59,7 +59,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max.bundles =
 
 		if (verbose) {cat(paste0("bundle[", cnt <- cnt + 1, "]"))}
 
-		bundle <- get_bundle(request = addr, username = username, password = password, verbose = verbose, max.attempts = max.attempts, delay.between.attempts = delay.between.attempts)
+		bundle <- get_bundle(request = addr, username = username, password = password, verbose = verbose, max_attempts = max_attempts, delay_between_attempts = delay_between_attempts)
 
 		if (is.null(bundle)) {
 
@@ -76,7 +76,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max.bundles =
 
 		rels.nxt  <- xml2::xml_attr(xml2::xml_find_first(links, "./relation"), "value") == "next"
 
-		if (cnt == max.bundles) {
+		if (cnt == max_bundles) {
 
 			if(any(!is.na(rels.nxt) & rels.nxt)) {
 
@@ -193,7 +193,9 @@ fhir_load <- function(directory) {
 #' For a more detailed explanation see the package vignette.
 #'
 #' @param sep A string to separate pasted multiple entries.
-#' @param add_ids Logical Scalar. Should indices be added to multiple entries?
+#' @param remove_empty_columns Logical scalar. Remove empty columns?
+#' @param add_indices A Logical Scalar.
+#' @param indices_brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
 #' @return A list of data frames as specified by \code{design}.
 #' @export
 #'
@@ -239,9 +241,9 @@ fhir_load <- function(directory) {
 #' @return A list of data frames as specified by \code{design}
 #'
 #' @export
-fhir_crack <- function(bundles, design, sep = " -+- ", add_ids = F) {
+fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, indices_brackets = c( "<", ">")) {
 
-	bundles2dfs(bundles, design, sep, add_ids)
+	bundles2dfs(bundles = bundles, design = design, sep = sep, remove_empty_columns, add_indices = add_indices, indices_brackets = indices_brackets)
 }
 
 
@@ -250,7 +252,9 @@ fhir_crack <- function(bundles, design, sep = " -+- ", add_ids = F) {
 #'
 #' @param url The url of the FHIR server endpoint.
 #' @param sep A string to separate pasted multiple entries
-#' @param remove.empty.columns Logical scalar. Remove empty columns?
+#' @param remove_empty_columns Logical scalar. Remove empty columns?
+#' @param add_indices A Logical Scalar.
+#' @param indices_brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
 #'
 #' @return A list of data frames containing the information from the statement
 #' @export
@@ -259,7 +263,7 @@ fhir_crack <- function(bundles, design, sep = " -+- ", add_ids = F) {
 #'
 #' cap <- fhir_cs("https://hapi.fhir.org/baseR4")
 #'
-fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.empty.columns = T) {
+fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_empty_columns = T, add_indices = F, indices_brackets = c( "<", ">")) {
 
 	caps <- fhir_search(request = paste_paths(url, "/metadata?_format=xml&_pretty=true"))
 
@@ -269,20 +273,7 @@ fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.
 		REST      = list("/CapabilityStatement/rest/resource")
 	)
 
-	dfs <- fhir_crack(bundles = caps, design = design, sep = sep)
-
-	if(remove.empty.columns) {
-
-		dfs <- lapply(
-			dfs,
-			function( df ) {
-
-				df[ , sapply( df, function( col ) 0 < sum( ! is.na( col ) ) ), drop = F ]
-			}
-		)
-	}
-
-	dfs
+	fhir_crack(bundles = caps, design = design, sep = sep, remove_empty_columns = remove_empty_columns, add_indices = add_indices, indices_brackets = indices_brackets)
 }
 
 #' Serialize a FHIR Bundle list
@@ -292,7 +283,7 @@ fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove.
 #' @return A list of serialized xml objects
 #' @export
 #' @examples
-#' bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max.bundles=3)
+#' bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)
 #' bundles_for_saving <- fhir_serialize(bundles)
 
 

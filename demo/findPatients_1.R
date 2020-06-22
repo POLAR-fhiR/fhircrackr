@@ -17,18 +17,11 @@ tables_design <- list(
 )
 
 
-bundles <- fhiR::fhir_search("https://hapi.fhir.org/baseR4/Patient?", max.bundles=3)
+bundles <- fhircrackr::fhir_search("https://hapi.fhir.org/baseR4/Patient?", max.bundles=3)
 
-list_of_tables <- fhiR::fhir2dfs(bundle = bundles, design = tables_design)
-cat("   - write tables as csv and Rdata files to disk \n")
-for(n in names(list_of_tables)) {
+list_of_tables <- fhircrackr::fhir_crack(bundles = bundles, design = tables_design, sep = "", add_ids = T)
 
-	write.table(list_of_tables[[ n ]], file = paste0(n, ".csv"), na = "", sep = ";", dec = ".", row.names = F, quote=F)
-}
-
-save(list_of_tables, file = "tables.RData")
-cat("   - finish\n")
-
+list_of_tables$Patients
 
 
 
