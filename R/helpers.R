@@ -235,10 +235,10 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_ids = F) {
 		function(column.name)  {
 
 			#dbg
-			#column.name <- names( df.columns )[ 2 ]
+			#column.name <- names( df.columns )[ 1 ]
 
 			i.srch <- df.columns[[column.name]]
-			#TODO: mask via flags 1:n
+
 			loc <- xml2::xml_find_all(x = child, xpath = i.srch)
 
 			val  <- xml2::xml_text(loc)
@@ -282,7 +282,7 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_ids = F) {
 			}
 			else {
 
-				if(is.na(val) || length(val) < 1 ) {
+				if(is.na(val) || length(val) < 1) {
 
 					NA
 
@@ -452,6 +452,8 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_ids = F) {
 		)
 	)
 
+	ret <- ret[ apply(ret, 1, function(row) ! all(is.na(row))), , drop = F]
+
 	cat( "\n" )
 
 	ret
@@ -543,7 +545,7 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", add_ids = F) {
 		function(n) {
 
 			#dbg
-			#n <- names(design)[3]
+			#n <- names(design)[1]
 
 			design.df <- design[[n]]
 
