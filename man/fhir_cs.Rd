@@ -11,20 +11,20 @@ fhir_cs(
 )
 }
 \arguments{
-\item{url}{The url of the fhir server endpoint.}
+\item{url}{The url of the FHIR server endpoint.}
 
 \item{sep}{A string to separate pasted multiple entries}
 
-\item{remove.empty.columns}{Logical Scalar. Remove empty columns?}
+\item{remove.empty.columns}{Logical scalar. Remove empty columns?}
 }
 \value{
-A data frame with the capability statement.
+A list of data frames containing the information from the statement
 }
 \description{
-Get the capability statement about a fhir server.
+Get the capability statement of a FHIR server.
 }
 \examples{
-\dontrun{
-fhir_cs("https://hapi.fhir.org/baseR4")
-}
+
+cap <- fhir_cs("https://hapi.fhir.org/baseR4")
+
 }
