@@ -1,14 +1,14 @@
-#' Transform vector to named list
-#' @description Transforms a vector of items to a named list. The names are created with a prefix and a suffix surrounding the items.
-#'
-#' @param ... A vector that can be coerced to a character.
-#' @param prefix A string taken as the prefix for the names of the list elements.
-#' @param suffix A string taken as the suffix for the names of the list elements.
-#'
-#' @return A named list, where the names are the content surrounded by a prefix and a suffix.
-#'
-#' @examples
-#' fhircrackr:::lst(letters[1:5], prefix="--", suffix="+")
+# Transform vector to named list
+# @description Transforms a vector of items to a named list. The names are created with a prefix and a suffix surrounding the items.
+#
+# @param ... A vector that can be coerced to a character.
+# @param prefix A string taken as the prefix for the names of the list elements.
+# @param suffix A string taken as the suffix for the names of the list elements.
+#
+# @return A named list, where the names are the content surrounded by a prefix and a suffix.
+#
+# @examples
+# fhircrackr:::lst(letters[1:5], prefix="--", suffix="+")
 lst <- function(..., prefix = NULL, suffix = NULL) {
 
 	v <- as.list(c(...))
@@ -18,11 +18,11 @@ lst <- function(..., prefix = NULL, suffix = NULL) {
 	v
 }
 
-#' Bind a list of data frames
-#' @description Rowbinds a list of data frames to one data frame
-#' @param list A list of data frames to bind
-#' @return A single data frame
-#'
+# Bind a list of data frames
+# @description Rowbinds a list of data frames to one data frame
+# @param list A list of data frames to bind
+# @return A single data frame
+#
 rbind_list_of_data_frames <- function( list ) {
 
 	unique.names <- unique(
@@ -56,20 +56,20 @@ rbind_list_of_data_frames <- function( list ) {
 	d
 }
 
-#' Download single FHIR bundle
-#' @description Download a single FHIR bundle via FHIR search request and return it as a xml object.
-#'
-#' @param request A string containing the full FHIR search request.
-#' @param username A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
-#' @param password A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
-#' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
-#' @param verbose A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.
-#' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
-#'
-#' @return The downloaded bundle in xml format.
-#'
-#' @examples
-#' bundle<-fhircrackr:::get_bundle(request = "https://hapi.fhir.org/baseR4/Patient?")
+# Download single FHIR bundle
+# @description Download a single FHIR bundle via FHIR search request and return it as a xml object.
+#
+# @param request A string containing the full FHIR search request.
+# @param username A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
+# @param password A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
+# @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
+# @param verbose A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.
+# @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
+#
+# @return The downloaded bundle in xml format.
+#
+# @examples
+# bundle<-fhircrackr:::get_bundle(request = "https://hapi.fhir.org/baseR4/Patient?")
 
 get_bundle <- function(request, username = NULL, password = NULL, verbose = T, max_attempts = 5, delay_between_attempts = 10) {
 
@@ -120,27 +120,27 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = T, m
 }
 
 
-#' Extract all columns
-#'
-#' Extracts all available values from a single resource
-#'
-#' @param child A xml child object, representing one FHIR resource
-#' from the resouce
-#' @param sep A String to separate pasted multiple entries.
-#' @param xpath A String to locate data in tree via xpath.
-#' @param add_indices A Logical Scalar.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#'
-#' @examples
-#' #unserialize example bundle
-#' bundles <- fhir_unserialize(medication_bundles)
-#'
-#' #extract child
-#' child <- xml2::xml_find_first(bundles[[1]], ".//MedicationStatement")
-#'
-#' #Extract all columns
-#' result <- fhircrackr:::xtrct_all_columns(child)
-#'
+# Extract all columns
+#
+# Extracts all available values from a single resource
+#
+# @param child A xml child object, representing one FHIR resource
+# from the resouce
+# @param sep A String to separate pasted multiple entries.
+# @param xpath A String to locate data in tree via xpath.
+# @param add_indices A Logical Scalar.
+# @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#
+# @examples
+# #unserialize example bundle
+# bundles <- fhir_unserialize(medication_bundles)
+#
+# #extract child
+# child <- xml2::xml_find_first(bundles[[1]], ".//MedicationStatement")
+#
+# #Extract all columns
+# result <- fhircrackr:::xtrct_all_columns(child)
+#
 xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices = F, brackets = c( "<", ">")) {
 
 	tree <- xml2::xml_find_all(child, xpath)
@@ -199,33 +199,33 @@ xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices
 	as.data.frame(d, stringsAsFactors = F)
 }
 
-#' Extract columns
-#'
-#' Extracts defined values from a single resource
-#'
-#' @param child A xml child object, representing one FHIR resource
-#' @param df.columns The part of design from \code{\link{fhir_crack}} describing which elements to extract
-#' from the resouce
-#' @param sep A string to separate pasted multiple entries.
-#' @param add_indices A Logical Scalar.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#'
-#' @examples
-#' #unserialize example bundle
-#' bundles <- fhir_unserialize(medication_bundles)
-#'
-#' #extract child
-#' child <- xml2::xml_find_first(bundles[[1]], ".//MedicationStatement")
-#'
-#' #define columns
-#' cols <-list(
-#' 	SYSTEM  = "medicationCodeableConcept/coding/system/@value",
-#' 	CODE    = "medicationCodeableConcept/coding/code/@value",
-#' 	DISPLAY = "medicationCodeableConcept/coding/display/@value"
-#' )
-#'
-#' #Extract columns
-#' result <- fhircrackr:::xtrct_columns(child, cols)
+# Extract columns
+#
+# Extracts defined values from a single resource
+#
+# @param child A xml child object, representing one FHIR resource
+# @param df.columns The part of design from \code{\link{fhir_crack}} describing which elements to extract
+# from the resouce
+# @param sep A string to separate pasted multiple entries.
+# @param add_indices A Logical Scalar.
+# @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#
+# @examples
+# #unserialize example bundle
+# bundles <- fhir_unserialize(medication_bundles)
+#
+# #extract child
+# child <- xml2::xml_find_first(bundles[[1]], ".//MedicationStatement")
+#
+# #define columns
+# cols <-list(
+# 	SYSTEM  = "medicationCodeableConcept/coding/system/@value",
+# 	CODE    = "medicationCodeableConcept/coding/code/@value",
+# 	DISPLAY = "medicationCodeableConcept/coding/display/@value"
+# )
+#
+# #Extract columns
+# result <- fhircrackr:::xtrct_columns(child, cols)
 
 xtrct_columns <- function(child, df.columns, sep = " -+- ", add_indices = F, brackets = c( "<", ">")) {
 
@@ -284,36 +284,36 @@ xtrct_columns <- function(child, df.columns, sep = " -+- ", add_indices = F, bra
 	as.data.frame(l, stringsAsFactors = F)
 }
 
-#' Extracts one data frame out of one bundle
-#' @param bundle A xml object containing one FHIR bundle
-#' @param design.df On element of the design from \code{\link{fhir_crack}}, i.e. a list of length 1
-#' or 2, where the first element is a XPath expression to the ressource and the (optional)
-#' second element is either a XPath expression or a named list containing column names and XPath expressions
-#' @param sep A string to separate pasted multiple entries.
-#' @param add_indices A Logical Scalar.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#' @param verbose Logical scalar. Print progress to console?
+# Extracts one data frame out of one bundle
+# @param bundle A xml object containing one FHIR bundle
+# @param design.df On element of the design from \code{\link{fhir_crack}}, i.e. a list of length 1
+# or 2, where the first element is a XPath expression to the ressource and the (optional)
+# second element is either a XPath expression or a named list containing column names and XPath expressions
+# @param sep A string to separate pasted multiple entries.
+# @param add_indices A Logical Scalar.
+# @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+# @param verbose Logical scalar. Print progress to console?
 
-#' @examples
-#' #unserialize example bundle
-#' bundles <- fhir_unserialize(medication_bundles)
-#'
-#' #extract first bundle
-#' bundle <- bundles[[1]]
-#'
-#' #define design
-#' design <- list(
-#'      ".//MedicationStatement",
-#'      list(
-#' 	      SYSTEM  = "medicationCodeableConcept/coding/system/@value",
-#' 	      CODE    = "medicationCodeableConcept/coding/code/@value",
-#' 	      DISPLAY = "medicationCodeableConcept/coding/display/@value"
-#' 	      )
-#' 	 )
-#'
-#'
-#' #convert bundle to data frame
-#' result <- fhircrackr:::bundle2df(bundle, design)
+# @examples
+# #unserialize example bundle
+# bundles <- fhir_unserialize(medication_bundles)
+#
+# #extract first bundle
+# bundle <- bundles[[1]]
+#
+# #define design
+# design <- list(
+#      ".//MedicationStatement",
+#      list(
+# 	      SYSTEM  = "medicationCodeableConcept/coding/system/@value",
+# 	      CODE    = "medicationCodeableConcept/coding/code/@value",
+# 	      DISPLAY = "medicationCodeableConcept/coding/display/@value"
+# 	      )
+# 	 )
+#
+#
+# #convert bundle to data frame
+# result <- fhircrackr:::bundle2df(bundle, design)
 bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">"), verbose=T) {
 
 	if (is.null(bundle)) {
@@ -381,35 +381,35 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 	rbind_list_of_data_frames(list = df.list)
 }
 
-#'Convert several bundles to one data frame
-#'
-#' @param bundles A list of xml objects containing FHIR bundles
-#' @param design.df On element of the design from \code{\link{fhir_crack}}, i.e. a list of length 1
-#' or 2, where the first element is a XPath expression to the ressource and the (optional)
-#' second element is either a XPath expression or a named list containing column names and XPath expressions
-#' @param sep A string to separate pasted multiple entries.
-#' @param add_indices A Logical Scalar.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#' @param verbose Logical scalar. Print progress to console?
+#Convert several bundles to one data frame
+#
+# @param bundles A list of xml objects containing FHIR bundles
+# @param design.df On element of the design from \code{\link{fhir_crack}}, i.e. a list of length 1
+# or 2, where the first element is a XPath expression to the ressource and the (optional)
+# second element is either a XPath expression or a named list containing column names and XPath expressions
+# @param sep A string to separate pasted multiple entries.
+# @param add_indices A Logical Scalar.
+# @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+# @param verbose Logical scalar. Print progress to console?
 
-#'
-#' @examples
-#' #unserialize example bundle
-#' bundles <- fhir_unserialize(medication_bundles)
-#'
-#' #define design
-#' design <- list(
-#'      ".//MedicationStatement",
-#'      list(
-#' 	      SYSTEM  = "medicationCodeableConcept/coding/system/@value",
-#' 	      CODE    = "medicationCodeableConcept/coding/code/@value",
-#' 	      DISPLAY = "medicationCodeableConcept/coding/display/@value"
-#' 	      )
-#' 	 )
-#'
-#'
-#' #convert bundles to data frame
-#' result <- fhircrackr:::bundles2df(bundles, design)
+#
+# @examples
+# #unserialize example bundle
+# bundles <- fhir_unserialize(medication_bundles)
+#
+# #define design
+# design <- list(
+#      ".//MedicationStatement",
+#      list(
+# 	      SYSTEM  = "medicationCodeableConcept/coding/system/@value",
+# 	      CODE    = "medicationCodeableConcept/coding/code/@value",
+# 	      DISPLAY = "medicationCodeableConcept/coding/display/@value"
+# 	      )
+# 	 )
+#
+#
+# #convert bundles to data frame
+# result <- fhircrackr:::bundles2df(bundles, design)
 
 bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">"), verbose=T) {
 
@@ -458,67 +458,67 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 	ret
 }
 
-#' Flatten list of FHIR bundles
-#' @description Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
-#'
-#' @param bundles A FHIR search result as returned by \code{\link{fhir_search}}.
-#' @param design A named list specifiying which data frame should contain which entries of the bundle.
-#' The names correspond to the names of the resulting data frames.
-#'
-#' Each element of design is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
-#' FHIR bundle page. There are 3 options for the second element of that list:
-#'
-#' - There is no second element: all attributes of the recource are extracted
-#' - The second element is string containing a XPath expression to all the values that should be extracted. "./@value" e.g. would extract all
-#'   values on the root level.
-#' - The second element is a named list where the elements are XPath expressions indicating the specific position of values to extract, where the names of the
-#' list elements are the column names of the resulting data frame.
-#'
-#' For a more detailed explanation see the package vignette.
-#'
-#' @param sep A string to separate pasted multiple entries.
-#' @param remove_empty_columns Logical scalar. Remove empty columns?
-#' @param add_indices A Logical Scalar.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#' @param verbose Logical scalar. Print progress to console?
+# Flatten list of FHIR bundles
+# @description Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
+#
+# @param bundles A FHIR search result as returned by \code{\link{fhir_search}}.
+# @param design A named list specifiying which data frame should contain which entries of the bundle.
+# The names correspond to the names of the resulting data frames.
+#
+# Each element of design is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
+# FHIR bundle page. There are 3 options for the second element of that list:
+#
+# - There is no second element: all attributes of the recource are extracted
+# - The second element is string containing a XPath expression to all the values that should be extracted. "./@value" e.g. would extract all
+#   values on the root level.
+# - The second element is a named list where the elements are XPath expressions indicating the specific position of values to extract, where the names of the
+# list elements are the column names of the resulting data frame.
+#
+# For a more detailed explanation see the package vignette.
+#
+# @param sep A string to separate pasted multiple entries.
+# @param remove_empty_columns Logical scalar. Remove empty columns?
+# @param add_indices A Logical Scalar.
+# @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+# @param verbose Logical scalar. Print progress to console?
 
-#' @return A list of data frames as specified by \code{design}.
-#' @export
-#'
-#' @examples
-#' #unserialize example bundle
-#' bundles <- fhir_unserialize(medication_bundles)
-#'
-#' #define attributes to extract
-#' df_design <- list(
-#'
-#'  #define specifically which elements to extract
-#' 	MedicationStatement = list(
-#'
-#' 		".//MedicationStatement",
-#'
-#' 		list(
-#' 			AID                = "id/@value",
-#' 			STATUS.TEXT        ="text/status/@value",
-#' 			STATUS             = "status/@value",
-#' 			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system/@value",
-#' 			MEDICATION.CODE    = "medicationCodeableConcept/coding/code/@value",
-#' 			MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display/@value",
-#' 			DOSAGE             = "dosage/text/@value",
-#' 			PATIENT            = "subject/reference/@value",
-#' 			LAST.UPDATE        = "meta/lastUpdated/@value"
-#' 		)
-#' 	),
-#'
-#'  #extract all values
-#' 	Patients = list(
-#'
-#' 		".//Patient"
-#' 	)
-#' )
-#'
-#' #convert fhir to data frames
-#' list_of_tables <- fhircrackr:::bundles2dfs(bundles, df_design)
+# @return A list of data frames as specified by \code{design}.
+# @export
+#
+# @examples
+# #unserialize example bundle
+# bundles <- fhir_unserialize(medication_bundles)
+#
+# #define attributes to extract
+# df_design <- list(
+#
+#  #define specifically which elements to extract
+# 	MedicationStatement = list(
+#
+# 		".//MedicationStatement",
+#
+# 		list(
+# 			AID                = "id/@value",
+# 			STATUS.TEXT        ="text/status/@value",
+# 			STATUS             = "status/@value",
+# 			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system/@value",
+# 			MEDICATION.CODE    = "medicationCodeableConcept/coding/code/@value",
+# 			MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display/@value",
+# 			DOSAGE             = "dosage/text/@value",
+# 			PATIENT            = "subject/reference/@value",
+# 			LAST.UPDATE        = "meta/lastUpdated/@value"
+# 		)
+# 	),
+#
+#  #extract all values
+# 	Patients = list(
+#
+# 		".//Patient"
+# 	)
+# )
+#
+# #convert fhir to data frames
+# list_of_tables <- fhircrackr:::bundles2dfs(bundles, df_design)
 
 bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">"), verbose=T) {
 
@@ -581,12 +581,12 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 	dfs
 }
 
-#' Check design
-#' @description Checks whether a design provided to \code{\link{fhir_crack}} is valid and
-#' issues a warning if it is not.
-#' @param design The design to be checked
-#' @return TRUE if design is invalid, FALSE if design is valid
-#'
+# Check design
+# @description Checks whether a design provided to \code{\link{fhir_crack}} is valid and
+# issues a warning if it is not.
+# @param design The design to be checked
+# @return TRUE if design is invalid, FALSE if design is valid
+#
 is_invalid_design <- function(design){
 
 	if (is.null(design)) {
