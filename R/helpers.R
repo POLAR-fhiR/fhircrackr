@@ -323,20 +323,6 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 		return(NULL)
 	}
 
-	if (is.null(design.df)) {
-
-		warning("Argument design.df is NULL, returning NULL.")
-
-		return(NULL)
-	}
-
-	if (length(design.df)<1) {
-
-		warning("Argument design.df has length 0, returning NULL.")
-
-		return(NULL)
-	}
-
 	xml2::xml_ns_strip(bundle)
 
 	xpath <- design.df[[1]]
@@ -420,19 +406,6 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 		return(NULL)
 	}
 
-	if (is.null(design.df)) {
-
-		warning("Argument design.df is NULL, returning NULL.")
-
-		return(NULL)
-	}
-
-	if (length(design.df)<1) {
-
-		warning("Argument design has length 0, returning NULL.")
-
-		return(NULL)
-	}
 
 	ret <- rbind_list_of_data_frames(
 		lapply(
@@ -525,20 +498,6 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 	if (is.null(bundles)) {
 
 		warning("Argument bundles is NULL, returning NULL.")
-
-		return(NULL)
-	}
-
-	if (is.null(design)) {
-
-		warning("Argument design.df is NULL, returning NULL.")
-
-		return(NULL)
-	}
-
-	if (length(design)<1) {
-
-		warning("Argument design has length 0, returning NULL.")
 
 		return(NULL)
 	}
