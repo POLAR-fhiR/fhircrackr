@@ -145,35 +145,35 @@ xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices
 
 	tree <- xml2::xml_find_all(child, xpath)
 
-	if( length(tree) < 1 ) return(data.frame())
+	if(length(tree) < 1) {return(data.frame())}
 
-	xp.child  <- xml2::xml_path( child )
-	xp.remain <- xml2::xml_path( tree )
-	xp.rel    <- substr( xp.remain, nchar( xp.child ) + 2, nchar( xp.remain ) )
-	xp.cols   <- gsub("/", ".", gsub("@", "", unique( gsub( "\\[[0-9]+\\]", "", xp.rel))))
+	xp.child  <- xml2::xml_path(child)
+	xp.remain <- xml2::xml_path(tree)
+	xp.rel    <- substr(xp.remain, nchar(xp.child) + 2, nchar(xp.remain))
+	xp.cols   <- gsub("/", ".", gsub("@", "", unique(gsub("\\[[0-9]+\\]", "", xp.rel))))
 
 	d <- lapply(1:length(xp.cols),function(dummy)character(0))
 
-	names( d ) <- xp.cols
+	names(d) <- xp.cols
 
 	val  <- xml2::xml_text(tree)
 
-	s <- stringr::str_split( xp.rel, "/" )
+	s <- stringr::str_split(xp.rel, "/")
 
 	o <- sapply(
-		seq_along( s ),
-		function( i ) {
+		seq_along(s),
+		function(i) {
 
 			#dbg
 			#i<-1
 
-			s. <- s[[ i ]]
+			s. <- s[[i]]
 
-			i.f <- ! grepl( "\\[[0-9]+\\]", s. )
+			i.f <- !grepl("\\[[0-9]+\\]", s.)
 
-			if( any( i.f ) ) {
+			if(any(i.f)) {
 
-				s.[ i.f ] <- paste0( s.[ i.f ], "[1]" )
+				s.[i.f] <- paste0(s.[i.f], "[1]")
 			}
 
 			c(
@@ -188,12 +188,12 @@ xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices
 		val  <- paste0(brackets[1], o[ 1, ], brackets[2], val)
 	}
 
-	for( col in xp.cols ) {
+	for(col in xp.cols) {
 
 		#dbg
 		#col <- xp.cols[1]
 
-		d[[ col ]] <- paste0(val[ col == o[ 2, ] ], collapse = sep)
+		d[[col]] <- paste0(val[col == o[2, ]], collapse = sep)
 	}
 
 	as.data.frame(d, stringsAsFactors = F)
@@ -227,9 +227,9 @@ xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices
 #' #Extract columns
 #' result <- fhircrackr:::xtrct_columns(child, cols)
 
-xtrct_columns <- function( child, df.columns, sep = " -+- ", add_indices = F, brackets = c( "<", ">")) {
+xtrct_columns <- function(child, df.columns, sep = " -+- ", add_indices = F, brackets = c( "<", ">")) {
 
-	xp <- xml2::xml_path( child )
+	xp <- xml2::xml_path(child)
 
 	l <- lapply(
 		lst(names(df.columns)),
@@ -244,31 +244,31 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_indices = F, br
 
 			val <- xml2::xml_text(loc)
 
-			if( add_indices ) {
+			if(add_indices) {
 
-				loc.xp <- xml2::xml_path( loc )
+				loc.xp <- xml2::xml_path(loc)
 
-				loc.xp.rel <- substr( loc.xp, nchar( xp ) + 2, nchar( loc.xp ) )
+				loc.xp.rel <- substr(loc.xp, nchar(xp) + 2, nchar(loc.xp))
 
-				s <- stringr::str_split( loc.xp.rel, "/" )
+				s <- stringr::str_split(loc.xp.rel, "/")
 
 				o <- sapply(
-					seq_along( s ),
-					function( i ) {
+					seq_along(s),
+					function(i) {
 
 						#dbg
 						#i<-1
 
-						s. <- s[[ i ]]
+						s. <- s[[i]]
 
-						i.f <- ! grepl( "\\[[0-9]+\\]", s. )
+						i.f <- !grepl("\\[[0-9]+\\]", s.)
 
-						if( any( i.f ) ) {
+						if(any(i.f)) {
 
-							s.[ i.f ] <- paste0( s.[ i.f ], "[1]" )
+							s.[i.f] <- paste0(s.[i.f], "[1]")
 						}
 
-						gsub(".1$", "", paste0(gsub( "[^0-9]", "", s. ), collapse = "." ))
+						gsub(".1$", "", paste0(gsub("[^0-9]", "", s.), collapse = "."))
 					}
 				)
 
@@ -292,7 +292,8 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_indices = F, br
 #' @param sep A string to separate pasted multiple entries.
 #' @param add_indices A Logical Scalar.
 #' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#'
+#' @param verbose Logical scalar. Print progress to console?
+
 #' @examples
 #' #unserialize example bundle
 #' bundles <- fhir_unserialize(medication_bundles)
@@ -313,7 +314,7 @@ xtrct_columns <- function( child, df.columns, sep = " -+- ", add_indices = F, br
 #'
 #' #convert bundle to data frame
 #' result <- fhircrackr:::bundle2df(bundle, design)
-bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">")) {
+bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">"), verbose=T) {
 
 	if (is.null(bundle)) {
 
@@ -355,15 +356,22 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 
 				res <- xtrct_columns( child, df.columns, sep = sep, add_indices = add_indices, brackets = brackets)
 
-				if( all(sapply(res, is.na))) cat( "x" ) else cat( "." )
+				if(verbose){
+
+					if(all(sapply(res, is.na))) {cat( "x" )} else {cat( "." )}
+
+				}
 			}
 			else{
 
-				xp <- if(1<length(design.df)) design.df[[2]] else ".//@*"
+				xp <- if(1<length(design.df)) {design.df[[2]]} else {".//@*"}
 
 				res <- xtrct_all_columns(child = child, sep = sep, xpath = xp, add_indices = add_indices, brackets = brackets)
 
-				if( nrow(res) < 1 ) cat( "x" ) else cat( "." )
+				if(verbose){
+
+					if(nrow(res) < 1) {cat( "x" )} else {cat( "." )}
+				}
 			}
 
 			res
@@ -382,6 +390,8 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 #' @param sep A string to separate pasted multiple entries.
 #' @param add_indices A Logical Scalar.
 #' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param verbose Logical scalar. Print progress to console?
+
 #'
 #' @examples
 #' #unserialize example bundle
@@ -401,7 +411,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 #' #convert bundles to data frame
 #' result <- fhircrackr:::bundles2df(bundles, design)
 
-bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">")) {
+bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">"), verbose=T) {
 
 	if (is.null(bundles)) {
 
@@ -432,18 +442,18 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 				#dbg
 				#i<-1
 
-				cat( "\n", i )
+				if (verbose) {cat( "\n", i )}
 
 				bundle <- bundles[[ i ]]
 
-				bundle2df( bundle, design.df, sep, add_indices = add_indices, brackets = brackets)
+				bundle2df( bundle, design.df, sep, add_indices = add_indices, brackets = brackets, verbose=verbose)
 			}
 		)
 	)
 
 	ret <- ret[ apply(ret, 1, function(row) ! all(is.na(row))), , drop = F]
 
-	cat( "\n" )
+	if (verbose) {cat( "\n" )}
 
 	ret
 }
@@ -470,6 +480,8 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
 #' @param add_indices A Logical Scalar.
 #' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param verbose Logical scalar. Print progress to console?
+
 #' @return A list of data frames as specified by \code{design}.
 #' @export
 #'
@@ -508,7 +520,7 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 #' #convert fhir to data frames
 #' list_of_tables <- fhircrackr:::bundles2dfs(bundles, df_design)
 
-bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">")) {
+bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">"), verbose=T) {
 
 	if (is.null(bundles)) {
 
@@ -547,13 +559,13 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 
 			design.df <- design[[n]]
 
-			cat("\n", n)
+			if (verbose) {cat("\n", n)}
 
-			bundles2df(bundles = bundles, design.df = design.df, sep = sep, add_indices = add_indices, brackets = brackets)
+			bundles2df(bundles = bundles, design.df = design.df, sep = sep, add_indices = add_indices, brackets = brackets, verbose=verbose)
 		}
 	)
 
-	cat("\n")
+	if (verbose) {cat("\n")}
 
 	if(remove_empty_columns) {
 
@@ -567,4 +579,52 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 	}
 
 	dfs
+}
+
+#' Check design
+#' @description Checks whether a design provided to \code{\link{fhir_crack}} is valid and
+#' issues a warning if it is not.
+#' @param design The design to be checked
+#' @return TRUE if design is invalid, FALSE if design is valid
+#'
+is_invalid_design <- function(design){
+
+	if (is.null(design)) {
+
+		warning("Argument design is NULL, returning NULL.")
+		return(T)
+	}
+
+	if (!is.list(design)) {
+
+		warning("Argument design has to be a list, returnign NULL.")
+		return(T)
+	}
+
+	if (length(design)<1) {
+
+		warning("Argument design has length 0, returning NULL.")
+		return(T)
+	}
+
+	list.type <- sapply(design, is.list)
+	if (any(!list.type)) {
+
+		warning("All elements of design have to be of type list. Returning NULL.")
+		return(T)
+	}
+
+	if (is.null(names(design)) || any(names(design)=="")) {
+
+		warning("Argument design should be a NAMED list but has at least one unnamed element. Returning NULL")
+		return(T)
+	}
+
+	lengths <- lapply(design, length)
+	if (any(lengths > 2 | lengths < 1)){
+		warning("At least one if the elements of argument design is not a list of length 1 or 2. Returning NUll")
+		return(T)
+	}
+
+	return(F)
 }

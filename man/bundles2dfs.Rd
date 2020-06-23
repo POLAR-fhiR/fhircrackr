@@ -10,7 +10,8 @@ bundles2dfs(
   sep = " -+- ",
   remove_empty_columns = F,
   add_indices = F,
-  brackets = c("<", ">")
+  brackets = c("<", ">"),
+  verbose = T
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ For a more detailed explanation see the package vignette.}
 \item{add_indices}{A Logical Scalar.}
 
 \item{brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
+
+\item{verbose}{Logical scalar. Print progress to console?}
 }
 \value{
 A list of data frames as specified by \code{design}.
