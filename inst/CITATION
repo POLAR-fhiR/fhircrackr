@@ -1,0 +1,17 @@
+citHeader("To cite fhircrackr in publications use:")
+
+citEntry(entry = "Manual",
+  title        = "Handling HL7 FHIR resources in R with {fhircrackr}",
+  author       = personList(as.person("Thomas Peschel"),
+                   as.person("Julia Gantner"),
+                   as.person("Jens Przybilla"),
+                   as.person("Frank Meineke")),
+  note		   = "R package version 0.1.0",
+  url		   = "https://CRAN.R-project.org/package=fhircrackr",
+  year		   = "2020",
+  textVersion  =
+  paste("Peschel, T., Gantner, J., Przybilla, J., Meineke, F. (2020).",
+        "Handling HL7 FHIR resources in R with fhircrackr.",
+        "R package version 0.1.0")
+
+)
