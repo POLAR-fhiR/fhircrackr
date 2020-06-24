@@ -32,9 +32,9 @@ The package is still under development. The CRAN version of the package contains
 ## Prerequisites
 The complexity of the problem requires a couple of prerequisites both regarding knowledge and access to data. We will shortly list the  preconditions to using the `fhircrackr` package here:  
 
-1. First of all, you need the endpoint of the FHIR server you want to access. If you don't have you own fhir server, you can use one of the publicly available servers, such as [https://hapi.fhir.org/baseR4](https://hapi.fhir.org/baseR4) or [http://fhir.hl7.de:8080/baseDstu3](http://fhir.hl7.de:8080/baseDstu3). The endpoint of a FHIR server is often referred to as [base].
+1. First of all, you need the endpoint of the FHIR server you want to access. If you don't have you own FHIR server, you can use one of the publicly available servers, such as [https://hapi.fhir.org/baseR4](https://hapi.fhir.org/baseR4) or [http://fhir.hl7.de:8080/baseDstu3](http://fhir.hl7.de:8080/baseDstu3). The endpoint of a FHIR server is often referred to as [base].
 
-2. To download ressources from the server, you should be familiar with [FHIR search requests](https://www.hl7.org/fhir/search.html). Fhir search allows you to download sets of resources that match very specific requirements. As the focus of this package is dealing with FHIR resources in R, rather than the intricacies of FHIR search, we will mostly use simple examples of FHIR search requests. Most of them will have the form `[base]/[type]?parameter(s)`, where `[type]` refers to the type of resource you are looking for and `parameter(s)` characterise specific properties those resources should have.
+2. To download ressources from the server, you should be familiar with [FHIR search requests](https://www.hl7.org/fhir/search.html). FHIR search allows you to download sets of resources that match very specific requirements. As the focus of this package is dealing with FHIR resources in R, rather than the intricacies of FHIR search, we will mostly use simple examples of FHIR search requests. Most of them will have the form `[base]/[type]?parameter(s)`, where `[type]` refers to the type of resource you are looking for and `parameter(s)` characterise specific properties those resources should have.
 `http://hapi.fhir.org/baseR4/Patient?gender=female` for example downloads all Patient resources from the fhir server at `http://hapi.fhir.org/baseR4/` that represent female patients.
 
 3. In the first step, `fhircrackr` downloads the resources in xml format into R. To specify which elements from the FHIR resources you want in your data frame, you should have at least some familiarity with XPath expressions. A good tutorial on XPath expressions can be found [here](https://www.w3schools.com/xml/xpath_intro.asp).
@@ -65,7 +65,7 @@ As you can see in the next block of code, `fhir_search()` returns a list of xml 
 str(patient_bundles)
 ```
 
-If for some reason you cannot connect to a FHIR server at the moment but want to explore the following functions anyway, the package provides an exemplary list of bundles containing Patient and MedicationStatement resources. See `?medication_bundles` for how to use it.
+If for some reason you cannot connect to a FHIR server at the moment but want to explore the following functions anyway, the package provides an example list of bundles containing Patient and MedicationStatement resources. See `?medication_bundles` for how to use it.
 
 Now we know that inside these xml objects there is the patient data somewhere. To get it out, we will use `fhir_crack()`. The most important arguments `fhir_crack()` takes is `bundles`, the list of bundles that is returned by `fhir_search()` and `design`, an object that tells the function wich data to extract from the bundle. It returns a list of data.frames.
 
@@ -159,11 +159,11 @@ list(
     <XPath indicating attribute level> 
   ),
 
-#Option 3: extrcat specific attributes  
+#Option 3: extract specific attributes  
   <Name of third data frame> = list(
     <XPath to resource type>,
     list(
-      <column name 1> = <XPath to attribute>
+      <column name 1> = <XPath to attribute>,
       <column name 2> = <XPath to attribute>
       ...
     ) 
@@ -352,7 +352,7 @@ bundles <- fhir_unserialize(serialized_bundles)
 head(bundles[[1]])
 ```
 
-After unserialization, the pointers are restored and you can continue to work with the bundles. Note that the exemplary bundle `medication_bundles` that is provided with the `fhircrackr` package is also provided in its serialized form and has to be unserialized as described on its help page.
+After unserialization, the pointers are restored and you can continue to work with the bundles. Note that the example bundle `medication_bundles` that is provided with the `fhircrackr` package is also provided in its serialized form and has to be unserialized as described on its help page.
 
 ### Save and load bundles as xml files
 If you want to store the bundles in xml files instead of R objects, you can use the functions `fhir_save()` and `fhir_load()`.
