@@ -242,6 +242,7 @@ fhir_load <- function(directory) {
 #' @return A list of data frames as specified by \code{design}
 #'
 #' @export
+
 fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">"), verbose=T) {
 
 	if(is_invalid_design(design)) {return(NULL)}
@@ -266,6 +267,7 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 #'
 #' cap <- fhir_cs("https://hapi.fhir.org/baseR4")
 #'
+
 fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_empty_columns = T, add_indices = F, brackets = c( "<", ">")) {
 
 	caps <- fhir_search(request = paste_paths(url, "/metadata?_format=xml&_pretty=true"))
