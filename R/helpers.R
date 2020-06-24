@@ -64,7 +64,7 @@ rbind_list_of_data_frames <- function( list ) {
 #' @param username A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
 #' @param password A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
 #' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
-#' @param verbose A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.
+#' @param verbose An integer scalar. Level of downloading information to be printed to the console? Defaults to 2.
 #' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
 #'
 #' @return The downloaded bundle in xml format.
@@ -73,7 +73,7 @@ rbind_list_of_data_frames <- function( list ) {
 #' @examples
 #' bundle<-fhircrackr:::get_bundle(request = "https://hapi.fhir.org/baseR4/Patient?")
 
-get_bundle <- function(request, username = NULL, password = NULL, verbose = T, max_attempts = 5, delay_between_attempts = 10) {
+get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, max_attempts = 5, delay_between_attempts = 10) {
 
 	#dbg
 	#request="https://hapi.fhir.org/baseR4/Medication?_format=xml"
@@ -83,7 +83,7 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = T, m
 		#dbg
 		#n <- 1
 
-		if(verbose) cat(paste0("(", n, "): ", request, "\n"))
+		if(1 < verbose) cat(paste0("(", n, "): ", request, "\n"))
 
 		auth <- if (!is.null(username) & !is.null(password)){
 
@@ -119,6 +119,111 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = T, m
 	}
 
 	NULL
+}
+
+
+#' Check design
+#' @description Checks whether a design provided to \code{\link{fhir_crack}} is invalid and
+#' issues a warning if it is.
+#' @param design The design to be checked
+#' @return TRUE if design is invalid, FALSE if design is valid
+#' @noRd
+is_invalid_design <- function(design){
+
+	if (is.null(design)) {
+
+		warning("Argument design is NULL, returning NULL.")
+		return(T)
+	}
+
+	if (!is.list(design)) {
+
+		warning("Argument design has to be a list, returnign NULL.")
+		return(T)
+	}
+
+	if (length(design)<1) {
+
+		warning("Argument design has length 0, returning NULL.")
+		return(T)
+	}
+
+	list.type <- sapply(design, is.list)
+
+	if (any(!list.type)) {
+
+		warning("All elements of design have to be of type list. Returning NULL.")
+		return(T)
+	}
+
+	if (is.null(names(design)) || any(names(design)=="")) {
+
+		warning("Argument design should be a NAMED list but has at least one unnamed element. Returning NULL")
+		return(T)
+	}
+
+	lengths <- sapply(design, length)
+
+	if (any(lengths < 1 | 2 < lengths)){
+
+		warning("At least one if the elements of argument design is not a list of length 1 or 2. Returning NUll")
+		return(T)
+	}
+
+	F
+}
+#' Check List of Bundles
+#' @description Checks whether a List of Bundles provided to \code{\link{fhir_crack}} is valid and
+#' issues a warning if it is not.
+#' @param bundles_list The List of Bundles to be checked
+#' @return TRUE if bundles_list is valid, FALSE if not
+#' @noRd
+is_valid_bundles_list <- function(bundles_list){
+
+	if (is.null(bundles_list)) {
+
+		warning("Argument bundles_list is NULL, returning NULL.")
+
+		return(F)
+	}
+
+	if (!is.list(bundles_list)) {
+
+		warning("Argument bundles_list has to be a list, returnign NULL.")
+		return(F)
+	}
+
+	if (length(bundles_list)<1) {
+
+		warning("Argument bundles_list has length 0, returning NULL.")
+		return(F)
+	}
+
+	valid.doc.types <- all(
+		sapply(
+			bundles_list,
+			function(b) {
+
+				if(is.null(b)) {
+
+					F
+				}
+				else {
+
+					cl <- class(b)
+					length(cl) == 2 || cl[1] == "xml_document" || cl[2] == "xml_node"
+				}
+			}
+		)
+	)
+
+	if (!valid.doc.types) {
+
+		warning("Argument bundles_list doesn't contain only valid Bundles. These have to be of Class 'xml_document' and 'xml_node'. Returning NULL")
+		return(F)
+	}
+
+	T
 }
 
 
@@ -296,7 +401,7 @@ xtrct_columns <- function(child, df.columns, sep = " -+- ", add_indices = F, bra
 #' @param sep A string to separate pasted multiple entries.
 #' @param add_indices A Logical Scalar.
 #' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#' @param verbose Logical scalar. Print progress to console?
+#' @param verbose An Integer Scalar. Level of downloading information to be printed to the console? Defaults to 1.
 #' @noRd
 #' @examples
 #' #unserialize example bundle
@@ -317,7 +422,7 @@ xtrct_columns <- function(child, df.columns, sep = " -+- ", add_indices = F, bra
 #'
 #' #convert bundle to data frame
 #' result <- fhircrackr:::bundle2df(bundle, design)
-bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">"), verbose=T) {
+bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">"), verbose = 2) {
 
 	if (is.null(bundle)) {
 
@@ -345,10 +450,9 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 
 				res <- xtrct_columns( child, df.columns, sep = sep, add_indices = add_indices, brackets = brackets)
 
-				if(verbose){
+				if(1 < verbose){
 
-					if(all(sapply(res, is.na))) {cat( "x" )} else {cat( "." )}
-
+					if(all(sapply(res, is.na))) {cat("x")} else {cat( ".")}
 				}
 			}
 			else{
@@ -357,9 +461,9 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 
 				res <- xtrct_all_columns(child = child, sep = sep, xpath = xp, add_indices = add_indices, brackets = brackets)
 
-				if(verbose){
+				if(1 < verbose){
 
-					if(nrow(res) < 1) {cat( "x" )} else {cat( "." )}
+					if(nrow(res) < 1) {cat("x")} else {cat(".")}
 				}
 			}
 
@@ -379,7 +483,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 #' @param sep A string to separate pasted multiple entries.
 #' @param add_indices A Logical Scalar.
 #' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#' @param verbose Logical scalar. Print progress to console?
+#' @param verbose An Integer Scalar. Level of downloading information to be printed to the console? Defaults to 2.
 #' @noRd
 #' @examples
 #' #unserialize example bundle
@@ -399,7 +503,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 #' #convert bundles to data frame
 #' result <- fhircrackr:::bundles2df(bundles, design)
 
-bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">"), verbose=T) {
+bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">"), verbose = 2) {
 
 	if (is.null(bundles)) {
 
@@ -417,18 +521,18 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 				#dbg
 				#i<-1
 
-				if (verbose) {cat( "\n", i )}
+				if (1 < verbose) {cat( "\n", i )}
 
 				bundle <- bundles[[ i ]]
 
-				bundle2df( bundle, design.df, sep, add_indices = add_indices, brackets = brackets, verbose=verbose)
+				bundle2df( bundle, design.df, sep, add_indices = add_indices, brackets = brackets, verbose = verbose)
 			}
 		)
 	)
 
 	ret <- ret[ apply(ret, 1, function(row) ! all(is.na(row))), , drop = F]
 
-	if (verbose) {cat( "\n" )}
+	if (1 < verbose) {cat( "\n" )}
 
 	ret
 }
@@ -455,7 +559,7 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
 #' @param add_indices A Logical Scalar.
 #' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#' @param verbose Logical scalar. Print progress to console?
+#' @param verbose An Integer Scalar. Level of downloading information to be printed to the console? Defaults to 2.
 #' @noRd
 #' @return A list of data frames as specified by \code{design}.
 #'
@@ -495,7 +599,7 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 #' #convert fhir to data frames
 #' list_of_tables <- fhircrackr:::bundles2dfs(bundles, df_design)
 
-bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">"), verbose=T) {
+bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">"), verbose = 2) {
 
 	if (is.null(bundles)) {
 
@@ -520,13 +624,13 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 
 			design.df <- design[[n]]
 
-			if (verbose) {cat("\n", n)}
+			if (1 < verbose) {cat("\n", n)}
 
-			bundles2df(bundles = bundles, design.df = design.df, sep = sep, add_indices = add_indices, brackets = brackets, verbose=verbose)
+			bundles2df(bundles = bundles, design.df = design.df, sep = sep, add_indices = add_indices, brackets = brackets, verbose = verbose)
 		}
 	)
 
-	if (verbose) {cat("\n")}
+	if (1 < verbose) {cat("\n")}
 
 	if(remove_empty_columns) {
 
@@ -542,50 +646,3 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 	dfs
 }
 
-#' Check design
-#' @description Checks whether a design provided to \code{\link{fhir_crack}} is valid and
-#' issues a warning if it is not.
-#' @param design The design to be checked
-#' @return TRUE if design is invalid, FALSE if design is valid
-#' @noRd
-is_invalid_design <- function(design){
-
-	if (is.null(design)) {
-
-		warning("Argument design is NULL, returning NULL.")
-		return(T)
-	}
-
-	if (!is.list(design)) {
-
-		warning("Argument design has to be a list, returnign NULL.")
-		return(T)
-	}
-
-	if (length(design)<1) {
-
-		warning("Argument design has length 0, returning NULL.")
-		return(T)
-	}
-
-	list.type <- sapply(design, is.list)
-	if (any(!list.type)) {
-
-		warning("All elements of design have to be of type list. Returning NULL.")
-		return(T)
-	}
-
-	if (is.null(names(design)) || any(names(design)=="")) {
-
-		warning("Argument design should be a NAMED list but has at least one unnamed element. Returning NULL")
-		return(T)
-	}
-
-	lengths <- lapply(design, length)
-	if (any(lengths > 2 | lengths < 1)){
-		warning("At least one if the elements of argument design is not a list of length 1 or 2. Returning NUll")
-		return(T)
-	}
-
-	return(F)
-}
