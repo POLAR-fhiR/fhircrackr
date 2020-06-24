@@ -37,7 +37,7 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 #' @param username A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
 #' @param password A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
 #' @param max_bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
-#' @param verbose A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.
+#' @param verbose A integer scalar. Level of downloading information to be printed to the console? Defaults to 1.
 #' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
 #' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
 #'
@@ -47,7 +47,7 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 #' @examples
 #' bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)
 
-fhir_search <- function(request, username = NULL, password = NULL, max_bundles = Inf, verbose = T, max_attempts = 5, delay_between_attempts = 10) {
+fhir_search <- function(request, username = NULL, password = NULL, max_bundles = Inf, verbose = 1, max_attempts = 5, delay_between_attempts = 10) {
 
 	bundles <- list()
 
@@ -57,13 +57,15 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 
 	repeat {
 
-		if (verbose) {cat(paste0("bundle[", cnt <- cnt + 1, "]"))}
+		cnt <- cnt + 1
+
+		if (1 < verbose) {cat(paste0("bundle[", cnt, "]"))}
 
 		bundle <- get_bundle(request = addr, username = username, password = password, verbose = verbose, max_attempts = max_attempts, delay_between_attempts = delay_between_attempts)
 
 		if (is.null(bundle)) {
 
-			message("download interrupted.\n")
+			if (0 < verbose) {message("download interrupted.\n")}
 
 			break
 		}
@@ -76,19 +78,22 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 
 		rels.nxt  <- xml2::xml_attr(xml2::xml_find_first(links, "./relation"), "value") == "next"
 
-		if (cnt == max_bundles) {
+		if (cnt == max_bundles ) {
 
-			if(any(!is.na(rels.nxt) & rels.nxt)) {
+			if (0 < verbose) {
 
-				message(
-					"\nDownload completed. Number of downloaded bundles was limited to ",
-					cnt,
-					" bundles, this is less than the total number of bundles available.\n"
-				)
-			}
-			else {
+				if (any(!is.na(rels.nxt) & rels.nxt)) {
 
-				message("\nDownload completed. All available bundles were downloaded.\n")
+					message(
+						"\nDownload completed. Number of downloaded bundles was limited to ",
+						cnt,
+						" bundles, this is less than the total number of bundles available.\n"
+					)
+				}
+				else {
+
+					message("\nDownload completed. All available bundles were downloaded.\n")
+				}
 			}
 
 			break
@@ -96,7 +101,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 
 		if (!any(!is.na(rels.nxt) & rels.nxt)) {
 
-			message("\nDownload completed. All available bundles were downloaded.\n")
+			if (0 < verbose) {message("\nDownload completed. All available bundles were downloaded.\n")}
 
 			break
 		}
@@ -107,7 +112,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 
 		if(is.null(addr) || is.na(addr) || length(addr) < 1 || addr == "") {
 
-			message("\nDownload completed. All available bundles were downloaded.\n")
+			if (0 < verbose) {message("\nDownload completed. All available bundles were downloaded.\n")}
 
 			break
 		}
@@ -196,7 +201,7 @@ fhir_load <- function(directory) {
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
 #' @param add_indices A Logical scalar.
 #' @param brackets A character vector of length two defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#' @param verbose Logical scalar. Print progress to console?
+#' @param verbose An Integer Scalar. Level of downloading information to be printed to the console? Defaults to 2.
 #' @return A list of data frames as specified by \code{design}.
 #' @export
 #'
@@ -243,11 +248,20 @@ fhir_load <- function(directory) {
 #'
 #' @export
 
-fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">"), verbose=T) {
+fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">"), verbose = 2) {
 
-	if(is_invalid_design(design)) {return(NULL)}
+	if (is_invalid_design(design)) return(NULL)
 
-	bundles2dfs(bundles = bundles, design = design, sep = sep, remove_empty_columns, add_indices = add_indices, brackets = brackets, verbose=verbose)
+	if (!is_valid_bundles_list(bundles)) return(NULL)
+
+	dfs <- bundles2dfs(bundles = bundles, design = design, sep = sep, remove_empty_columns = remove_empty_columns, add_indices = add_indices, brackets = brackets, verbose = verbose)
+
+	if(0 < verbose) {
+
+		message( "FHIR-Resources cracked.")
+	}
+
+	dfs
 }
 
 
@@ -270,7 +284,7 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 
 fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_empty_columns = T, add_indices = F, brackets = c( "<", ">")) {
 
-	caps <- fhir_search(request = paste_paths(url, "/metadata?_format=xml&_pretty=true"))
+	caps <- fhir_search(request = paste_paths(url, "/metadata?"), verbose = 2)
 
 	design <- list(
 		META      = list("/CapabilityStatement", "./*/@*"),

@@ -11,7 +11,7 @@ fhir_crack(
   remove_empty_columns = F,
   add_indices = F,
   brackets = c("<", ">"),
-  verbose = T
+  verbose = 2
 )
 }
 \arguments{
@@ -39,7 +39,7 @@ For a more detailed explanation see the package vignette.}
 
 \item{brackets}{A character vector of length two defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
 
-\item{verbose}{Logical scalar. Print progress to console?}
+\item{verbose}{An Integer Scalar. Level of downloading information to be printed to the console? Defaults to 2.}
 }
 \value{
 A list of data frames as specified by \code{design}.
@@ -62,8 +62,8 @@ df_design <- list(
 		".//MedicationStatement",
 
 		list(
-			AID                = "id/@value",
-			STATUS.TEXT        ="text/status/@value",
+			MS.ID              = "id/@value",
+			STATUS.TEXT        = "text/status/@value",
 			STATUS             = "status/@value",
 			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system/@value",
 			MEDICATION.CODE    = "medicationCodeableConcept/coding/code/@value",

@@ -9,7 +9,7 @@ fhir_search(
   username = NULL,
   password = NULL,
   max_bundles = Inf,
-  verbose = T,
+  verbose = 1,
   max_attempts = 5,
   delay_between_attempts = 10
 )
@@ -23,7 +23,7 @@ fhir_search(
 
 \item{max_bundles}{Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
 
-\item{verbose}{A logical scalar. Should downloading information be printed to the console? Defaults to TRUE.}
+\item{verbose}{A integer scalar. Level of downloading information to be printed to the console? Defaults to 1.}
 
 \item{max_attempts}{A numeric scalar. The maximal number of attempts to send a request, defaults to 5.}
 
