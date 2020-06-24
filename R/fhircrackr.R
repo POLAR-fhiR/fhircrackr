@@ -194,8 +194,9 @@ fhir_load <- function(directory) {
 #'
 #' @param sep A string to separate pasted multiple entries.
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
-#' @param add_indices A Logical Scalar.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param add_indices A Logical scalar.
+#' @param brackets A character vector of length two defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param verbose Logical scalar. Print progress to console?
 #' @return A list of data frames as specified by \code{design}.
 #' @export
 #'
@@ -241,9 +242,11 @@ fhir_load <- function(directory) {
 #' @return A list of data frames as specified by \code{design}
 #'
 #' @export
-fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">")) {
+fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">"), verbose=T) {
 
-	bundles2dfs(bundles = bundles, design = design, sep = sep, remove_empty_columns, add_indices = add_indices, brackets = brackets)
+	if(is_invalid_design(design)) {return(NULL)}
+
+	bundles2dfs(bundles = bundles, design = design, sep = sep, remove_empty_columns, add_indices = add_indices, brackets = brackets, verbose=verbose)
 }
 
 

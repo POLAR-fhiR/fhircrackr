@@ -31,7 +31,7 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "fhir_search()" )
 
-bundles <- fhir_search( request = "https://vonk.fire.ly/R4/Patient?_pretty=true&_count=100000", max_bundles = 10 )
+bundles <- fhir_search( request = "https://hapi.fhir.org/baseR4/Patient?_pretty=true", max_bundles = 5 )
 
 testthat::test_that(
 	"fhir_search downloads a valid bundle list", {
