@@ -35,10 +35,10 @@ bundles <- fhir_search( request = "https://hapi.fhir.org/baseR4/Patient?_pretty=
 
 testthat::test_that(
 	"fhir_search downloads a valid bundle list", {
-		testthat::expect_equal( is.null( bundles ), F )
-		testthat::expect_equal( is.list( bundles ), T )
-		testthat::expect_equal( 0 < length( bundles ), T )
-		testthat::expect_equal( isClass( "xml_node", bundles[[ 1 ]] ), T )
+		testthat::expect_false( is.null( bundles ) )
+		testthat::expect_true( is.list( bundles ) )
+		testthat::expect_true( 0 < length( bundles ) )
+		testthat::expect_true( isClass( "xml_node", bundles[[ 1 ]] ) )
 	}
 )
 
@@ -50,8 +50,8 @@ fhir_save( bundles, "myBundles" )
 
 testthat::test_that(
 	"fhir_save stores all bundles as xml files in the required directory", {
-		testthat::expect_equal( any( "myBundles" %in% dir( ) ), T )
-		testthat::expect_equal( 0 < length( dir( "myBundles" ) ), T )
+		testthat::expect_true( any( "myBundles" %in% dir( ) ) )
+		testthat::expect_true( 0 < length( dir( "myBundles" ) ) )
 	}
 )
 
@@ -63,10 +63,10 @@ myBundles <- fhir_load( "myBundles" )
 
 testthat::test_that(
 	"fhir_load reads all bundles as xml files from the given directory", {
-		testthat::expect_equal( is.null( myBundles ), F )
-		testthat::expect_equal( is.list( myBundles ), T )
-		testthat::expect_equal( 0 < length( myBundles ), T )
-		testthat::expect_equal( isClass( "xml_node", myBundles[[ 1 ]] ), T )
+		testthat::expect_false( is.null( myBundles ) )
+		testthat::expect_true( is.list( myBundles ) )
+		testthat::expect_true( 0 < length( myBundles ) )
+		testthat::expect_true( isClass( "xml_node", myBundles[[ 1 ]] ) )
 	}
 )
 
