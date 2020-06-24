@@ -57,7 +57,7 @@ In general, a fhir search request returns a *bundle* of the resources you reques
 
 If you want to connect to a fhir server that uses basic authentification, you can supply the arguments `username` and `password`.
 
-Because endpoints can sometimes be hard to reach, `fhir_search()` will start five attempts to connect to the endpoint before it gives up. With the arguments `max.attempts` and `delay.between.attempts` you can control this number as well the time interval between attempts.
+Because endpoints can sometimes be hard to reach, `fhir_search()` will start five attempts to connect to the endpoint before it gives up. With the arguments `max_attempts` and `delay_between_attempts` you can control this number as well the time interval between attempts.
 
 As you can see in the next block of code, `fhir_search()` returns a list of xml objects where each list element represents one bundle of resources, so a list of two xml objects in our case:
 
