@@ -213,8 +213,8 @@ fhir_load <- function(directory) {
 #' 		".//MedicationStatement",
 #'
 #' 		list(
-#' 			AID                = "id/@value",
-#' 			STATUS.TEXT        ="text/status/@value",
+#' 			MS.ID              = "id/@value",
+#' 			STATUS.TEXT        = "text/status/@value",
 #' 			STATUS             = "status/@value",
 #' 			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system/@value",
 #' 			MEDICATION.CODE    = "medicationCodeableConcept/coding/code/@value",
