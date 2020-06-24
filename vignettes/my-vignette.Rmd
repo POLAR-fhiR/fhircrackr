@@ -238,7 +238,7 @@ Let's have a look at the following example, where we have a bundle containing ju
 
 ```{r}
 bundle<-xml2::read_xml(
-"<Bundle>
+	"<Bundle>
 		
 		<Patient>
 			<id value='id1'/>
@@ -287,7 +287,7 @@ bundle<-xml2::read_xml(
 				<birthDate value='1974-12-25'/>
 			</Patient>		
 		
-</Bundle>"
+	</Bundle>"
 )
 
 bundle_list<-list(bundle)
