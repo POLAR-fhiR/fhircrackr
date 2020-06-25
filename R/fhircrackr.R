@@ -275,8 +275,10 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 #' @param url The URL of the FHIR server endpoint.
 #' @param sep A string to separate pasted multiple entries
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
-#' @param add_indices A Logical Scalar.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the indices. e.g. c( "<", ">")
+#' @param add_indices A logical scalar.
+#' @param brackets A vector of strings defining the Brackets surrounding the indices. e.g. c( "<", ">")
+#' @param verbose An integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
+#' downloading/extraction progress will be printed. Defaults to 2.
 #'
 #' @return A list of data frames containing the information from the statement
 #' @export
@@ -286,9 +288,9 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 #' cap <- fhir_cs("https://hapi.fhir.org/baseR4")
 #'
 
-fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_empty_columns = T, add_indices = F, brackets = c( "<", ">")) {
+fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_empty_columns = T, add_indices = F, brackets = c( "<", ">"), verbose=2) {
 
-	caps <- fhir_search(request = paste_paths(url, "/metadata?"), verbose = 2)
+	caps <- fhir_search(request = paste_paths(url, "/metadata?"), verbose = verbose)
 
 	design <- list(
 		META      = list("/CapabilityStatement", "./*/@*"),
@@ -296,7 +298,7 @@ fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_
 		REST      = list("/CapabilityStatement/rest/resource")
 	)
 
-	fhir_crack(bundles = caps, design = design, sep = sep, remove_empty_columns = remove_empty_columns, add_indices = add_indices, brackets = brackets)
+	fhir_crack(bundles = caps, design = design, sep = sep, remove_empty_columns = remove_empty_columns, add_indices = add_indices, brackets = brackets, verbose=verbose)
 }
 
 #' Serialize a FHIR Bundle list
