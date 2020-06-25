@@ -122,8 +122,11 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, m
 
 #' Check http status code
 #'
+#' Checks the status code and issues an error or warning if necessary
 #'
-#'
+#' @param code A http status code
+#' @example check_http_code(404)
+#' @noRd
 #'
 #'
 check_http_code <- function(code){
