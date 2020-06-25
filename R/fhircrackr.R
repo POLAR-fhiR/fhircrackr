@@ -327,6 +327,86 @@ fhir_unserialize <- function(bundles) {
 	lapply(bundles, xml2::xml_unserialize)
 
 }
+
+detree_row <- function( row, brackets = c( "\\[", "\\]" ) ) {
+
+	pattern.ids <- paste0( brackets[1], "([0-9]+\\.*)+", brackets[2] )
+
+	gsub( paste0( brackets, collapse = "" ), "", stringr::str_extract_all( "[1]A [2]A", pattern.ids))
+	stringr::str_extract_all( "[1.1]A [2.1]A", pattern.ids)
+
+	d <- row[ 0, , F ]#as.data.frame( row, stringsAsFactors = F )[ 0, ]
+
+	for( cn in names( row ) ) {
+		#dbg
+		#cn <- names(row)[4]
+
+		col <- row[[ cn ]]
+
+		items   <- stringr::str_split( col, pattern )[[ 1 ]]
+
+		if( is.na( items[ 1 ] ) ) {
+
+			NULL
+		}
+		else {
+
+			items <- items[ 2 : length( items ) ]
+
+			ids     <- stringr::str_extract_all( col, pattern )[[ 1 ]]
+			row.ids <- gsub( "(\\[)([0-9]+)(.*\\])", "\\2", ids )
+
+			new.ids <- gsub( "(\\[)([0-9]+\\.*)(.*\\])", "\\1\\3", ids )
+
+			if( 0 < length( new.ids ) && new.ids == "[]" ) new.ids <- ""
+
+			un.rids <- unique(row.ids)
+
+			for( i in seq_along( un.rids ) ) {
+
+				#dbg
+				#i <- 1
+				id <- un.rids[[ i ]]
+
+				fltr <- row.ids == id
+
+				it <- items[ fltr ]
+				ni <- new.ids[ fltr ]
+				ri <- row.ids[ fltr ]
+				vl <- paste0( ni, it, collapse = "" )
+
+				#print( paste0("id=",id," cn=",cn))
+				d[ id, cn ] <- vl
+			}
+		}
+	}
+
+#	rownames( d ) <- un.rids
+
+	d
+}
+
+detree_df <- function( df=d3$Entries, brackets = c( "[", "]" ) ) {
+
+	Reduce(
+		rbind,
+		lapply(
+			seq_len(nrow(df)),
+			function( row.id ) {
+
+				#dbg
+				#row.id <- 1
+
+				detree_row(df[row.id,])
+			}
+		)
+	)
+}
+
+
+
+j<-detree_df(df = d3$Entries)
+
 ##### Documentation for medication_bundles data set ######
 
 #' Exemplary FHIR bundles

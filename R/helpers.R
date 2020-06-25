@@ -26,6 +26,9 @@ lst <- function(..., prefix = NULL, suffix = NULL) {
 #' @noRd
 rbind_list_of_data_frames <- function( list ) {
 
+	#dbg
+	#list <- l
+
 	unique.names <- unique(
 		Reduce(
 			union,
