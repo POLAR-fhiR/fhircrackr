@@ -17,13 +17,14 @@ fhir_search(
 \arguments{
 \item{request}{A string containing the full FHIR search request.}
 
-\item{username}{A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.}
+\item{username}{A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.}
 
-\item{password}{A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.}
+\item{password}{A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.}
 
 \item{max_bundles}{Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
 
-\item{verbose}{A integer scalar. Level of downloading information to be printed to the console? Defaults to 1.}
+\item{verbose}{An Integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
+downloading progress will be printed. Defaults to 2.}
 
 \item{max_attempts}{A numeric scalar. The maximal number of attempts to send a request, defaults to 5.}
 
