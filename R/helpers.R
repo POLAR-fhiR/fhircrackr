@@ -470,13 +470,6 @@ xtrct_columns <- function(child, df.columns, sep = " -+- ", add_indices = F, bra
 #' result <- fhircrackr:::bundle2df(bundle, design)
 bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">"), verbose = 2) {
 
-	if (is.null(bundle)) {
-
-		warning("Argument bundle is NULL, returning NULL.")
-
-		return(NULL)
-	}
-
 	xml2::xml_ns_strip(bundle)
 
 	xpath <- design.df[[1]]
@@ -550,14 +543,6 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 #' result <- fhircrackr:::bundles2df(bundles, design)
 
 bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">"), verbose = 2) {
-
-	if (is.null(bundles)) {
-
-		warning("Argument bundles is NULL, returning NULL.")
-
-		return(NULL)
-	}
-
 
 	ret <- rbind_list_of_data_frames(
 		lapply(
@@ -646,13 +631,6 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 #' list_of_tables <- fhircrackr:::bundles2dfs(bundles, df_design)
 
 bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">"), verbose = 2) {
-
-	if (is.null(bundles)) {
-
-		warning("Argument bundles is NULL, returning NULL.")
-
-		return(NULL)
-	}
 
 	if (add_indices) {
 
