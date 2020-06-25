@@ -34,10 +34,11 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 #' @description Downloads all fhir bundles of a fhir search request from a fhir server.
 #'
 #' @param request A string containing the full FHIR search request.
-#' @param username A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
-#' @param password A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
+#' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
+#' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param max_bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
-#' @param verbose A integer scalar. Level of downloading information to be printed to the console? Defaults to 1.
+#' @param verbose An Integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
+#' downloading progress will be printed. Defaults to 2.
 #' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
 #' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
 #'
@@ -185,13 +186,13 @@ fhir_load <- function(directory) {
 #' @description Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
 #'
 #' @param bundles A FHIR search result as returned by \code{\link{fhir_search}}.
-#' @param design A named list specifiying which data frame should contain which entries of the bundle.
+#' @param design A named list specifying which data frame should contain which entries of the bundle.
 #' The names correspond to the names of the resulting data frames.
 #'
 #' Each element of design is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
 #' FHIR bundle page. There are 3 options for the second element of that list:
 #'
-#' - There is no second element: all attributes of the recource are extracted
+#' - There is no second element: all attributes of the resource are extracted
 #' - The second element is string containing a XPath expression to all the values that should be extracted. "./@value" e.g. would extract all
 #'   values on the root level.
 #' - The second element is a named list where the elements are XPath expressions indicating the specific position of values to extract, where the names of the
@@ -202,9 +203,10 @@ fhir_load <- function(directory) {
 #' @param sep A string to separate pasted multiple entries.
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
 #' @param add_indices A Logical scalar.
-#' @param brackets A character vector of length two defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#' @param verbose An Integer Scalar. Level of downloading information to be printed to the console? Defaults to 2.
-#' @return A list of data frames as specified by \code{design}.
+#' @param brackets A character vector of length two defining the Brackets surrounding the indices. e.g. c( "<", ">")
+#' @param verbose An Integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
+#' extraction progress will be printed. Defaults to 2.
+#' #' @return A list of data frames as specified by \code{design}.
 #' @export
 #'
 #' @examples
@@ -254,7 +256,7 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 
 	if (is_invalid_design(design)) return(NULL)
 
-	if (!is_valid_bundles_list(bundles)) return(NULL)
+	if (is_invalid_bundles_list(bundles)) return(NULL)
 
 	dfs <- bundles2dfs(bundles = bundles, design = design, sep = sep, remove_empty_columns = remove_empty_columns, add_indices = add_indices, brackets = brackets, verbose = verbose)
 
@@ -270,11 +272,11 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 #' Get capability statement
 #' @description Get the capability statement of a FHIR server.
 #'
-#' @param url The url of the FHIR server endpoint.
+#' @param url The URL of the FHIR server endpoint.
 #' @param sep A string to separate pasted multiple entries
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
 #' @param add_indices A Logical Scalar.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param brackets A Vector of Strings defining the Brackets surrounding the indices. e.g. c( "<", ">")
 #'
 #' @return A list of data frames containing the information from the statement
 #' @export

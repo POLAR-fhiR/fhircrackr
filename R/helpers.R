@@ -61,10 +61,10 @@ rbind_list_of_data_frames <- function( list ) {
 #' @description Download a single FHIR bundle via FHIR search request and return it as a xml object.
 #'
 #' @param request A string containing the full FHIR search request.
-#' @param username A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
-#' @param password A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
+#' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentification.
+#' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentification.
 #' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
-#' @param verbose An integer scalar. Level of downloading information to be printed to the console? Defaults to 2.
+#' @param verbose An integer scalar. If > 1,  Downloading progress is printed. Defaults to 2.
 #' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
 #'
 #' @return The downloaded bundle in xml format.
@@ -219,30 +219,30 @@ is_invalid_design <- function(design){
 	F
 }
 #' Check List of Bundles
-#' @description Checks whether a List of Bundles provided to \code{\link{fhir_crack}} is valid and
-#' issues a warning if it is not.
+#' @description Checks whether a List of Bundles provided to \code{\link{fhir_crack}} is ivalid and
+#' issues a warning if it is.
 #' @param bundles_list The List of Bundles to be checked
-#' @return TRUE if bundles_list is valid, FALSE if not
+#' @return TRUE if bundles_list is invalid, FALSE if not
 #' @noRd
-is_valid_bundles_list <- function(bundles_list){
+is_invalid_bundles_list <- function(bundles_list){
 
 	if (is.null(bundles_list)) {
 
 		warning("Argument bundles_list is NULL, returning NULL.")
 
-		return(F)
+		return(T)
 	}
 
 	if (!is.list(bundles_list)) {
 
 		warning("Argument bundles_list has to be a list, returnign NULL.")
-		return(F)
+		return(T)
 	}
 
 	if (length(bundles_list)<1) {
 
 		warning("Argument bundles_list has length 0, returning NULL.")
-		return(F)
+		return(T)
 	}
 
 	valid.doc.types <- all(
@@ -265,11 +265,11 @@ is_valid_bundles_list <- function(bundles_list){
 
 	if (!valid.doc.types) {
 
-		warning("Argument bundles_list doesn't contain only valid Bundles. These have to be of Class 'xml_document' and 'xml_node'. Returning NULL")
-		return(F)
+		warning("Argument bundles_list contains at least one invalid Bundle. Bundles have to be of Class 'xml_document' and 'xml_node'. Returning NULL")
+		return(T)
 	}
 
-	T
+	F
 }
 
 
@@ -447,7 +447,7 @@ xtrct_columns <- function(child, df.columns, sep = " -+- ", add_indices = F, bra
 #' @param sep A string to separate pasted multiple entries.
 #' @param add_indices A Logical Scalar.
 #' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#' @param verbose An Integer Scalar. Level of downloading information to be printed to the console? Defaults to 1.
+#' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
 #' @noRd
 #' @examples
 #' #unserialize example bundle
@@ -529,7 +529,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 #' @param sep A string to separate pasted multiple entries.
 #' @param add_indices A Logical Scalar.
 #' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#' @param verbose An Integer Scalar. Level of downloading information to be printed to the console? Defaults to 2.
+#' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
 #' @noRd
 #' @examples
 #' #unserialize example bundle
@@ -605,7 +605,7 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
 #' @param add_indices A Logical Scalar.
 #' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#' @param verbose An Integer Scalar. Level of downloading information to be printed to the console? Defaults to 2.
+#' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
 #' @noRd
 #' @return A list of data frames as specified by \code{design}.
 #'
