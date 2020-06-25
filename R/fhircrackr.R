@@ -288,11 +288,11 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 #' cap <- fhir_cs("https://hapi.fhir.org/baseR4")
 #'
 
-fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_empty_columns = T, add_indices = F, brackets = c( "<", ">"), verbose=2) {
+fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_empty_columns = T, add_indices = F, brackets = c( "<", ">"), verbose = 2) {
 
 	caps <- fhir_search(request = paste_paths(url, "/metadata?"), verbose = verbose)
 
-	design <- list(
+		design <- list(
 		META      = list("/CapabilityStatement", "./*/@*"),
 		REST.META = list("/CapabilityStatement/rest", "./*/@*"),
 		REST      = list("/CapabilityStatement/rest/resource")
@@ -332,84 +332,41 @@ fhir_unserialize <- function(bundles) {
 
 }
 
-detree_row <- function( row, brackets = c( "\\[", "\\]" ) ) {
 
-	pattern.ids <- paste0( brackets[1], "([0-9]+\\.*)+", brackets[2] )
 
-	gsub( paste0( brackets, collapse = "" ), "", stringr::str_extract_all( "[1]A [2]A", pattern.ids))
-	stringr::str_extract_all( "[1.1]A [2.1]A", pattern.ids)
+#' Reconstructring Data Frames
+#'
+#' @param indexed_data_frame A Data Frame with indexed multiple Entries in its Columns.
+#' @param brackets A Cahracter Vector of Length 2, holding the Brackets.
+#' @param sep A Character Scalar, the Separator.
+#'
+#' @return A Data Frame.
+#' @export
+#'
+#' @examples
+#' \dontrun {
+#' fhir_melt( df )
+#' }
+#'
+fhir_melt <- function( indexed_data_frame, brackets = c( "<", ">" ), sep = " -+- " ) {
 
-	d <- row[ 0, , F ]#as.data.frame( row, stringsAsFactors = F )[ 0, ]
-
-	for( cn in names( row ) ) {
-		#dbg
-		#cn <- names(row)[4]
-
-		col <- row[[ cn ]]
-
-		items   <- stringr::str_split( col, pattern )[[ 1 ]]
-
-		if( is.na( items[ 1 ] ) ) {
-
-			NULL
-		}
-		else {
-
-			items <- items[ 2 : length( items ) ]
-
-			ids     <- stringr::str_extract_all( col, pattern )[[ 1 ]]
-			row.ids <- gsub( "(\\[)([0-9]+)(.*\\])", "\\2", ids )
-
-			new.ids <- gsub( "(\\[)([0-9]+\\.*)(.*\\])", "\\1\\3", ids )
-
-			if( 0 < length( new.ids ) && new.ids == "[]" ) new.ids <- ""
-
-			un.rids <- unique(row.ids)
-
-			for( i in seq_along( un.rids ) ) {
-
-				#dbg
-				#i <- 1
-				id <- un.rids[[ i ]]
-
-				fltr <- row.ids == id
-
-				it <- items[ fltr ]
-				ni <- new.ids[ fltr ]
-				ri <- row.ids[ fltr ]
-				vl <- paste0( ni, it, collapse = "" )
-
-				#print( paste0("id=",id," cn=",cn))
-				d[ id, cn ] <- vl
-			}
-		}
-	}
-
-#	rownames( d ) <- un.rids
-
-	d
-}
-
-detree_df <- function( df=d3$Entries, brackets = c( "[", "]" ) ) {
-
-	Reduce(
+	d <- Reduce(
 		rbind,
 		lapply(
-			seq_len(nrow(df)),
+			seq_len(nrow(indexed_data_frame)),
 			function( row.id ) {
 
 				#dbg
-				#row.id <- 1
+				#row.id <- 2
 
-				detree_row(df[row.id,])
+				detree_row(row = indexed_data_frame[row.id,], brackets = brackets, sep = sep)
 			}
 		)
 	)
+
+	d[ order( as.numeric( rownames( d ) ) ), ]
 }
 
-
-
-j<-detree_df(df = d3$Entries)
 
 ##### Documentation for medication_bundles data set ######
 

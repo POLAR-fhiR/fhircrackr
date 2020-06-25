@@ -9,7 +9,8 @@ fhir_cs(
   sep = " -+- ",
   remove_empty_columns = T,
   add_indices = F,
-  brackets = c("<", ">")
+  brackets = c("<", ">"),
+  verbose = 2
 )
 }
 \arguments{
@@ -19,9 +20,12 @@ fhir_cs(
 
 \item{remove_empty_columns}{Logical scalar. Remove empty columns?}
 
-\item{add_indices}{A Logical Scalar.}
+\item{add_indices}{A logical scalar.}
 
-\item{brackets}{A Vector of Strings defining the Brackets surrounding the indices. e.g. c( "<", ">")}
+\item{brackets}{A vector of strings defining the Brackets surrounding the indices. e.g. c( "<", ">")}
+
+\item{verbose}{An integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
+downloading/extraction progress will be printed. Defaults to 2.}
 }
 \value{
 A list of data frames containing the information from the statement

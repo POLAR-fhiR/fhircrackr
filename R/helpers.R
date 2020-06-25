@@ -674,4 +674,67 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 }
 
 
+# escape if neccessary
+esc <- function( s ) gsub( "([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s )
+
+# row to data frame
+detree_row <- function( row=caps$REST[2,], brackets = c( "<", ">" ), sep = " -+- " ) {
+
+	#dbg
+	#row <- d3.3$Entries[ 1, ]
+
+	brackets.escaped <- esc( brackets )
+
+	pattern.ids <- paste0( brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2] )
+
+	ids <- stringr::str_extract_all( row, pattern.ids)
+
+	names( ids ) <- names( row )
+
+	pattern.items <- paste0( brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2] )
+
+	items <- stringr::str_split( row, pattern.items)
+
+	items <- lapply( items, function( i ) if( ! is.na( i ) && i[1] == "" ) i[ 2 : length( i ) ] else i )
+
+	names( items ) <- names( row )
+
+	d <- row[ 0, , F ]
+
+	for( i in  names( ids ) ) {
+
+		#dbg
+		#i<-names( ids )[2]
+
+		id <- ids[[ i ]]
+
+		if( ! all( is.na( id ) ) ) {
+
+			it <- items[[ i ]]
+
+			new.rows        <- gsub( paste0( brackets.escaped[1], "([0-9]+)\\.*.*" ), "\\1", id )
+			new.ids         <- gsub( paste0( "(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")" ), "\\1\\3", id )
+			unique.new.rows <- unique( new.rows )
+
+			set <- paste0( new.ids, it )
+
+			f <- sapply(
+				unique.new.rows,
+				function( unr ) {
+
+					#dbg
+					#unr <- unique.new.rows[1]
+
+					fltr <- unr == new.rows
+
+					paste0( set[ fltr ], collapse = "" )
+				}
+			)
+
+			for( n in unique.new.rows ) d[ n, i ] <- gsub( paste0( esc( sep ), "$" ), "", f[ n ], perl = T )
+		}
+	}
+
+	d
+}
 
