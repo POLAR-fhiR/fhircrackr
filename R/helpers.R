@@ -90,36 +90,79 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, m
 			httr::authenticate(username, password)
 		}
 
-		response <- try(
-			httr::GET(
-				request,
-				httr::add_headers(Accept = "application/fhir+xml"),
-				httr::content_type("application/fhir+xml;charset=utf-8"),
-				auth
-			),
-			silent = T
+		response <- httr::GET(
+			request,
+			httr::add_headers(Accept = "application/fhir+xml"),
+			httr::content_type("application/fhir+xml;charset=utf-8"),
+			auth
 		)
 
-		if (class(response)[1] != "try-error") {
+		check_http_code(response$status_code)
 
-			payload <- try(httr::content(response, as = "text", encoding = "UTF-8"), silent = T)
 
-			if (class(payload)[1] != "try-error") {
+		payload <- try(httr::content(response, as = "text", encoding = "UTF-8"), silent = T)
 
-				xml <- try(xml2::read_xml(payload), silent = T)
+		if (class(payload)[1] != "try-error") {
 
-				if(class(xml)[1] != "try-error") {
+			xml <- try(xml2::read_xml(payload), silent = T)
 
-					return(xml)
-				}
+			if(class(xml)[1] != "try-error") {
+
+				return(xml)
 			}
 		}
+
 
 		Sys.sleep(delay_between_attempts)
 	}
 
 	NULL
 }
+
+
+#' Check http status code
+#'
+#'
+#'
+#'
+#'
+check_http_code <- function(code){
+
+	if (code == 400) {
+
+		stop("HTTP code 400 - Please check if your request is a valid FHIR search request.")
+
+	}
+
+	if (code == 401) {
+
+		stop("HTTP code 401 - Authentification needed.")
+	}
+
+	if (code == 404) {
+
+		stop("HTTP code 404 - Not found. Did you misspell the resource?")
+	}
+
+	if (code >= 300 & code < 400) {
+
+		warning(paste("Your request generated a HTTP code", code))
+	}
+
+	if (code >=400 & code < 500) {
+
+		stop(paste("Your request generated a client error, HTTP code", code))
+
+	}
+
+	if (code >=500 & code < 600) {
+
+		stop(paste("Your request generated a server error, HTTP code", code))
+
+	}
+
+}
+
 
 
 #' Check design
@@ -645,4 +688,6 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 
 	dfs
 }
+
+
 
