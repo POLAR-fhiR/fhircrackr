@@ -13,7 +13,7 @@ fhir_cs(
 )
 }
 \arguments{
-\item{url}{The url of the FHIR server endpoint.}
+\item{url}{The URL of the FHIR server endpoint.}
 
 \item{sep}{A string to separate pasted multiple entries}
 
@@ -21,7 +21,7 @@ fhir_cs(
 
 \item{add_indices}{A Logical Scalar.}
 
-\item{brackets}{A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
+\item{brackets}{A Vector of Strings defining the Brackets surrounding the indices. e.g. c( "<", ">")}
 }
 \value{
 A list of data frames containing the information from the statement

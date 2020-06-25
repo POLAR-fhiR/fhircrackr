@@ -17,13 +17,13 @@ fhir_crack(
 \arguments{
 \item{bundles}{A FHIR search result as returned by \code{\link{fhir_search}}.}
 
-\item{design}{A named list specifiying which data frame should contain which entries of the bundle.
+\item{design}{A named list specifying which data frame should contain which entries of the bundle.
 The names correspond to the names of the resulting data frames.
 
 Each element of design is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
 FHIR bundle page. There are 3 options for the second element of that list:
 
-- There is no second element: all attributes of the recource are extracted
+- There is no second element: all attributes of the resource are extracted
 - The second element is string containing a XPath expression to all the values that should be extracted. "./@value" e.g. would extract all
   values on the root level.
 - The second element is a named list where the elements are XPath expressions indicating the specific position of values to extract, where the names of the
@@ -37,13 +37,13 @@ For a more detailed explanation see the package vignette.}
 
 \item{add_indices}{A Logical scalar.}
 
-\item{brackets}{A character vector of length two defining the Brackets surrounding the Indices. e.g. c( "<", ">")}
+\item{brackets}{A character vector of length two defining the Brackets surrounding the indices. e.g. c( "<", ">")}
 
-\item{verbose}{An Integer Scalar. Level of downloading information to be printed to the console? Defaults to 2.}
+\item{verbose}{An Integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
+extraction progress will be printed. Defaults to 2.
+#' @return A list of data frames as specified by \code{design}.}
 }
 \value{
-A list of data frames as specified by \code{design}.
-
 A list of data frames as specified by \code{design}
 }
 \description{
