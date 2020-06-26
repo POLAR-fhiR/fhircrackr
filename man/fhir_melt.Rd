@@ -6,26 +6,28 @@
 \usage{
 fhir_melt(
   indexed_data_frame,
-  column.prefix = "address",
+  column.prefix = "id",
   brackets = c("<", ">"),
   sep = " -+- "
 )
 }
 \arguments{
-\item{indexed_data_frame}{A Data Frame with indexed multiple Entries in its Columns.}
+\item{indexed_data_frame}{A Data Frame with indexed multiple entries in its columns.}
 
-\item{brackets}{A Cahracter Vector of Length 2, holding the Brackets.}
+\item{column.prefix}{A String specifiying the column(s) to be melted.}
 
-\item{sep}{A Character Scalar, the Separator.}
+\item{brackets}{A character vector of Length 2, holding the Brackets.}
+
+\item{sep}{A string, the separator.}
 }
 \value{
-A Data Frame.
+A data frame without indices
 }
 \description{
 Reconstructring Data Frames
 }
 \examples{
-\dontrun {
+\dontrun{
 fhir_melt( df )
 }
 

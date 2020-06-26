@@ -336,15 +336,16 @@ fhir_unserialize <- function(bundles) {
 
 #' Reconstructring Data Frames
 #'
-#' @param indexed_data_frame A Data Frame with indexed multiple Entries in its Columns.
-#' @param brackets A Cahracter Vector of Length 2, holding the Brackets.
-#' @param sep A Character Scalar, the Separator.
+#' @param indexed_data_frame A Data Frame with indexed multiple entries in its columns.
+#' @param brackets A character vector of Length 2, holding the Brackets.
+#' @param sep A string, the separator.
+#' @param column.prefix A String specifiying the column(s) to be melted.
 #'
-#' @return A Data Frame.
+#' @return A data frame without indices
 #' @export
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #' fhir_melt( df )
 #' }
 #'
@@ -423,7 +424,7 @@ fhir_melt <- function( indexed_data_frame, column.prefix = "id", brackets = c( "
 #')
 #'
 #'
-#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list("/Bundle/Patient")), add_indices = T, verbose = 2)
+#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list("/Bundle/Patient")), add_indices = TRUE, verbose = 2)
 #'
 #' df_indices_removed <- fhir_rm_indices(dfs[[1]])
 
