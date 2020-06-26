@@ -4,7 +4,12 @@
 \alias{fhir_melt}
 \title{Reconstructring Data Frames}
 \usage{
-fhir_melt(indexed_data_frame, brackets = c("<", ">"), sep = " -+- ")
+fhir_melt(
+  indexed_data_frame,
+  column.prefix = "address",
+  brackets = c("<", ">"),
+  sep = " -+- "
+)
 }
 \arguments{
 \item{indexed_data_frame}{A Data Frame with indexed multiple Entries in its Columns.}

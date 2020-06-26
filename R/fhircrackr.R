@@ -348,7 +348,10 @@ fhir_unserialize <- function(bundles) {
 #' fhir_melt( df )
 #' }
 #'
-fhir_melt <- function( indexed_data_frame, brackets = c( "<", ">" ), sep = " -+- " ) {
+fhir_melt <- function( indexed_data_frame, column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- " ) {
+
+	#dbg
+	#column.prefix <- "id"
 
 	d <- Reduce(
 		rbind,
@@ -357,14 +360,21 @@ fhir_melt <- function( indexed_data_frame, brackets = c( "<", ">" ), sep = " -+-
 			function( row.id ) {
 
 				#dbg
-				#row.id <- 2
+				#row.id <- 1
 
-				detree_row(row = indexed_data_frame[row.id,], brackets = brackets, sep = sep)
+				e <- detree_row(row = indexed_data_frame[row.id,], column.prefix = column.prefix, brackets = brackets, sep = sep)
+
+				e[[ column.prefix ]] <- row.id
+
+
+				#e[[ column.prefix ]] <- row.id
+
+				e
 			}
 		)
 	)
 
-	d[ order( as.numeric( rownames( d ) ) ), ]
+	d[ order( d[[ column.prefix ]] ), ]
 }
 
 

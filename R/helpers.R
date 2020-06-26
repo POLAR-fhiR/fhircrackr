@@ -659,7 +659,7 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 
 	if (1 < verbose) {cat("\n")}
 
-	if(remove_empty_columns) {
+	if (remove_empty_columns) {
 
 		dfs <- lapply(
 			dfs,
@@ -678,7 +678,17 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 esc <- function( s ) gsub( "([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s )
 
 # row to data frame
-detree_row <- function( row=caps$REST[2,], brackets = c( "<", ">" ), sep = " -+- " ) {
+detree_row <- function( row=a[3,], column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- " ) {
+
+	pattern.col <- paste0( "^", column.prefix, "\\." )
+
+	col.names.mutable  <- names( row )[ grep( pattern.col, names( row ) ) ]
+
+	col.names.constant <- setdiff( names( row ), col.names.mutable )
+
+	row.mutable  <- row[ col.names.mutable ]
+
+	row.constant <- row[ col.names.constant ]
 
 	#dbg
 	#row <- d3.3$Entries[ 1, ]
@@ -687,24 +697,24 @@ detree_row <- function( row=caps$REST[2,], brackets = c( "<", ">" ), sep = " -+-
 
 	pattern.ids <- paste0( brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2] )
 
-	ids <- stringr::str_extract_all( row, pattern.ids)
+	ids <- stringr::str_extract_all( row.mutable, pattern.ids)
 
-	names( ids ) <- names( row )
+	names( ids ) <- col.names.mutable
 
 	pattern.items <- paste0( brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2] )
 
-	items <- stringr::str_split( row, pattern.items)
+	items <- stringr::str_split( row.mutable, pattern.items)
 
 	items <- lapply( items, function( i ) if( ! is.na( i ) && i[1] == "" ) i[ 2 : length( i ) ] else i )
 
-	names( items ) <- names( row )
+	names( items ) <- col.names.mutable
 
 	d <- row[ 0, , F ]
 
-	for( i in  names( ids ) ) {
+	for( i in names( ids ) ) {
 
 		#dbg
-		#i<-names( ids )[2]
+		#i<-names( ids )[1]
 
 		id <- ids[[ i ]]
 
@@ -734,6 +744,10 @@ detree_row <- function( row=caps$REST[2,], brackets = c( "<", ">" ), sep = " -+-
 			for( n in unique.new.rows ) d[ n, i ] <- gsub( paste0( esc( sep ), "$" ), "", f[ n ], perl = T )
 		}
 	}
+
+	if( 0 < length( col.names.constant ) ) d[ , col.names.constant ] <- row[ col.names.constant ]
+
+	names( d )[ names( d ) %in% col.names.mutable ] <- gsub( paste0( "^", column.prefix, "\\." ), "", col.names.mutable )
 
 	d
 }
