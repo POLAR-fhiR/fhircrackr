@@ -26,6 +26,9 @@ lst <- function(..., prefix = NULL, suffix = NULL) {
 #' @noRd
 rbind_list_of_data_frames <- function( list ) {
 
+	#dbg
+	#list <- l
+
 	unique.names <- unique(
 		Reduce(
 			union,
@@ -61,10 +64,10 @@ rbind_list_of_data_frames <- function( list ) {
 #' @description Download a single FHIR bundle via FHIR search request and return it as a xml object.
 #'
 #' @param request A string containing the full FHIR search request.
-#' @param username A string containing the username for basic authentification. Defaults to NULL, meaning no authentification.
-#' @param password A string containing the passwort for basic authentification. Defaults to NULL, meaning no authentification.
+#' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentification.
+#' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentification.
 #' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
-#' @param verbose An integer scalar. Level of downloading information to be printed to the console? Defaults to 2.
+#' @param verbose An integer scalar. If > 1,  Downloading progress is printed. Defaults to 2.
 #' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
 #'
 #' @return The downloaded bundle in xml format.
@@ -90,36 +93,82 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, m
 			httr::authenticate(username, password)
 		}
 
-		response <- try(
-			httr::GET(
-				request,
-				httr::add_headers(Accept = "application/fhir+xml"),
-				httr::content_type("application/fhir+xml;charset=utf-8"),
-				auth
-			),
-			silent = T
+		response <- httr::GET(
+			request,
+			httr::add_headers(Accept = "application/fhir+xml"),
+			httr::content_type("application/fhir+xml;charset=utf-8"),
+			auth
 		)
 
-		if (class(response)[1] != "try-error") {
+		check_http_code(response$status_code)
 
-			payload <- try(httr::content(response, as = "text", encoding = "UTF-8"), silent = T)
 
-			if (class(payload)[1] != "try-error") {
+		payload <- try(httr::content(response, as = "text", encoding = "UTF-8"), silent = T)
 
-				xml <- try(xml2::read_xml(payload), silent = T)
+		if (class(payload)[1] != "try-error") {
 
-				if(class(xml)[1] != "try-error") {
+			xml <- try(xml2::read_xml(payload), silent = T)
 
-					return(xml)
-				}
+			if(class(xml)[1] != "try-error") {
+
+				return(xml)
 			}
 		}
+
 
 		Sys.sleep(delay_between_attempts)
 	}
 
 	NULL
 }
+
+
+#' Check http status code
+#'
+#' Checks the status code and issues an error or warning if necessary
+#'
+#' @param code A http status code
+#' @example check_http_code(404)
+#' @noRd
+#'
+#'
+check_http_code <- function(code){
+
+	if (code == 400) {
+
+		stop("HTTP code 400 - Please check if your request is a valid FHIR search request.")
+
+	}
+
+	if (code == 401) {
+
+		stop("HTTP code 401 - Authentification needed.")
+	}
+
+	if (code == 404) {
+
+		stop("HTTP code 404 - Not found. Did you misspell the resource?")
+	}
+
+	if (code >= 300 & code < 400) {
+
+		warning(paste("Your request generated a HTTP code", code))
+	}
+
+	if (code >=400 & code < 500) {
+
+		stop(paste("Your request generated a client error, HTTP code", code))
+
+	}
+
+	if (code >=500 & code < 600) {
+
+		stop(paste("Your request generated a server error, HTTP code", code))
+
+	}
+
+}
+
 
 
 #' Check design
@@ -173,30 +222,30 @@ is_invalid_design <- function(design){
 	F
 }
 #' Check List of Bundles
-#' @description Checks whether a List of Bundles provided to \code{\link{fhir_crack}} is valid and
-#' issues a warning if it is not.
+#' @description Checks whether a List of Bundles provided to \code{\link{fhir_crack}} is ivalid and
+#' issues a warning if it is.
 #' @param bundles_list The List of Bundles to be checked
-#' @return TRUE if bundles_list is valid, FALSE if not
+#' @return TRUE if bundles_list is invalid, FALSE if not
 #' @noRd
-is_valid_bundles_list <- function(bundles_list){
+is_invalid_bundles_list <- function(bundles_list){
 
 	if (is.null(bundles_list)) {
 
 		warning("Argument bundles_list is NULL, returning NULL.")
 
-		return(F)
+		return(T)
 	}
 
 	if (!is.list(bundles_list)) {
 
 		warning("Argument bundles_list has to be a list, returnign NULL.")
-		return(F)
+		return(T)
 	}
 
 	if (length(bundles_list)<1) {
 
 		warning("Argument bundles_list has length 0, returning NULL.")
-		return(F)
+		return(T)
 	}
 
 	valid.doc.types <- all(
@@ -219,11 +268,11 @@ is_valid_bundles_list <- function(bundles_list){
 
 	if (!valid.doc.types) {
 
-		warning("Argument bundles_list doesn't contain only valid Bundles. These have to be of Class 'xml_document' and 'xml_node'. Returning NULL")
-		return(F)
+		warning("Argument bundles_list contains at least one invalid Bundle. Bundles have to be of Class 'xml_document' and 'xml_node'. Returning NULL")
+		return(T)
 	}
 
-	T
+	F
 }
 
 
@@ -401,7 +450,7 @@ xtrct_columns <- function(child, df.columns, sep = " -+- ", add_indices = F, bra
 #' @param sep A string to separate pasted multiple entries.
 #' @param add_indices A Logical Scalar.
 #' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#' @param verbose An Integer Scalar. Level of downloading information to be printed to the console? Defaults to 1.
+#' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
 #' @noRd
 #' @examples
 #' #unserialize example bundle
@@ -423,13 +472,6 @@ xtrct_columns <- function(child, df.columns, sep = " -+- ", add_indices = F, bra
 #' #convert bundle to data frame
 #' result <- fhircrackr:::bundle2df(bundle, design)
 bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">"), verbose = 2) {
-
-	if (is.null(bundle)) {
-
-		warning("Argument bundle is NULL, returning NULL.")
-
-		return(NULL)
-	}
 
 	xml2::xml_ns_strip(bundle)
 
@@ -483,7 +525,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 #' @param sep A string to separate pasted multiple entries.
 #' @param add_indices A Logical Scalar.
 #' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#' @param verbose An Integer Scalar. Level of downloading information to be printed to the console? Defaults to 2.
+#' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
 #' @noRd
 #' @examples
 #' #unserialize example bundle
@@ -504,14 +546,6 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 #' result <- fhircrackr:::bundles2df(bundles, design)
 
 bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">"), verbose = 2) {
-
-	if (is.null(bundles)) {
-
-		warning("Argument bundles is NULL, returning NULL.")
-
-		return(NULL)
-	}
-
 
 	ret <- rbind_list_of_data_frames(
 		lapply(
@@ -559,7 +593,7 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
 #' @param add_indices A Logical Scalar.
 #' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
-#' @param verbose An Integer Scalar. Level of downloading information to be printed to the console? Defaults to 2.
+#' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
 #' @noRd
 #' @return A list of data frames as specified by \code{design}.
 #'
@@ -601,13 +635,6 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 
 bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">"), verbose = 2) {
 
-	if (is.null(bundles)) {
-
-		warning("Argument bundles is NULL, returning NULL.")
-
-		return(NULL)
-	}
-
 	if (add_indices) {
 
 		if (is.null(brackets)) brackets <- c("<", ">")
@@ -632,7 +659,7 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 
 	if (1 < verbose) {cat("\n")}
 
-	if(remove_empty_columns) {
+	if (remove_empty_columns) {
 
 		dfs <- lapply(
 			dfs,
@@ -644,5 +671,84 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 	}
 
 	dfs
+}
+
+
+# escape if neccessary
+esc <- function( s ) gsub( "([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s )
+
+# row to data frame
+detree_row <- function( row=a[3,], column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- " ) {
+
+	pattern.col <- paste0( "^", column.prefix, "\\." )
+
+	col.names.mutable  <- names( row )[ grep( pattern.col, names( row ) ) ]
+
+	col.names.constant <- setdiff( names( row ), col.names.mutable )
+
+	row.mutable  <- row[ col.names.mutable ]
+
+	row.constant <- row[ col.names.constant ]
+
+	#dbg
+	#row <- d3.3$Entries[ 1, ]
+
+	brackets.escaped <- esc( brackets )
+
+	pattern.ids <- paste0( brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2] )
+
+	ids <- stringr::str_extract_all( row.mutable, pattern.ids)
+
+	names( ids ) <- col.names.mutable
+
+	pattern.items <- paste0( brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2] )
+
+	items <- stringr::str_split( row.mutable, pattern.items)
+
+	items <- lapply( items, function( i ) if( ! is.na( i ) && i[1] == "" ) i[ 2 : length( i ) ] else i )
+
+	names( items ) <- col.names.mutable
+
+	d <- row[ 0, , F ]
+
+	for( i in names( ids ) ) {
+
+		#dbg
+		#i<-names( ids )[1]
+
+		id <- ids[[ i ]]
+
+		if( ! all( is.na( id ) ) ) {
+
+			it <- items[[ i ]]
+
+			new.rows        <- gsub( paste0( brackets.escaped[1], "([0-9]+)\\.*.*" ), "\\1", id )
+			new.ids         <- gsub( paste0( "(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")" ), "\\1\\3", id )
+			unique.new.rows <- unique( new.rows )
+
+			set <- paste0( new.ids, it )
+
+			f <- sapply(
+				unique.new.rows,
+				function( unr ) {
+
+					#dbg
+					#unr <- unique.new.rows[1]
+
+					fltr <- unr == new.rows
+
+					paste0( set[ fltr ], collapse = "" )
+				}
+			)
+
+			for( n in unique.new.rows ) d[ n, i ] <- gsub( paste0( esc( sep ), "$" ), "", f[ n ], perl = T )
+		}
+	}
+
+	if( 0 < length( col.names.constant ) ) d[ , col.names.constant ] <- row[ col.names.constant ]
+
+	names( d )[ names( d ) %in% col.names.mutable ] <- gsub( paste0( "^", column.prefix, "\\." ), "", col.names.mutable )
+
+	d
 }
 

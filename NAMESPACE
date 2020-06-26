@@ -3,6 +3,7 @@
 export(fhir_crack)
 export(fhir_cs)
 export(fhir_load)
+export(fhir_melt)
 export(fhir_save)
 export(fhir_search)
 export(fhir_serialize)
