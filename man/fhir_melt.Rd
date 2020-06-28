@@ -6,9 +6,10 @@
 \usage{
 fhir_melt(
   indexed_data_frame,
-  column.prefix = "address",
+  column.prefix = "id",
   brackets = c("<", ">"),
-  sep = " -+- "
+  sep = " -+- ",
+  id.name = "#-#+#ID#+#-#"
 )
 }
 \arguments{
