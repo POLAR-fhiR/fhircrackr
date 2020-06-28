@@ -678,7 +678,7 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 esc <- function( s ) gsub( "([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s )
 
 # row to data frame
-detree_row <- function( row=a[3,], column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- " ) {
+extract_row <- function( row=a[3,], column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- ", all_columns = T ) {
 
 	pattern.col <- paste0( "^", column.prefix, "\\." )
 
@@ -709,7 +709,7 @@ detree_row <- function( row=a[3,], column.prefix = "id", brackets = c( "<", ">" 
 
 	names( items ) <- col.names.mutable
 
-	d <- row[ 0, , F ]
+	d <- if( all_columns ) row[ 0, , F ] else row[ 0, col.names.mutable, F ]
 
 	for( i in names( ids ) ) {
 
@@ -745,9 +745,12 @@ detree_row <- function( row=a[3,], column.prefix = "id", brackets = c( "<", ">" 
 		}
 	}
 
-	if( 0 < length( col.names.constant ) ) d[ , col.names.constant ] <- row[ col.names.constant ]
+	if( 0 < length( col.names.constant ) && all_columns ) {
 
-	names( d )[ names( d ) %in% col.names.mutable ] <- gsub( paste0( "^", column.prefix, "\\." ), "", col.names.mutable )
+		d[ , col.names.constant ] <- row[ col.names.constant ]
+	}
+
+#	names( d )[ names( d ) %in% col.names.mutable ] <- gsub( paste0( "^", column.prefix, "\\." ), "", col.names.mutable )
 
 	d
 }

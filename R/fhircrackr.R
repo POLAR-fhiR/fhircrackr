@@ -123,6 +123,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 }
 
 
+
 #' Save FHIR bundles as xml-files
 #' @description Writes a list of FHIR bundles as numbered xml files into a directory.
 #'
@@ -155,6 +156,7 @@ fhir_save <- function(bundles, directory = "result") {
 }
 
 
+
 #' Load bundles from xml-files
 #' @description Reads all bundles stored as xml files from a directory.
 #'
@@ -180,6 +182,7 @@ fhir_load <- function(directory) {
 
 	lapply(lst(xml.files), function(x) xml2::read_xml( paste_paths(directory, x)))
 }
+
 
 
 #' Flatten list of FHIR bundles
@@ -269,6 +272,7 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 }
 
 
+
 #' Get capability statement
 #' @description Get the capability statement of a FHIR server.
 #'
@@ -288,7 +292,7 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 #' cap <- fhir_cs("https://hapi.fhir.org/baseR4")
 #'
 
-fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_empty_columns = T, add_indices = F, brackets = c( "<", ">"), verbose = 2) {
+fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " ", remove_empty_columns = T, add_indices = F, brackets = c( "<", ">"), verbose = 2) {
 
 	caps <- fhir_search(request = paste_paths(url, "/metadata?"), verbose = verbose)
 
@@ -312,6 +316,7 @@ fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_
 #' bundles_for_saving <- fhir_serialize(bundles)
 
 
+
 fhir_serialize <- function(bundles) {
 
 	lapply(bundles, xml2::xml_serialize, connection=NULL)
@@ -329,27 +334,28 @@ fhir_serialize <- function(bundles) {
 fhir_unserialize <- function(bundles) {
 
 	lapply(bundles, xml2::xml_unserialize)
-
 }
 
 
 
-#' Reconstructring Data Frames
+#' Extracting Multiple Entries
 #'
 #' @param indexed_data_frame A Data Frame with indexed multiple entries in its columns.
+#' @param column.prefix A String specifiying a common prefix of the names of all columns to be extracted simultaneously.
 #' @param brackets A character vector of Length 2, holding the Brackets.
 #' @param sep A string, the separator.
-#' @param column.prefix A String specifiying the column(s) to be melted.
+#' @param id_name A String, the name of the column holding the resource id (row id).
+#' @param all_columns A Logical Scalar. Return all columns or extracted only.
 #'
 #' @return A data frame without indices
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' fhir_melt( df )
+#' fhir_extrac( df )
 #' }
 #'
-fhir_melt <- function( indexed_data_frame, column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- ", id.name = "#-#+#ID#+#-#" ) {
+fhir_extract <- function( indexed_data_frame, column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- ", id_name = "RESOURCE_IDENTIFICATOR", all_columns = F ) {
 
 	#dbg
 	#column.prefix <- "id"
@@ -361,20 +367,19 @@ fhir_melt <- function( indexed_data_frame, column.prefix = "id", brackets = c( "
 			function( row.id ) {
 
 				#dbg
-				#row.id <- 1
+				#row.id <- 2
 
-				e <- detree_row(row = indexed_data_frame[row.id,], column.prefix = column.prefix, brackets = brackets, sep = sep)
 
-				if( ! id.name %in% names( e ) )  e[[ id.name ]] <- row.id
+				e <- extract_row(row = indexed_data_frame[row.id,], column.prefix = column.prefix, brackets = brackets, sep = sep, all_columns = all_columns )
 
-				#e[[ column.prefix ]] <- row.id
+				e[ 1 : nrow( e ), id_name ] <- row.id
 
 				e
 			}
 		)
 	)
 
-	d[ order( d[[ id.name ]] ), ]
+	d[ order( d[[ id_name ]] ), ]
 }
 
 #' Remove indices from data frame
@@ -432,7 +437,7 @@ fhir_rm_indices <- function(indexed.df, brackets = c( "<", ">" )){
 
 	brackets.escaped <- esc(brackets)
 
-	pattern.ids <- paste0( brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2] )
+	pattern.ids <- paste0( brackets.escaped[1], "([0-9]*\\.*)+", brackets.escaped[2] )
 
 	vec<-c(as.matrix(indexed.df))
 
@@ -441,6 +446,7 @@ fhir_rm_indices <- function(indexed.df, brackets = c( "<", ">" )){
 	ret <- as.data.frame(matrix(res, nrow=nrow(indexed.df), ncol=ncol(indexed.df)))
 
 	rownames(ret) <- rownames(indexed.df)
+
 	colnames(ret) <- colnames(indexed.df)
 
 	return(ret)

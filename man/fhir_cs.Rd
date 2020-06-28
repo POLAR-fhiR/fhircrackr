@@ -6,7 +6,7 @@
 \usage{
 fhir_cs(
   url = "https://hapi.fhir.org/baseR4",
-  sep = " -+- ",
+  sep = " ",
   remove_empty_columns = T,
   add_indices = F,
   brackets = c("<", ">"),
