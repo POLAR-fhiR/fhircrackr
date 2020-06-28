@@ -336,15 +336,16 @@ fhir_unserialize <- function(bundles) {
 
 #' Reconstructring Data Frames
 #'
-#' @param indexed_data_frame A Data Frame with indexed multiple Entries in its Columns.
-#' @param brackets A Cahracter Vector of Length 2, holding the Brackets.
-#' @param sep A Character Scalar, the Separator.
+#' @param indexed_data_frame A Data Frame with indexed multiple entries in its columns.
+#' @param brackets A character vector of Length 2, holding the Brackets.
+#' @param sep A string, the separator.
+#' @param column.prefix A String specifiying the column(s) to be melted.
 #'
-#' @return A Data Frame.
+#' @return A data frame without indices
 #' @export
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #' fhir_melt( df )
 #' }
 #'
@@ -374,6 +375,75 @@ fhir_melt <- function( indexed_data_frame, column.prefix = "id", brackets = c( "
 	)
 
 	d[ order( d[[ id.name ]] ), ]
+}
+
+#' Remove indices from data frame
+#' Removes the indices produced by \code{\link{fhir_crack}} when \code{add_indices=TRUE}
+#' @param indexed.df A data.frame with indices as produced by \code{\link{fhir_crack}}
+#' @param brackets A character of length two defining the brackets that were used in \code{\link{fhir_crack}}
+#'
+#' @return A data frame without indices.
+#' @export
+#'
+#' @examples
+#'
+#'
+#'
+#' bundle <- xml2::read_xml(
+#'"<Bundle>
+#'
+#'         <Patient>
+#'             <id value='id1'/>
+#'             <address>
+#'                 <use value='home'/>
+#'                 <city value='Amsterdam'/>
+#'                 <type value='physical'/>
+#'                <country value='Netherlands'/>
+#'             </address>
+#'             <birthDate value='1992-02-06'/>
+#'         </Patient>
+#'
+#'         <Patient>
+#'             <id value='id2'/>
+#'             <address>
+#'                 <use value='home'/>
+#'                 <city value='Rome'/>
+#'                 <type value='physical'/>
+#'                 <country value='Italy'/>
+#'             </address>
+#'             <address>
+#'                 <use value='work'/>
+#'                 <city value='Stockholm'/>
+#'                 <type value='postal'/>
+#'                 <country value='Sweden'/>
+#'             </address>
+#'             <birthDate value='1980-05-23'/>
+#'         </Patient>
+#' </Bundle>"
+#')
+#'
+#'
+#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list("/Bundle/Patient")), add_indices = TRUE, verbose = 2)
+#'
+#' df_indices_removed <- fhir_rm_indices(dfs[[1]])
+
+
+fhir_rm_indices <- function(indexed.df, brackets = c( "<", ">" )){
+
+	brackets.escaped <- esc(brackets)
+
+	pattern.ids <- paste0( brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2] )
+
+	vec<-c(as.matrix(indexed.df))
+
+	res<-gsub(pattern.ids, "",vec)
+
+	ret <- as.data.frame(matrix(res, nrow=nrow(indexed.df), ncol=ncol(indexed.df)))
+
+	rownames(ret) <- rownames(indexed.df)
+	colnames(ret) <- colnames(indexed.df)
+
+	return(ret)
 }
 
 
