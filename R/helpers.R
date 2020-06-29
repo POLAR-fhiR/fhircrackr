@@ -682,6 +682,8 @@ extract_row <- function(row=a[3, ], column.prefix = "id", brackets = c( "<", ">"
 
 	pattern.col <- paste0("^", column.prefix, "\\.")
 
+	if (!any(grepl(pattern.col, names(a)))) {stop("The column prefix you gave doesn't appear in any of the column names.")}
+
 	col.names.mutable  <- names(row)[grep(pattern.col, names(row))]
 
 	col.names.constant <- setdiff(names(row), col.names.mutable)
@@ -698,6 +700,8 @@ extract_row <- function(row=a[3, ], column.prefix = "id", brackets = c( "<", ">"
 	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 
 	ids <- stringr::str_extract_all(row.mutable, pattern.ids)
+
+	if (sum(sapply(ids, length)) < 1) {stop("The brackets you specified don't seem to fit the index brackets in your data.frame, please check.")}
 
 	names(ids) <- col.names.mutable
 
