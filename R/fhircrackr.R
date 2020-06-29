@@ -355,7 +355,7 @@ fhir_unserialize <- function(bundles) {
 #' fhir_extrac( df )
 #' }
 #'
-fhir_extract <- function( indexed_data_frame, column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- ", id_name = "RESOURCE_IDENTIFICATOR", all_columns = F ) {
+fhir_extract <- function(indexed_data_frame, column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- ", id_name = "RESOURCE_IDENTIFICATOR", all_columns = F) {
 
 	#dbg
 	#column.prefix <- "id"
@@ -364,22 +364,22 @@ fhir_extract <- function( indexed_data_frame, column.prefix = "id", brackets = c
 		rbind,
 		lapply(
 			seq_len(nrow(indexed_data_frame)),
-			function( row.id ) {
+			function(row.id) {
 
 				#dbg
 				#row.id <- 2
 
 
-				e <- extract_row(row = indexed_data_frame[row.id,], column.prefix = column.prefix, brackets = brackets, sep = sep, all_columns = all_columns )
+				e <- extract_row(row = indexed_data_frame[row.id,], column.prefix = column.prefix, brackets = brackets, sep = sep, all_columns = all_columns)
 
-				e[ 1 : nrow( e ), id_name ] <- row.id
+				e[1:nrow(e), id_name] <- row.id
 
 				e
 			}
 		)
 	)
 
-	d[ order( d[[ id_name ]] ), ]
+	d[order(d[[id_name]]), ]
 }
 
 #' Remove indices from data frame

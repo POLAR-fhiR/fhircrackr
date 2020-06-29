@@ -675,79 +675,79 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 
 
 # escape if neccessary
-esc <- function( s ) gsub( "([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s )
+esc <- function(s) gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s)
 
 # row to data frame
-extract_row <- function( row=a[3,], column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- ", all_columns = T ) {
+extract_row <- function(row=a[3, ], column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- ", all_columns = T) {
 
-	pattern.col <- paste0( "^", column.prefix, "\\." )
+	pattern.col <- paste0("^", column.prefix, "\\.")
 
-	col.names.mutable  <- names( row )[ grep( pattern.col, names( row ) ) ]
+	col.names.mutable  <- names(row)[grep(pattern.col, names(row))]
 
-	col.names.constant <- setdiff( names( row ), col.names.mutable )
+	col.names.constant <- setdiff(names(row), col.names.mutable)
 
-	row.mutable  <- row[ col.names.mutable ]
+	row.mutable  <- row[col.names.mutable]
 
-	row.constant <- row[ col.names.constant ]
+	row.constant <- row[col.names.constant]
 
 	#dbg
 	#row <- d3.3$Entries[ 1, ]
 
-	brackets.escaped <- esc( brackets )
+	brackets.escaped <- esc(brackets)
 
-	pattern.ids <- paste0( brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2] )
+	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 
-	ids <- stringr::str_extract_all( row.mutable, pattern.ids)
+	ids <- stringr::str_extract_all(row.mutable, pattern.ids)
 
-	names( ids ) <- col.names.mutable
+	names(ids) <- col.names.mutable
 
-	pattern.items <- paste0( brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2] )
+	pattern.items <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 
-	items <- stringr::str_split( row.mutable, pattern.items)
+	items <- stringr::str_split(row.mutable, pattern.items)
 
-	items <- lapply( items, function( i ) if( ! is.na( i ) && i[1] == "" ) i[ 2 : length( i ) ] else i )
+	items <- lapply(items, function(i) {if (!is.na(i) && i[1]=="") {i[2:length(i)]} else {i} })
 
-	names( items ) <- col.names.mutable
+	names(items) <- col.names.mutable
 
-	d <- if( all_columns ) row[ 0, , F ] else row[ 0, col.names.mutable, F ]
+	d <- if (all_columns) {row[0, , F]} else {row[0, col.names.mutable, F]}
 
-	for( i in names( ids ) ) {
+	for (i in names(ids)) {
 
 		#dbg
 		#i<-names( ids )[1]
 
-		id <- ids[[ i ]]
+		id <- ids[[i]]
 
-		if( ! all( is.na( id ) ) ) {
+		if (!all(is.na(id))) {
 
-			it <- items[[ i ]]
+			it <- items[[i]]
 
-			new.rows        <- gsub( paste0( brackets.escaped[1], "([0-9]+)\\.*.*" ), "\\1", id )
-			new.ids         <- gsub( paste0( "(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")" ), "\\1\\3", id )
-			unique.new.rows <- unique( new.rows )
+			new.rows        <- gsub(paste0(brackets.escaped[1], "([0-9]+)\\.*.*" ), "\\1", id)
+			new.ids         <- gsub(paste0("(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")"), "\\1\\3", id)
+			unique.new.rows <- unique(new.rows)
 
-			set <- paste0( new.ids, it )
+			set <- paste0(new.ids, it)
 
 			f <- sapply(
 				unique.new.rows,
-				function( unr ) {
+				function(unr) {
 
 					#dbg
 					#unr <- unique.new.rows[1]
 
 					fltr <- unr == new.rows
 
-					paste0( set[ fltr ], collapse = "" )
+					paste0(set[fltr], collapse = "")
 				}
 			)
 
-			for( n in unique.new.rows ) d[ n, i ] <- gsub( paste0( esc( sep ), "$" ), "", f[ n ], perl = T )
+			for (n in unique.new.rows) {d[n, i] <- gsub(paste0(esc(sep), "$"), "", f[n], perl = T)}
 		}
 	}
 
-	if( 0 < length( col.names.constant ) && all_columns ) {
+	if (0 < length(col.names.constant) && all_columns) {
 
-		d[ , col.names.constant ] <- row[ col.names.constant ]
+		d[, col.names.constant] <- row[col.names.constant]
 	}
 
 #	names( d )[ names( d ) %in% col.names.mutable ] <- gsub( paste0( "^", column.prefix, "\\." ), "", col.names.mutable )
