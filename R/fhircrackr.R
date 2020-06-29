@@ -338,10 +338,10 @@ fhir_unserialize <- function(bundles) {
 
 
 
-#' Extracting Multiple Entries
+#' Extract multiple entries
 #'
 #' @param indexed_data_frame A Data Frame with indexed multiple entries in its columns.
-#' @param column.prefix A String specifiying a common prefix of the names of all columns to be extracted simultaneously.
+#' @param column.prefix A String specifying a common prefix of the names of all columns to be extracted simultaneously.
 #' @param brackets A character vector of Length 2, holding the Brackets.
 #' @param sep A string, the separator.
 #' @param id_name A String, the name of the column holding the resource id (row id).
@@ -428,7 +428,8 @@ fhir_extract <- function(indexed_data_frame, column.prefix = "id", brackets = c(
 #')
 #'
 #'
-#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list("/Bundle/Patient")), add_indices = TRUE, verbose = 2)
+#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list("/Bundle/Patient")),
+#'                   add_indices = TRUE, verbose = 2)
 #'
 #' df_indices_removed <- fhir_rm_indices(dfs[[1]])
 
