@@ -289,14 +289,14 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 #'
 #' @examples
 #'
-#' cap <- fhir_cs("https://hapi.fhir.org/baseR4")
+#' cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")
 #'
 
-fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " ", remove_empty_columns = T, add_indices = F, brackets = c( "<", ">"), verbose = 2) {
+fhir_capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " ", remove_empty_columns = T, add_indices = T, brackets = c( "<", ">"), verbose = 2) {
 
 	caps <- fhir_search(request = paste_paths(url, "/metadata?"), verbose = verbose)
 
-		design <- list(
+	design <- list(
 		META      = list("/CapabilityStatement", "./*/@*"),
 		REST.META = list("/CapabilityStatement/rest", "./*/@*"),
 		REST      = list("/CapabilityStatement/rest/resource")
@@ -337,11 +337,32 @@ fhir_unserialize <- function(bundles) {
 }
 
 
+#' Find common columns.
+#'
+#' @param indexed_data_frame A indexed Data Frame.
+#' @param column_names_prefix A String containing the prefix of all common columns.
+#'
+#' @return A Vector of Strings reperesenting the common column names.
+#' @export
+#'
+fhir_common_columns <- function(indexed_data_frame, column_names_prefix) {
+
+	pattern_column_names  <- paste0("^", column_names_prefix, "\\.*")
+
+	column_names <- names(indexed_data_frame)
+
+	hits <- grepl(pattern_column_names, column_names)
+
+	if (!any(hits)) {stop("The column prefix you gave doesn't appear in any of the column names.")}
+
+	column_names[hits]
+}
+
 
 #' Extract multiple entries
 #'
 #' @param indexed_data_frame A Data Frame with indexed multiple entries in its columns.
-#' @param column.prefix A String specifying a common prefix of the names of all columns to be extracted simultaneously.
+#' @param columns A Vecotr of Strings specifying the names of all columns to be extracted simultaneously.
 #' @param brackets A character vector of Length 2, holding the Brackets.
 #' @param sep A string, the separator.
 #' @param id_name A String, the name of the column holding the resource id (row id).
@@ -350,15 +371,14 @@ fhir_unserialize <- function(bundles) {
 #' @return A data frame without indices
 #' @export
 #'
-#' @examples
-#' \dontrun{
-#' fhir_extrac( df )
-#' }
-#'
-fhir_extract <- function(indexed_data_frame, column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- ", id_name = "RESOURCE_IDENTIFICATOR", all_columns = F) {
+fhir_melt <- function(indexed_data_frame, columns, brackets = c( "<", ">" ), sep = " -+- ", id_name = "RESOURCE_IDENTIFICATOR", all_columns = F) {
+
+	if (! is_indexed_data_frame(indexed_data_frame)) {stop("The data frame is not indexed by fhir_crack.")}
+
+	if (! all(columns %in% names(indexed_data_frame))) {stop("Not all column names you gave match with the column names in the data frame.")}
 
 	#dbg
-	#column.prefix <- "id"
+	#column_prefix <- "id"
 
 	d <- Reduce(
 		rbind,
@@ -367,10 +387,10 @@ fhir_extract <- function(indexed_data_frame, column.prefix = "id", brackets = c(
 			function(row.id) {
 
 				#dbg
-				#row.id <- 2
+				#row.id <- 1
 
 
-				e <- extract_row(row = indexed_data_frame[row.id,], column.prefix = column.prefix, brackets = brackets, sep = sep, all_columns = all_columns)
+				e <- melt_row(row = indexed_data_frame[ row.id, ], columns = columns, brackets = brackets, sep = sep, all_columns = all_columns)
 
 				e[1:nrow(e), id_name] <- row.id
 
@@ -384,7 +404,7 @@ fhir_extract <- function(indexed_data_frame, column.prefix = "id", brackets = c(
 
 #' Remove indices from data frame
 #' Removes the indices produced by \code{\link{fhir_crack}} when \code{add_indices=TRUE}
-#' @param indexed.df A data.frame with indices as produced by \code{\link{fhir_crack}}
+#' @param indexed_data_frame A data frame with indices for multiple entries as produced by \code{\link{fhir_crack}}
 #' @param brackets A character of length two defining the brackets that were used in \code{\link{fhir_crack}}
 #'
 #' @return A data frame without indices.
@@ -434,21 +454,23 @@ fhir_extract <- function(indexed_data_frame, column.prefix = "id", brackets = c(
 #' df_indices_removed <- fhir_rm_indices(dfs[[1]])
 
 
-fhir_rm_indices <- function(indexed.df, brackets = c( "<", ">" )){
+fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">")){
 
 	brackets.escaped <- esc(brackets)
 
-	pattern.ids <- paste0( brackets.escaped[1], "([0-9]*\\.*)+", brackets.escaped[2] )
+	pattern.ids <- paste0(brackets.escaped[1], "([0-9]*\\.*)+", brackets.escaped[2])
 
-	vec<-c(as.matrix(indexed.df))
+	vec <- c(as.matrix(indexed_data_frame))
 
-	res<-gsub(pattern.ids, "",vec)
+	res <- gsub(pattern.ids, "",vec)
 
-	ret <- as.data.frame(matrix(res, nrow=nrow(indexed.df), ncol=ncol(indexed.df)))
+	ret <- as.data.frame(matrix(res, nrow=nrow(indexed_data_frame), ncol=ncol(indexed_data_frame)))
 
-	rownames(ret) <- rownames(indexed.df)
+	rownames(ret) <- rownames(indexed_data_frame)
 
-	colnames(ret) <- colnames(indexed.df)
+	colnames(ret) <- colnames(indexed_data_frame)
+
+	attr(ret,"indexed") <- NULL
 
 	return(ret)
 }

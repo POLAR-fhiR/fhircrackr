@@ -54,11 +54,13 @@ rbind_list_of_data_frames <- function( list ) {
 
 		m <- nrow( l )
 
-		d[ ( n + 1 ) : ( n + m ), names( l ) ] <- l[ , names( l ), drop = F]
+		d[ ( n + 1 ) : ( n + m ), names( l ) ] <- dplyr::select( l, names( l ) )
 	}
 
 	d
 }
+
+
 
 #' Download single FHIR bundle
 #' @description Download a single FHIR bundle via FHIR search request and return it as a xml object.
@@ -568,6 +570,8 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 
 	if (1 < verbose) {cat( "\n" )}
 
+	if (add_indices) attr(ret, "indexed") <- T
+
 	ret
 }
 
@@ -665,7 +669,9 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 			dfs,
 			function( df ) {
 
-				df[ , sapply( df, function( col ) 0 < sum( ! is.na( col ) ) ), drop = F ]
+				cols <- names( df )[ sapply( df, function( col ) 0 < sum( ! is.na( col ) ) ) ]
+
+				dplyr::select( df, cols )
 			}
 		)
 	}
@@ -673,18 +679,18 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 	dfs
 }
 
+is_indexed_data_frame <- function( data_frame ) {
+
+	"indexed" %in% names( attributes(data_frame) ) && attr(data_frame, "indexed")
+}
 
 # escape if neccessary
 esc <- function(s) gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s)
 
 # row to data frame
-extract_row <- function(row=a[3, ], column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- ", all_columns = T) {
+melt_row <- function(row, columns, brackets = c( "<", ">" ), sep = " -+- ", all_columns = F) {
 
-	pattern.col <- paste0("^", column.prefix, "\\.")
-
-	if (!any(grepl(pattern.col, names(a)))) {stop("The column prefix you gave doesn't appear in any of the column names.")}
-
-	col.names.mutable  <- names(row)[grep(pattern.col, names(row))]
+	col.names.mutable  <- columns
 
 	col.names.constant <- setdiff(names(row), col.names.mutable)
 
@@ -751,7 +757,7 @@ extract_row <- function(row=a[3, ], column.prefix = "id", brackets = c( "<", ">"
 
 	if (0 < length(col.names.constant) && all_columns) {
 
-		d[, col.names.constant] <- row[col.names.constant]
+		d[, col.names.constant] <- dplyr::select( row, col.names.constant )
 	}
 
 #	names( d )[ names( d ) %in% col.names.mutable ] <- gsub( paste0( "^", column.prefix, "\\." ), "", col.names.mutable )
