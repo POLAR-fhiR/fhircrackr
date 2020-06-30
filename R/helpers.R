@@ -54,11 +54,13 @@ rbind_list_of_data_frames <- function( list ) {
 
 		m <- nrow( l )
 
-		d[ ( n + 1 ) : ( n + m ), names( l ) ] <- l[ , names( l ), drop = F]
+		d[ ( n + 1 ) : ( n + m ), names( l ) ] <- dplyr::select( l, names( l ) )
 	}
 
 	d
 }
+
+
 
 #' Download single FHIR bundle
 #' @description Download a single FHIR bundle via FHIR search request and return it as a xml object.
@@ -568,6 +570,8 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 
 	if (1 < verbose) {cat( "\n" )}
 
+	if (add_indices) attr(ret, "indexed") <- T
+
 	ret
 }
 
@@ -665,7 +669,9 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 			dfs,
 			function( df ) {
 
-				df[ , sapply( df, function( col ) 0 < sum( ! is.na( col ) ) ), drop = F ]
+				cols <- names( df )[ sapply( df, function( col ) 0 < sum( ! is.na( col ) ) ) ]
+
+				dplyr::select( df, cols )
 			}
 		)
 	}
@@ -673,81 +679,108 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 	dfs
 }
 
+is_indexed_data_frame <- function( data_frame ) {
 
-# escape if neccessary
-esc <- function( s ) gsub( "([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s )
+	"indexed" %in% names( attributes(data_frame) ) && attr(data_frame, "indexed")
+}
 
-# row to data frame
-detree_row <- function( row=a[3,], column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- " ) {
+#' Escape special characters
+#' @param s A string in which the characters should be escaped
+#' @return A string with all special characters escaped
+#' @example esc(c("(",")"))
+#' @noRd
+#'
+esc <- function(s) {
 
-	pattern.col <- paste0( "^", column.prefix, "\\." )
+	gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s)
 
-	col.names.mutable  <- names( row )[ grep( pattern.col, names( row ) ) ]
+}
 
-	col.names.constant <- setdiff( names( row ), col.names.mutable )
+#' Turn a row with multiple entries into a data frame
+#'
+#' @param row One row of an indexed data frame
+#' @param columns A character vector specifying the names of all columns that should be molten simultaneously.
+#' It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!
+#' @param brackets A character vector of length 2, defining the brackets used for the indices.
+#' @param sep A string, the separator.
+#' @param all_columns A logical scalar. Return all columns or only the ones specified in \code{columns}?
+#' @return A data frame with nrow > 1
+#' @noRd
 
-	row.mutable  <- row[ col.names.mutable ]
 
-	row.constant <- row[ col.names.constant ]
+melt_row <- function(row, columns, brackets = c( "<", ">" ), sep = " -+- ", all_columns = F) {
+
+	col.names.mutable  <- columns
+
+	col.names.constant <- setdiff(names(row), col.names.mutable)
+
+	row.mutable  <- row[col.names.mutable]
+
+	row.constant <- row[col.names.constant]
 
 	#dbg
 	#row <- d3.3$Entries[ 1, ]
 
-	brackets.escaped <- esc( brackets )
+	brackets.escaped <- esc(brackets)
 
-	pattern.ids <- paste0( brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2] )
+	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 
-	ids <- stringr::str_extract_all( row.mutable, pattern.ids)
+	ids <- stringr::str_extract_all(row.mutable, pattern.ids)
 
-	names( ids ) <- col.names.mutable
+	if (sum(sapply(ids, length)) < 1) {stop("The brackets you specified don't seem to fit the index brackets in your data.frame, please check.")}
 
-	pattern.items <- paste0( brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2] )
+	names(ids) <- col.names.mutable
 
-	items <- stringr::str_split( row.mutable, pattern.items)
+	pattern.items <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 
-	items <- lapply( items, function( i ) if( ! is.na( i ) && i[1] == "" ) i[ 2 : length( i ) ] else i )
+	items <- stringr::str_split(row.mutable, pattern.items)
 
-	names( items ) <- col.names.mutable
+	items <- lapply(items, function(i) {if (!all(is.na(i)) && i[1]=="") {i[2:length(i)]} else {i} })
 
-	d <- row[ 0, , F ]
+	names(items) <- col.names.mutable
 
-	for( i in names( ids ) ) {
+	d <- if (all_columns) {row[0, , F]} else {row[0, col.names.mutable, F]}
+
+	for (i in names(ids)) {
 
 		#dbg
 		#i<-names( ids )[1]
 
-		id <- ids[[ i ]]
+		id <- ids[[i]]
 
-		if( ! all( is.na( id ) ) ) {
+		if (!all(is.na(id))) {
 
-			it <- items[[ i ]]
+			it <- items[[i]]
 
-			new.rows        <- gsub( paste0( brackets.escaped[1], "([0-9]+)\\.*.*" ), "\\1", id )
-			new.ids         <- gsub( paste0( "(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")" ), "\\1\\3", id )
-			unique.new.rows <- unique( new.rows )
+			new.rows        <- gsub(paste0(brackets.escaped[1], "([0-9]+)\\.*.*" ), "\\1", id)
+			new.ids         <- gsub(paste0("(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")"), "\\1\\3", id)
+			unique.new.rows <- unique(new.rows)
 
-			set <- paste0( new.ids, it )
+			set <- paste0(new.ids, it)
 
 			f <- sapply(
 				unique.new.rows,
-				function( unr ) {
+				function(unr) {
 
 					#dbg
 					#unr <- unique.new.rows[1]
 
 					fltr <- unr == new.rows
 
-					paste0( set[ fltr ], collapse = "" )
+					paste0(set[fltr], collapse = "")
 				}
 			)
 
-			for( n in unique.new.rows ) d[ n, i ] <- gsub( paste0( esc( sep ), "$" ), "", f[ n ], perl = T )
+			for (n in unique.new.rows) {d[n, i] <- gsub(paste0(esc(sep), "$"), "", f[n], perl = T)}
 		}
 	}
 
-	if( 0 < length( col.names.constant ) ) d[ , col.names.constant ] <- row[ col.names.constant ]
+	if (0 < length(col.names.constant) && all_columns) {
 
-	names( d )[ names( d ) %in% col.names.mutable ] <- gsub( paste0( "^", column.prefix, "\\." ), "", col.names.mutable )
+		d[, col.names.constant] <- dplyr::select( row, col.names.constant )
+	}
+
+#	names( d )[ names( d ) %in% col.names.mutable ] <- gsub( paste0( "^", column.prefix, "\\." ), "", col.names.mutable )
 
 	d
 }

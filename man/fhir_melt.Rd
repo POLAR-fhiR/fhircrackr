@@ -2,31 +2,97 @@
 % Please edit documentation in R/fhircrackr.R
 \name{fhir_melt}
 \alias{fhir_melt}
-\title{Reconstructring Data Frames}
+\title{Melt multiple entries}
 \usage{
 fhir_melt(
   indexed_data_frame,
-  column.prefix = "address",
+  columns,
   brackets = c("<", ">"),
-  sep = " -+- "
+  sep = " -+- ",
+  id_name = "resource_identificator",
+  all_columns = F
 )
 }
 \arguments{
-\item{indexed_data_frame}{A Data Frame with indexed multiple Entries in its Columns.}
+\item{indexed_data_frame}{A data frame with indexed multiple entries.}
 
-\item{brackets}{A Cahracter Vector of Length 2, holding the Brackets.}
+\item{columns}{A character vector specifying the names of all columns that should be molten simultaneously.
+It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!}
 
-\item{sep}{A Character Scalar, the Separator.}
+\item{brackets}{A character vector of length 2, defining the brackets used for the indices.}
+
+\item{sep}{A string, the separator.}
+
+\item{id_name}{A string, the name of the column holding the identification of the origin of the new rows.}
+
+\item{all_columns}{A logical scalar. Return all columns or only the ones specified in \code{columns}?}
 }
 \value{
-A Data Frame.
+A data frame where each entry from the variables in \code{columns} appears in a separate row.
 }
 \description{
-Reconstructring Data Frames
+This function divides multiple entries in an indexed data frame as produced by \code{\link{fhir_crack}}
+with \code{add_indices = TRUE} into separate observations.
+}
+\details{
+Every row containing values that consist of multiple entries on the variables specified by the argument \code{columns}
+will be turned into multiple rows, one for each entry. Values on other variables will be repeated in all the new columns.
+
+The new data frame will contain only the molten variables (if \code{all_cloumns = FALSE}) or all variables
+(if \code{all_columns = TRUE}) as well as an additional variable \code{resource_identificator} that maps which rows came
+from the same origin. The name of this column can be changed in the argument \code{id_name}.
+
+For a more detailed description on how to use this function please see the package vignette.
 }
 \examples{
-\dontrun {
-fhir_melt( df )
-}
+#generate example
+bundle <- xml2::read_xml(
+"<Bundle>
 
+        <Patient>
+            <id value='id1'/>
+            <address>
+                <use value='home'/>
+                <city value='Amsterdam'/>
+                <type value='physical'/>
+               <country value='Netherlands'/>
+            </address>
+            <birthDate value='1992-02-06'/>
+        </Patient>
+
+        <Patient>
+            <id value='id2'/>
+            <address>
+                <use value='home'/>
+                <city value='Rome'/>
+                <type value='physical'/>
+                <country value='Italy'/>
+            </address>
+            <address>
+                <use value='work'/>
+                <city value='Stockholm'/>
+                <type value='postal'/>
+                <country value='Sweden'/>
+            </address>
+            <birthDate value='1980-05-23'/>
+        </Patient>
+</Bundle>"
+)
+
+#crack fhir resources
+dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list(".//Patient")),
+                  add_indices = TRUE, brackets = c("[","]"))
+
+#find all column names associated with attribute address
+col_names <- fhir_common_columns(dfs$Patients, "address")
+
+#original data frame
+dfs$Patients
+
+#only keep address columns
+fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names, brackets = c("[","]"))
+
+#keep all columns
+fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,
+          brackets = c("[","]"), all_columns = TRUE)
 }

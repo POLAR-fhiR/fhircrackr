@@ -123,6 +123,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 }
 
 
+
 #' Save FHIR bundles as xml-files
 #' @description Writes a list of FHIR bundles as numbered xml files into a directory.
 #'
@@ -155,6 +156,7 @@ fhir_save <- function(bundles, directory = "result") {
 }
 
 
+
 #' Load bundles from xml-files
 #' @description Reads all bundles stored as xml files from a directory.
 #'
@@ -180,6 +182,7 @@ fhir_load <- function(directory) {
 
 	lapply(lst(xml.files), function(x) xml2::read_xml( paste_paths(directory, x)))
 }
+
 
 
 #' Flatten list of FHIR bundles
@@ -269,6 +272,7 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 }
 
 
+
 #' Get capability statement
 #' @description Get the capability statement of a FHIR server.
 #'
@@ -285,14 +289,14 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 #'
 #' @examples
 #'
-#' cap <- fhir_cs("https://hapi.fhir.org/baseR4")
+#' cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")
 #'
 
-fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_empty_columns = T, add_indices = F, brackets = c( "<", ">"), verbose = 2) {
+fhir_capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " ", remove_empty_columns = T, add_indices = T, brackets = c( "<", ">"), verbose = 2) {
 
 	caps <- fhir_search(request = paste_paths(url, "/metadata?"), verbose = verbose)
 
-		design <- list(
+	design <- list(
 		META      = list("/CapabilityStatement", "./*/@*"),
 		REST.META = list("/CapabilityStatement/rest", "./*/@*"),
 		REST      = list("/CapabilityStatement/rest/resource")
@@ -312,6 +316,7 @@ fhir_cs <- function(url = "https://hapi.fhir.org/baseR4", sep = " -+- ", remove_
 #' bundles_for_saving <- fhir_serialize(bundles)
 
 
+
 fhir_serialize <- function(bundles) {
 
 	lapply(bundles, xml2::xml_serialize, connection=NULL)
@@ -329,52 +334,234 @@ fhir_serialize <- function(bundles) {
 fhir_unserialize <- function(bundles) {
 
 	lapply(bundles, xml2::xml_unserialize)
-
 }
 
 
-
-#' Reconstructring Data Frames
+#' Find common columns
 #'
-#' @param indexed_data_frame A Data Frame with indexed multiple Entries in its Columns.
-#' @param brackets A Cahracter Vector of Length 2, holding the Brackets.
-#' @param sep A Character Scalar, the Separator.
+#' This is a convenience function to find all column names in a data frame starting with the same string that can
+#' then be used for \code{\link{fhir_melt}}.
 #'
-#' @return A Data Frame.
+#' It is intended for use on data frames with column names that have been automatically produced by \code{\link{fhir_crack}}
+#' and follow the form \code{level1.level2.level3} such as \code{name.given.value} or \code{code.coding.system.value}.
+#' Note that this function will only work on column names following exactly this schema.
+#'
+#' The resulting character vector can be used for melting all columns belonging to the same attribute in an indexed data frame, see \code{?fhir_melt}.
+#'
+#' @param data_frame A data frame with automatically named columns as produced by \code{\link{fhir_crack}}.
+#' @param column_names_prefix A string containing the common prefix of the desired columns.
+#' @return A character vector with the names of all columns matching \code{column_names_prefix}.
+#' @examples
+#' #unserialize example bundles
+#' bundles <- fhir_unserialize(medication_bundles)
+#'
+#' #crack Patient Resources
+#' design <- list(
+#'   Patients = list(".//Patient")
+#' )
+#'
+#' dfs <- fhir_crack(bundles, design)
+#'
+#' #look at automatically generated names
+#' names(dfs$Patients)
+#'
+#' #extract all column names beginning with the string "name"
+#' fhir_common_columns(data_frame = dfs$Patients, column_names_prefix = "name")
 #' @export
 #'
-#' @examples
-#' \dontrun {
-#' fhir_melt( df )
-#' }
+fhir_common_columns <- function(data_frame, column_names_prefix) {
+
+	pattern_column_names  <- paste0("^", column_names_prefix, "\\.*")
+
+	column_names <- names(data_frame)
+
+	hits <- grepl(pattern_column_names, column_names)
+
+	if (!any(hits)) {stop("The column prefix you gave doesn't appear in any of the column names.")}
+
+	column_names[hits]
+}
+
+
+#' Melt multiple entries
 #'
-fhir_melt <- function( indexed_data_frame, column.prefix = "id", brackets = c( "<", ">" ), sep = " -+- " ) {
+#' This function divides multiple entries in an indexed data frame as produced by \code{\link{fhir_crack}}
+#' with \code{add_indices = TRUE} into separate observations.
+#'
+#' Every row containing values that consist of multiple entries on the variables specified by the argument \code{columns}
+#' will be turned into multiple rows, one for each entry. Values on other variables will be repeated in all the new columns.
+#'
+#' The new data frame will contain only the molten variables (if \code{all_cloumns = FALSE}) or all variables
+#' (if \code{all_columns = TRUE}) as well as an additional variable \code{resource_identificator} that maps which rows came
+#' from the same origin. The name of this column can be changed in the argument \code{id_name}.
+#'
+#' For a more detailed description on how to use this function please see the package vignette.
+#'
+#' @param indexed_data_frame A data frame with indexed multiple entries.
+#' @param columns A character vector specifying the names of all columns that should be molten simultaneously.
+#' It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!
+#' @param brackets A character vector of length 2, defining the brackets used for the indices.
+#' @param sep A string, the separator.
+#' @param id_name A string, the name of the column holding the identification of the origin of the new rows.
+#' @param all_columns A logical scalar. Return all columns or only the ones specified in \code{columns}?
+#'
+#' @return A data frame where each entry from the variables in \code{columns} appears in a separate row.
+#'
+#' @examples
+#' #generate example
+#' bundle <- xml2::read_xml(
+#'"<Bundle>
+#'
+#'         <Patient>
+#'             <id value='id1'/>
+#'             <address>
+#'                 <use value='home'/>
+#'                 <city value='Amsterdam'/>
+#'                 <type value='physical'/>
+#'                <country value='Netherlands'/>
+#'             </address>
+#'             <birthDate value='1992-02-06'/>
+#'         </Patient>
+#'
+#'         <Patient>
+#'             <id value='id2'/>
+#'             <address>
+#'                 <use value='home'/>
+#'                 <city value='Rome'/>
+#'                 <type value='physical'/>
+#'                 <country value='Italy'/>
+#'             </address>
+#'             <address>
+#'                 <use value='work'/>
+#'                 <city value='Stockholm'/>
+#'                 <type value='postal'/>
+#'                 <country value='Sweden'/>
+#'             </address>
+#'             <birthDate value='1980-05-23'/>
+#'         </Patient>
+#' </Bundle>"
+#')
+#'
+#' #crack fhir resources
+#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list(".//Patient")),
+#'                   add_indices = TRUE, brackets = c("[","]"))
+#'
+#' #find all column names associated with attribute address
+#' col_names <- fhir_common_columns(dfs$Patients, "address")
+#'
+#' #original data frame
+#' dfs$Patients
+#'
+#' #only keep address columns
+#' fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names, brackets = c("[","]"))
+#'
+#' #keep all columns
+#' fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,
+#'           brackets = c("[","]"), all_columns = TRUE)
+#' @export
+
+fhir_melt <- function(indexed_data_frame, columns, brackets = c( "<", ">" ), sep = " -+- ", id_name = "resource_identificator", all_columns = F) {
+
+	if (! is_indexed_data_frame(indexed_data_frame)) {stop("The data frame is not indexed by fhir_crack.")}
+
+	if (! all(columns %in% names(indexed_data_frame))) {stop("Not all column names you gave match with the column names in the data frame.")}
 
 	#dbg
-	#column.prefix <- "id"
+	#column_prefix <- "id"
 
 	d <- Reduce(
 		rbind,
 		lapply(
 			seq_len(nrow(indexed_data_frame)),
-			function( row.id ) {
+			function(row.id) {
 
 				#dbg
 				#row.id <- 1
 
-				e <- detree_row(row = indexed_data_frame[row.id,], column.prefix = column.prefix, brackets = brackets, sep = sep)
 
-				e[[ column.prefix ]] <- row.id
+				e <- melt_row(row = indexed_data_frame[ row.id, ], columns = columns, brackets = brackets, sep = sep, all_columns = all_columns)
 
-
-				#e[[ column.prefix ]] <- row.id
+				e[1:nrow(e), id_name] <- row.id
 
 				e
 			}
 		)
 	)
 
-	d[ order( d[[ column.prefix ]] ), ]
+	d[order(d[[id_name]]), ]
+}
+
+#' Remove indices from data frame
+#' Removes the indices produced by \code{\link{fhir_crack}} when \code{add_indices=TRUE}
+#' @param indexed_data_frame A data frame with indices for multiple entries as produced by \code{\link{fhir_crack}}
+#' @param brackets A character of length two defining the brackets that were used in \code{\link{fhir_crack}}
+#'
+#' @return A data frame without indices.
+#' @export
+#'
+#' @examples
+#'
+#'
+#'
+#' bundle <- xml2::read_xml(
+#'"<Bundle>
+#'
+#'         <Patient>
+#'             <id value='id1'/>
+#'             <address>
+#'                 <use value='home'/>
+#'                 <city value='Amsterdam'/>
+#'                 <type value='physical'/>
+#'                <country value='Netherlands'/>
+#'             </address>
+#'             <birthDate value='1992-02-06'/>
+#'         </Patient>
+#'
+#'         <Patient>
+#'             <id value='id2'/>
+#'             <address>
+#'                 <use value='home'/>
+#'                 <city value='Rome'/>
+#'                 <type value='physical'/>
+#'                 <country value='Italy'/>
+#'             </address>
+#'             <address>
+#'                 <use value='work'/>
+#'                 <city value='Stockholm'/>
+#'                 <type value='postal'/>
+#'                 <country value='Sweden'/>
+#'             </address>
+#'             <birthDate value='1980-05-23'/>
+#'         </Patient>
+#' </Bundle>"
+#')
+#'
+#'
+#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list("/Bundle/Patient")),
+#'                   add_indices = TRUE, verbose = 2)
+#'
+#' df_indices_removed <- fhir_rm_indices(dfs[[1]])
+
+
+fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">")){
+
+	brackets.escaped <- esc(brackets)
+
+	pattern.ids <- paste0(brackets.escaped[1], "([0-9]*\\.*)+", brackets.escaped[2])
+
+	vec <- c(as.matrix(indexed_data_frame))
+
+	res <- gsub(pattern.ids, "",vec)
+
+	ret <- as.data.frame(matrix(res, nrow=nrow(indexed_data_frame), ncol=ncol(indexed_data_frame)))
+
+	rownames(ret) <- rownames(indexed_data_frame)
+
+	colnames(ret) <- colnames(indexed_data_frame)
+
+	attr(ret,"indexed") <- NULL
+
+	return(ret)
 }
 
 
