@@ -9,7 +9,7 @@ fhir_melt(
   columns,
   brackets = c("<", ">"),
   sep = " -+- ",
-  id_name = "resource_identificator",
+  id_name = "resource_identifier",
   all_columns = F
 )
 }
@@ -21,7 +21,7 @@ It is advisable to only melt columns simultaneously that belong to the same (rep
 
 \item{brackets}{A character vector of length 2, defining the brackets used for the indices.}
 
-\item{sep}{A string, the separator.}
+\item{sep}{A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}}
 
 \item{id_name}{A string, the name of the column holding the identification of the origin of the new rows.}
 
