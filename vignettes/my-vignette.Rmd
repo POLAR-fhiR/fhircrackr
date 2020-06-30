@@ -373,13 +373,13 @@ bundles <- fhir_load("MyDirectory")
 
 
 ## Download capability statement
-The [capability statement](https://www.hl7.org/fhir/capabilitystatement.html) documents  a set of capabilities (behaviors) of a FHIR Server for a particular version of FHIR. You can download this statement using the function `fhir_cs()`:
+The [capability statement](https://www.hl7.org/fhir/capabilitystatement.html) documents  a set of capabilities (behaviors) of a FHIR Server for a particular version of FHIR. You can download this statement using the function `fhir_capability_statement()`:
 
 ```{r, results=F}
 cap <- fhir_capability_statement("http://hapi.fhir.org/baseR4/")
 ```
 
-`fhir_cs()` takes a FHIR server endpoint and returns a list of data frames containing all information from the capability statement of this server.
+`fhir_capability_statement()` takes a FHIR server endpoint and returns a list of data frames containing all information from the capability statement of this server.
 
 You can then access the parts that interest you, for example:
 

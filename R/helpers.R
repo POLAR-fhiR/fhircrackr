@@ -735,7 +735,7 @@ melt_row <- function(row, columns, brackets = c( "<", ">" ), sep = " -+- ", all_
 
 	items <- stringr::str_split(row.mutable, pattern.items)
 
-	items <- lapply(items, function(i) {if (!is.na(i) && i[1]=="") {i[2:length(i)]} else {i} })
+	items <- lapply(items, function(i) {if (!all(is.na(i)) && i[1]=="") {i[2:length(i)]} else {i} })
 
 	names(items) <- col.names.mutable
 
