@@ -5,12 +5,14 @@
 \title{Remove indices from data frame
 Removes the indices produced by \code{\link{fhir_crack}} when \code{add_indices=TRUE}}
 \usage{
-fhir_rm_indices(indexed_data_frame, brackets = c("<", ">"))
+fhir_rm_indices(indexed_data_frame, brackets = c("<", ">"), sep = "-+-")
 }
 \arguments{
 \item{indexed_data_frame}{A data frame with indices for multiple entries as produced by \code{\link{fhir_crack}}}
 
 \item{brackets}{A character of length two defining the brackets that were used in \code{\link{fhir_crack}}}
+
+\item{sep}{A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}}
 }
 \value{
 A data frame without indices.

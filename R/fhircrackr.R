@@ -401,7 +401,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #' @param columns A character vector specifying the names of all columns that should be molten simultaneously.
 #' It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!
 #' @param brackets A character vector of length 2, defining the brackets used for the indices.
-#' @param sep A string, the separator.
+#' @param sep A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}
 #' @param id_name A string, the name of the column holding the identification of the origin of the new rows.
 #' @param all_columns A logical scalar. Return all columns or only the ones specified in \code{columns}?
 #'
@@ -495,6 +495,7 @@ fhir_melt <- function(indexed_data_frame, columns, brackets = c( "<", ">" ), sep
 #' Removes the indices produced by \code{\link{fhir_crack}} when \code{add_indices=TRUE}
 #' @param indexed_data_frame A data frame with indices for multiple entries as produced by \code{\link{fhir_crack}}
 #' @param brackets A character of length two defining the brackets that were used in \code{\link{fhir_crack}}
+#' @param sep A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}
 #'
 #' @return A data frame without indices.
 #' @export

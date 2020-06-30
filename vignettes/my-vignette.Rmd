@@ -302,7 +302,7 @@ design1 <- list(
 	Patients = list(".//Patient")
 )
 
-df1 <- fhir_crack(bundle_list, design1, sep = " | ",)
+df1 <- fhir_crack(bundle_list, design1, sep = " | ")
 df1$Patients
 ```
 As you can see, multiple entries for the same attribute (address and id) are pasted together. This works fine for Patient 2, but for Patient 3 you can see a problem with the number of entries that are displayed. The original Patient resource had *three* (incomplete) `address` entries, but because the first two of them use complementary elements (`use` and `city` vs. `type` and `country`), the resulting pasted entries look like there had just been two entries for the `address` attribute. 
@@ -373,9 +373,9 @@ This will give you the appropriate cross product of all multiple entries.
 Once you have sorted out the multiple entries, you might want to get rid of the indices in you data.frame. This can be achieved using `fhir_rm_indices()`:
 
 ```{r}
-fhir_rm_indices(molten_2, brackets=c("[","]"))
+fhir_rm_indices(molten_2, brackets=c("[","]"), sep=" ")
 ```
-Again, `brackets` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()`respectively.
+Again, `brackets` and `sep` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()`respectively.
 
 ## Save and load downloaded bundles
 Since `fhir_crack()` discards of all the data not specified in `design` it makes sense to store the original search result for reproducibility and in case you realize later on that you need elements from the resources that you haven't extracted at first.
