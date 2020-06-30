@@ -1,5 +1,5 @@
-# fhircrackr
-fhickrackr is a package that conveniently downloads FHIR resources in xml format and converts them to R data frames. It uses FHIR search to download bundles from a FHIR server, provides functions to save and read xml-files containing such bundles and allows flattening the bundles to data frames using XPath expressions.
+# fhircrackr: Handling HL7 FHIR resources in R 
+fhircrackr is a package that conveniently downloads FHIR resources in xml format and converts them to R data frames. It uses FHIR search to download bundles from a FHIR server, provides functions to save and read xml-files containing such bundles and allows flattening the bundles to data frames using XPath expressions.
 
 You can download the development version using `devtools::install_github("POLAR-fhiR/fhircrackr")`.
 
@@ -8,9 +8,9 @@ This readme gives a only short overview over the most important functions in `fh
 ## Prerequisites
 For the moment, this package focuses mostly on downloading and flattening resources from a FHIR server. This requires some prerequisites:
 
-- The endpoint of the FHIR server you want to access. If you don't have you own FHIR server, you can use one of the publicly available servers, such as [https://hapi.fhir.org/baseR4](https://hapi.fhir.org/baseR4) or [http://fhir.hl7.de:8080/baseDstu3](http://fhir.hl7.de:8080/baseDstu3). The endpoint of a FHIR server is often referred to as [base].
+- The endpoint of the FHIR server you want to access. If you don't have your own FHIR server, you can use one of the publicly available servers, such as [https://hapi.fhir.org/baseR4](https://hapi.fhir.org/baseR4) or [http://fhir.hl7.de:8080/baseDstu3](http://fhir.hl7.de:8080/baseDstu3). The endpoint of a FHIR server is often referred to as [base].
 
-- To download ressources from the server, you should be familiar with [FHIR search requests](https://www.hl7.org/fhir/search.html). FHIR search allows you to download sets of resources that match very specific requirements. As this package mainly takes care of the downloading and flattening part, we will use very simple examples of FHIR search requests of the form `[base]/[type]?parameter(s)`, where `[type]` refers to the type of resource you are looking for and `parameter(s)` characterise specific properties those resources should have.
+- To download resources from the server, you should be familiar with [FHIR search requests](https://www.hl7.org/fhir/search.html). FHIR search allows you to download sets of resources that match very specific requirements. As this package mainly takes care of the downloading and flattening part, we will use very simple examples of FHIR search requests of the form `[base]/[type]?parameter(s)`, where `[type]` refers to the type of resource you are looking for and `parameter(s)` characterize specific properties those resources should have.
 `https://hapi.fhir.org/baseR4/Patient?gender=female` for example downloads all Patient resources from the FHIR server at `https://hapi.fhir.org/baseR4/` that represent female patients.
 
 - To specify which attributes of the FHIR resources you want in your data frame, you should have at least some familiarity with XPath expressions, because this package downloads the resources in xml-format. A good tutorial for XPath can be found [here](https://www.w3schools.com/xml/xpath_intro.asp).
@@ -22,9 +22,9 @@ bundles <- fhir_search("https://hapi.fhir.org/baseR4/MedicationStatement?_includ
 ```
 To download resources from a FHIR server into R, you use the function `fhir_search()`. This function requires you to state a full FHIR search request such as `https://hapi.fhir.org/baseR4/MedicationStatement?_include=MedicationStatement:subject` in the argument `request`. This example request downloads all MedicationStatement resources and the Patient resources they link to.
 
-If you want to connect to a FHIR server that uses basic authentification, you can supply the arguments `username` and `password`. Because endpoints can sometimes be hard to reach, `fhir_search()` will start five attempts to connect to the endpoint before it gives up. With the arguments `max_attempts` and `delay_between_attempts` you can control this number as well the time interval between attempts.
+If you want to connect to a FHIR server that uses basic authentication, you can supply the arguments `username` and `password`. Because endpoints can sometimes be hard to reach, `fhir_search()` will start five attempts to connect to the endpoint before it gives up. With the arguments `max_attempts` and `delay_between_attempts` you can control this number as well the time interval between attempts.
 
-In general, aFHIR search request returns a *bundle* of the resources you requested. If there are a lot of resources matching your request, the search result isn't returned in one big bundle but distributed over several of them. If the argument `max_bundles` is set to its default `Inf`, `fhir_search()` will return all available bundles, meaning all resources matching your request. If you set it to another number, the download will stop once it has reached the specified number of bundles. Note that in this case, the result *may not contain all* the resources from the server matching your request!
+In general, a FHIR search request returns a *bundle* of the resources you requested. If there are a lot of resources matching your request, the search result isn't returned in one big bundle but distributed over several of them. If the argument `max_bundles` is set to its default `Inf`, `fhir_search()` will return all available bundles, meaning all resources matching your request. If you set it to another number, the download will stop once it has reached the specified number of bundles. Note that in this case, the result *may not contain all* the resources from the server matching your request!
 
 `fhir_search()` returns a list of xml objects where each list element represents one bundle of resources.
 
@@ -76,7 +76,7 @@ It makes sense to create one data frame per type of resource (MedicationStatemen
 
 `Medication` is a list of length 2, where the first element is an XPath expression selecting the nodes (i.e. resources) matching a MedicationStatement, so this element is used to define the type of resource in this data frame.
 
-The second element is again a list, this time a named list. Each element corresponds to one variable (i.e. column) in the resulting data frame. The name (e.g. `Status`) will be the column name, the column values will be taken from the attribut defined by the following XPath expression (e.g. `"status/@value"`).
+The second element is again a list, this time a named list. Each element corresponds to one variable (i.e. column) in the resulting data frame. The name (e.g. `Status`) will be the column name, the column values will be taken from the attribute defined by the following XPath expression (e.g. `"status/@value"`).
 
 The abstract form `design` therefore has is:
 
@@ -106,8 +106,82 @@ list(
 There are other forms `design` can take, for example if you want to extract all attributes or only attributes from a certain level of the resource. To get to know these options, please see the package vignette.
 
 
+## Multiple entries
+When there are multiple entries to one attribute, e.g. multiple addresses for the same Patient resource, `fhir_crack()` will paste these entries together using the string provided in the argument `sep`. If you set `add_indices=TRUE`, the entries will be assigned indices to allow you to distinguish between entries:
+
+```r
+#create example bundle with multiple entries
+
+bundle<-xml2::read_xml(
+	"<Bundle>
+		
+		<Patient>
+			<id value='id1'/>
+			<address>
+				<use value='home'/>
+				<city value='Amsterdam'/>
+				<type value='physical'/>
+				<country value='Netherlands'/>
+			</address>
+			<birthDate value='1992-02-06'/>
+		</Patient>
+		
+		<Patient>
+			<id value='id2'/>
+			<address>
+				<use value='home'/>
+				<city value='Rome'/>
+				<type value='physical'/>
+				<country value='Italy'/>
+			</address>
+			<address>
+				<use value='work'/>
+				<city value='Stockholm'/>
+				<type value='postal'/>
+				<country value='Sweden'/>
+			</address>			
+			<birthDate value='1980-05-23'/>
+		</Patient>
+		
+		<Patient>
+				<id value='id3'/> 
+				<address>
+					<use value='home'/>
+					<city value='Berlin'/>
+				</address>
+				<address>
+					<type value='postal'/>
+					<country value='France'/>
+				</address>
+				<address>
+					<use value='work'/>
+					<city value='London'/>
+					<type value='postal'/>
+					<country value='England'/>
+				</address>
+				<birthDate value='1974-12-25'/>
+			</Patient>		
+		
+	</Bundle>"
+)
+
+bundle_list<-list(bundle)
+
+#define design
+design <- list(
+	Patients = list(".//Patient")
+)
+
+#extract data frame
+dfs <- fhir_crack(bundle_list, design, sep = " ", brackets= c("[","]"))
+
+dfs$Patients
+```
+For more information on how to deal with these indexed data frames, e.g. how to melt rows with multiple entries into several distinct rows or how to get rid of the indices again, please see the respective paragraph in the package vignette. 
+
+
 ## Save and load downloaded bundles
-Since `fhir_crack()` discards of all the data not specified in `design` it makes sense to store the original search result for reproducibility and in case you realise later on that you need elements from the resources that you haven't extracted at first.
+Since `fhir_crack()` discards of all the data not specified in `design` it makes sense to store the original search result for reproducibility and in case you realize later on that you need elements from the resources that you haven't extracted at first.
 
 There are two ways of saving the FHIR bundles you downloaded: Either you save them as R objects, or you write them to an xml file.
 
@@ -142,7 +216,7 @@ After unserialization, the pointers are restored and you can continue to work wi
 
 ### Save and load bundles as xml files
 If you want to store the bundles in xml files instead of R objects, you can use the functions `fhir_save()` and `fhir_load()`.
-`fhir_save()` takes a list of bundles in form of xml objects (as returned by `fhir_search()`) and writes them into the directory specified in the argument `directory`. Each bundle is saved as a seperate xml-file. If the folder defined in `directory` doesn't exist, it is created in the current working directory.
+`fhir_save()` takes a list of bundles in form of xml objects (as returned by `fhir_search()`) and writes them into the directory specified in the argument `directory`. Each bundle is saved as a separate xml-file. If the folder defined in `directory` doesn't exist, it is created in the current working directory.
 
 ```r
 #save bundles as xml files
