@@ -551,7 +551,7 @@ fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), sep="-+-
 
 	vec <- c(as.matrix(indexed_data_frame))
 
-	splitted_entries <- stringr::str_split(vec, sep)
+	splitted_entries <- stringr::str_split(vec, esc(sep))
 
 	stripped_entries <- lapply(splitted_entries, sub, pattern = pattern.ids, replacement="")
 
