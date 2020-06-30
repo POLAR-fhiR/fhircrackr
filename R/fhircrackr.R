@@ -460,7 +460,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #'           brackets = c("[","]"), all_columns = TRUE)
 #' @export
 
-fhir_melt <- function(indexed_data_frame, columns, brackets = c( "<", ">" ), sep = " -+- ", id_name = "resource_identificator", all_columns = F) {
+fhir_melt <- function(indexed_data_frame, columns, brackets = c( "<", ">" ), sep = " -+- ", id_name = "resource_identifier", all_columns = F) {
 
 	if (! is_indexed_data_frame(indexed_data_frame)) {stop("The data frame is not indexed by fhir_crack.")}
 
@@ -543,7 +543,7 @@ fhir_melt <- function(indexed_data_frame, columns, brackets = c( "<", ">" ), sep
 #' df_indices_removed <- fhir_rm_indices(dfs[[1]])
 
 
-fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">")){
+fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), sep="-+-"){
 
 	brackets.escaped <- esc(brackets)
 
@@ -551,9 +551,13 @@ fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">")){
 
 	vec <- c(as.matrix(indexed_data_frame))
 
-	res <- gsub(pattern.ids, "",vec)
+	splitted_entries <- stringr::str_split(vec, esc(sep))
 
-	ret <- as.data.frame(matrix(res, nrow=nrow(indexed_data_frame), ncol=ncol(indexed_data_frame)))
+	stripped_entries <- lapply(splitted_entries, sub, pattern = pattern.ids, replacement="")
+
+	bound_entries <- sapply(stripped_entries, paste, collapse=sep)
+
+	ret <- as.data.frame(matrix(bound_entries, nrow=nrow(indexed_data_frame), ncol=ncol(indexed_data_frame)))
 
 	rownames(ret) <- rownames(indexed_data_frame)
 
