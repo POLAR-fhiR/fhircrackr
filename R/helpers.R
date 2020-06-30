@@ -684,10 +684,30 @@ is_indexed_data_frame <- function( data_frame ) {
 	"indexed" %in% names( attributes(data_frame) ) && attr(data_frame, "indexed")
 }
 
-# escape if neccessary
-esc <- function(s) gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s)
+#' Escape special characters
+#' @param s A string in which the characters should be escaped
+#' @return A string with all special characters escaped
+#' @example esc(c("(",")"))
+#' @noRd
+#'
+esc <- function(s) {
 
-# row to data frame
+	gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s)
+
+}
+
+#' Turn a row with multiple entries into a data frame
+#'
+#' @param row One row of an indexed data frame
+#' @param columns A character vector specifying the names of all columns that should be molten simultaneously.
+#' It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!
+#' @param brackets A character vector of length 2, defining the brackets used for the indices.
+#' @param sep A string, the separator.
+#' @param all_columns A logical scalar. Return all columns or only the ones specified in \code{columns}?
+#' @return A data frame with nrow > 1
+#' @noRd
+
+
 melt_row <- function(row, columns, brackets = c( "<", ">" ), sep = " -+- ", all_columns = F) {
 
 	col.names.mutable  <- columns
