@@ -117,14 +117,14 @@ A silly example to show what's possible:
 
 Table gender if patient is male or table names if patient is female:  
 ```{r}
-designGenderAndNames <- list(
+designGenderORNames <- list(
   Patients = list(
     "//Patient",
     "./gender[@value='male']/@value|./name[../gender/@value='female']/*/@value"
   )
 )
 
-head(fhir_crack(patient_bundles, designGenderAndNames))
+head(fhir_crack(patient_bundles, designGenderORNames)$Patient)
 ```
 
 #### 3. Extract specific attributes
@@ -443,7 +443,7 @@ bundles <- fhir_load("MyDirectory")
 
 
 ## Download capability statement
-The [capability statement](https://www.hl7.org/fhir/capabilitystatement.html) documents  a set of capabilities (behaviors) of a FHIR Server for a particular version of FHIR. You can download this statement using the function `fhir_capability_statement()`:
+The [capability statement](https://www.hl7.org/fhir/capabilitystatement.html) documents a set of capabilities (behaviors) of a FHIR Server for a particular version of FHIR. You can download this statement using the function `fhir_capability_statement()`:
 
 ```{r, results=F}
 cap <- fhir_capability_statement("http://hapi.fhir.org/baseR4/")
@@ -454,7 +454,7 @@ cap <- fhir_capability_statement("http://hapi.fhir.org/baseR4/")
 You can then access the parts that interest you, for example:
 
 ```{r}
-cap$META$software.version
+cap$META$fhirVersion.value
 ```
 
 ## Further Options
