@@ -8,7 +8,7 @@ This readme gives a only short overview over the most important functions in `fh
 ## Prerequisites
 For the moment, this package focuses mostly on downloading and flattening resources from a FHIR server. This requires some prerequisites:
 
-- The endpoint of the FHIR server you want to access. If you don't have your own FHIR server, you can use one of the publicly available servers, such as [https://hapi.fhir.org/baseR4](https://hapi.fhir.org/baseR4) or [http://fhir.hl7.de:8080/baseDstu3](http://fhir.hl7.de:8080/baseDstu3). The endpoint of a FHIR server is often referred to as [base].
+- The endpoint of the FHIR server you want to access. If you don't have your own FHIR server, you can use one of the publicly available servers, such as https&#58;//hapi.fhir.org/baseR4 or http&#58;//fhir.hl7.de:8080/baseDstu3. The endpoint of a FHIR server is often referred to as [base].
 
 - To download resources from the server, you should be familiar with [FHIR search requests](https://www.hl7.org/fhir/search.html). FHIR search allows you to download sets of resources that match very specific requirements. As this package mainly takes care of the downloading and flattening part, we will use very simple examples of FHIR search requests of the form `[base]/[type]?parameter(s)`, where `[type]` refers to the type of resource you are looking for and `parameter(s)` characterize specific properties those resources should have.
 `https://hapi.fhir.org/baseR4/Patient?gender=female` for example downloads all Patient resources from the FHIR server at `https://hapi.fhir.org/baseR4/` that represent female patients.

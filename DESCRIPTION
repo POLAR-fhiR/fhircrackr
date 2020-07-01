@@ -8,8 +8,8 @@ Authors@R: c(
     person("Julia", "Gantner", email = "julia.gantner@med.uni-jena.de", role = "aut"),
     person("Jens", "Przybilla", email = "jprzybilla@imise.uni-leipzig.de", role = "aut"),
     person("Frank", "Meineke", email = "frank.meineke@imise.uni-leipzig.de", role = "aut"))
-Description: fhircrackr is a package that conveniently downloads fhir resources in xml format 
-    and converts them to R data frames. It uses FHIR-search to download bundles 
+Description: Useful tools for conveniently downloading FHIR resources in xml format 
+    and converting them to R data frames. The package uses FHIR-search to download bundles 
     from a FHIR server, provides functions to save and read xml-files containing such bundles 
     and allows flattening the bundles to data.frames using XPath expressions.
 BugReports: https://github.com/POLAR-fhiR/fhircrackr/issues
@@ -28,4 +28,4 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 Depends: 
-    R (>= 2.10)
+    R (>= 3.50)
