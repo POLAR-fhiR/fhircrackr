@@ -6,7 +6,7 @@
 \title{Exemplary FHIR bundles}
 \format{
 List of length 3 containing \emph{serialized} "xml_document" objects, each representing one bundle from a
-FHIR search request. \emph{They have to be unserialized before use, see Usage!}
+FHIR search request. \emph{They have to be unserialized before use, see Examples!}
 }
 \source{
 \url{https://hapi.fhir.org/baseR4/MedicationStatement?code=http://snomed.info/ct|429374003&_include=MedicationStatement:subject}
@@ -21,10 +21,11 @@ when direct access to a FHIR server is not possible.
 }
 \details{
 medication_bundles is a list of \emph{serialized} xml objects representing FHIR bundles as returned by fhir_search().
+
 It contains 3 bundles with MedicationStatement resources representing Medications with Snomed CT code
 429374003 and the respective Patient resources that are linked to these MedicationStatements.
 
-It corresponds to Example 2 of downloading and flattening FHIR resources from the vignette of the package.
+It corresponds to the example of downloading and flattening FHIR resources from the vignette of the package.
 }
 \examples{
 #unserialize xml objects before doing anything else with them!

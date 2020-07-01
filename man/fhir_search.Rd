@@ -2,7 +2,7 @@
 % Please edit documentation in R/fhircrackr.R
 \name{fhir_search}
 \alias{fhir_search}
-\title{Download fhir search result}
+\title{Download Fhir search result}
 \usage{
 fhir_search(
   request,
@@ -34,7 +34,7 @@ downloading progress will be printed. Defaults to 2.}
 A list of bundles in xml format.
 }
 \description{
-Downloads all fhir bundles of a fhir search request from a fhir server.
+Downloads all FHIR bundles of a FHIR search request from a FHIR server.
 }
 \examples{
 bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)

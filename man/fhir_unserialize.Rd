@@ -2,15 +2,15 @@
 % Please edit documentation in R/fhircrackr.R
 \name{fhir_unserialize}
 \alias{fhir_unserialize}
-\title{Serialize a FHIR Bundle list}
+\title{Unserialize a FHIR Bundle list}
 \usage{
 fhir_unserialize(bundles)
 }
 \arguments{
-\item{bundles}{A list of xml objects representing FHIR bundles as returned by \code{\link{fhir_search}}}
+\item{bundles}{A list of serialized xml objects representing FHIR bundles as returned by \code{\link{fhir_search}}}
 }
 \value{
-A list of serialized xml objects
+A list of unserialized xml objects
 }
 \description{
 Unserializes a list of FHIR bundles that have been serialized to allow for saving in .rda or .RData format.

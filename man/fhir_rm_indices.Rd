@@ -2,8 +2,7 @@
 % Please edit documentation in R/fhircrackr.R
 \name{fhir_rm_indices}
 \alias{fhir_rm_indices}
-\title{Remove indices from data frame
-Removes the indices produced by \code{\link{fhir_crack}} when \code{add_indices=TRUE}}
+\title{Remove indices from data frame}
 \usage{
 fhir_rm_indices(indexed_data_frame, brackets = c("<", ">"), sep = "-+-")
 }
@@ -18,7 +17,6 @@ fhir_rm_indices(indexed_data_frame, brackets = c("<", ">"), sep = "-+-")
 A data frame without indices.
 }
 \description{
-Remove indices from data frame
 Removes the indices produced by \code{\link{fhir_crack}} when \code{add_indices=TRUE}
 }
 \examples{

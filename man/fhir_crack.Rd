@@ -24,10 +24,12 @@ Each element of design is a list of length 1 or 2, where the first element is a 
 FHIR bundle page. There are 3 options for the second element of that list:
 
 - There is no second element: all attributes of the resource are extracted
-- The second element is string containing a XPath expression to all the values that should be extracted. "./@value" e.g. would extract all
+
+- The second element is a string containing a XPath expression to all the values that should be extracted. "./@value" e.g. would extract all
   values on the root level.
-- The second element is a named list where the elements are XPath expressions indicating the specific position of values to extract, where the names of the
-list elements are the column names of the resulting data frame.
+
+- The second element is a named list where the elements are XPath expressions indicating the specific position of values to extract,
+ where the names of the list elements are the column names of the resulting data frame.
 
 For a more detailed explanation see the package vignette.}
 
