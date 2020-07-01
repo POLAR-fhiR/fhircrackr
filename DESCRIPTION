@@ -2,7 +2,7 @@ Package: fhircrackr
 Type: Package
 Title: Handling HL7 FHIR Resources in R
 Version: 0.1.0
-Date: 2020-06-23
+Date: 2020-07-01
 Authors@R: c(
     person("Thomas", "Peschel", email = "tpeschel@imise.uni-leipzig.de", role = c("aut","cre")),
     person("Julia", "Gantner", email = "julia.gantner@med.uni-jena.de", role = "aut"),
