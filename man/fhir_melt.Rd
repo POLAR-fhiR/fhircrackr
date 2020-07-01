@@ -21,9 +21,9 @@ It is advisable to only melt columns simultaneously that belong to the same (rep
 
 \item{brackets}{A character vector of length 2, defining the brackets used for the indices.}
 
-\item{sep}{A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}}
+\item{sep}{A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}.}
 
-\item{id_name}{A string, the name of the column holding the identification of the origin of the new rows.}
+\item{id_name}{A string, the name of the column that will hold the identification of the origin of the new rows.}
 
 \item{all_columns}{A logical scalar. Return all columns or only the ones specified in \code{columns}?}
 }
@@ -36,7 +36,7 @@ with \code{add_indices = TRUE} into separate observations.
 }
 \details{
 Every row containing values that consist of multiple entries on the variables specified by the argument \code{columns}
-will be turned into multiple rows, one for each entry. Values on other variables will be repeated in all the new columns.
+will be turned into multiple rows, one for each entry. Values on other variables will be repeated in all the new rows.
 
 The new data frame will contain only the molten variables (if \code{all_cloumns = FALSE}) or all variables
 (if \code{all_columns = TRUE}) as well as an additional variable \code{resource_identificator} that maps which rows came

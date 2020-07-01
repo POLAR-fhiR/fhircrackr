@@ -30,8 +30,8 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 
 
 
-#' Download fhir search result
-#' @description Downloads all fhir bundles of a fhir search request from a fhir server.
+#' Download Fhir search result
+#' @description Downloads all FHIR bundles of a FHIR search request from a FHIR server.
 #'
 #' @param request A string containing the full FHIR search request.
 #' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
@@ -196,10 +196,12 @@ fhir_load <- function(directory) {
 #' FHIR bundle page. There are 3 options for the second element of that list:
 #'
 #' - There is no second element: all attributes of the resource are extracted
-#' - The second element is string containing a XPath expression to all the values that should be extracted. "./@value" e.g. would extract all
+#'
+#' - The second element is a string containing a XPath expression to all the values that should be extracted. "./@value" e.g. would extract all
 #'   values on the root level.
-#' - The second element is a named list where the elements are XPath expressions indicating the specific position of values to extract, where the names of the
-#' list elements are the column names of the resulting data frame.
+#'
+#' - The second element is a named list where the elements are XPath expressions indicating the specific position of values to extract,
+#'  where the names of the list elements are the column names of the resulting data frame.
 #'
 #' For a more detailed explanation see the package vignette.
 #'
@@ -322,11 +324,11 @@ fhir_serialize <- function(bundles) {
 	lapply(bundles, xml2::xml_serialize, connection=NULL)
 }
 
-#' Serialize a FHIR Bundle list
+#' Unserialize a FHIR Bundle list
 #'
 #' @description Unserializes a list of FHIR bundles that have been serialized to allow for saving in .rda or .RData format.
-#' @param bundles A list of xml objects representing FHIR bundles as returned by \code{\link{fhir_search}}
-#' @return A list of serialized xml objects
+#' @param bundles A list of serialized xml objects representing FHIR bundles as returned by \code{\link{fhir_search}}
+#' @return A list of unserialized xml objects
 #' @export
 #' @examples
 #' bundles <- fhir_unserialize(medication_bundles)
@@ -389,7 +391,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #' with \code{add_indices = TRUE} into separate observations.
 #'
 #' Every row containing values that consist of multiple entries on the variables specified by the argument \code{columns}
-#' will be turned into multiple rows, one for each entry. Values on other variables will be repeated in all the new columns.
+#' will be turned into multiple rows, one for each entry. Values on other variables will be repeated in all the new rows.
 #'
 #' The new data frame will contain only the molten variables (if \code{all_cloumns = FALSE}) or all variables
 #' (if \code{all_columns = TRUE}) as well as an additional variable \code{resource_identificator} that maps which rows came
@@ -401,8 +403,8 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #' @param columns A character vector specifying the names of all columns that should be molten simultaneously.
 #' It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!
 #' @param brackets A character vector of length 2, defining the brackets used for the indices.
-#' @param sep A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}
-#' @param id_name A string, the name of the column holding the identification of the origin of the new rows.
+#' @param sep A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}.
+#' @param id_name A string, the name of the column that will hold the identification of the origin of the new rows.
 #' @param all_columns A logical scalar. Return all columns or only the ones specified in \code{columns}?
 #'
 #' @return A data frame where each entry from the variables in \code{columns} appears in a separate row.
@@ -492,6 +494,7 @@ fhir_melt <- function(indexed_data_frame, columns, brackets = c( "<", ">" ), sep
 }
 
 #' Remove indices from data frame
+#'
 #' Removes the indices produced by \code{\link{fhir_crack}} when \code{add_indices=TRUE}
 #' @param indexed_data_frame A data frame with indices for multiple entries as produced by \code{\link{fhir_crack}}
 #' @param brackets A character of length two defining the brackets that were used in \code{\link{fhir_crack}}
@@ -578,13 +581,14 @@ fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), sep="-+-
 #' when direct access to a FHIR server is not possible.
 #'
 #' medication_bundles is a list of \emph{serialized} xml objects representing FHIR bundles as returned by fhir_search().
+#'
 #' It contains 3 bundles with MedicationStatement resources representing Medications with Snomed CT code
 #' 429374003 and the respective Patient resources that are linked to these MedicationStatements.
 #'
-#' It corresponds to Example 2 of downloading and flattening FHIR resources from the vignette of the package.
+#' It corresponds to the example of downloading and flattening FHIR resources from the vignette of the package.
 #'
 #' @format List of length 3 containing \emph{serialized} "xml_document" objects, each representing one bundle from a
-#' FHIR search request. \emph{They have to be unserialized before use, see Usage!}
+#' FHIR search request. \emph{They have to be unserialized before use, see Examples!}
 #'
 #' @examples
 #' #unserialize xml objects before doing anything else with them!
