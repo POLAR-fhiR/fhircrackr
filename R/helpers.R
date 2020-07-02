@@ -333,6 +333,7 @@ is_invalid_design <- function(design){
 		tryCatch(
 			xml2::xml_find_all(testbundle, expressions[[i]]),
 			warning = function(x){
+				if(grepl("Invalid expression", x))
 				stop("One of the strings you have provided as XPath expressions in the design argument is not a valid XPath expression. Please revise the following expression: ",
 					 esc(expressions[[i]]))
 			}
