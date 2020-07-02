@@ -54,6 +54,22 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 
 	addr <- request
 
+	if (0 < verbose) {
+		message(
+			paste0(
+				"Starting download of ",
+				if ( max_bundles < Inf ) max_bundles else "ALL!",
+				" bundles of resource type ",
+				gsub( "(^.+/)(.+)(\\?).*$", "\\2", request, perl = T ),
+				" from fhir endpoint ",
+				gsub( "(^.+)(/.+\\?).*$", "\\1", request, perl = T ),
+				".\n"
+			)
+		)
+
+		if ( 9 < max_bundles ) message( "This may take a while..." )
+	}
+
 	cnt <- 0
 
 	repeat {
@@ -66,7 +82,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 
 		if (is.null(bundle)) {
 
-			if (0 < verbose) {message("download interrupted.\n")}
+			if (0 < verbose) {message("Download interrupted.\n")}
 
 			break
 		}

@@ -26,6 +26,13 @@ lst <- function(..., prefix = NULL, suffix = NULL) {
 #' @noRd
 rbind_list_of_data_frames <- function( list ) {
 
+	if (is.null(list) || length(list)<1) {
+
+		warning( "no data in list for rbind_list_of_data_frames(list)" )
+
+		return( NULL )
+	}
+
 	#dbg
 	#list <- l
 
@@ -40,6 +47,13 @@ rbind_list_of_data_frames <- function( list ) {
 			)
 		)
 	)
+
+	if (is.null( unique.names)) {
+
+		warning( "no unique names found in rbind_list_of_data_frames(list)")
+
+		return(NULL)
+	}
 
 	d <- as.data.frame(lapply(seq_along(unique.names),function(dummy)character(0)), stringsAsFactors = F)
 
@@ -88,7 +102,7 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, m
 		#dbg
 		#n <- 1
 
-		if(1 < verbose) cat(paste0("(", n, "): ", request, "\n"))
+		if (1 < verbose) cat(paste0("(", n, "): ", request, "\n"))
 
 		auth <- if (!is.null(username) & !is.null(password)){
 
@@ -102,8 +116,8 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, m
 			auth
 		)
 
-		check_http_code(response$status_code)
-
+		#check_http_code(response$status_code)
+		check_response(response)
 
 		payload <- try(httr::content(response, as = "text", encoding = "UTF-8"), silent = T)
 
@@ -117,11 +131,27 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, m
 			}
 		}
 
-
 		Sys.sleep(delay_between_attempts)
 	}
 
 	NULL
+}
+
+error_to_file <- function( xml ) {
+
+	payload <- try(httr::content(response, as = "text", encoding = "UTF-8"), silent = T)
+
+	if (class(payload)[1] != "try-error") {
+
+		xml <- try(xml2::read_xml(payload), silent = T)
+
+		if(class(xml)[1] != "try-error") {
+
+			xml2::write_xml(xml, "error.xml")
+
+			write.csv(fhir_crack(list(xml),list(error=list("//*"))),"error_message.csv")
+		}
+	}
 }
 
 
@@ -134,12 +164,26 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, m
 #' @noRd
 #'
 #'
-check_http_code <- function(code){
+check_response <- function(response){
+
+	code <- response$status_code
 
 	if (code == 400) {
 
-		stop("HTTP code 400 - Please check if your request is a valid FHIR search request.")
+		payload <- try(httr::content(response, as = "text", encoding = "UTF-8"), silent = T)
 
+		if (class(payload)[1] != "try-error") {
+
+			xml <- try(xml2::read_xml(payload), silent = T)
+
+			if(class(xml)[1] != "try-error") {
+
+				xml2::write_xml(xml, "error.xml")
+				write.csv(fhir_crack(list(xml),list(error=list("//*"))),"error_message.csv")
+			}
+		}
+
+		stop("HTTP code 400 - Please check if your request is a valid FHIR search request.")
 	}
 
 	if (code == 401) {
@@ -159,17 +203,58 @@ check_http_code <- function(code){
 
 	if (code >=400 & code < 500) {
 
-		stop(paste("Your request generated a client error, HTTP code", code))
-
+		#stop(paste("Your request generated a client error, HTTP code", code))
 	}
 
 	if (code >=500 & code < 600) {
 
 		stop(paste("Your request generated a server error, HTTP code", code))
-
 	}
 
 }
+
+#' Check http status code
+#'
+#' Checks the status code and issues an error or warning if necessary
+#'
+#' @param code A http status code
+#' @example check_http_code(404)
+#' @noRd
+#'
+#'
+# check_http_code <- function(code){
+#
+# 	if (code == 400) {
+#
+# 		stop("HTTP code 400 - Please check if your request is a valid FHIR search request.")
+# 	}
+#
+# 	if (code == 401) {
+#
+# 		stop("HTTP code 401 - Authentification needed.")
+# 	}
+#
+# 	if (code == 404) {
+#
+# 		stop("HTTP code 404 - Not found. Did you misspell the resource?")
+# 	}
+#
+# 	if (code >= 300 & code < 400) {
+#
+# 		warning(paste("Your request generated a HTTP code", code))
+# 	}
+#
+# 	if (code >=400 & code < 500) {
+#
+# 		stop(paste("Your request generated a client error, HTTP code", code))
+# 	}
+#
+# 	if (code >=500 & code < 600) {
+#
+# 		stop(paste("Your request generated a server error, HTTP code", code))
+# 	}
+#
+# }
 
 
 
