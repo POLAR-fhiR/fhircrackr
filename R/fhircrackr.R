@@ -41,6 +41,13 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 #' downloading progress will be printed. Defaults to 2.
 #' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
 #' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
+#' @param log_errors Takes values 0, 1 or 2. Controls the logging of errors. 1 and 2 will write a file to the current working directory.
+#'
+#' 0: no logging of errors,
+#'
+#' 1: tabulate http response and write to csv-file
+#'
+#' 2: write http response as to xml-file
 #'
 #' @return A list of bundles in xml format.
 #' @export
@@ -48,7 +55,8 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 #' @examples
 #' bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)
 
-fhir_search <- function(request, username = NULL, password = NULL, max_bundles = Inf, verbose = 1, max_attempts = 5, delay_between_attempts = 10) {
+fhir_search <- function(request, username = NULL, password = NULL, max_bundles = Inf, verbose = 1,
+						max_attempts = 5, delay_between_attempts = 10, log_errors=0) {
 
 	bundles <- list()
 
@@ -61,7 +69,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 				if ( max_bundles < Inf ) max_bundles else "ALL!",
 				" bundles of resource type ",
 				gsub( "(^.+/)(.+)(\\?).*$", "\\2", request, perl = T ),
-				" from fhir endpoint ",
+				" from FHIR endpoint ",
 				gsub( "(^.+)(/.+\\?).*$", "\\1", request, perl = T ),
 				".\n"
 			)
@@ -78,7 +86,8 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 
 		if (1 < verbose) {cat(paste0("bundle[", cnt, "]"))}
 
-		bundle <- get_bundle(request = addr, username = username, password = password, verbose = verbose, max_attempts = max_attempts, delay_between_attempts = delay_between_attempts)
+		bundle <- get_bundle(request = addr, username = username, password = password, verbose = verbose,
+							 max_attempts = max_attempts, delay_between_attempts = delay_between_attempts, log_errors = log_errors)
 
 		if (is.null(bundle)) {
 
