@@ -234,11 +234,11 @@ check_response <- function(response, log_errors){
 
 		if(log_errors > 0){
 
-			warning(paste0("Your request generated a HTTP code ", code, ". For more information see the error file that has been generated in the working directory."))
+			warning("Your request generated a HTTP code ", code, ". For more information see the error file that has been generated in the working directory.")
 
 		}else{
 
-			warning(paste0("Your request generated a HTTP code ", code, ". To print more detailed information to a file, set argument log_errors to 1 or 2 and rerun fhir_search()."))
+			warning("Your request generated a HTTP code ", code, ". To print more detailed information to a file, set argument log_errors to 1 or 2 and rerun fhir_search().")
 
 		}
 
@@ -248,11 +248,11 @@ check_response <- function(response, log_errors){
 
 		if(log_errors > 0){
 
-			stop(paste0("Your request generated a client error, HTTP code ", code, ". For more information see the error file that has been generated in the working directory."))
+			stop("Your request generated a client error, HTTP code ", code, ". For more information see the error file that has been generated in the working directory.")
 
 		}else{
 
-			stop(paste0("Your request generated a client error, HTTP code ", code, ". To print more detailed information to a file, set argument log_errors to 1 or 2 and rerun fhir_search()."))
+			stop("Your request generated a client error, HTTP code ", code, ". To print more detailed information to a file, set argument log_errors to 1 or 2 and rerun fhir_search().")
 
 		}
 
@@ -262,11 +262,11 @@ check_response <- function(response, log_errors){
 
 		if(log_errors > 0){
 
-			stop(paste0("Your request generated a server error, HTTP code ", code, ". For more information see the error file that has been generated in the working directory."))
+			stop("Your request generated a server error, HTTP code ", code, ". For more information see the error file that has been generated in the working directory.")
 
 		}else{
 
-			stop(paste0("Your request generated a server error, HTTP code ", code, ". To print more detailed error information to a file, set argument log_errors to 1 or 2 and rerun fhir_search()."))
+			stop("Your request generated a server error, HTTP code ", code, ". To print more detailed error information to a file, set argument log_errors to 1 or 2 and rerun fhir_search().")
 
 		}
 
@@ -292,7 +292,7 @@ is_invalid_design <- function(design){
 
 	if (!is.list(design)) {
 
-		warning("Argument design has to be a list, returnign NULL.")
+		warning("Argument design has to be a list, returning NULL.")
 		return(T)
 	}
 
@@ -324,10 +324,25 @@ is_invalid_design <- function(design){
 		return(T)
 	}
 
-	F
+	expressions <- unlist(design)
+
+	testbundle <- xml2::read_xml("<Bundle>   </Bundle>")
+
+	for(i in 1:length(expressions)){
+
+		tryCatch(
+			xml2::xml_find_all(testbundle, expressions[[i]]),
+			warning = function(x){
+				stop("One of the strings you have provided as XPath expressions in the design argument is not a valid XPath expression. Please revise the following expression: ",
+					 esc(expressions[[i]]))
+			}
+		)
+	}
+
+	return(F)
 }
 #' Check List of Bundles
-#' @description Checks whether a List of Bundles provided to \code{\link{fhir_crack}} is ivalid and
+#' @description Checks whether a List of Bundles provided to \code{\link{fhir_crack}} is invalid and
 #' issues a warning if it is.
 #' @param bundles_list The List of Bundles to be checked
 #' @return TRUE if bundles_list is invalid, FALSE if not
