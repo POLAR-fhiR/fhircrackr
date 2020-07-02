@@ -600,6 +600,8 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 
 	children <- xml2::xml_find_all(bundle, xpath)
 
+	if(length(children) == 0) {stop(esc(xpath), " seems not to be present in the bundles.")}
+
 	df.list <- lapply(
 		children,
 		function(child) {
