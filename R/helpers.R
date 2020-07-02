@@ -106,7 +106,7 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, m
 
 		if (1 < verbose) cat(paste0("(", n, "): ", request, "\n"))
 
-		auth <- if (!is.null(username) & !is.null(password)){
+		auth <- if (!is.null(username) && !is.null(password)){
 
 			httr::authenticate(username, password)
 		}
@@ -183,7 +183,7 @@ check_response <- function(response, log_errors){
 
 	code <- response$status_code
 
-	if(code != 200 & log_errors>0){
+	if(code != 200 && log_errors>0){
 
 		error_to_file(response, log_errors)
 	}
@@ -230,7 +230,7 @@ check_response <- function(response, log_errors){
 
 	}
 
-	if (code >= 300 & code < 400) {
+	if (code >= 300 && code < 400) {
 
 		if(log_errors > 0){
 
@@ -258,7 +258,7 @@ check_response <- function(response, log_errors){
 
 	}
 
-	if (code >=500 & code < 600) {
+	if (code >=500 && code < 600) {
 
 		if(log_errors > 0){
 
