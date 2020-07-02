@@ -4,7 +4,7 @@ title: "fhircrackr: Handling HL7 FHIR resources in R"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{fhircrackr}
+  %\VignetteIndexEntry{fhircrackr: Handling HL7 FHIR resources in R}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -32,7 +32,7 @@ The package is still under development. The CRAN version of the package contains
 ## Prerequisites
 The complexity of the problem requires a couple of prerequisites both regarding knowledge and access to data. We will shortly list the  preconditions to using the `fhircrackr` package here:  
 
-1. First of all, you need the endpoint of the FHIR server you want to access. If you don't have your own FHIR server, you can use one of the publicly available servers, such as [https://hapi.fhir.org/baseR4](https://hapi.fhir.org/baseR4) or [http://fhir.hl7.de:8080/baseDstu3](http://fhir.hl7.de:8080/baseDstu3). The endpoint of a FHIR server is often referred to as [base].
+1. First of all, you need the endpoint of the FHIR server you want to access. If you don't have your own FHIR server, you can use one of the publicly available servers, such as `https://hapi.fhir.org/baseR4` or `http://fhir.hl7.de:8080/baseDstu3`. The endpoint of a FHIR server is often referred to as [base].
 
 2. To download resources from the server, you should be familiar with [FHIR search requests](https://www.hl7.org/fhir/search.html). FHIR search allows you to download sets of resources that match very specific requirements. As the focus of this package is dealing with FHIR resources in R rather than the intricacies of FHIR search, we will mostly use simple examples of FHIR search requests. Most of them will have the form `[base]/[type]?parameter(s)`, where `[type]` refers to the type of resource you are looking for and `parameter(s)` characterize specific properties those resources should have.
 `http://hapi.fhir.org/baseR4/Patient?gender=female` for example downloads all Patient resources from the FHIR server at `http://hapi.fhir.org/baseR4/` that represent female patients.
