@@ -108,7 +108,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 
 			if (0 < verbose) {
 
-				if (any(!is.na(rels.nxt) && rels.nxt)) {
+				if (any(!is.na(rels.nxt) & rels.nxt)) {
 
 					message(
 						"\nDownload completed. Number of downloaded bundles was limited to ",
@@ -125,7 +125,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 			break
 		}
 
-		if (!any(!is.na(rels.nxt) && rels.nxt)) {
+		if (!any(!is.na(rels.nxt) & rels.nxt)) {
 
 			if (0 < verbose) {message("\nDownload completed. All available bundles were downloaded.\n")}
 
