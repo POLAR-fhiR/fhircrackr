@@ -395,7 +395,7 @@ summary {
 design &lt;- list(
 
   MedicationStatements = list(
-    &quot;.//MedicationStatement&quot;,
+    &quot;//MedicationStatement&quot;,
     list(
       STATUS             = &quot;status/@value&quot;,
       MEDICATION.SYSTEM  = &quot;medicationCodeableConcept/coding/system/@value&quot;,
@@ -408,7 +408,7 @@ design &lt;- list(
   ),
 
   Patients = list(
-    &quot;.//Patient&quot;,
+    &quot;//Patient&quot;,
     list(
       NAME.GIVEN  = &quot;name/given/@value&quot;,
       NAME.FAMILY = &quot;name/family/@value&quot;,
@@ -489,23 +489,23 @@ bundle&lt;-xml2::read_xml(
         &lt;/Patient&gt;
         
         &lt;Patient&gt;
-                &lt;id value=&#39;id3&#39;/&gt; 
-                &lt;address&gt;
-                    &lt;use value=&#39;home&#39;/&gt;
-                    &lt;city value=&#39;Berlin&#39;/&gt;
-                &lt;/address&gt;
-                &lt;address&gt;
-                    &lt;type value=&#39;postal&#39;/&gt;
-                    &lt;country value=&#39;France&#39;/&gt;
-                &lt;/address&gt;
-                &lt;address&gt;
-                    &lt;use value=&#39;work&#39;/&gt;
-                    &lt;city value=&#39;London&#39;/&gt;
-                    &lt;type value=&#39;postal&#39;/&gt;
-                    &lt;country value=&#39;England&#39;/&gt;
-                &lt;/address&gt;
-                &lt;birthDate value=&#39;1974-12-25&#39;/&gt;
-            &lt;/Patient&gt;      
+            &lt;id value=&#39;id3&#39;/&gt; 
+            &lt;address&gt;
+                &lt;use value=&#39;home&#39;/&gt;
+                &lt;city value=&#39;Berlin&#39;/&gt;
+            &lt;/address&gt;
+            &lt;address&gt;
+                &lt;type value=&#39;postal&#39;/&gt;
+                &lt;country value=&#39;France&#39;/&gt;
+            &lt;/address&gt;
+            &lt;address&gt;
+                &lt;use value=&#39;work&#39;/&gt;
+                &lt;city value=&#39;London&#39;/&gt;
+                &lt;type value=&#39;postal&#39;/&gt;
+                &lt;country value=&#39;England&#39;/&gt;
+            &lt;/address&gt;
+            &lt;birthDate value=&#39;1974-12-25&#39;/&gt;
+        &lt;/Patient&gt;      
         
     &lt;/Bundle&gt;&quot;
 )
@@ -514,7 +514,7 @@ bundle_list&lt;-list(bundle)
 
 #define design
 design &lt;- list(
-    Patients = list(&quot;.//Patient&quot;)
+    Patients = list(&quot;//Patient&quot;)
 )
 
 #extract data frame

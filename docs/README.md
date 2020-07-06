@@ -38,7 +38,7 @@ We can achieve this using the `fhir_crack()` function.
 design <- list(
 
   MedicationStatements = list(
-    ".//MedicationStatement",
+    "//MedicationStatement",
     list(
       STATUS             = "status/@value",
       MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system/@value",
@@ -51,7 +51,7 @@ design <- list(
   ),
 
   Patients = list(
-    ".//Patient",
+    "//Patient",
     list(
       NAME.GIVEN  = "name/given/@value",
       NAME.FAMILY = "name/family/@value",
@@ -144,23 +144,23 @@ bundle<-xml2::read_xml(
 		</Patient>
 		
 		<Patient>
-				<id value='id3'/> 
-				<address>
-					<use value='home'/>
-					<city value='Berlin'/>
-				</address>
-				<address>
-					<type value='postal'/>
-					<country value='France'/>
-				</address>
-				<address>
-					<use value='work'/>
-					<city value='London'/>
-					<type value='postal'/>
-					<country value='England'/>
-				</address>
-				<birthDate value='1974-12-25'/>
-			</Patient>		
+			<id value='id3'/> 
+			<address>
+				<use value='home'/>
+				<city value='Berlin'/>
+			</address>
+			<address>
+				<type value='postal'/>
+				<country value='France'/>
+			</address>
+			<address>
+				<use value='work'/>
+				<city value='London'/>
+				<type value='postal'/>
+				<country value='England'/>
+			</address>
+			<birthDate value='1974-12-25'/>
+		</Patient>		
 		
 	</Bundle>"
 )
@@ -169,7 +169,7 @@ bundle_list<-list(bundle)
 
 #define design
 design <- list(
-	Patients = list(".//Patient")
+	Patients = list("//Patient")
 )
 
 #extract data frame
