@@ -98,7 +98,7 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "fhir_cs()" )
 
-caps <- fhir_cs( "https://hapi.fhir.org/baseR4", sep = " ~ ")
+caps <- fhir_capability_statement( "https://hapi.fhir.org/baseR4", sep = " ~ ")
 
 testthat::test_that(
 	"fhir_cs() works", {
