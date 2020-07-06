@@ -90,9 +90,9 @@ col_names <- fhir_common_columns(dfs$Patients, "address")
 dfs$Patients
 
 #only keep address columns
-fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names, brackets = c("[","]"))
+fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names, brackets = c("[","]", sep = " "))
 
 #keep all columns
 fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,
-          brackets = c("[","]"), all_columns = TRUE)
+          brackets = c("[","]"), sep = " ", all_columns = TRUE)
 }
