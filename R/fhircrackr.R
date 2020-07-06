@@ -102,7 +102,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 
 		links <- xml2::xml_find_all(bundle, "link")
 
-		rels.nxt  <- xml2::xml_attr(xml2::xml_find_first(links, "./relation"), "value") == "next"
+		rels.nxt <- xml2::xml_text(xml2::xml_find_first(links, "./relation/@value")) == "next"
 
 		if (cnt == max_bundles ) {
 
@@ -480,11 +480,11 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #' dfs$Patients
 #'
 #' #only keep address columns
-#' fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names, brackets = c("[","]"))
+#' fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names, brackets = c("[","]", sep = " "))
 #'
 #' #keep all columns
 #' fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,
-#'           brackets = c("[","]"), all_columns = TRUE)
+#'           brackets = c("[","]"), sep = " ", all_columns = TRUE)
 #' @export
 
 fhir_melt <- function(indexed_data_frame, columns, brackets = c( "<", ">" ), sep = " -+- ", id_name = "resource_identifier", all_columns = F) {
