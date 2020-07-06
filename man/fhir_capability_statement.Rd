@@ -34,7 +34,6 @@ A list of data frames containing the information from the statement
 Get the capability statement of a FHIR server.
 }
 \examples{
-
-cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")
+\dontrun{cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")}
 
 }
