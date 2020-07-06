@@ -315,8 +315,7 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 #' @export
 #'
 #' @examples
-#'
-#' cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")
+#' \dontrun{cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")}
 #'
 
 fhir_capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " ", remove_empty_columns = T, add_indices = T, brackets = c( "<", ">"), verbose = 2) {
