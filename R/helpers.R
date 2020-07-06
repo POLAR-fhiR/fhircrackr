@@ -26,6 +26,13 @@ lst <- function(..., prefix = NULL, suffix = NULL) {
 #' @noRd
 rbind_list_of_data_frames <- function( list ) {
 
+	if (is.null(list) || length(list)<1) {
+
+		warning( "no data in list for rbind_list_of_data_frames(list)" )
+
+		return( NULL )
+	}
+
 	#dbg
 	#list <- l
 
@@ -40,6 +47,13 @@ rbind_list_of_data_frames <- function( list ) {
 			)
 		)
 	)
+
+	if (is.null( unique.names)) {
+
+		warning( "no unique names found in rbind_list_of_data_frames(list)")
+
+		return(NULL)
+	}
 
 	d <- as.data.frame(lapply(seq_along(unique.names),function(dummy)character(0)), stringsAsFactors = F)
 
@@ -66,11 +80,12 @@ rbind_list_of_data_frames <- function( list ) {
 #' @description Download a single FHIR bundle via FHIR search request and return it as a xml object.
 #'
 #' @param request A string containing the full FHIR search request.
-#' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentification.
-#' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentification.
+#' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
+#' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
 #' @param verbose An integer scalar. If > 1,  Downloading progress is printed. Defaults to 2.
 #' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
+#' @param log_errors A numeric scalar. 0 means no error logging, 1: crack with fhir_crack and log to csv, 2 log xml directly
 #'
 #' @return The downloaded bundle in xml format.
 #' @noRd
@@ -78,7 +93,8 @@ rbind_list_of_data_frames <- function( list ) {
 #' @examples
 #' bundle<-fhircrackr:::get_bundle(request = "https://hapi.fhir.org/baseR4/Patient?")
 
-get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, max_attempts = 5, delay_between_attempts = 10) {
+get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, max_attempts = 5,
+					   delay_between_attempts = 10, log_errors=0) {
 
 	#dbg
 	#request="https://hapi.fhir.org/baseR4/Medication?_format=xml"
@@ -88,9 +104,9 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, m
 		#dbg
 		#n <- 1
 
-		if(1 < verbose) cat(paste0("(", n, "): ", request, "\n"))
+		if (1 < verbose) cat(paste0("(", n, "): ", request, "\n"))
 
-		auth <- if (!is.null(username) & !is.null(password)){
+		auth <- if (!is.null(username) && !is.null(password)){
 
 			httr::authenticate(username, password)
 		}
@@ -102,8 +118,7 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, m
 			auth
 		)
 
-		check_http_code(response$status_code)
-
+		check_response(response, log_errors = log_errors)
 
 		payload <- try(httr::content(response, as = "text", encoding = "UTF-8"), silent = T)
 
@@ -117,55 +132,143 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, m
 			}
 		}
 
-
 		Sys.sleep(delay_between_attempts)
 	}
 
 	NULL
 }
 
-
-#' Check http status code
+#'log the error message of a http response
 #'
-#' Checks the status code and issues an error or warning if necessary
-#'
-#' @param code A http status code
-#' @example check_http_code(404)
+#' @param response A http response
+#' @param log_errors A numeric scalar. 0 means no error logging, 1: crack with fhir_crack and log to csv, 2 log xml directly
 #' @noRd
 #'
 #'
-check_http_code <- function(code){
+error_to_file <- function(response, log_errors) {
+
+	payload <- httr::content(response, as = "text", encoding = "UTF-8")
+
+		xml <- xml2::read_xml(payload)
+
+		time <- gsub(" |-","_", Sys.time())
+		time <- gsub(":", "", time)
+
+		if(log_errors==1) {
+
+			message <- fhir_crack(list(xml),list(error=list("//*")), verbose=0)[[1]]
+			utils::write.csv(message, paste0("error_message_", time, ".csv"))
+
+		}
+
+		if(log_errors==2) {
+
+			xml2::write_xml(xml, paste0("error_", time, ".xml"))
+
+		}
+
+
+
+}
+#' Check http response
+#'
+#' Checks the http response and issues an error or warning if necessary
+#'
+#' @param response A http response
+#' @param log_errors A numeric scalar. 0 means no error logging, 1: crack with fhir_crack and log to csv, 2 log xml directly
+#' @noRd
+#'
+#'
+check_response <- function(response, log_errors){
+
+	code <- response$status_code
+
+	if(code != 200 && log_errors>0){
+
+		error_to_file(response, log_errors)
+	}
 
 	if (code == 400) {
 
-		stop("HTTP code 400 - Please check if your request is a valid FHIR search request.")
+		if(log_errors > 0){
+
+			stop("HTTP code 400 - This can be caused by an invalid FHIR search request or a server issue. For more information see the error file that has been generated in the working directory.")
+
+		}else{
+
+			stop("HTTP code 400 - This can be caused by an invalid FHIR search request or a server issue. To print more detailed error information to a file, set argument log_errors to 1 or 2 and rerun fhir_search().")
+
+		}
 
 	}
 
 	if (code == 401) {
 
-		stop("HTTP code 401 - Authentification needed.")
+		if(log_errors > 0){
+
+			stop("HTTP code 401 - Authentication needed. For more information see the error file that has been generated in the working directory.")
+
+		}else{
+
+			stop("HTTP code 401 - Authentication needed. To print more detailed error information to a file, set argument log_errors to 1 or 2 and rerun fhir_search().")
+
+		}
+
 	}
 
 	if (code == 404) {
 
-		stop("HTTP code 404 - Not found. Did you misspell the resource?")
+		if(log_errors > 0) {
+
+			stop("HTTP code 404 - Not found. Did you misspell the resource? For more information see the error file that has been generated in the working directory.")
+
+		}else{
+
+			stop("HTTP code 404 - Not found. Did you misspell the resource? To print more detailed error information to a file, set argument log_errors to 1 or 2 and rerun fhir_search().")
+
+		}
+
 	}
 
-	if (code >= 300 & code < 400) {
+	if (code >= 300 && code < 400) {
 
-		warning(paste("Your request generated a HTTP code", code))
+		if(log_errors > 0){
+
+			warning("Your request generated a HTTP code ", code, ". For more information see the error file that has been generated in the working directory.")
+
+		}else{
+
+			warning("Your request generated a HTTP code ", code, ". To print more detailed information to a file, set argument log_errors to 1 or 2 and rerun fhir_search().")
+
+		}
+
 	}
 
 	if (code >=400 & code < 500) {
 
-		stop(paste("Your request generated a client error, HTTP code", code))
+		if(log_errors > 0){
+
+			stop("Your request generated a client error, HTTP code ", code, ". For more information see the error file that has been generated in the working directory.")
+
+		}else{
+
+			stop("Your request generated a client error, HTTP code ", code, ". To print more detailed information to a file, set argument log_errors to 1 or 2 and rerun fhir_search().")
+
+		}
 
 	}
 
-	if (code >=500 & code < 600) {
+	if (code >=500 && code < 600) {
 
-		stop(paste("Your request generated a server error, HTTP code", code))
+		if(log_errors > 0){
+
+			stop("Your request generated a server error, HTTP code ", code, ". For more information see the error file that has been generated in the working directory.")
+
+		}else{
+
+			stop("Your request generated a server error, HTTP code ", code, ". To print more detailed error information to a file, set argument log_errors to 1 or 2 and rerun fhir_search().")
+
+		}
 
 	}
 
@@ -189,7 +292,7 @@ is_invalid_design <- function(design){
 
 	if (!is.list(design)) {
 
-		warning("Argument design has to be a list, returnign NULL.")
+		warning("Argument design has to be a list, returning NULL.")
 		return(T)
 	}
 
@@ -221,10 +324,26 @@ is_invalid_design <- function(design){
 		return(T)
 	}
 
-	F
+	expressions <- unlist(design)
+
+	testbundle <- xml2::read_xml("<Bundle>   </Bundle>")
+
+	for(i in 1:length(expressions)){
+
+		tryCatch(
+			xml2::xml_find_all(testbundle, expressions[[i]]),
+			warning = function(x){
+				if(grepl("Invalid expression", x))
+				stop("One of the strings you have provided as XPath expressions in the design argument is not a valid XPath expression. Please revise the following expression: ",
+					 esc(expressions[[i]]))
+			}
+		)
+	}
+
+	return(F)
 }
 #' Check List of Bundles
-#' @description Checks whether a List of Bundles provided to \code{\link{fhir_crack}} is ivalid and
+#' @description Checks whether a List of Bundles provided to \code{\link{fhir_crack}} is invalid and
 #' issues a warning if it is.
 #' @param bundles_list The List of Bundles to be checked
 #' @return TRUE if bundles_list is invalid, FALSE if not
@@ -480,6 +599,8 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 	xpath <- design.df[[1]]
 
 	children <- xml2::xml_find_all(bundle, xpath)
+
+	if(length(children) == 0) {stop(esc(xpath), " seems not to be present in the bundles.")}
 
 	df.list <- lapply(
 		children,

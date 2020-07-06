@@ -41,6 +41,13 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 #' downloading progress will be printed. Defaults to 2.
 #' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
 #' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
+#' @param log_errors Takes values 0, 1 or 2. Controls the logging of errors. 1 and 2 will write a file to the current working directory.
+#'
+#' 0: no logging of errors,
+#'
+#' 1: tabulate http response and write to csv-file
+#'
+#' 2: write http response as to xml-file
 #'
 #' @return A list of bundles in xml format.
 #' @export
@@ -48,11 +55,28 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 #' @examples
 #' bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)
 
-fhir_search <- function(request, username = NULL, password = NULL, max_bundles = Inf, verbose = 1, max_attempts = 5, delay_between_attempts = 10) {
+fhir_search <- function(request, username = NULL, password = NULL, max_bundles = Inf, verbose = 1,
+						max_attempts = 5, delay_between_attempts = 10, log_errors=0) {
 
 	bundles <- list()
 
 	addr <- request
+
+	if (0 < verbose) {
+		message(
+			paste0(
+				"Starting download of ",
+				if ( max_bundles < Inf ) max_bundles else "ALL!",
+				" bundles of resource type ",
+				gsub( "(^.+/)(.+)(\\?).*$", "\\2", request, perl = T ),
+				" from FHIR endpoint ",
+				gsub( "(^.+)(/.+\\?).*$", "\\1", request, perl = T ),
+				".\n"
+			)
+		)
+
+		if ( 9 < max_bundles ) message( "This may take a while..." )
+	}
 
 	cnt <- 0
 
@@ -62,11 +86,12 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 
 		if (1 < verbose) {cat(paste0("bundle[", cnt, "]"))}
 
-		bundle <- get_bundle(request = addr, username = username, password = password, verbose = verbose, max_attempts = max_attempts, delay_between_attempts = delay_between_attempts)
+		bundle <- get_bundle(request = addr, username = username, password = password, verbose = verbose,
+							 max_attempts = max_attempts, delay_between_attempts = delay_between_attempts, log_errors = log_errors)
 
 		if (is.null(bundle)) {
 
-			if (0 < verbose) {message("download interrupted.\n")}
+			if (0 < verbose) {message("Download interrupted.\n")}
 
 			break
 		}
@@ -77,7 +102,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 
 		links <- xml2::xml_find_all(bundle, "link")
 
-		rels.nxt  <- xml2::xml_attr(xml2::xml_find_first(links, "./relation"), "value") == "next"
+		rels.nxt <- xml2::xml_text(xml2::xml_find_first(links, "./relation/@value")) == "next"
 
 		if (cnt == max_bundles ) {
 
@@ -455,11 +480,11 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #' dfs$Patients
 #'
 #' #only keep address columns
-#' fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names, brackets = c("[","]"))
+#' fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names, brackets = c("[","]", sep = " "))
 #'
 #' #keep all columns
 #' fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,
-#'           brackets = c("[","]"), all_columns = TRUE)
+#'           brackets = c("[","]"), sep = " ", all_columns = TRUE)
 #' @export
 
 fhir_melt <- function(indexed_data_frame, columns, brackets = c( "<", ">" ), sep = " -+- ", id_name = "resource_identifier", all_columns = F) {
