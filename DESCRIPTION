@@ -4,10 +4,24 @@ Title: Handling HL7 FHIR Resources in R
 Version: 0.1.0
 Date: 2020-07-01
 Authors@R: c(
-    person("Thomas", "Peschel", email = "tpeschel@imise.uni-leipzig.de", role = c("aut","cre")),
-    person("Julia", "Gantner", email = "julia.gantner@med.uni-jena.de", role = "aut"),
-    person("Jens", "Przybilla", email = "jprzybilla@imise.uni-leipzig.de", role = "aut"),
-    person("Frank", "Meineke", email = "frank.meineke@imise.uni-leipzig.de", role = "aut"))
+    person( given = "Thomas", 
+            family = "Peschel", 
+            email = "tpeschel@imise.uni-leipzig.de", 
+            role = c("aut","cre")),
+    person( given = "Julia", 
+            family = "Gantner", 
+            email = "julia.gantner@med.uni-jena.de", 
+            role = "aut",
+            comment=c(ORCID = "0000-0003-1568-5893")),
+    person( given = "Jens", 
+            family = "Przybilla", 
+            email = "jprzybilla@imise.uni-leipzig.de", 
+            role = "aut"),
+    person( given = "Frank", 
+            family = "Meineke", 
+            email = "frank.meineke@imise.uni-leipzig.de", 
+            role = "aut",
+            comment=c(ORCID = "0000-0002-9256-7543")))
 Description: Useful tools for conveniently downloading FHIR resources in xml format 
     and converting them to R data frames. The package uses FHIR-search to download bundles 
     from a FHIR server, provides functions to save and read xml-files containing such bundles 
