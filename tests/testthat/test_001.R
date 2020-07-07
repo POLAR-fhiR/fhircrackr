@@ -31,10 +31,14 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "fhir_search()" )
 
-bundles <- fhir_search( request = "https://hapi.fhir.org/baseR4/Patient?_pretty=true", max_bundles = 5 )
 
 testthat::test_that(
 	"fhir_search downloads a valid bundle list", {
+
+		testthat::skip_on_cran()
+
+		bundles <- fhir_search( request = "https://hapi.fhir.org/baseR4/Patient?_pretty=true", max_bundles = 5 )
+
 		testthat::expect_false( is.null( bundles ) )
 		testthat::expect_true( is.list( bundles ) )
 		testthat::expect_true( 0 < length( bundles ) )
@@ -46,7 +50,7 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "fhir_save" )
 
-fhir_save( bundles, "myBundles" )
+fhir_save( fhir_unserialize(patient_bundles), "myBundles" )
 
 testthat::test_that(
 	"fhir_save stores all bundles as xml files in the required directory", {
@@ -96,12 +100,15 @@ testthat::test_that(
 
 
 #########################################################################################################
-testthat::context( "fhir_cs()" )
-
-caps <- fhir_capability_statement( "https://hapi.fhir.org/baseR4", sep = " ~ ")
+testthat::context( "fhir_capability_statement()" )
 
 testthat::test_that(
-	"fhir_cs() works", {
+	"fhir_capability_statement() works", {
+
+		testthat::skip_on_cran()
+
+		caps <- fhir_capability_statement( "https://hapi.fhir.org/baseR4", sep = " ~ ")
+
 		testthat::expect_false( is.null( caps ) )
 		testthat::expect_true( is.list( caps ) )
 		testthat::expect_true( is.data.frame( caps[[ 1 ]] ) )

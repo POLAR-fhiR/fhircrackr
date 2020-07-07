@@ -16,6 +16,9 @@ A list of serialized xml objects
 Serializes a list of FHIR bundles to allow for saving in .rda or .RData format without losing integrity of pointers
 }
 \examples{
-bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)
+#example bundles are serialized, unserialize like this:
+bundles <- fhir_unserialize(medication_bundles)
+
+#Serialize like this:
 bundles_for_saving <- fhir_serialize(bundles)
 }

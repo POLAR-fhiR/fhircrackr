@@ -46,5 +46,5 @@ A list of bundles in xml format.
 Downloads all FHIR bundles of a FHIR search request from a FHIR server.
 }
 \examples{
-bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)
+\dontrun{bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)}
 }
