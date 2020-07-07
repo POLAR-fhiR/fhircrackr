@@ -628,9 +628,7 @@ fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), sep="-+-
 #' search_request  <- "https://hapi.fhir.org/baseR4/MedicationStatement?
 #' code=http://snomed.info/ct|429374003&
 #' _include=MedicationStatement:subject"
-#'
 #'fhir_search(search_request, max.bundles = 3)
-#'
 #' }
 #'
 #' [Downloaded 06-22-20]
