@@ -35,7 +35,7 @@ The complexity of the problem requires a couple of prerequisites both regarding 
 1. First of all, you need the endpoint of the FHIR server you want to access. If you don't have your own FHIR server, you can use one of the publicly available servers, such as `https://hapi.fhir.org/baseR4` or `http://fhir.hl7.de:8080/baseDstu3`. The endpoint of a FHIR server is often referred to as [base].
 
 2. To download resources from the server, you should be familiar with [FHIR search requests](https://www.hl7.org/fhir/search.html). FHIR search allows you to download sets of resources that match very specific requirements. As the focus of this package is dealing with FHIR resources in R rather than the intricacies of FHIR search, we will mostly use simple examples of FHIR search requests. Most of them will have the form `[base]/[type]?parameter(s)`, where `[type]` refers to the type of resource you are looking for and `parameter(s)` characterize specific properties those resources should have.
-`http://hapi.fhir.org/baseR4/Patient?gender=female` for example downloads all Patient resources from the FHIR server at `http://hapi.fhir.org/baseR4/` that represent female patients.
+`https://hapi.fhir.org/baseR4/Patient?gender=female` for example downloads all Patient resources from the FHIR server at `https://hapi.fhir.org/baseR4/` that represent female patients.
 
 3. In the first step, `fhircrackr` downloads the resources in xml format into R. To specify which elements from the FHIR resources you want in your data frame, you should have at least some familiarity with XPath expressions. A good tutorial on XPath expressions can be found [here](https://www.w3schools.com/xml/xpath_intro.asp).
 
@@ -46,12 +46,17 @@ In the following we'll go through a typical workflow with `fhircrackr` step by s
 ### Example 1: Download Patient resources
 We will start with a very simple example and use `fhir_search()` to download Patient resources from a publicly available HAPI server after we've loaded the package with `library(fhircrackr)`:
 
-```{r, results=F, message=F}
+```{r, eval=F}
 library(fhircrackr)
-patient_bundles <- fhir_search(request="https://hapi.fhir.org/baseR4/Patient?",
+patient_bundles <- fhir_search(request="http://fhir.hl7.de:8080/baseDstu3/Patient?",
 							   max_bundles=2, verbose = 0)
 
 ```
+
+```{r, include=F}
+library(fhircrackr)
+patient_bundles <- fhir_unserialize(patient_bundles)
+``` 
 
 The minimum information `fhir_search()` requires is a string containing the full FHIR search request in the argument `request`.
 In general, a FHIR search request returns a *bundle* of the resources you requested. If there are a lot of resources matching your request, the search result isn't returned in one big bundle but distributed over several of them. If the argument `max_bundles` is set to its default `Inf`, `fhir_search()` will return all available bundles, meaning all resources matching your request. If you set it to `2` as in the example above, the download will stop after the first two bundles. Note that in this case, the result *may not contain all* the resources from the server matching your request.
@@ -190,8 +195,12 @@ search_request  <- paste0(
 
 Then we can download the resources:
 
-```{r, results=F, message=F}
+```{r, eval=F}
 medication_bundles <- fhir_search(search_request, max_bundles = 3)
+```
+
+```{r, include=F}
+medication_bundles <- fhir_unserialize(medication_bundles)
 ```
 
 And convert them into data frames, one for the MedicationStatements and one for the Patients:
@@ -333,6 +342,7 @@ If the data frame produced by `fhir_crack()` contains multiple entries, you'll p
 fhir_melt(df2$Patients, columns = "address.city.value", brackets = c("[","]"), 
 		  sep=" ", all_columns = FALSE)
 ```
+
 The new variable `resource_identifier` maps which rows in the created data frame belong to which row (usually equivalent to one resource) in the original data frame.
 `brackets` and `sep` should be given the same character vectors that have been used to build the indices in `fhir_melt()`. `columns` is a character vector with the names of the variables you want to melt. You can provide more than one column here but it makes sense to only have variables from the same repeating attribute together in one call to `fhir_melt()`:
 
@@ -448,17 +458,11 @@ bundles <- fhir_load("MyDirectory")
 ## Download capability statement
 The [capability statement](https://www.hl7.org/fhir/capabilitystatement.html) documents a set of capabilities (behaviors) of a FHIR Server for a particular version of FHIR. You can download this statement using the function `fhir_capability_statement()`:
 
-```{r, results=F}
+```{r, eval=F}
 cap <- fhir_capability_statement("http://hapi.fhir.org/baseR4/", verbose = 0)
 ```
 
 `fhir_capability_statement()` takes a FHIR server endpoint and returns a list of data frames containing all information from the capability statement of this server.
-
-You can then access the parts that interest you, for example:
-
-```{r}
-cap$META$fhirVersion.value
-```
 
 ## Further Options
 ### Extract data below resource level
