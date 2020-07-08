@@ -53,7 +53,7 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 #' @export
 #'
 #' @examples
-#' \dontrun{bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)}
+#' \donttest{bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)}
 
 fhir_search <- function(request, username = NULL, password = NULL, max_bundles = Inf, verbose = 1,
 						max_attempts = 5, delay_between_attempts = 10, log_errors=0) {
@@ -68,9 +68,9 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 				"Starting download of ",
 				if ( max_bundles < Inf ) max_bundles else "ALL!",
 				" bundles of resource type ",
-				gsub( "(^.+/)(.+)(\\?).*$", "\\2", request, perl = T ),
+				gsub( "(^.+/)(.+)(\\?).*$", "\\2", request, perl = TRUE ),
 				" from FHIR endpoint ",
-				gsub( "(^.+)(/.+\\?).*$", "\\1", request, perl = T ),
+				gsub( "(^.+)(/.+\\?).*$", "\\1", request, perl = TRUE ),
 				".\n"
 			)
 		)
@@ -159,7 +159,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 #'
 #' @examples
 #' #unserialize example bundle
-#' \dontrun{
+#' \donttest{
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #save to folder named "result"
@@ -172,7 +172,7 @@ fhir_save <- function(bundles, directory = "result") {
 
 	if (!dir.exists(directory))
 
-		dir.create(directory, recursive = T)
+		dir.create(directory, recursive = TRUE)
 
 	for (n in 1:length(bundles)) {
 
@@ -193,7 +193,7 @@ fhir_save <- function(bundles, directory = "result") {
 #' @examples
 #' #unserialize example bundle
 #' bundles <- fhir_unserialize(medication_bundles)
-#' \dontrun{
+#' \donttest{
 #' #save to folder named "result"
 #' fhir_save(bundles, "result")
 #'
@@ -282,7 +282,7 @@ fhir_load <- function(directory) {
 #'
 #' @export
 
-fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">"), verbose = 2) {
+fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = FALSE, add_indices = FALSE, brackets = c( "<", ">"), verbose = 2) {
 
 	if (is_invalid_design(design)) return(NULL)
 
@@ -315,10 +315,10 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = F,
 #' @export
 #'
 #' @examples
-#' \dontrun{cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")}
+#' \donttest{cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")}
 #'
 
-fhir_capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " ", remove_empty_columns = T, add_indices = T, brackets = c( "<", ">"), verbose = 2) {
+fhir_capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " ", remove_empty_columns = TRUE, add_indices = TRUE, brackets = c( "<", ">"), verbose = 2) {
 
 	caps <- fhir_search(request = paste_paths(url, "/metadata?"), verbose = verbose)
 
@@ -489,7 +489,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #'           brackets = c("[","]"), sep = " ", all_columns = TRUE)
 #' @export
 
-fhir_melt <- function(indexed_data_frame, columns, brackets = c( "<", ">" ), sep = " -+- ", id_name = "resource_identifier", all_columns = F) {
+fhir_melt <- function(indexed_data_frame, columns, brackets = c( "<", ">" ), sep = " -+- ", id_name = "resource_identifier", all_columns = FALSE) {
 
 	if (! is_indexed_data_frame(indexed_data_frame)) {stop("The data frame is not indexed by fhir_crack.")}
 
