@@ -16,10 +16,8 @@ Writes a list of FHIR bundles as numbered xml files into a directory.
 }
 \examples{
 #unserialize example bundle
-\dontrun{
 bundles <- fhir_unserialize(medication_bundles)
 
-#save to folder named "result"
-fhir_save(bundles, "result")
-}
+#save to temporary directory
+fhir_save(bundles, directory = tempdir())
 }

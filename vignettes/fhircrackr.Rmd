@@ -416,15 +416,19 @@ head(serialized_bundles[[1]])
 ```
 
 ```{r, eval=F}
+#create temporary directory for saving
+temp_dir <- tempdir()
+
 #save
-save(serialized_bundles, file="bundles.rda")
+save(serialized_bundles, file=paste0(temp_dir, "\\bundles.rda"))
+
 ```
 
 If you load this bundle again, you have to unserialize it before you can work with it:
 
 ```{r, eval=F}
 #load bundles
-load("bundles.rda")
+load(paste0(temp_dir, "\\bundles.rda"))
 ```
 
 ```{r}
@@ -443,13 +447,13 @@ If you want to store the bundles in xml files instead of R objects, you can use 
 
 ```{r, eval=F}
 #save bundles as xml files
-fhir_save(patient_bundles, directory="MyDirectory")
+fhir_save(patient_bundles, directory=temp_dir)
 ```
 
 To read bundles saved with `fhir_save()` back into R, you can use `fhir_load()`:
 
 ```{r, eval=F}
-bundles <- fhir_load("MyDirectory")
+bundles <- fhir_load(temp_dir)
 ```  
 
 `fhir_load()` takes the name of the directory (or path to it) as its only argument. All xml-files in this directory will be read into R and returned as a list of bundles in xml format just as returned by `fhir_search()`.

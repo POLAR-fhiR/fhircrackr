@@ -10,7 +10,7 @@ fhir_melt(
   brackets = c("<", ">"),
   sep = " -+- ",
   id_name = "resource_identifier",
-  all_columns = F
+  all_columns = FALSE
 )
 }
 \arguments{

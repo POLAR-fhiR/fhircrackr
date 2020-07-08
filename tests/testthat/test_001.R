@@ -1,5 +1,5 @@
 #########################################################################################################
-testthat::context( "crack()" )
+testthat::context( "fhir_crack()" )
 
 xmlfile <- xml2::read_xml( "specimen.xml" )
 
@@ -50,12 +50,13 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "fhir_save" )
 
-fhir_save( fhir_unserialize(patient_bundles), "myBundles" )
+directory <- tempdir()
+
+fhir_save( fhir_unserialize(patient_bundles), directory)
 
 testthat::test_that(
 	"fhir_save stores all bundles as xml files in the required directory", {
-		testthat::expect_true( any( "myBundles" %in% dir( ) ) )
-		testthat::expect_true( 0 < length( dir( "myBundles" ) ) )
+		testthat::expect_true( 0 < length( dir( directory ) ) )
 	}
 )
 
@@ -63,7 +64,7 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "fhir_load()" )
 
-myBundles <- fhir_load( "myBundles" )
+myBundles <- fhir_load( directory )
 
 testthat::test_that(
 	"fhir_load reads all bundles as xml files from the given directory", {

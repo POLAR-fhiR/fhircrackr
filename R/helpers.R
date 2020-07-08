@@ -55,7 +55,7 @@ rbind_list_of_data_frames <- function( list ) {
 		return(NULL)
 	}
 
-	d <- as.data.frame(lapply(seq_along(unique.names),function(dummy)character(0)), stringsAsFactors = F)
+	d <- as.data.frame(lapply(seq_along(unique.names),function(dummy)character(0)), stringsAsFactors = FALSE)
 
 	names( d ) <- unique.names
 
@@ -120,11 +120,11 @@ get_bundle <- function(request, username = NULL, password = NULL, verbose = 2, m
 
 		check_response(response, log_errors = log_errors)
 
-		payload <- try(httr::content(response, as = "text", encoding = "UTF-8"), silent = T)
+		payload <- try(httr::content(response, as = "text", encoding = "UTF-8"), silent = TRUE)
 
 		if (class(payload)[1] != "try-error") {
 
-			xml <- try(xml2::read_xml(payload), silent = T)
+			xml <- try(xml2::read_xml(payload), silent = TRUE)
 
 			if(class(xml)[1] != "try-error") {
 
@@ -287,19 +287,19 @@ is_invalid_design <- function(design){
 	if (is.null(design)) {
 
 		warning("Argument design is NULL, returning NULL.")
-		return(T)
+		return(TRUE)
 	}
 
 	if (!is.list(design)) {
 
 		warning("Argument design has to be a list, returning NULL.")
-		return(T)
+		return(TRUE)
 	}
 
 	if (length(design)<1) {
 
 		warning("Argument design has length 0, returning NULL.")
-		return(T)
+		return(TRUE)
 	}
 
 	list.type <- sapply(design, is.list)
@@ -307,13 +307,13 @@ is_invalid_design <- function(design){
 	if (any(!list.type)) {
 
 		warning("All elements of design have to be of type list. Returning NULL.")
-		return(T)
+		return(TRUE)
 	}
 
 	if (is.null(names(design)) || any(names(design)=="")) {
 
 		warning("Argument design should be a NAMED list but has at least one unnamed element. Returning NULL")
-		return(T)
+		return(TRUE)
 	}
 
 	lengths <- sapply(design, length)
@@ -321,7 +321,7 @@ is_invalid_design <- function(design){
 	if (any(lengths < 1 | 2 < lengths)){
 
 		warning("At least one if the elements of argument design is not a list of length 1 or 2. Returning NUll")
-		return(T)
+		return(TRUE)
 	}
 
 	expressions <- unlist(design)
@@ -340,7 +340,7 @@ is_invalid_design <- function(design){
 		)
 	}
 
-	return(F)
+	return(FALSE)
 }
 #' Check List of Bundles
 #' @description Checks whether a List of Bundles provided to \code{\link{fhir_crack}} is invalid and
@@ -354,19 +354,19 @@ is_invalid_bundles_list <- function(bundles_list){
 
 		warning("Argument bundles_list is NULL, returning NULL.")
 
-		return(T)
+		return(TRUE)
 	}
 
 	if (!is.list(bundles_list)) {
 
 		warning("Argument bundles_list has to be a list, returnign NULL.")
-		return(T)
+		return(TRUE)
 	}
 
 	if (length(bundles_list)<1) {
 
 		warning("Argument bundles_list has length 0, returning NULL.")
-		return(T)
+		return(TRUE)
 	}
 
 	valid.doc.types <- all(
@@ -376,7 +376,7 @@ is_invalid_bundles_list <- function(bundles_list){
 
 				if(is.null(b)) {
 
-					F
+					FALSE
 				}
 				else {
 
@@ -390,10 +390,10 @@ is_invalid_bundles_list <- function(bundles_list){
 	if (!valid.doc.types) {
 
 		warning("Argument bundles_list contains at least one invalid Bundle. Bundles have to be of Class 'xml_document' and 'xml_node'. Returning NULL")
-		return(T)
+		return(TRUE)
 	}
 
-	F
+	FALSE
 }
 
 
@@ -402,7 +402,7 @@ is_invalid_bundles_list <- function(bundles_list){
 #' Extracts all available values from a single resource
 #'
 #' @param child A xml child object, representing one FHIR resource
-#' from the resouce
+#' from the resource
 #' @param sep A String to separate pasted multiple entries.
 #' @param xpath A String to locate data in tree via xpath.
 #' @param add_indices A Logical Scalar.
@@ -419,7 +419,7 @@ is_invalid_bundles_list <- function(bundles_list){
 #' #Extract all columns
 #' result <- fhircrackr:::xtrct_all_columns(child)
 #'
-xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices = F, brackets = c( "<", ">")) {
+xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices = FALSE, brackets = c( "<", ">")) {
 
 	tree <- xml2::xml_find_all(child, xpath)
 
@@ -474,7 +474,7 @@ xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices
 		d[[col]] <- paste0(val[col == o[2, ]], collapse = sep)
 	}
 
-	as.data.frame(d, stringsAsFactors = F)
+	as.data.frame(d, stringsAsFactors = FALSE)
 }
 
 #' Extract columns
@@ -506,7 +506,7 @@ xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices
 #' #Extract columns
 #' result <- fhircrackr:::xtrct_columns(child, cols)
 
-xtrct_columns <- function(child, df.columns, sep = " -+- ", add_indices = F, brackets = c( "<", ">")) {
+xtrct_columns <- function(child, df.columns, sep = " -+- ", add_indices = FALSE, brackets = c( "<", ">")) {
 
 	xp <- xml2::xml_path(child)
 
@@ -560,7 +560,7 @@ xtrct_columns <- function(child, df.columns, sep = " -+- ", add_indices = F, bra
 		}
 	)
 
-	as.data.frame(l, stringsAsFactors = F)
+	as.data.frame(l, stringsAsFactors = FALSE)
 }
 
 #' Extracts one data frame out of one bundle
@@ -592,7 +592,7 @@ xtrct_columns <- function(child, df.columns, sep = " -+- ", add_indices = F, bra
 #'
 #' #convert bundle to data frame
 #' result <- fhircrackr:::bundle2df(bundle, design)
-bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">"), verbose = 2) {
+bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = FALSE, brackets = c( "<", ">"), verbose = 2) {
 
 	xml2::xml_ns_strip(bundle)
 
@@ -668,7 +668,7 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = F, bracket
 #' #convert bundles to data frame
 #' result <- fhircrackr:::bundles2df(bundles, design)
 
-bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brackets = c( "<", ">"), verbose = 2) {
+bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = FALSE, brackets = c( "<", ">"), verbose = 2) {
 
 	ret <- rbind_list_of_data_frames(
 		lapply(
@@ -687,11 +687,11 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 		)
 	)
 
-	ret <- ret[ apply(ret, 1, function(row) ! all(is.na(row))), , drop = F]
+	ret <- ret[ apply(ret, 1, function(row) ! all(is.na(row))), , drop = FALSE]
 
 	if (1 < verbose) {cat( "\n" )}
 
-	if (add_indices) attr(ret, "indexed") <- T
+	if (add_indices) attr(ret, "indexed") <- TRUE
 
 	ret
 }
@@ -758,7 +758,7 @@ bundles2df <- function(bundles, design.df, sep = " -+- ", add_indices = F, brack
 #' #convert fhir to data frames
 #' list_of_tables <- fhircrackr:::bundles2dfs(bundles, df_design)
 
-bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F, add_indices = F, brackets = c( "<", ">"), verbose = 2) {
+bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = FALSE, add_indices = FALSE, brackets = c( "<", ">"), verbose = 2) {
 
 	if (add_indices) {
 
@@ -829,7 +829,7 @@ esc <- function(s) {
 #' @noRd
 
 
-melt_row <- function(row, columns, brackets = c( "<", ">" ), sep = " -+- ", all_columns = F) {
+melt_row <- function(row, columns, brackets = c( "<", ">" ), sep = " -+- ", all_columns = FALSE) {
 
 	col.names.mutable  <- columns
 
@@ -860,7 +860,7 @@ melt_row <- function(row, columns, brackets = c( "<", ">" ), sep = " -+- ", all_
 
 	names(items) <- col.names.mutable
 
-	d <- if (all_columns) {row[0, , F]} else {row[0, col.names.mutable, F]}
+	d <- if (all_columns) {row[0, , FALSE]} else {row[0, col.names.mutable, FALSE]}
 
 	for (i in names(ids)) {
 
@@ -892,7 +892,7 @@ melt_row <- function(row, columns, brackets = c( "<", ">" ), sep = " -+- ", all_
 				}
 			)
 
-			for (n in unique.new.rows) {d[n, i] <- gsub(paste0(esc(sep), "$"), "", f[n], perl = T)}
+			for (n in unique.new.rows) {d[n, i] <- gsub(paste0(esc(sep), "$"), "", f[n], perl = TRUE)}
 		}
 	}
 
