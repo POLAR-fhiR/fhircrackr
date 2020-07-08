@@ -159,12 +159,11 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 #'
 #' @examples
 #' #unserialize example bundle
-#' \donttest{
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
-#' #save to folder named "result"
-#' fhir_save(bundles, "result")
-#'}
+#' #save to temporary directory
+#' fhir_save(bundles, directory = tempdir())
+
 
 fhir_save <- function(bundles, directory = "result") {
 
@@ -193,13 +192,12 @@ fhir_save <- function(bundles, directory = "result") {
 #' @examples
 #' #unserialize example bundle
 #' bundles <- fhir_unserialize(medication_bundles)
-#' \donttest{
-#' #save to folder named "result"
-#' fhir_save(bundles, "result")
 #'
-#' #read from folder "result"
-#' read_bundles <- fhir_load("result")
-#' }
+#' #save to temporary directory
+#' fhir_save(bundles, directory = tempdir())
+#'
+#' #load from temporary directory
+#' loaded_bundles <- fhir_load(tempdir())
 
 fhir_load <- function(directory) {
 
