@@ -8,8 +8,8 @@ fhir_crack(
   bundles,
   design,
   sep = " -+- ",
-  remove_empty_columns = F,
-  add_indices = F,
+  remove_empty_columns = FALSE,
+  add_indices = FALSE,
   brackets = c("<", ">"),
   verbose = 2
 )

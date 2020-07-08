@@ -18,11 +18,10 @@ Reads all bundles stored as xml files from a directory.
 \examples{
 #unserialize example bundle
 bundles <- fhir_unserialize(medication_bundles)
-\dontrun{
-#save to folder named "result"
-fhir_save(bundles, "result")
 
-#read from folder "result"
-read_bundles <- fhir_load("result")
-}
+#save to temporary directory
+fhir_save(bundles, directory = tempdir())
+
+#load from temporary directory
+loaded_bundles <- fhir_load(tempdir())
 }
