@@ -2,5 +2,6 @@
 ^\.Rproj\.user$
 ^data-raw$
 ^cran-comments\.md$
+^ToDo\.md$
 ^docs$
 ^CRAN-RELEASE$
