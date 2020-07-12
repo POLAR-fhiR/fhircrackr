@@ -514,7 +514,7 @@ fhir_melt <- function(indexed_data_frame, columns, brackets = c("<", ">"), sep =
 		)
 	)
 
-	d[order(d[[id_name]]), ]
+	if (! is.null(d) && 0 < nrow(d)) d[order(d[[id_name]]), ]
 }
 
 #' Remove indices from data frame
