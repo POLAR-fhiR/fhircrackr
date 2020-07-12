@@ -487,7 +487,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #'           brackets = c("[","]"), sep = " ", all_columns = TRUE)
 #' @export
 
-fhir_melt <- function(indexed_data_frame, columns, brackets = c( "<", ">" ), sep = " -+- ", id_name = "resource_identifier", all_columns = FALSE) {
+fhir_melt <- function(indexed_data_frame, columns, brackets = c("<", ">"), sep = " -+- ", id_name = "resource_identifier", all_columns = FALSE) {
 
 	if (! is_indexed_data_frame(indexed_data_frame)) {stop("The data frame is not indexed by fhir_crack.")}
 
@@ -503,19 +503,18 @@ fhir_melt <- function(indexed_data_frame, columns, brackets = c( "<", ">" ), sep
 			function(row.id) {
 
 				#dbg
-				#row.id <- 1
-
+				#row.id <- 3
 
 				e <- melt_row(row = indexed_data_frame[ row.id, ], columns = columns, brackets = brackets, sep = sep, all_columns = all_columns)
 
-				e[1:nrow(e), id_name] <- row.id
+				if (0<nrow(e)) e[seq_len(nrow(e)), id_name] <- row.id
 
 				e
 			}
 		)
 	)
 
-	d[order(d[[id_name]]), ]
+	if (! is.null(d) && 0 < nrow(d)) d[order(d[[id_name]]), ]
 }
 
 #' Remove indices from data frame

@@ -30,7 +30,7 @@ rbind_list_of_data_frames <- function( list ) {
 
 		warning( "no data in list for rbind_list_of_data_frames(list)" )
 
-		return( NULL )
+		return(as.data.frame(NULL))
 	}
 
 	#dbg
@@ -600,41 +600,47 @@ bundle2df <- function(bundle, design.df, sep = " -+- ", add_indices = FALSE, bra
 
 	children <- xml2::xml_find_all(bundle, xpath)
 
-	if(length(children) == 0) {stop(esc(xpath), " seems not to be present in the bundles.")}
+	df.list <- if (length(children) == 0) {
 
-	df.list <- lapply(
-		children,
-		function(child) {
+		warning( paste0(esc(xpath), " seems not to be present in the bundles.") )
 
-			#dbg
-			#child <- children[[ 1 ]]
+		list()
+	}
+	else {
+		lapply(
+			children,
+			function(child) {
 
-			if (1<length(design.df) && is.list(design.df[[2]])) {
+				#dbg
+				#child <- children[[ 1 ]]
 
-				df.columns <- design.df[[2]]
+				if (1<length(design.df) && is.list(design.df[[2]])) {
 
-				res <- xtrct_columns( child, df.columns, sep = sep, add_indices = add_indices, brackets = brackets)
+					df.columns <- design.df[[2]]
 
-				if(1 < verbose){
+					res <- xtrct_columns( child, df.columns, sep = sep, add_indices = add_indices, brackets = brackets)
 
-					if(all(sapply(res, is.na))) {cat("x")} else {cat( ".")}
+					if(1 < verbose){
+
+						if(all(sapply(res, is.na))) {cat("x")} else {cat( ".")}
+					}
 				}
-			}
-			else{
+				else{
 
-				xp <- if(1<length(design.df)) {design.df[[2]]} else {".//@*"}
+					xp <- if(1<length(design.df)) {design.df[[2]]} else {".//@*"}
 
-				res <- xtrct_all_columns(child = child, sep = sep, xpath = xp, add_indices = add_indices, brackets = brackets)
+					res <- xtrct_all_columns(child = child, sep = sep, xpath = xp, add_indices = add_indices, brackets = brackets)
 
-				if(1 < verbose){
+					if(1 < verbose){
 
-					if(nrow(res) < 1) {cat("x")} else {cat(".")}
+						if(nrow(res) < 1) {cat("x")} else {cat(".")}
+					}
 				}
-			}
 
-			res
-		}
-	)
+				res
+			}
+		)
+	}
 
 	rbind_list_of_data_frames(list = df.list)
 }
@@ -814,7 +820,6 @@ is_indexed_data_frame <- function( data_frame ) {
 esc <- function(s) {
 
 	gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s)
-
 }
 
 #' Turn a row with multiple entries into a data frame
@@ -848,7 +853,7 @@ melt_row <- function(row, columns, brackets = c( "<", ">" ), sep = " -+- ", all_
 
 	ids <- stringr::str_extract_all(row.mutable, pattern.ids)
 
-	if (sum(sapply(ids, length)) < 1) {stop("The brackets you specified don't seem to fit the index brackets in your data.frame, please check.")}
+	#if (sum(sapply(ids, length)) < 1) {stop("The brackets you specified don't seem to fit the index brackets in your data.frame, please check.")}
 
 	names(ids) <- col.names.mutable
 
@@ -898,7 +903,8 @@ melt_row <- function(row, columns, brackets = c( "<", ">" ), sep = " -+- ", all_
 
 	if (0 < length(col.names.constant) && all_columns) {
 
-		d[, col.names.constant] <- dplyr::select( row, col.names.constant )
+		if (0 < nrow(d) ) d[, col.names.constant] <- dplyr::select( row, col.names.constant )
+		else d[1, col.names.constant] <- dplyr::select( row, col.names.constant )
 	}
 
 #	names( d )[ names( d ) %in% col.names.mutable ] <- gsub( paste0( "^", column.prefix, "\\." ), "", col.names.mutable )
