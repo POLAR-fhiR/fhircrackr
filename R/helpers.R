@@ -798,7 +798,11 @@ bundles2dfs <- function(bundles, design, sep = " -+- ", remove_empty_columns = F
 
 				cols <- names( df )[ sapply( df, function( col ) 0 < sum( ! is.na( col ) ) ) ]
 
-				dplyr::select( df, cols )
+				df <- dplyr::select( df, cols )
+
+				if (add_indices) attr(df, "indexed") <- TRUE
+
+				df
 			}
 		)
 	}
