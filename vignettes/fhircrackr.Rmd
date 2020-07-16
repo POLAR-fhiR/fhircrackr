@@ -1,5 +1,5 @@
 ---
-title: "fhircrackr: Handling HL7 FHIR resources in R"
+title: "fhircrackr: Handling HL7&reg; FHIR&reg; resources in R"
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ```
 
 ## Introduction
-`fhircrackr` is a package designed to help analyzing HL7 FHIR resources.
+`fhircrackr` is a package designed to help analyzing HL7 FHIR^[FHIR is the registered trademark of HL7 and is used with the permission of HL7. Use of the FHIR trademark does not constitute endorsement of this product by HL7] resources.
 
 FHIR stands for *Fast Healthcare Interoperability Resources* and  is a standard describing data formats and elements (known as "resources") as well as an application programming interface (API) for exchanging electronic health records. The standard was created by the Health Level Seven International (HL7) health-care standards organization. For more information on the FHIR standard, visit https://www.hl7.org/fhir/.
 
