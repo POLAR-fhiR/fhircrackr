@@ -1,5 +1,5 @@
-# fhircrackr: Handling HL7 FHIR resources in R 
-fhircrackr is a package that conveniently downloads FHIR resources in xml format and converts them to R data frames. It uses FHIR search to download bundles from a FHIR server, provides functions to save and read xml-files containing such bundles and allows flattening the bundles to data frames using XPath expressions.
+# fhircrackr: Handling HL7&reg; FHIR&reg; resources in R 
+fhircrackr is a package that conveniently downloads FHIR^[FHIR is the registered trademark of HL7 and is used with the permission of HL7. Use of the FHIR trademark does not constitute endorsement of this product by HL7] resources in xml format and converts them to R data frames. It uses FHIR search to download bundles from a FHIR server, provides functions to save and read xml-files containing such bundles and allows flattening the bundles to data frames using XPath expressions.
 
 You can download the development version using `devtools::install_github("POLAR-fhiR/fhircrackr")`.
 

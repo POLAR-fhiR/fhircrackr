@@ -366,8 +366,8 @@ summary {
 
 
 <div id="fhircrackr-handling-hl7-fhir-resources-in-r" class="section level1">
-<h1>fhircrackr: Handling HL7 FHIR resources in R</h1>
-<p>fhircrackr is a package that conveniently downloads FHIR resources in xml format and converts them to R data frames. It uses FHIR search to download bundles from a FHIR server, provides functions to save and read xml-files containing such bundles and allows flattening the bundles to data frames using XPath expressions.</p>
+<h1>fhircrackr: Handling HL7® FHIR® resources in R</h1>
+<p>fhircrackr is a package that conveniently downloads FHIR<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> resources in xml format and converts them to R data frames. It uses FHIR search to download bundles from a FHIR server, provides functions to save and read xml-files containing such bundles and allows flattening the bundles to data frames using XPath expressions.</p>
 <p>You can download the development version using <code>devtools::install_github(&quot;POLAR-fhiR/fhircrackr&quot;)</code>.</p>
 <p>This readme gives a only short overview over the most important functions in <code>fhircrackr</code>. For a more comprehensive introduction see the package vignette.</p>
 <div id="prerequisites" class="section level2">
@@ -559,6 +559,12 @@ fhir_save(patient_bundles, directory=&quot;MyDirectory&quot;)</code></pre>
 <p><code>fhir_load()</code> takes the name of the directory (or path to it) as its only argument. All xml-files in this directory will be read into R and returned as a list of bundles in xml format just as returned by <code>fhir_search()</code>.</p>
 </div>
 </div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>FHIR is the registered trademark of HL7 and is used with the permission of HL7. Use of the FHIR trademark does not constitute endorsement of this product by HL7<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
 </div>
 
 
