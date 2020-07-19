@@ -75,6 +75,64 @@ rbind_list_of_data_frames <- function( list ) {
 }
 
 
+#' @description Remove attributes from xpath expressions
+#'
+#' @param design a fhircrackr design
+#'
+#' @return A design without attributes in all xpath expressions.
+#' @noRd
+
+remove_attribute_from_design <- function(design) {
+	for (n_d in names(design)) {
+		if (1 < length(design[[n_d]])) {
+			if (1 < length(design[[n_d]][[2]])){
+				for (n_c in names(design[[n_d]][[2]])) {
+					txt <- design[[n_d]][[2]][[n_c]]
+					txt <- sub("/@\\w+$", "", txt)
+					design[[n_d]][[2]][[n_c]] <- txt
+				}
+			}
+			else {
+				txt <- design[[n_d]][[2]]
+				txt <- sub("/@\\w+$", "", txt)
+				design[[n_d]][[2]] <- txt
+			}
+		}
+	}
+	design
+}
+
+#' @description Add attributes from xpath expressions
+#'
+#' @param design A fhircrackr design.
+#' @param attrib The attribute that should be added to the xpath expressions. Default is 'value'
+#'
+#' @return A design with attribute attrib in all xpath expressions.
+#' @noRd
+add_attribute_from_design <- function(design, attrib="value") {
+	for (n_d in names(design)) {
+		if (1 < length(design[[n_d]])) {
+			if (1 < length(design[[n_d]][[2]])){
+				for (n_c in names(design[[n_d]][[2]])) {
+					txt <- design[[n_d]][[2]][[n_c]]
+					if (length(grep("/@\\w+$", txt)) < 1) {
+						txt <- paste_paths(txt, paste0("@", attrib))
+						design[[n_d]][[2]][[n_c]] <- txt
+					}
+				}
+			}
+			else {
+				txt <- design[[n_d]][[2]]
+				if (length(grep("/@\\w+$", txt)) < 1) {
+					txt <- paste_paths(txt, paste0("@", attrib))
+					design[[n_d]][[2]] <- txt
+				}
+			}
+		}
+	}
+	design
+}
+
 
 #' Download single FHIR bundle
 #' @description Download a single FHIR bundle via FHIR search request and return it as a xml object.
@@ -915,4 +973,3 @@ melt_row <- function(row, columns, brackets = c( "<", ">" ), sep = " -+- ", all_
 
 	d
 }
-
