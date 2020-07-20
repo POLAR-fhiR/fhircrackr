@@ -532,7 +532,9 @@ xtrct_all_columns <- function(child, sep = " -+- ", xpath = ".//@*", add_indices
 		d[[col]] <- paste0(val[col == o[2, ]], collapse = sep)
 	}
 
-	as.data.frame(d, stringsAsFactors = FALSE)
+	result <- as.data.frame(d, stringsAsFactors = FALSE)
+	names(result) <- gsub("(\\.\\w+)$", "", names(result))
+	result
 }
 
 #' Extract columns
