@@ -88,13 +88,13 @@ remove_attribute_from_design <- function(design) {
 			if (1 < length(design[[n_d]][[2]])){
 				for (n_c in names(design[[n_d]][[2]])) {
 					txt <- design[[n_d]][[2]][[n_c]]
-					txt <- sub("/@\\w+$", "", txt)
+					txt <- sub("/@(\\w|\\*)+$", "", txt)
 					design[[n_d]][[2]][[n_c]] <- txt
 				}
 			}
 			else {
 				txt <- design[[n_d]][[2]]
-				txt <- sub("/@\\w+$", "", txt)
+				txt <- sub("/@(\\w|\\*)+$", "", txt)
 				design[[n_d]][[2]] <- txt
 			}
 		}
@@ -102,20 +102,20 @@ remove_attribute_from_design <- function(design) {
 	design
 }
 
-#' @description Add attributes from xpath expressions
+#' @description Add attributes to xpath expressions
 #'
 #' @param design A fhircrackr design.
 #' @param attrib The attribute that should be added to the xpath expressions. Default is 'value'
 #'
 #' @return A design with attribute attrib in all xpath expressions.
 #' @noRd
-add_attribute_from_design <- function(design, attrib="value") {
+add_attribute_to_design <- function(design, attrib="value") {
 	for (n_d in names(design)) {
 		if (1 < length(design[[n_d]])) {
 			if (1 < length(design[[n_d]][[2]])){
 				for (n_c in names(design[[n_d]][[2]])) {
 					txt <- design[[n_d]][[2]][[n_c]]
-					if (length(grep("/@\\w+$", txt)) < 1) {
+					if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
 						txt <- paste_paths(txt, paste0("@", attrib))
 						design[[n_d]][[2]][[n_c]] <- txt
 					}
@@ -123,7 +123,7 @@ add_attribute_from_design <- function(design, attrib="value") {
 			}
 			else {
 				txt <- design[[n_d]][[2]]
-				if (length(grep("/@\\w+$", txt)) < 1) {
+				if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
 					txt <- paste_paths(txt, paste0("@", attrib))
 					design[[n_d]][[2]] <- txt
 				}
