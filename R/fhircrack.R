@@ -167,7 +167,12 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 
 fhir_save <- function(bundles, directory = "result") {
 
-	if(is_invalid_bundles_list(bundles)){stop("No bundles have been saved")}
+	if(is_invalid_bundles_list(bundles)){
+
+		warning("Invalid bundle list format. No bundles have been saved")
+
+		return(NULL)
+	}
 
 	w <- 1 + floor(log10(length(bundles)))
 
