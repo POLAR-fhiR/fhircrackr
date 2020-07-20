@@ -250,15 +250,15 @@ fhir_load <- function(directory) {
 #' 		".//MedicationStatement",
 #'
 #' 		list(
-#' 			MS.ID              = "id/@value",
-#' 			STATUS.TEXT        = "text/status/@value",
-#' 			STATUS             = "status/@value",
-#' 			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system/@value",
-#' 			MEDICATION.CODE    = "medicationCodeableConcept/coding/code/@value",
-#' 			MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display/@value",
-#' 			DOSAGE             = "dosage/text/@value",
-#' 			PATIENT            = "subject/reference/@value",
-#' 			LAST.UPDATE        = "meta/lastUpdated/@value"
+#' 			MS.ID              = "id",
+#' 			STATUS.TEXT        = "text/status",
+#' 			STATUS             = "status",
+#' 			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+#' 			MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+#' 			MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+#' 			DOSAGE             = "dosage/text",
+#' 			PATIENT            = "subject/reference",
+#' 			LAST.UPDATE        = "meta/lastUpdated"
 #' 		)
 #' 	),
 #'
