@@ -25,6 +25,6 @@ df_design <- list(
 	)
 )
 
-(df_design_w_value <- add_value_attribute_from_design(df_design,"value"))
-(df_design_wo_value <- remove_value_attribute_from_design(df_design_w_value))
-(df_design_w_value <- add_value_attribute_from_design(df_design_wo_value,"value"))
+(df_design_w_value <- add_attribute_to_design(df_design,"value"))
+(df_design_wo_value <- remove_attribute_from_design(df_design_w_value))
+(df_design_w_value <- add_attribute_to_design(df_design_wo_value,"value"))
