@@ -108,7 +108,7 @@ We can extract all attributes that are found on certain levels of the resource, 
 design2 <- list(
   Patients = list(
     "//Patient",
-    "./*/@value"
+    "./*"
   )
 )
 
@@ -119,7 +119,7 @@ list_of_tables <- fhir_crack(patient_bundles, design2, verbose = 0)
 head(list_of_tables$Patients)
 ```
 
-`"./*/@value"` for example tells `fhir_crack()` to extract all attributes that are located (exactly) one level below the Patient's level given by the XPath expression `//Patient`. In this case, the column names are still automatically generated. Combinations of XPath expressions with conditions are also allowed.  
+`"./*"` for example tells `fhir_crack()` to extract all attributes that are located (exactly) one level below the Patient's level given by the XPath expression `//Patient`. In this case, the column names are still automatically generated. Combinations of XPath expressions with conditions are also allowed.  
 
 
 #### 3. Extract specific attributes
@@ -132,12 +132,12 @@ design3 <- list(
 	Patients = list(
 		"//Patient",
 		list(
-			PID           = "id/@value",
-			NAME.USE      = "name/use/@value",
-			NAME.GIVEN    = "name/given/@value",
-			NAME.FAMILY   = "name/family/@value",
-			GENDER        = "gender/@value",
-			BIRTHDAY      = "birthDate/@value"
+			PID           = "id",
+			NAME.USE      = "name/use",
+			NAME.GIVEN    = "name/given",
+			NAME.FAMILY   = "name/family",
+			GENDER        = "gender",
+			BIRTHDAY      = "birthDate"
 		)
 	)
 )
@@ -213,22 +213,22 @@ design <- list(
 		"//MedicationStatement",
 
 		list(
-			MS.ID              = "id/@value",
-			STATUS.TEXT        = "text/status/@value",
-			STATUS             = "status/@value",
-			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system/@value",
-			MEDICATION.CODE    = "medicationCodeableConcept/coding/code/@value",
-			MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display/@value",
-			DOSAGE             = "dosage/text/@value",
-			PATIENT            = "subject/reference/@value",
-			LAST.UPDATE        = "meta/lastUpdated/@value"
+			MS.ID              = "id",
+			STATUS.TEXT        = "text/status",
+			STATUS             = "status",
+			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+			MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+			MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+			DOSAGE             = "dosage/text",
+			PATIENT            = "subject/reference",
+			LAST.UPDATE        = "meta/lastUpdated"
 		)
 	),
 
 	Patients = list(
 
 		"//Patient",
-		"./*/@value"
+		"./*"
 	)
 )
 
@@ -339,7 +339,7 @@ Of course this is a very specific case that only occurs if your resources have m
 If the data frame produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. This is where `fhir_melt()` comes into play. `fhir_melt()` takes an indexed data frame with multiple entries in one or several `columns` and spreads (aka melts) these entries over several rows:
 
 ```{r}
-fhir_melt(df2$Patients, columns = "address.city.value", brackets = c("[","]"), 
+fhir_melt(df2$Patients, columns = "address.city", brackets = c("[","]"), 
 		  sep=" ", all_columns = FALSE)
 ```
 
@@ -347,8 +347,8 @@ The new variable `resource_identifier` maps which rows in the created data frame
 `brackets` and `sep` should be given the same character vectors that have been used to build the indices in `fhir_melt()`. `columns` is a character vector with the names of the variables you want to melt. You can provide more than one column here but it makes sense to only have variables from the same repeating attribute together in one call to `fhir_melt()`:
 
 ```{r}
-cols <- c("address.city.value", "address.use.value", "address.type.value", 
-		  "address.country.value")
+cols <- c("address.city", "address.use", "address.type", 
+		  "address.country")
 
 fhir_melt(df2$Patients, columns = cols, brackets = c("[","]"), 
 		  sep=" ", all_columns = FALSE)
@@ -370,7 +370,7 @@ Values on the other variables will just repeat in the newly created rows.
 If you try to melt several variables that don't belong to the same attribute in one call to `fhir_melt()`, this will cause problems, because the different attributes won't be combined correctly:
 
 ```{r}
-cols <- c(cols, "id.value")
+cols <- c(cols, "id")
 fhir_melt(df2$Patients, columns = cols, brackets = c("[","]"), 
 		  sep=" ", all_columns = TRUE)
 
@@ -385,7 +385,7 @@ molten_1 <- fhir_melt(df2$Patients, columns = cols, brackets = c("[","]"),
 					  sep=" ", all_columns = TRUE)
 molten_1
 
-molten_2 <- fhir_melt(molten_1, columns = "id.value", brackets = c("[","]"), 
+molten_2 <- fhir_melt(molten_1, columns = "id", brackets = c("[","]"), 
 					  sep=" ", all_columns = TRUE)
 molten_2
 ```

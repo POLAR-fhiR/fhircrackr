@@ -250,15 +250,15 @@ fhir_load <- function(directory) {
 #' 		".//MedicationStatement",
 #'
 #' 		list(
-#' 			MS.ID              = "id/@value",
-#' 			STATUS.TEXT        = "text/status/@value",
-#' 			STATUS             = "status/@value",
-#' 			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system/@value",
-#' 			MEDICATION.CODE    = "medicationCodeableConcept/coding/code/@value",
-#' 			MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display/@value",
-#' 			DOSAGE             = "dosage/text/@value",
-#' 			PATIENT            = "subject/reference/@value",
-#' 			LAST.UPDATE        = "meta/lastUpdated/@value"
+#' 			MS.ID              = "id",
+#' 			STATUS.TEXT        = "text/status",
+#' 			STATUS             = "status",
+#' 			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+#' 			MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+#' 			MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+#' 			DOSAGE             = "dosage/text",
+#' 			PATIENT            = "subject/reference",
+#' 			LAST.UPDATE        = "meta/lastUpdated"
 #' 		)
 #' 	),
 #'
@@ -285,6 +285,8 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = FA
 	if (is_invalid_design(design)) return(NULL)
 
 	if (is_invalid_bundles_list(bundles)) return(NULL)
+
+	design <- add_attribute_to_design(design)
 
 	dfs <- bundles2dfs(bundles = bundles, design = design, sep = sep, remove_empty_columns = remove_empty_columns, add_indices = add_indices, brackets = brackets, verbose = verbose)
 

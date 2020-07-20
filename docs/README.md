@@ -40,23 +40,23 @@ design <- list(
   MedicationStatements = list(
     "//MedicationStatement",
     list(
-      STATUS             = "status/@value",
-      MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system/@value",
-      MEDICATION.CODE    = "medicationCodeableConcept/coding/code/@value",
-      MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display/@value",
-      PATIENT            = "subject/reference/@value",
-      START              = "effectivePeriod/start/@value",
-      END                = "effectivePeriod/end/@value"
+      STATUS             = "status",
+      MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+      MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+      MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+      PATIENT            = "subject/reference",
+      START              = "effectivePeriod/start",
+      END                = "effectivePeriod/end"
     )
   ),
 
   Patients = list(
     "//Patient",
     list(
-      NAME.GIVEN  = "name/given/@value",
-      NAME.FAMILY = "name/family/@value",
-      SEX         = "gender/@value",
-      BIRTHDATE   = "birthDate/@value"
+      NAME.GIVEN  = "name/given",
+      NAME.FAMILY = "name/family",
+      SEX         = "gender",
+      BIRTHDATE   = "birthDate"
     )
   )
 )
@@ -76,7 +76,7 @@ It makes sense to create one data frame per type of resource (MedicationStatemen
 
 `Medication` is a list of length 2, where the first element is an XPath expression selecting the nodes (i.e. resources) matching a MedicationStatement, so this element is used to define the type of resource in this data frame.
 
-The second element is again a list, this time a named list. Each element corresponds to one variable (i.e. column) in the resulting data frame. The name (e.g. `Status`) will be the column name, the column values will be taken from the attribute defined by the following XPath expression (e.g. `"status/@value"`).
+The second element is again a list, this time a named list. Each element corresponds to one variable (i.e. column) in the resulting data frame. The name (e.g. `Status`) will be the column name, the column values will be taken from the attribute defined by the following XPath expression (e.g. `"status"`).
 
 The abstract form `design` therefore has is:
 
