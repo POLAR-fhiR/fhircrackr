@@ -286,7 +286,7 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = FA
 
 	if (is_invalid_bundles_list(bundles)) return(NULL)
 
-	design <- add_attribute_from_design(design)
+	design <- add_attribute_to_design(design)
 
 	dfs <- bundles2dfs(bundles = bundles, design = design, sep = sep, remove_empty_columns = remove_empty_columns, add_indices = add_indices, brackets = brackets, verbose = verbose)
 
