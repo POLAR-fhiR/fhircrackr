@@ -410,20 +410,26 @@ is_invalid_bundles_list <- function(bundles_list){
 
 	if (is.null(bundles_list)) {
 
-		warning("Argument bundles_list is NULL, returning NULL.")
+		warning("Argument bundles is NULL, returning NULL.")
 
 		return(TRUE)
 	}
 
 	if (!is.list(bundles_list)) {
 
-		warning("Argument bundles_list has to be a list, returnign NULL.")
+		warning("Argument bundles has to be a list, returnin NULL.")
 		return(TRUE)
 	}
 
 	if (length(bundles_list)<1) {
 
-		warning("Argument bundles_list has length 0, returning NULL.")
+		warning("Argument bundles has length 0, returning NULL.")
+		return(TRUE)
+	}
+
+	if (any(sapply(bundles_list,is.raw))) {
+
+		warning("Argument bundles seems to contain serialized bundles. Use fhir_unserialize() before proceeding. Returning NULL")
 		return(TRUE)
 	}
 
@@ -447,7 +453,7 @@ is_invalid_bundles_list <- function(bundles_list){
 
 	if (!valid.doc.types) {
 
-		warning("Argument bundles_list contains at least one invalid Bundle. Bundles have to be of Class 'xml_document' and 'xml_node'. Returning NULL")
+		warning("Argument bundles contains at least one invalid Bundle. Bundles have to be of Class 'xml_document' and 'xml_node'. Returning NULL")
 		return(TRUE)
 	}
 

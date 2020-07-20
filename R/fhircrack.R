@@ -167,6 +167,13 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 
 fhir_save <- function(bundles, directory = "result") {
 
+	if(is_invalid_bundles_list(bundles)){
+
+		warning("Invalid bundle list format. No bundles have been saved")
+
+		return(NULL)
+	}
+
 	w <- 1 + floor(log10(length(bundles)))
 
 	if (!dir.exists(directory))
@@ -348,6 +355,8 @@ fhir_capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep 
 
 fhir_serialize <- function(bundles) {
 
+	if(is_invalid_bundles_list(bundles)){return(NULL)}
+
 	lapply(bundles, xml2::xml_serialize, connection=NULL)
 }
 
@@ -361,6 +370,11 @@ fhir_serialize <- function(bundles) {
 #' bundles <- fhir_unserialize(medication_bundles)
 
 fhir_unserialize <- function(bundles) {
+
+	if(any(!sapply(bundles, is.raw))) {
+		warning("The list you provided doesn't seem to contain serialized objects. Returing NULL")
+		return(NULL)
+		}
 
 	lapply(bundles, xml2::xml_unserialize)
 }
