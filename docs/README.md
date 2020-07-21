@@ -223,6 +223,8 @@ If you want to store the bundles in xml files instead of R objects, you can use 
 fhir_save(patient_bundles, directory="MyDirectory")
 ```
 
+
+
 To read bundles saved with `fhir_save()` back into R, you can use `fhir_load()`:
 
 ```{r}
@@ -230,6 +232,12 @@ bundles <- fhir_load("MyDirectory")
 ```  
 
 `fhir_load()` takes the name of the directory (or path to it) as its only argument. All xml-files in this directory will be read into R and returned as a list of bundles in xml format just as returned by `fhir_search()`.
+
+
+## Acknowledgements
+This work was carried out by the SMITH consortium and the cross-consortium use case POLAR_MI; both are part of the German Initiative for Medical Informatics and funded by the German Federal Ministry of Education and Research (BMBF), grant no. 01ZZ1803A , 01ZZ1803C and 01ZZ1910A.
+
+
 
 ------
 

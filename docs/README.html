@@ -397,23 +397,23 @@ design &lt;- list(
   MedicationStatements = list(
     &quot;//MedicationStatement&quot;,
     list(
-      STATUS             = &quot;status/@value&quot;,
-      MEDICATION.SYSTEM  = &quot;medicationCodeableConcept/coding/system/@value&quot;,
-      MEDICATION.CODE    = &quot;medicationCodeableConcept/coding/code/@value&quot;,
-      MEDICATION.DISPLAY = &quot;medicationCodeableConcept/coding/display/@value&quot;,
-      PATIENT            = &quot;subject/reference/@value&quot;,
-      START              = &quot;effectivePeriod/start/@value&quot;,
-      END                = &quot;effectivePeriod/end/@value&quot;
+      STATUS             = &quot;status&quot;,
+      MEDICATION.SYSTEM  = &quot;medicationCodeableConcept/coding/system&quot;,
+      MEDICATION.CODE    = &quot;medicationCodeableConcept/coding/code&quot;,
+      MEDICATION.DISPLAY = &quot;medicationCodeableConcept/coding/display&quot;,
+      PATIENT            = &quot;subject/reference&quot;,
+      START              = &quot;effectivePeriod/start&quot;,
+      END                = &quot;effectivePeriod/end&quot;
     )
   ),
 
   Patients = list(
     &quot;//Patient&quot;,
     list(
-      NAME.GIVEN  = &quot;name/given/@value&quot;,
-      NAME.FAMILY = &quot;name/family/@value&quot;,
-      SEX         = &quot;gender/@value&quot;,
-      BIRTHDATE   = &quot;birthDate/@value&quot;
+      NAME.GIVEN  = &quot;name/given&quot;,
+      NAME.FAMILY = &quot;name/family&quot;,
+      SEX         = &quot;gender&quot;,
+      BIRTHDATE   = &quot;birthDate&quot;
     )
   )
 )
@@ -427,7 +427,7 @@ View(df$Patients)</code></pre>
 <p><code>design</code> should be a named list, where each element of <code>design</code> corresponds to one data frame that will be created. The element names of <code>design</code> are going to be the names of the data.frames in the result of the function.</p>
 <p>It makes sense to create one data frame per type of resource (MedicationStatement and Patient in this case). Lets have a look at the element <code>Medication</code> from the above example of <code>design</code> to understand how it works:</p>
 <p><code>Medication</code> is a list of length 2, where the first element is an XPath expression selecting the nodes (i.e. resources) matching a MedicationStatement, so this element is used to define the type of resource in this data frame.</p>
-<p>The second element is again a list, this time a named list. Each element corresponds to one variable (i.e. column) in the resulting data frame. The name (e.g. <code>Status</code>) will be the column name, the column values will be taken from the attribute defined by the following XPath expression (e.g. <code>&quot;status/@value&quot;</code>).</p>
+<p>The second element is again a list, this time a named list. Each element corresponds to one variable (i.e. column) in the resulting data frame. The name (e.g. <code>Status</code>) will be the column name, the column values will be taken from the attribute defined by the following XPath expression (e.g. <code>&quot;status&quot;</code>).</p>
 <p>The abstract form <code>design</code> therefore has is:</p>
 <pre class="r"><code>list(
 
@@ -557,9 +557,13 @@ fhir_save(patient_bundles, directory=&quot;MyDirectory&quot;)</code></pre>
 <p>To read bundles saved with <code>fhir_save()</code> back into R, you can use <code>fhir_load()</code>:</p>
 <pre class="{r}"><code>bundles &lt;- fhir_load(&quot;MyDirectory&quot;)</code></pre>
 <p><code>fhir_load()</code> takes the name of the directory (or path to it) as its only argument. All xml-files in this directory will be read into R and returned as a list of bundles in xml format just as returned by <code>fhir_search()</code>.</p>
+</div>
+</div>
+<div id="acknowledgements" class="section level2">
+<h2>Acknowledgements</h2>
+<p>This work was carried out by the SMITH consortium and the cross-consortium use case POLAR_MI; both are part of the German Initiative for Medical Informatics and funded by the German Federal Ministry of Education and Research (BMBF), grant no. 01ZZ1803A , 01ZZ1803C and 01ZZ1910A.</p>
 <hr />
 <p><a name="hl7stuff">1</a>: FHIR is the registered trademark of HL7 and is used with the permission of HL7. Use of the FHIR trademark does not constitute endorsement of this product by HL7.</p>
-</div>
 </div>
 </div>
 

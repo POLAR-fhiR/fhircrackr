@@ -483,3 +483,6 @@ head(df$MedCodes)
 
 ```
 The above example shows that instead of the MedicationStatement resource, we can choose the MedicationCodeableConcept as the root level for our extraction. This can be useful to get a quick and relatively clean overview over the types of codes used on this level of the resource. It is however important to note that this mode of extraction makes it impossible to recognize if each row belongs to one resource or if several of these rows came from the same resource. This of course also means that you cannot link this information to data from other resources because this extraction mode discards of that information.
+
+## Acknowledgements
+This work was carried out by the SMITH consortium and the cross-consortium use case POLAR_MI; both are part of the German Initiative for Medical Informatics and funded by the German Federal Ministry of Education and Research (BMBF), grant no. 01ZZ1803A , 01ZZ1803C and 01ZZ1910A.
