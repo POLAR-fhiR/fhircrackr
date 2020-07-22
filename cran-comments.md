@@ -1,3 +1,6 @@
+## General comments
+After first release of the packages a few rather severe bugs turned up, which is the reason why we are submitting a patch this early.
+
 ## Test environments
 
 * local Windows 7 (64-Bit), R 4.0.2
