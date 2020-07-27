@@ -16,13 +16,13 @@
 #' paste_paths("/data/", "/patients/")
 #' paste_paths("data", "patients", "windows")
 
-paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
-
+paste_paths <- function(path1 = "w",
+						path2 = "d",
+						os = "LiNuX") {
 	os <- tolower(substr(os, 1, 1))
 
 	if (os == "w") {
-
-		return(paste0(sub( "\\\\$" , "", path1), "\\", sub( "^\\\\", "", path2)))
+		return(paste0(sub("\\\\$" , "", path1), "\\", sub("^\\\\", "", path2)))
 	}
 
 	paste0(sub("/$" , "", path1), "/", sub("^/", "", path2))
@@ -55,97 +55,118 @@ paste_paths <- function(path1="w", path2="d", os = "LiNuX") {
 #' @examples
 #' \donttest{bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)}
 
-fhir_search <- function(request, username = NULL, password = NULL, max_bundles = Inf, verbose = 1,
-						max_attempts = 5, delay_between_attempts = 10, log_errors=0) {
+fhir_search <-
+	function(request,
+			 username = NULL,
+			 password = NULL,
+			 max_bundles = Inf,
+			 verbose = 1,
+			 max_attempts = 5,
+			 delay_between_attempts = 10,
+			 log_errors = 0) {
+		bundles <- list()
 
-	bundles <- list()
+		addr <- request
 
-	addr <- request
-
-	if (0 < verbose) {
-		message(
-			paste0(
-				"Starting download of ",
-				if ( max_bundles < Inf ) max_bundles else "ALL!",
-				" bundles of resource type ",
-				gsub( "(^.+/)(.+)(\\?).*$", "\\2", request, perl = TRUE ),
-				" from FHIR endpoint ",
-				gsub( "(^.+)(/.+\\?).*$", "\\1", request, perl = TRUE ),
-				".\n"
+		if (0 < verbose) {
+			message(
+				paste0(
+					"Starting download of ",
+					if (max_bundles < Inf)
+						max_bundles
+					else
+						"ALL!",
+					" bundles of resource type ",
+					gsub("(^.+/)(.+)(\\?).*$", "\\2", request, perl = TRUE),
+					" from FHIR endpoint ",
+					gsub("(^.+)(/.+\\?).*$", "\\1", request, perl = TRUE),
+					".\n"
+				)
 			)
-		)
 
-		if ( 9 < max_bundles ) message( "This may take a while..." )
-	}
-
-	cnt <- 0
-
-	repeat {
-
-		cnt <- cnt + 1
-
-		if (1 < verbose) {cat(paste0("bundle[", cnt, "]"))}
-
-		bundle <- get_bundle(request = addr, username = username, password = password, verbose = verbose,
-							 max_attempts = max_attempts, delay_between_attempts = delay_between_attempts, log_errors = log_errors)
-
-		if (is.null(bundle)) {
-
-			if (0 < verbose) {message("Download interrupted.\n")}
-
-			break
+			if (9 < max_bundles)
+				message("This may take a while...")
 		}
 
-		xml2::xml_ns_strip( bundle )
+		cnt <- 0
 
-		bundles[[addr]] <- bundle
+		repeat {
+			cnt <- cnt + 1
 
-		links <- xml2::xml_find_all(bundle, "link")
-
-		rels.nxt <- xml2::xml_text(xml2::xml_find_first(links, "./relation/@value")) == "next"
-
-		if (cnt == max_bundles ) {
-
-			if (0 < verbose) {
-
-				if (any(!is.na(rels.nxt) & rels.nxt)) {
-
-					message(
-						"\nDownload completed. Number of downloaded bundles was limited to ",
-						cnt,
-						" bundles, this is less than the total number of bundles available.\n"
-					)
-				}
-				else {
-
-					message("\nDownload completed. All available bundles were downloaded.\n")
-				}
+			if (1 < verbose) {
+				cat(paste0("bundle[", cnt, "]"))
 			}
 
-			break
+			bundle <-
+				get_bundle(
+					request = addr,
+					username = username,
+					password = password,
+					verbose = verbose,
+					max_attempts = max_attempts,
+					delay_between_attempts = delay_between_attempts,
+					log_errors = log_errors
+				)
+
+			if (is.null(bundle)) {
+				if (0 < verbose) {
+					message("Download interrupted.\n")
+				}
+
+				break
+			}
+
+			xml2::xml_ns_strip(bundle)
+
+			bundles[[addr]] <- bundle
+
+			links <- xml2::xml_find_all(bundle, "link")
+
+			rels.nxt <-
+				xml2::xml_text(xml2::xml_find_first(links, "./relation/@value")) == "next"
+
+			if (cnt == max_bundles) {
+				if (0 < verbose) {
+					if (any(!is.na(rels.nxt) & rels.nxt)) {
+						message(
+							"\nDownload completed. Number of downloaded bundles was limited to ",
+							cnt,
+							" bundles, this is less than the total number of bundles available.\n"
+						)
+					}
+					else {
+						message("\nDownload completed. All available bundles were downloaded.\n")
+					}
+				}
+
+				break
+			}
+
+			if (!any(!is.na(rels.nxt) & rels.nxt)) {
+				if (0 < verbose) {
+					message("\nDownload completed. All available bundles were downloaded.\n")
+				}
+
+				break
+			}
+
+			urls  <-
+				xml2::xml_attr(xml2::xml_find_first(links, "./url"), "value")
+
+			addr <- urls[rels.nxt][1]
+
+			if (is.null(addr) ||
+				is.na(addr) || length(addr) < 1 || addr == "") {
+				if (0 < verbose) {
+					message("\nDownload completed. All available bundles were downloaded.\n")
+				}
+
+				break
+			}
 		}
 
-		if (!any(!is.na(rels.nxt) & rels.nxt)) {
-
-			if (0 < verbose) {message("\nDownload completed. All available bundles were downloaded.\n")}
-
-			break
-		}
-
-		urls  <- xml2::xml_attr(xml2::xml_find_first(links, "./url"), "value")
-
-		addr <- urls[rels.nxt][1]
-
-		if(is.null(addr) || is.na(addr) || length(addr) < 1 || addr == "") {
-
-			if (0 < verbose) {message("\nDownload completed. All available bundles were downloaded.\n")}
-
-			break
-		}
+		bundles
 	}
-
-	bundles
-}
 
 
 
@@ -166,9 +187,7 @@ fhir_search <- function(request, username = NULL, password = NULL, max_bundles =
 
 
 fhir_save <- function(bundles, directory = "result") {
-
-	if(is_invalid_bundles_list(bundles)){
-
+	if (is_invalid_bundles_list(bundles)) {
 		warning("Invalid bundle list format. No bundles have been saved")
 
 		return(NULL)
@@ -181,8 +200,9 @@ fhir_save <- function(bundles, directory = "result") {
 		dir.create(directory, recursive = TRUE)
 
 	for (n in 1:length(bundles)) {
-
-		xml2::write_xml(bundles[[n]], paste_paths(directory, paste0(stringr::str_pad(n, width = w, pad = "0"), ".xml")))
+		xml2::write_xml(bundles[[n]], paste_paths(directory, paste0(
+			stringr::str_pad(n, width = w, pad = "0"), ".xml"
+		)))
 	}
 }
 
@@ -207,10 +227,10 @@ fhir_save <- function(bundles, directory = "result") {
 #' loaded_bundles <- fhir_load(tempdir())
 
 fhir_load <- function(directory) {
-
 	xml.files <- dir(directory, "*.xml")
 
-	lapply(lst(xml.files), function(x) xml2::read_xml( paste_paths(directory, x)))
+	lapply(lst(xml.files), function(x)
+		xml2::read_xml(paste_paths(directory, x)))
 }
 
 
@@ -287,23 +307,39 @@ fhir_load <- function(directory) {
 #'
 #' @export
 
-fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = FALSE, add_indices = FALSE, brackets = c( "<", ">"), verbose = 2) {
+fhir_crack <-
+	function(bundles,
+			 design,
+			 sep = " -+- ",
+			 remove_empty_columns = FALSE,
+			 add_indices = FALSE,
+			 brackets = c("<", ">"),
+			 verbose = 2) {
+		if (is_invalid_design(design))
+			return(NULL)
 
-	if (is_invalid_design(design)) return(NULL)
+		if (is_invalid_bundles_list(bundles))
+			return(NULL)
 
-	if (is_invalid_bundles_list(bundles)) return(NULL)
+		design <- add_attribute_to_design(design)
 
-	design <- add_attribute_to_design(design)
+		dfs <-
+			bundles2dfs(
+				bundles = bundles,
+				design = design,
+				sep = sep,
+				remove_empty_columns = remove_empty_columns,
+				add_indices = add_indices,
+				brackets = brackets,
+				verbose = verbose
+			)
 
-	dfs <- bundles2dfs(bundles = bundles, design = design, sep = sep, remove_empty_columns = remove_empty_columns, add_indices = add_indices, brackets = brackets, verbose = verbose)
+		if (0 < verbose) {
+			message("FHIR-Resources cracked.")
+		}
 
-	if(0 < verbose) {
-
-		message( "FHIR-Resources cracked.")
+		dfs
 	}
-
-	dfs
-}
 
 
 
@@ -325,18 +361,33 @@ fhir_crack <- function(bundles, design, sep = " -+- ", remove_empty_columns = FA
 #' \donttest{cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")}
 #'
 
-fhir_capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep = " ", remove_empty_columns = TRUE, add_indices = TRUE, brackets = c( "<", ">"), verbose = 2) {
+fhir_capability_statement <-
+	function(url = "https://hapi.fhir.org/baseR4",
+			 sep = " ",
+			 remove_empty_columns = TRUE,
+			 add_indices = TRUE,
+			 brackets = c("<", ">"),
+			 verbose = 2) {
+		caps <-
+			fhir_search(request = paste_paths(url, "/metadata?"),
+						verbose = verbose)
 
-	caps <- fhir_search(request = paste_paths(url, "/metadata?"), verbose = verbose)
+		design <- list(
+			META      = list("/CapabilityStatement", "./*/@*"),
+			REST.META = list("/CapabilityStatement/rest", "./*/@*"),
+			REST      = list("/CapabilityStatement/rest/resource")
+		)
 
-	design <- list(
-		META      = list("/CapabilityStatement", "./*/@*"),
-		REST.META = list("/CapabilityStatement/rest", "./*/@*"),
-		REST      = list("/CapabilityStatement/rest/resource")
-	)
-
-	fhir_crack(bundles = caps, design = design, sep = sep, remove_empty_columns = remove_empty_columns, add_indices = add_indices, brackets = brackets, verbose=verbose)
-}
+		fhir_crack(
+			bundles = caps,
+			design = design,
+			sep = sep,
+			remove_empty_columns = remove_empty_columns,
+			add_indices = add_indices,
+			brackets = brackets,
+			verbose = verbose
+		)
+	}
 
 #' Serialize a FHIR Bundle list
 #'
@@ -354,10 +405,11 @@ fhir_capability_statement <- function(url = "https://hapi.fhir.org/baseR4", sep 
 
 
 fhir_serialize <- function(bundles) {
+	if (is_invalid_bundles_list(bundles)) {
+		return(NULL)
+	}
 
-	if(is_invalid_bundles_list(bundles)){return(NULL)}
-
-	lapply(bundles, xml2::xml_serialize, connection=NULL)
+	lapply(bundles, xml2::xml_serialize, connection = NULL)
 }
 
 #' Unserialize a FHIR Bundle list
@@ -370,11 +422,10 @@ fhir_serialize <- function(bundles) {
 #' bundles <- fhir_unserialize(medication_bundles)
 
 fhir_unserialize <- function(bundles) {
-
-	if(any(!sapply(bundles, is.raw))) {
+	if (any(!sapply(bundles, is.raw))) {
 		warning("The list you provided doesn't seem to contain serialized objects. Returing NULL")
 		return(NULL)
-		}
+	}
 
 	lapply(bundles, xml2::xml_unserialize)
 }
@@ -413,14 +464,15 @@ fhir_unserialize <- function(bundles) {
 #' @export
 #'
 fhir_common_columns <- function(data_frame, column_names_prefix) {
-
 	pattern_column_names  <- paste0("^", column_names_prefix, "\\.*")
 
 	column_names <- names(data_frame)
 
 	hits <- grepl(pattern_column_names, column_names)
 
-	if (!any(hits)) {stop("The column prefix you gave doesn't appear in any of the column names.")}
+	if (!any(hits)) {
+		stop("The column prefix you gave doesn't appear in any of the column names.")
+	}
 
 	column_names[hits]
 }
@@ -503,35 +555,50 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #'           brackets = c("[","]"), sep = " ", all_columns = TRUE)
 #' @export
 
-fhir_melt <- function(indexed_data_frame, columns, brackets = c("<", ">"), sep = " -+- ", id_name = "resource_identifier", all_columns = FALSE) {
+fhir_melt <-
+	function(indexed_data_frame,
+			 columns,
+			 brackets = c("<", ">"),
+			 sep = " -+- ",
+			 id_name = "resource_identifier",
+			 all_columns = FALSE) {
+		if (!is_indexed_data_frame(indexed_data_frame)) {
+			stop("The data frame is not indexed by fhir_crack.")
+		}
 
-	if (! is_indexed_data_frame(indexed_data_frame)) {stop("The data frame is not indexed by fhir_crack.")}
+		if (!all(columns %in% names(indexed_data_frame))) {
+			stop("Not all column names you gave match with the column names in the data frame.")
+		}
 
-	if (! all(columns %in% names(indexed_data_frame))) {stop("Not all column names you gave match with the column names in the data frame.")}
+		#dbg
+		#column_prefix <- "id"
 
-	#dbg
-	#column_prefix <- "id"
+		d <- Reduce(rbind,
+					lapply(seq_len(nrow(
+						indexed_data_frame
+					)),
+					function(row.id) {
+						#dbg
+						#row.id <- 3
 
-	d <- Reduce(
-		rbind,
-		lapply(
-			seq_len(nrow(indexed_data_frame)),
-			function(row.id) {
+						e <-
+							melt_row(
+								row = indexed_data_frame[row.id,],
+								columns = columns,
+								brackets = brackets,
+								sep = sep,
+								all_columns = all_columns
+							)
 
-				#dbg
-				#row.id <- 3
+						if (0 < nrow(e))
+							e[seq_len(nrow(e)), id_name] <- row.id
 
-				e <- melt_row(row = indexed_data_frame[ row.id, ], columns = columns, brackets = brackets, sep = sep, all_columns = all_columns)
+						e
+					}))
 
-				if (0<nrow(e)) e[seq_len(nrow(e)), id_name] <- row.id
-
-				e
-			}
-		)
-	)
-
-	if (! is.null(d) && 0 < nrow(d)) d[order(d[[id_name]]), ]
-}
+		if (!is.null(d) && 0 < nrow(d))
+			d[order(d[[id_name]]),]
+	}
 
 #' Remove indices from data frame
 #'
@@ -587,30 +654,42 @@ fhir_melt <- function(indexed_data_frame, columns, brackets = c("<", ">"), sep =
 #' df_indices_removed <- fhir_rm_indices(dfs[[1]])
 
 
-fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), sep="-+-"){
+fhir_rm_indices <-
+	function(indexed_data_frame,
+			 brackets = c("<", ">"),
+			 sep = "-+-") {
+		brackets.escaped <- esc(brackets)
 
-	brackets.escaped <- esc(brackets)
+		pattern.ids <-
+			paste0(brackets.escaped[1], "([0-9]*\\.*)+", brackets.escaped[2])
 
-	pattern.ids <- paste0(brackets.escaped[1], "([0-9]*\\.*)+", brackets.escaped[2])
+		vec <- c(as.matrix(indexed_data_frame))
 
-	vec <- c(as.matrix(indexed_data_frame))
+		splitted_entries <- stringr::str_split(vec, esc(sep))
 
-	splitted_entries <- stringr::str_split(vec, esc(sep))
+		stripped_entries <-
+			lapply(splitted_entries,
+				   sub,
+				   pattern = pattern.ids,
+				   replacement = "")
 
-	stripped_entries <- lapply(splitted_entries, sub, pattern = pattern.ids, replacement="")
+		bound_entries <- sapply(stripped_entries, paste, collapse = sep)
 
-	bound_entries <- sapply(stripped_entries, paste, collapse=sep)
+		ret <-
+			as.data.frame(matrix(
+				bound_entries,
+				nrow = nrow(indexed_data_frame),
+				ncol = ncol(indexed_data_frame)
+			))
 
-	ret <- as.data.frame(matrix(bound_entries, nrow=nrow(indexed_data_frame), ncol=ncol(indexed_data_frame)))
+		rownames(ret) <- rownames(indexed_data_frame)
 
-	rownames(ret) <- rownames(indexed_data_frame)
+		colnames(ret) <- colnames(indexed_data_frame)
 
-	colnames(ret) <- colnames(indexed_data_frame)
+		attr(ret, "indexed") <- NULL
 
-	attr(ret,"indexed") <- NULL
-
-	return(ret)
-}
+		return(ret)
+	}
 
 
 ##### Documentation for medication_bundles data set ######
