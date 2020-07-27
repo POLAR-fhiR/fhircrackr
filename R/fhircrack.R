@@ -505,35 +505,35 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #' @examples
 #' #generate example
 #' bundle <- xml2::read_xml(
-#'"<Bundle>
+#' "<Bundle>
 #'
-#'         <Patient>
-#'             <id value='id1'/>
-#'             <address>
-#'                 <use value='home'/>
-#'                 <city value='Amsterdam'/>
-#'                 <type value='physical'/>
-#'                <country value='Netherlands'/>
-#'             </address>
-#'             <birthDate value='1992-02-06'/>
-#'         </Patient>
+#'     <Patient>
+#'         <id value='id1'/>
+#'         <address>
+#'             <use value='home'/>
+#'             <city value='Amsterdam'/>
+#'             <type value='physical'/>
+#'            <country value='Netherlands'/>
+#'         </address>
+#'         <birthDate value='1992-02-06'/>
+#'     </Patient>
 #'
-#'         <Patient>
-#'             <id value='id2'/>
-#'             <address>
-#'                 <use value='home'/>
-#'                 <city value='Rome'/>
-#'                 <type value='physical'/>
-#'                 <country value='Italy'/>
-#'             </address>
-#'             <address>
-#'                 <use value='work'/>
-#'                 <city value='Stockholm'/>
-#'                 <type value='postal'/>
-#'                 <country value='Sweden'/>
-#'             </address>
-#'             <birthDate value='1980-05-23'/>
-#'         </Patient>
+#'     <Patient>
+#'         <id value='id2'/>
+#'         <address>
+#'             <use value='home'/>
+#'             <city value='Rome'/>
+#'             <type value='physical'/>
+#'             <country value='Italy'/>
+#'         </address>
+#'         <address>
+#'             <use value='work'/>
+#'             <city value='Stockholm'/>
+#'             <type value='postal'/>
+#'             <country value='Sweden'/>
+#'         </address>
+#'         <birthDate value='1980-05-23'/>
+#'     </Patient>
 #' </Bundle>"
 #')
 #'
