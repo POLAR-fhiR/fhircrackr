@@ -206,7 +206,7 @@ medication_bundles <- fhir_unserialize(medication_bundles)
 And convert them into data frames, one for the MedicationStatements and one for the Patients:
 
 ```{r}
-design <- list(
+designs <- list(
 
 	MedicationStatement = list(
 
@@ -233,7 +233,7 @@ design <- list(
 )
 
 
-list_of_tables <- fhir_crack(medication_bundles, design, verbose = 0)
+list_of_tables <- fhir_crack(medication_bundles, designs, verbose = 0)
 
 head(list_of_tables$MedicationStatement)
 
@@ -319,15 +319,14 @@ df1$Patients
 ```
 As you can see, multiple entries for the same attribute (address and id) are pasted together. This works fine for Patient 2, but for Patient 3 you can see a problem with the number of entries that are displayed. The original Patient resource had *three* (incomplete) `address` entries, but because the first two of them use complementary elements (`use` and `city` vs. `type` and `country`), the resulting pasted entries look like there had just been two entries for the `address` attribute.
 
-You can counter this problem with the `add_indices` argument and customize the appearance of the indices with `brackets`:
+You can counter this problem and customize the appearance of the indices with `brackets`:
 
 ```{r}
 design2 <- list(
 	Patients = list("//Patient")
 )
 
-df2 <- fhir_crack(bundle_list, design1, sep = " ", add_indices = T, 
-				  brackets = c("[", "]"), verbose = 0)
+df2 <- fhir_crack(bundle_list, design1, sep = " ", brackets = c("[", "]"), verbose = 0)
 df2$Patients
 ```
 Now the indices display the entry the value belongs to. That way you can see that Patient resource 3 had three entries for the attribute `address` and you can also see which attributes belong to which entry.
@@ -395,7 +394,7 @@ This will give you the appropriate cross product of all multiple entries.
 Once you have sorted out the multiple entries, you might want to get rid of the indices in your data.frame. This can be achieved using `fhir_rm_indices()`:
 
 ```{r}
-fhir_rm_indices(molten_2, brackets=c("[","]"), sep=" ")
+fhir_rm_indices(molten_2, brackets=c("[","]"))
 ```
 Again, `brackets` and `sep` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()`respectively.
 

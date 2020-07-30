@@ -71,60 +71,60 @@ rbind_list_of_data_frames <- function(list) {
 
 #' @description Remove attributes from xpath expressions
 #'
-#' @param design a fhircrackr design
+#' @param designs a fhircrackr design list.
 #'
-#' @return A design without attributes in all xpath expressions.
+#' @return A design list without attributes in all xpath expressions.
 #' @noRd
 
-remove_attribute_from_design <- function(design) {
-	for (n_d in names(design)) {
-		if (1 < length(design[[n_d]])) {
-			if (1 < length(design[[n_d]][[2]])) {
-				for (n_c in names(design[[n_d]][[2]])) {
-					txt <- design[[n_d]][[2]][[n_c]]
+remove_attribute_from_design <- function(designs) {
+	for (n_d in names(designs)) {
+		if (1 < length(designs[[n_d]])) {
+			if (1 < length(designs[[n_d]][[2]])) {
+				for (n_c in names(designs[[n_d]][[2]])) {
+					txt <- designs[[n_d]][[2]][[n_c]]
 					txt <- sub("/@(\\w|\\*)+$", "", txt)
-					design[[n_d]][[2]][[n_c]] <- txt
+					designs[[n_d]][[2]][[n_c]] <- txt
 				}
 			}
 			else {
-				txt <- design[[n_d]][[2]]
+				txt <- designs[[n_d]][[2]]
 				txt <- sub("/@(\\w|\\*)+$", "", txt)
-				design[[n_d]][[2]] <- txt
+				designs[[n_d]][[2]] <- txt
 			}
 		}
 	}
-	design
+	designs
 }
 
 #' @description Add attributes to xpath expressions
 #'
-#' @param design A fhircrackr design.
+#' @param designs A fhircrackr design list.
 #' @param attrib The attribute that should be added to the xpath expressions. Default is 'value'
 #'
-#' @return A design with attribute attrib in all xpath expressions.
+#' @return A design list with attribute attrib in all xpath expressions.
 #' @noRd
-add_attribute_to_design <- function(design, attrib = "value") {
-	for (n_d in names(design)) {
-		if (1 < length(design[[n_d]])) {
-			if (1 < length(design[[n_d]][[2]])) {
-				for (n_c in names(design[[n_d]][[2]])) {
-					txt <- design[[n_d]][[2]][[n_c]]
+add_attribute_to_design <- function(designs, attrib = "value") {
+	for (n_d in names(designs)) {
+		if (1 < length(designs[[n_d]])) {
+			if (1 < length(designs[[n_d]][[2]])) {
+				for (n_c in names(designs[[n_d]][[2]])) {
+					txt <- designs[[n_d]][[2]][[n_c]]
 					if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
 						txt <- paste_paths(txt, paste0("@", attrib))
-						design[[n_d]][[2]][[n_c]] <- txt
+						designs[[n_d]][[2]][[n_c]] <- txt
 					}
 				}
 			}
 			else {
-				txt <- design[[n_d]][[2]]
+				txt <- designs[[n_d]][[2]]
 				if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
 					txt <- paste_paths(txt, paste0("@", attrib))
-					design[[n_d]][[2]] <- txt
+					designs[[n_d]][[2]] <- txt
 				}
 			}
 		}
 	}
-	design
+	designs
 }
 
 
@@ -344,43 +344,43 @@ check_response <- function(response, log_errors) {
 
 
 
-#' Check design
+#' Check design list.
 #' @description Checks whether a design provided to \code{\link{fhir_crack}} is invalid and
 #' issues a warning if it is.
-#' @param design The design to be checked
+#' @param designs The design list to be checked
 #' @return TRUE if design is invalid, FALSE if design is valid
 #' @noRd
-is_invalid_design <- function(design) {
-	if (is.null(design)) {
+is_invalid_design_list <- function(designs) {
+	if (is.null(designs)) {
 		warning("Argument design is NULL, returning NULL.")
 		return(TRUE)
 	}
 
-	if (!is.list(design)) {
+	if (!is.list(designs)) {
 		warning("Argument design has to be a list, returning NULL.")
 		return(TRUE)
 	}
 
-	if (length(design) < 1) {
+	if (length(designs) < 1) {
 		warning("Argument design has length 0, returning NULL.")
 		return(TRUE)
 	}
 
-	list.type <- sapply(design, is.list)
+	list.type <- sapply(designs, is.list)
 
 	if (any(!list.type)) {
 		warning("All elements of design have to be of type list. Returning NULL.")
 		return(TRUE)
 	}
 
-	if (is.null(names(design)) || any(names(design) == "")) {
+	if (is.null(names(designs)) || any(names(designs) == "")) {
 		warning(
 			"Argument design should be a NAMED list but has at least one unnamed element. Returning NULL"
 		)
 		return(TRUE)
 	}
 
-	lengths <- sapply(design, length)
+	lengths <- sapply(designs, length)
 
 	if (any(lengths < 1 | 2 < lengths)) {
 		warning(
@@ -389,7 +389,7 @@ is_invalid_design <- function(design) {
 		return(TRUE)
 	}
 
-	expressions <- unlist(design)
+	expressions <- unlist(designs)
 
 	testbundle <- xml2::read_xml("<Bundle>   </Bundle>")
 
@@ -469,8 +469,7 @@ is_invalid_bundles_list <- function(bundles_list) {
 #' from the resource
 #' @param sep A String to separate pasted multiple entries.
 #' @param xpath A String to locate data in tree via xpath.
-#' @param add_indices A Logical Scalar.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">") NULL means no brackets.
 #' @noRd
 #'
 #' @examples
@@ -487,8 +486,7 @@ xtrct_all_columns <-
 	function(child,
 			 sep = " -+- ",
 			 xpath = ".//@*",
-			 add_indices = FALSE,
-			 brackets = c("<", ">")) {
+			 brackets = NULL) {
 		tree <- xml2::xml_find_all(child, xpath)
 
 		if (length(tree) < 1) {
@@ -534,7 +532,7 @@ xtrct_all_columns <-
 						)))
 					})
 
-		if (add_indices) {
+		if (!is.null(brackets)) {
 			val  <- paste0(brackets[1], o[1, ], brackets[2], val)
 		}
 
@@ -558,8 +556,7 @@ xtrct_all_columns <-
 #' @param df.columns The part of design from \code{\link{fhir_crack}} describing which elements to extract
 #' from the resouce
 #' @param sep A string to separate pasted multiple entries.
-#' @param add_indices A Logical Scalar.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">") NULL means no brackets.
 #' @noRd
 #'
 #' @examples
@@ -583,8 +580,7 @@ xtrct_columns <-
 	function(child,
 			 df.columns,
 			 sep = " -+- ",
-			 add_indices = FALSE,
-			 brackets = c("<", ">")) {
+			 brackets = NULL) {
 		xp <- xml2::xml_path(child)
 
 		l <- lapply(lst(names(df.columns)),
@@ -598,7 +594,7 @@ xtrct_columns <-
 
 						val <- xml2::xml_text(loc)
 
-						if (add_indices) {
+						if (!is.null(brackets)) {
 							loc.xp <- xml2::xml_path(loc)
 
 							loc.xp.rel <- substr(loc.xp, nchar(xp) + 2, nchar(loc.xp))
@@ -637,8 +633,7 @@ xtrct_columns <-
 #' or 2, where the first element is a XPath expression to the ressource and the (optional)
 #' second element is either a XPath expression or a named list containing column names and XPath expressions
 #' @param sep A string to separate pasted multiple entries.
-#' @param add_indices A Logical Scalar.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">") NULL means no brackets.
 #' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
 #' @noRd
 #' @examples
@@ -664,8 +659,7 @@ bundle2df <-
 	function(bundle,
 			 design.df,
 			 sep = " -+- ",
-			 add_indices = FALSE,
-			 brackets = c("<", ">"),
+			 brackets = NULL,
 			 verbose = 2) {
 		xml2::xml_ns_strip(bundle)
 
@@ -692,7 +686,6 @@ bundle2df <-
 				   				child,
 				   				df.columns,
 				   				sep = sep,
-				   				add_indices = add_indices,
 				   				brackets = brackets
 				   			)
 
@@ -716,7 +709,6 @@ bundle2df <-
 				   				child = child,
 				   				sep = sep,
 				   				xpath = xp,
-				   				add_indices = add_indices,
 				   				brackets = brackets
 				   			)
 
@@ -743,8 +735,7 @@ bundle2df <-
 #' or 2, where the first element is a XPath expression to the ressource and the (optional)
 #' second element is either a XPath expression or a named list containing column names and XPath expressions
 #' @param sep A string to separate pasted multiple entries.
-#' @param add_indices A Logical Scalar.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">") NULL means no brackets.
 #' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
 #' @noRd
 #' @examples
@@ -769,7 +760,6 @@ bundles2df <-
 	function(bundles,
 			 design.df,
 			 sep = " -+- ",
-			 add_indices = FALSE,
 			 brackets = c("<", ">"),
 			 verbose = 2) {
 		ret <- rbind_list_of_data_frames(lapply(seq_len(length(bundles)),
@@ -787,7 +777,6 @@ bundles2df <-
 														bundle,
 														design.df,
 														sep,
-														add_indices = add_indices,
 														brackets = brackets,
 														verbose = verbose
 													)
@@ -801,9 +790,6 @@ bundles2df <-
 			cat("\n")
 		}
 
-		if (add_indices)
-			attr(ret, "indexed") <- TRUE
-
 		ret
 	}
 
@@ -811,10 +797,10 @@ bundles2df <-
 #' @description Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
 #'
 #' @param bundles A FHIR search result as returned by \code{\link{fhir_search}}.
-#' @param design A named list specifiying which data frame should contain which entries of the bundle.
+#' @param designs A named list specifiying which data frame should contain which entries of the bundle.
 #' The names correspond to the names of the resulting data frames.
 #'
-#' Each element of design is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
+#' Each element of designs is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
 #' FHIR bundle page. There are 3 options for the second element of that list:
 #'
 #' - There is no second element: all attributes of the recource are extracted
@@ -827,11 +813,10 @@ bundles2df <-
 #'
 #' @param sep A string to separate pasted multiple entries.
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
-#' @param add_indices A Logical Scalar.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">")
+#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">") NULL means no brackets.
 #' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
 #' @noRd
-#' @return A list of data frames as specified by \code{design}.
+#' @return A list of data frames as specified by \code{designs}.
 #'
 #'
 #' @examples
@@ -839,7 +824,7 @@ bundles2df <-
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #define attributes to extract
-#' df_design <- list(
+#' designs <- list(
 #'
 #'  #define specifically which elements to extract
 #' 	MedicationStatement = list(
@@ -867,30 +852,25 @@ bundles2df <-
 #' )
 #'
 #' #convert fhir to data frames
-#' list_of_tables <- fhircrackr:::bundles2dfs(bundles, df_design)
+#' list_of_tables <- fhircrackr:::bundles2dfs(bundles, designs)
 
 bundles2dfs <-
 	function(bundles,
-			 design,
+			 designs,
 			 sep = " -+- ",
 			 remove_empty_columns = FALSE,
-			 add_indices = FALSE,
-			 brackets = c("<", ">"),
+			 brackets = NULL,
 			 verbose = 2) {
-		if (add_indices) {
-			if (is.null(brackets))
-				brackets <- c("<", ">")
 
-			if (length(brackets) < 2)
-				brackets[2] <- brackets[1]
-		}
+		if (! is.null(brackets) && length(brackets) < 2)
+				brackets <- c( brackets[1], brackets[1] )
 
-		dfs <- lapply(lst(names(design)),
+		dfs <- lapply(lst(names(designs)),
 					  function(n) {
 					  	#dbg
-					  	#n <- names(design)[1]
+					  	#n <- names(designs)[1]
 
-					  	design.df <- design[[n]]
+					  	design.df <- designs[[n]]
 
 					  	if (1 < verbose) {
 					  		cat("\n", n)
@@ -900,7 +880,6 @@ bundles2dfs <-
 					  		bundles = bundles,
 					  		design.df = design.df,
 					  		sep = sep,
-					  		add_indices = add_indices,
 					  		brackets = brackets,
 					  		verbose = verbose
 					  	)
@@ -919,20 +898,12 @@ bundles2dfs <-
 
 						  	df <- dplyr::select(df, cols)
 
-						  	if (add_indices)
-						  		attr(df, "indexed") <- TRUE
-
 						  	df
 						  })
 		}
 
 		dfs
 	}
-
-is_indexed_data_frame <- function(data_frame) {
-	"indexed" %in% names(attributes(data_frame)) &&
-		attr(data_frame, "indexed")
-}
 
 #' Escape special characters
 #' @param s A string in which the characters should be escaped

@@ -8,7 +8,6 @@ fhir_capability_statement(
   url = "https://hapi.fhir.org/baseR4",
   sep = " ",
   remove_empty_columns = TRUE,
-  add_indices = TRUE,
   brackets = c("<", ">"),
   verbose = 2
 )
@@ -20,9 +19,7 @@ fhir_capability_statement(
 
 \item{remove_empty_columns}{Logical scalar. Remove empty columns?}
 
-\item{add_indices}{A logical scalar.}
-
-\item{brackets}{A vector of strings defining the Brackets surrounding the indices. e.g. c( "<", ">")}
+\item{brackets}{A vector of strings defining the Brackets surrounding the indices. NULL means no brackets. Default is c( "<", ">").}
 
 \item{verbose}{An integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
 downloading/extraction progress will be printed. Defaults to 2.}

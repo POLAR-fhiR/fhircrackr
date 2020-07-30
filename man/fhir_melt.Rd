@@ -49,39 +49,39 @@ For a more detailed description on how to use this function please see the packa
 bundle <- xml2::read_xml(
 "<Bundle>
 
-        <Patient>
-            <id value='id1'/>
-            <address>
-                <use value='home'/>
-                <city value='Amsterdam'/>
-                <type value='physical'/>
-               <country value='Netherlands'/>
-            </address>
-            <birthDate value='1992-02-06'/>
-        </Patient>
+    <Patient>
+        <id value='id1'/>
+        <address>
+            <use value='home'/>
+            <city value='Amsterdam'/>
+            <type value='physical'/>
+           <country value='Netherlands'/>
+        </address>
+        <birthDate value='1992-02-06'/>
+    </Patient>
 
-        <Patient>
-            <id value='id2'/>
-            <address>
-                <use value='home'/>
-                <city value='Rome'/>
-                <type value='physical'/>
-                <country value='Italy'/>
-            </address>
-            <address>
-                <use value='work'/>
-                <city value='Stockholm'/>
-                <type value='postal'/>
-                <country value='Sweden'/>
-            </address>
-            <birthDate value='1980-05-23'/>
-        </Patient>
+    <Patient>
+        <id value='id2'/>
+        <address>
+            <use value='home'/>
+            <city value='Rome'/>
+            <type value='physical'/>
+            <country value='Italy'/>
+        </address>
+        <address>
+            <use value='work'/>
+            <city value='Stockholm'/>
+            <type value='postal'/>
+            <country value='Sweden'/>
+        </address>
+        <birthDate value='1980-05-23'/>
+    </Patient>
 </Bundle>"
 )
 
 #crack fhir resources
-dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list(".//Patient")),
-                  add_indices = TRUE, brackets = c("[","]"))
+dfs <- fhir_crack(bundles = list(bundle), designs = list(Patients = list(".//Patient")),
+                  brackets = c("[","]"))
 
 #find all column names associated with attribute address
 col_names <- fhir_common_columns(dfs$Patients, "address")
@@ -90,7 +90,8 @@ col_names <- fhir_common_columns(dfs$Patients, "address")
 dfs$Patients
 
 #only keep address columns
-fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names, brackets = c("[","]", sep = " "))
+fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,
+          brackets = c("[","]", sep = " "))
 
 #keep all columns
 fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,

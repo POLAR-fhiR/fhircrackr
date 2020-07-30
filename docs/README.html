@@ -392,7 +392,7 @@ summary {
 <p>If you want to do statistical analyses, the xml format the resources come in is not very useful. Instead, we need the data in some matrix like form, preferably as a data frame.</p>
 <p>We can achieve this using the <code>fhir_crack()</code> function.</p>
 <pre class="r"><code>#define which elements of the resources are of interest
-design &lt;- list(
+designs &lt;- list(
 
   MedicationStatements = list(
     &quot;//MedicationStatement&quot;,
@@ -419,16 +419,16 @@ design &lt;- list(
 )
 
 #Convert resources
-dfs &lt;- fhir_crack(bundles, design)
+dfs &lt;- fhir_crack(bundles, designs)
 
 #Inspect results
 View(df$Patients)</code></pre>
-<p><code>fhir_crack()</code> takes a list of bundles as returned by <code>fhir_search()</code> and a list <code>design</code> defining the data to be extracted from the resources and returns a list of data frames.</p>
-<p><code>design</code> should be a named list, where each element of <code>design</code> corresponds to one data frame that will be created. The element names of <code>design</code> are going to be the names of the data.frames in the result of the function.</p>
+<p><code>fhir_crack()</code> takes a list of bundles as returned by <code>fhir_search()</code> and a list of <code>designs</code> defining the data to be extracted from the resources and returns a list of data frames.</p>
+<p><code>designs</code> should be a named list, where each element of <code>designs</code> corresponds to data frame design which defines how the data frame will be created. The element names of <code>designs</code> are going to be the names of the data.frames in the result of the function.</p>
 <p>It makes sense to create one data frame per type of resource (MedicationStatement and Patient in this case). Lets have a look at the element <code>Medication</code> from the above example of <code>design</code> to understand how it works:</p>
 <p><code>Medication</code> is a list of length 2, where the first element is an XPath expression selecting the nodes (i.e. resources) matching a MedicationStatement, so this element is used to define the type of resource in this data frame.</p>
-<p>The second element is again a list, this time a named list. Each element corresponds to one variable (i.e. column) in the resulting data frame. The name (e.g. <code>Status</code>) will be the column name, the column values will be taken from the attribute defined by the following XPath expression (e.g. <code>&quot;status&quot;</code>).</p>
-<p>The abstract form <code>design</code> therefore has is:</p>
+<p>The second element is again a list, this time a named list. Each element corresponds to one variable (i.e. column) in the resulting data frame. The name (e.g. <code>Status</code>) will be the column name, the column values will be taken from the attribute defined by the following XPath expression (e.g. <code>&quot;status&quot;</code>).</p>
+<p>The abstract form <code>designs</code> therefore has is:</p>
 <pre class="r"><code>list(
 
   &lt;Name of first data frame&gt; = list(
@@ -450,7 +450,7 @@ View(df$Patients)</code></pre>
   ),
   ...
 )</code></pre>
-<p>There are other forms <code>design</code> can take, for example if you want to extract all attributes or only attributes from a certain level of the resource. To get to know these options, please see the package vignette.</p>
+<p>There are other forms <code>designs</code> can take, for example if you want to extract all attributes or only attributes from a certain level of the resource. To get to know these options, please see the package vignette.</p>
 </div>
 <div id="multiple-entries" class="section level2">
 <h2>Multiple entries</h2>
@@ -461,50 +461,50 @@ bundle&lt;-xml2::read_xml(
     &quot;&lt;Bundle&gt;
         
         &lt;Patient&gt;
-            &lt;id value=&#39;id1&#39;/&gt;
+            &lt;id value='id1'/&gt;
             &lt;address&gt;
-                &lt;use value=&#39;home&#39;/&gt;
-                &lt;city value=&#39;Amsterdam&#39;/&gt;
-                &lt;type value=&#39;physical&#39;/&gt;
-                &lt;country value=&#39;Netherlands&#39;/&gt;
+                &lt;use value='home'/&gt;
+                &lt;city value='Amsterdam'/&gt;
+                &lt;type value='physical'/&gt;
+                &lt;country value='Netherlands'/&gt;
             &lt;/address&gt;
-            &lt;birthDate value=&#39;1992-02-06&#39;/&gt;
+            &lt;birthDate value='1992-02-06'/&gt;
         &lt;/Patient&gt;
         
         &lt;Patient&gt;
-            &lt;id value=&#39;id2&#39;/&gt;
+            &lt;id value='id2'/&gt;
             &lt;address&gt;
-                &lt;use value=&#39;home&#39;/&gt;
-                &lt;city value=&#39;Rome&#39;/&gt;
-                &lt;type value=&#39;physical&#39;/&gt;
-                &lt;country value=&#39;Italy&#39;/&gt;
+                &lt;use value='home'/&gt;
+                &lt;city value='Rome'/&gt;
+                &lt;type value='physical'/&gt;
+                &lt;country value='Italy'/&gt;
             &lt;/address&gt;
             &lt;address&gt;
-                &lt;use value=&#39;work&#39;/&gt;
-                &lt;city value=&#39;Stockholm&#39;/&gt;
-                &lt;type value=&#39;postal&#39;/&gt;
-                &lt;country value=&#39;Sweden&#39;/&gt;
+                &lt;use value='work'/&gt;
+                &lt;city value='Stockholm'/&gt;
+                &lt;type value='postal'/&gt;
+                &lt;country value='Sweden'/&gt;
             &lt;/address&gt;          
-            &lt;birthDate value=&#39;1980-05-23&#39;/&gt;
+            &lt;birthDate value='1980-05-23'/&gt;
         &lt;/Patient&gt;
         
         &lt;Patient&gt;
-            &lt;id value=&#39;id3&#39;/&gt; 
+            &lt;id value='id3'/&gt; 
             &lt;address&gt;
-                &lt;use value=&#39;home&#39;/&gt;
-                &lt;city value=&#39;Berlin&#39;/&gt;
+                &lt;use value='home'/&gt;
+                &lt;city value='Berlin'/&gt;
             &lt;/address&gt;
             &lt;address&gt;
-                &lt;type value=&#39;postal&#39;/&gt;
-                &lt;country value=&#39;France&#39;/&gt;
+                &lt;type value='postal'/&gt;
+                &lt;country value='France'/&gt;
             &lt;/address&gt;
             &lt;address&gt;
-                &lt;use value=&#39;work&#39;/&gt;
-                &lt;city value=&#39;London&#39;/&gt;
-                &lt;type value=&#39;postal&#39;/&gt;
-                &lt;country value=&#39;England&#39;/&gt;
+                &lt;use value='work'/&gt;
+                &lt;city value='London'/&gt;
+                &lt;type value='postal'/&gt;
+                &lt;country value='England'/&gt;
             &lt;/address&gt;
-            &lt;birthDate value=&#39;1974-12-25&#39;/&gt;
+            &lt;birthDate value='1974-12-25'/&gt;
         &lt;/Patient&gt;      
         
     &lt;/Bundle&gt;&quot;
