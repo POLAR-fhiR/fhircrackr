@@ -533,7 +533,12 @@ xtrct_all_columns <-
 					})
 
 		if (!is.null(brackets)) {
-			val  <- paste0(brackets[1], o[1, ], brackets[2], val)
+
+			is_av_val <- ! is.na(val)
+
+			o. <- o[1, ]
+
+			val[is_av_val] <- paste0(brackets[1], o.[is_av_val], brackets[2], val[is_av_val])
 		}
 
 		for (col in xp.cols) {
@@ -617,7 +622,11 @@ xtrct_columns <-
 											gsub(".1$", "", paste0(gsub("[^0-9]", "", s.), collapse = "."))
 										})
 
-							paste0(brackets[1], o, brackets[2], val, collapse = sep)
+							if (0 < length(val)) {
+								paste0(brackets[1], o, brackets[2], val, collapse = sep)
+							}
+							else
+								NA
 						}
 						else {
 							paste0(val, collapse = sep)
@@ -760,7 +769,7 @@ bundles2df <-
 	function(bundles,
 			 design.df,
 			 sep = " -+- ",
-			 brackets = c("<", ">"),
+			 brackets = NULL,
 			 verbose = 2) {
 		ret <- rbind_list_of_data_frames(lapply(seq_len(length(bundles)),
 												function(i) {
