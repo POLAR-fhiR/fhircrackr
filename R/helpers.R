@@ -623,7 +623,10 @@ xtrct_columns <-
 										})
 
 							if (0 < length(val)) {
-								paste0(brackets[1], o, brackets[2], val, collapse = sep)
+
+								is_av <- ! is.na(val)
+
+								paste0(brackets[1], o[is_av], brackets[2], val[is_av], collapse = sep)
 							}
 							else
 								NA
