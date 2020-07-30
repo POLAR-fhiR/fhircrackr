@@ -4,14 +4,18 @@
 \alias{fhir_rm_indices}
 \title{Remove indices from data frame}
 \usage{
-fhir_rm_indices(indexed_data_frame, brackets = c("<", ">"), sep = "-+-")
+fhir_rm_indices(
+  indexed_data_frame,
+  brackets = c("<", ">"),
+  columns = names(indexed_data_frame)
+)
 }
 \arguments{
 \item{indexed_data_frame}{A data frame with indices for multiple entries as produced by \code{\link{fhir_crack}}}
 
-\item{brackets}{A character of length two defining the brackets that were used in \code{\link{fhir_crack}}}
+\item{brackets}{A string vector of length two defining the brackets that were used in \code{\link{fhir_crack}}}
 
-\item{sep}{A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}}
+\item{columns}{A string vector of columns, where indices should be removed.}
 }
 \value{
 A data frame without indices.
@@ -20,8 +24,6 @@ A data frame without indices.
 Removes the indices produced by \code{\link{fhir_crack}} when \code{add_indices=TRUE}
 }
 \examples{
-
-
 
 bundle <- xml2::read_xml(
 "<Bundle>
@@ -57,8 +59,8 @@ bundle <- xml2::read_xml(
 )
 
 
-dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list("/Bundle/Patient")),
-                  add_indices = TRUE, verbose = 2)
+dfs <- fhir_crack(bundles = list(bundle), designs = list(Patients = list("/Bundle/Patient")),
+                  verbose = 2)
 
 df_indices_removed <- fhir_rm_indices(dfs[[1]])
 }

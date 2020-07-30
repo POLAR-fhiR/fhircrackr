@@ -30,11 +30,11 @@ The resulting character vector can be used for melting all columns belonging to 
 bundles <- fhir_unserialize(medication_bundles)
 
 #crack Patient Resources
-design <- list(
+designs <- list(
   Patients = list(".//Patient")
 )
 
-dfs <- fhir_crack(bundles, design)
+dfs <- fhir_crack(bundles, designs)
 
 #look at automatically generated names
 names(dfs$Patients)

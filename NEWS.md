@@ -1,3 +1,11 @@
+# fhircrackr 0.1.1.9000
+
+- remove argmument sep from fhir_rm_indices
+- add argument columns to fhir_rm_indices
+
+- remove argument add_indices for getting the info about it via brackets argument itself
+
+
 # fhircrackr 0.1.1
 
 - fixed errors in `fhir_crack()` when resource type doesn't appear in bundle

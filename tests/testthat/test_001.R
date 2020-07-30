@@ -89,7 +89,7 @@ design <- list(
 	)
 )
 
-dfs <- fhir_crack( bundles = myBundles, design = design, sep = "»" )
+dfs <- fhir_crack( bundles = myBundles, designs = design, sep = "»" )
 
 testthat::test_that(
 	"fhir_crack creates all required data frames", {

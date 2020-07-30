@@ -6,21 +6,20 @@
 \usage{
 fhir_crack(
   bundles,
-  design,
+  designs,
   sep = " -+- ",
   remove_empty_columns = FALSE,
-  add_indices = FALSE,
-  brackets = c("<", ">"),
+  brackets = NULL,
   verbose = 2
 )
 }
 \arguments{
 \item{bundles}{A FHIR search result as returned by \code{\link{fhir_search}}.}
 
-\item{design}{A named list specifying which data frame should contain which entries of the bundle.
+\item{designs}{A named list specifying which data frame should contain which entries of the bundle.
 The names correspond to the names of the resulting data frames.
 
-Each element of design is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
+Each element of designs is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
 FHIR bundle page. There are 3 options for the second element of that list:
 
 - There is no second element: all attributes of the resource are extracted
@@ -37,16 +36,14 @@ For a more detailed explanation see the package vignette.}
 
 \item{remove_empty_columns}{Logical scalar. Remove empty columns?}
 
-\item{add_indices}{A Logical scalar.}
-
-\item{brackets}{A character vector of length two defining the Brackets surrounding the indices. e.g. c( "<", ">")}
+\item{brackets}{A character vector of length two defining the Brackets surrounding the indices. e.g. c( "<", ">"). NULL means no brackets.}
 
 \item{verbose}{An Integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
 extraction progress will be printed. Defaults to 2.
-#' @return A list of data frames as specified by \code{design}.}
+#' @return A list of data frames as specified by \code{designs}.}
 }
 \value{
-A list of data frames as specified by \code{design}
+A list of data frames as specified by \code{designs}
 }
 \description{
 Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
@@ -56,7 +53,7 @@ Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of
 bundles <- fhir_unserialize(medication_bundles)
 
 #define attributes to extract
-df_design <- list(
+designs <- list(
 
  #define specifically which elements to extract
 	MedicationStatement = list(
@@ -84,7 +81,7 @@ df_design <- list(
 )
 
 #convert fhir to data frames
-list_of_tables <- fhir_crack(bundles, df_design)
+list_of_tables <- fhir_crack(bundles, designs)
 
 #check results
 head(list_of_tables$MedicationStatement)

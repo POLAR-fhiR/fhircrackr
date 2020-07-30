@@ -35,7 +35,7 @@ We can achieve this using the `fhir_crack()` function.
 
 ```r
 #define which elements of the resources are of interest
-design <- list(
+designs <- list(
 
   MedicationStatements = list(
     "//MedicationStatement",
@@ -62,15 +62,15 @@ design <- list(
 )
 
 #Convert resources
-dfs <- fhir_crack(bundles, design)
+dfs <- fhir_crack(bundles, designs)
 
 #Inspect results
 View(df$Patients)
 ```
 
-`fhir_crack()` takes a list of bundles as returned by `fhir_search()` and a list `design` defining the data to be extracted from the resources and returns a list of data frames.
+`fhir_crack()` takes a list of bundles as returned by `fhir_search()` and a list of `designs` defining the data to be extracted from the resources and returns a list of data frames.
 
-`design` should be a named list, where each element of `design` corresponds to one data frame that will be created. The element names of `design` are going to be the names of the data.frames in the result of the function.
+`designs` should be a named list, where each element of `designs` corresponds to data frame design which defines how the data frame will be created. The element names of `designs` are going to be the names of the data.frames in the result of the function.
 
 It makes sense to create one data frame per type of resource (MedicationStatement and Patient in this case). Lets have a look at the element `Medication` from the above example of `design` to understand how it works:
 
@@ -78,7 +78,7 @@ It makes sense to create one data frame per type of resource (MedicationStatemen
 
 The second element is again a list, this time a named list. Each element corresponds to one variable (i.e. column) in the resulting data frame. The name (e.g. `Status`) will be the column name, the column values will be taken from the attribute defined by the following XPath expression (e.g. `"status"`).
 
-The abstract form `design` therefore has is:
+The abstract form `designs` therefore has is:
 
 ```r
 list(
@@ -103,11 +103,11 @@ list(
   ...
 )
 ```
-There are other forms `design` can take, for example if you want to extract all attributes or only attributes from a certain level of the resource. To get to know these options, please see the package vignette.
+There are other forms `designs` can take, for example if you want to extract all attributes or only attributes from a certain level of the resource. To get to know these options, please see the package vignette.
 
 
 ## Multiple entries
-When there are multiple entries to one attribute, e.g. multiple addresses for the same Patient resource, `fhir_crack()` will paste these entries together using the string provided in the argument `sep`. If you set `add_indices=TRUE`, the entries will be assigned indices to allow you to distinguish between entries:
+When there are multiple entries to one attribute, e.g. multiple addresses for the same Patient resource, `fhir_crack()` will paste these entries together using the string provided in the argument `sep`. If you set `brackets=c('[', ']')`, the entries will be assigned to indices to allow you to distinguish between entries. The indices are surrounded by the given brackets:
 
 ```r
 #create example bundle with multiple entries
