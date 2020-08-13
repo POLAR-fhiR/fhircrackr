@@ -1,15 +1,22 @@
 
 # Plans for next Version of fhircrackr
 
+
 ## Simplify fhir_crack
 
-- fhir_crack should be able to create single df (not list of dfs) where possible
+- deprecate add_indices (information is taken from brackets argument)
 
-- add function to fhir_crack that automatically recognises whether design suggests single df or list of dfs
+- rename argument designs to design
+
+- Arguments remove_empty_columns, brackets and sep can be provided within design 
+
+- fhir_crack should be able to create single df (not list of dfs) where possible
 
 - update is_invalid_design accordingly
 
 - update documentation, vignette and readme accordingly
+
+
 
 ## Performance Issues
 
