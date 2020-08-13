@@ -257,10 +257,14 @@ fhir_load <- function(directory) {
 #'
 #' @param sep A string to separate pasted multiple entries.
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
-#' @param brackets A character vector of length two defining the Brackets surrounding the indices. e.g. c( "<", ">"). NULL means no brackets.
+#' @param brackets A character vector of length two defining the Brackets surrounding indices for multiple entires, e.g. c( "<", ">").
+#'  If NULL, no indices will be added to multiple entries.
 #' @param verbose An Integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
-#' #' @return A list of data frames as specified by \code{designs}.
+#' @param add_indices Deprecated. This argument was used to control adding of indices for multiple entries. This is now
+#' done via the brackets argument. If brackets is NULL, no indices are added, if brackets is not NULL, indices are added to multiple entries.
+#'
+#' @return A list of data frames as specified by \code{designs}.
 #' @export
 #'
 #' @examples
@@ -312,14 +316,38 @@ fhir_crack <-
 			 sep = " -+- ",
 			 remove_empty_columns = FALSE,
 			 brackets = NULL,
-			 verbose = 2) {
-		if (is_invalid_design_list(designs))
+			 verbose = 2,
+			 add_indices) {
+
+		#-----------------------# remove once add_indices is removed:
+		if(!missing("add_indices")){
+
+			warning("Argument add_indices is deprecated and will be removed eventually.\n In future versions indices will automatically be added when argument brackets is not NULL.")
+
+			if(add_indices & is.null(brackets)) {brackets <- c("<", ">")}
+
+			if(!add_indices & !is.null(brackets)) {brackets <- NULL}
+
+		}
+
+		#-----------------------#
+
+
+		if (is_invalid_design_list(designs)){
+
+			return(NULL)
+		}
+
+		if (is_invalid_bundles_list(bundles)){
+
 			return(NULL)
 
-		if (is_invalid_bundles_list(bundles))
-			return(NULL)
+		}
+
 
 		designs <- add_attribute_to_design(designs)
+
+
 
 		dfs <-
 			bundles2dfs(
