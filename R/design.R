@@ -119,23 +119,23 @@ is_valid_design <- function(design){
 	#TODO: Hier noch andere Checks aus is_invalid_design aus helpers.R ergänzen
 
 	#general checks
-	if (is.null(designs)) {
+	if (is.null(design)) {
 		warning("Argument design is NULL")
 		return(FALSE)
 	}
 
-	if (!is.list(designs)) {
+	if (!is.list(design)) {
 		warning("Argument design has to be a list")
 		return(FALSE)
 	}
 
-	if (length(designs) < 1) {
+	if (length(design) < 1) {
 		warning("Argument design has length 0")
 		return(FALSE)
 	}
 
 	#checks of df_descriptions
-	df_descr_results <- plyr::ldply(design, is_valid_df_desc)
+	df_descr_results <- ?plyr::ldply(design, is_valid_df_desc)
 
 	df_descr_results$number <- 1:nrow(df_descr_results)
 
@@ -150,7 +150,6 @@ is_valid_design <- function(design){
 	}
 
 	return(TRUE)
-
 }
 
 
