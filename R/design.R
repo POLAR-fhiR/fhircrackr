@@ -6,10 +6,12 @@ fix <- function (list, names, defaults=NULL) {
 	if (is.null(list)) {
 
 		warning("Argument list is NULL")
+		return(NULL)
 	}
 	else if (!is.list(list)) {
 
 		warning(paste0("Argument list is ", typeof(list), " but must be list or NULL."))
+		return(NULL)
 	}
 
 	if (length(list) < length(names)){
@@ -29,8 +31,9 @@ fix <- function (list, names, defaults=NULL) {
 
 		if (0 < length(wnames)) {
 
-			return(paste0("Unknown design component ", wnames,
+			warning(paste0("Unknown design component ", wnames,
 						". Names of design components can only be resource, cols, style, sep, brackets and rm_empty_cols\n"))
+			return(NULL)
 		}
 
 		lnames[lnames == ""] <- setdiff(names, lnames)[seq_len(sum(lnames == ""))]
@@ -53,11 +56,6 @@ fix <- function (list, names, defaults=NULL) {
 fix_df_desc <- function (df_desc) {
 
 	df_desc <- fix(list = df_desc, names = c("resource", "cols", "style"))
-
-	if (is.character(df_desc)) {
-
-		return(df_desc)
-	}
 
 	df_desc$style <- if (is.null(df_desc$style)){
 
@@ -186,7 +184,7 @@ is_valid_design(design = design1)
 #Falsche Namen: wirft momentan noch Fehler: In Warnung umwandeln und als invalid markieren?
 design2 <- list(
 	Pat = list(
-		Resource = "//Patient",
+		resource = "//Patient",
 		cols = list(
 			ID = "id"
 		),
