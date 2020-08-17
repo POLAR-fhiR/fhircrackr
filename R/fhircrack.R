@@ -310,8 +310,7 @@ fhir_load <- function(directory) {
 #'
 #' @export
 
-fhir_crack <-
-	function(bundles,
+fhir_crack <- function(bundles,
 			 design,
 			 sep = " -+- ",
 			 remove_empty_columns = FALSE,
@@ -332,10 +331,19 @@ fhir_crack <-
 
 		#-----------------------#
 
+		design <- lapply(design, fix_df_desc)
 
-		if (is_invalid_design_list(design)){
+		design_validity <- is_valid_design(design)
+
+		if (!design_validity[[1]] && is.null(design_validity[[2]])){
 
 			return(NULL)
+		}
+
+		if (!design_validity[[1]] && !is.null(design_validity[[2]])){
+
+			design[design_validity[[2]]] <- "invalid"
+
 		}
 
 		if (is_invalid_bundles_list(bundles)){
@@ -344,13 +352,14 @@ fhir_crack <-
 
 		}
 
-
-		design <- add_attribute_to_design(design)
-
+		#TODO: Mit Funktionsargumenten überschreiben
 
 
+		design <- add_attribute_to_design(design) #geht das noch?
 
-		dfs <-
+
+
+		dfs <-#argumente geeignet übergeben
 			bundles2dfs(
 				bundles = bundles,
 				design = design,

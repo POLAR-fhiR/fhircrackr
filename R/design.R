@@ -59,11 +59,15 @@ fix_df_desc <- function (df_desc) {
 
 	df_desc$style <- if (is.null(df_desc$style)){
 
-		NULL
-	}
-	else {
+		list(sep = " ", brackets = NULL, rm_empty_cols = TRUE)
 
-		fix(df_desc$style, c("sep", "brackets", "rm_empty_cols"), defaults = list(" ", c("<", ">"), TRUE))
+	}else {
+
+		style <- fix(list=df_desc$style, c("sep", "brackets", "rm_empty_cols"))
+
+		if(is.null(style$sep)) {style$sep <- " "}
+		if(is.null(style$rm_empty_cols)) {style$rm_empty_cols <- TRUE}
+
 	}
 
 	df_desc
@@ -155,23 +159,23 @@ is_valid_design <- function(design){
 
 	#general checks
 	if (is.null(design)) {
-		warning("Argument design is NULL")
-		return(FALSE)
+		warning("Argument design is NULL, returning NULL")
+		return(list(FALSE, NULL))
 	}
 
 	if (!is.list(design)) {
-		warning("Argument design has to be a list")
-		return(FALSE)
+		warning("Argument design has to be a list, returning NULL")
+		return(list(FALSE, NULL))
 	}
 
 	if (is.null(names(design)) || any(names(design) == "")) {
-		warning("Argument design should be a named list of data.frame descriptions, but at least one of the elements of design is unnamed.")
-		return(FALSE)
+		warning("Argument design should be a named list of data.frame descriptions, but at least one of the elements of design is unnamed. Returning NULL")
+		return(list(FALSE, NULL))
 	}
 
 	if (length(design) < 1) {
-		warning("Argument design has length 0")
-		return(FALSE)
+		warning("Argument design has length 0, returning NULL")
+		return(list(FALSE, NULL))
 	}
 
 	#checks of df_descriptions
@@ -184,12 +188,13 @@ is_valid_design <- function(design){
 	if (0 < nrow(invalid)){
 		warning(
 			"The following data.frame descriptions in your design seem to be invalid:\n",
-			paste0("Data.frame description no.", invalid$number, " (", invalid$.id,")"," : ", invalid$message, "\n")
+			paste0("Data.frame description no.", invalid$number, " (", invalid$.id,")"," : ", invalid$message, "\n"),
+			"Returning NULL for all invalid data.frame descriptions. \n"
 		)
-		return(FALSE)
+		return(list(FALSE,invalid$number))
 	}
 
-	return(TRUE)
+	return(list(TRUE, NULL))
 }
 
 
