@@ -239,10 +239,10 @@ fhir_load <- function(directory) {
 #' @description Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
 #'
 #' @param bundles A FHIR search result as returned by \code{\link{fhir_search}}.
-#' @param designs A named list specifying which data frame should contain which entries of the bundle.
-#' The names correspond to the names of the resulting data frames.
+#' @param design A named list specifying which data frame should contain which entries of the bundle.
+#' The names correspond to the names of the resulting data frames. Also a single Data Frame Design called Description is possible here.
 #'
-#' Each element of designs is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
+#' Each element of design is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
 #' FHIR bundle page. There are 3 options for the second element of that list:
 #'
 #' - There is no second element: all attributes of the resource are extracted
@@ -257,7 +257,7 @@ fhir_load <- function(directory) {
 #'
 #' @param sep A string to separate pasted multiple entries.
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
-#' @param brackets A character vector of length two defining the Brackets surrounding indices for multiple entires, e.g. c( "<", ">").
+#' @param brackets A characgithub merge conflictster vector of length two defining the Brackets surrounding indices for multiple entires, e.g. c( "<", ">").
 #'  If NULL, no indices will be added to multiple entries.
 #' @param verbose An Integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
@@ -272,7 +272,7 @@ fhir_load <- function(directory) {
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #define attributes to extract
-#' designs <- list(
+#' design <- list(
 #'
 #'  #define specifically which elements to extract
 #' 	MedicationStatement = list(
@@ -300,19 +300,19 @@ fhir_load <- function(directory) {
 #' )
 #'
 #' #convert fhir to data frames
-#' list_of_tables <- fhir_crack(bundles, designs)
+#' list_of_tables <- fhir_crack(bundles, design)
 #'
 #' #check results
 #' head(list_of_tables$MedicationStatement)
 #' head(list_of_tables$Patients)
 #'
-#' @return A list of data frames as specified by \code{designs}
+#' @return A list of data frames as specified by \code{design}
 #'
 #' @export
 
 fhir_crack <-
 	function(bundles,
-			 designs,
+			 design,
 			 sep = " -+- ",
 			 remove_empty_columns = FALSE,
 			 brackets = NULL,
@@ -333,7 +333,7 @@ fhir_crack <-
 		#-----------------------#
 
 
-		if (is_invalid_design_list(designs)){
+		if (is_invalid_design_list(design)){
 
 			return(NULL)
 		}
@@ -341,18 +341,19 @@ fhir_crack <-
 		if (is_invalid_bundles_list(bundles)){
 
 			return(NULL)
-
+      
 		}
 
 
-		designs <- add_attribute_to_design(designs)
+		designs <- add_attribute_to_design(design)
+
 
 
 
 		dfs <-
 			bundles2dfs(
 				bundles = bundles,
-				designs = designs,
+				design = design,
 				sep = sep,
 				remove_empty_columns = remove_empty_columns,
 				brackets = brackets,
@@ -395,7 +396,7 @@ fhir_capability_statement <-
 			fhir_search(request = paste_paths(url, "/metadata?"),
 						verbose = verbose)
 
-		designs <- list(
+		design <- list(
 			META      = list("/CapabilityStatement", "./*/@*"),
 			REST.META = list("/CapabilityStatement/rest", "./*/@*"),
 			REST      = list("/CapabilityStatement/rest/resource")
@@ -403,7 +404,7 @@ fhir_capability_statement <-
 
 		fhir_crack(
 			bundles = caps,
-			designs = designs,
+			design = design,
 			sep = sep,
 			remove_empty_columns = remove_empty_columns,
 			brackets = brackets,
@@ -472,11 +473,11 @@ fhir_unserialize <- function(bundles) {
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #crack Patient Resources
-#' designs <- list(
+#' design <- list(
 #'   Patients = list(".//Patient")
 #' )
 #'
-#' dfs <- fhir_crack(bundles, designs)
+#' dfs <- fhir_crack(bundles, design)
 #'
 #' #look at automatically generated names
 #' names(dfs$Patients)
@@ -560,7 +561,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #')
 #'
 #' #crack fhir resources
-#' dfs <- fhir_crack(bundles = list(bundle), designs = list(Patients = list(".//Patient")),
+#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list(".//Patient")),
 #'                   brackets = c("[","]"))
 #'
 #' #find all column names associated with attribute address
@@ -666,7 +667,7 @@ fhir_melt <-
 #')
 #'
 #'
-#' dfs <- fhir_crack(bundles = list(bundle), designs = list(Patients = list("/Bundle/Patient")),
+#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list("/Bundle/Patient")),
 #'                   verbose = 2)
 #'
 #' df_indices_removed <- fhir_rm_indices(dfs[[1]])
