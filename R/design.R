@@ -1,16 +1,18 @@
+rm(list = ls())
 
 #Fix list by assigning proper names and defaults
 fix <- function (list, names, defaults=NULL) {
 
 	if (is.null(list)) {
 
-			warning("Argument list is NULL")
+		warning("Argument list is NULL")
+		return(NULL)
+	}
+	else if (!is.list(list)) {
 
-		}else if (!is.list(list)) {
-
-			warning(paste0("Argument list is ", typeof(list), " but must be list or NULL."))
-
-		}
+		warning(paste0("Argument list is ", typeof(list), " but must be list or NULL."))
+		return(NULL)
+	}
 
 	if (length(list) < length(names)){
 
@@ -22,16 +24,16 @@ fix <- function (list, names, defaults=NULL) {
 	if (is.null(lnames)) {
 
 		names(list) <- names
-
-	}else{
+	}
+	else {
 
 		wnames <- setdiff(setdiff(lnames, names), "")
 
 		if (0 < length(wnames)) {
 
-			stop(paste0("Unknown design component ", wnames,
+			warning(paste0("Unknown design component ", wnames,
 						". Names of design components can only be resource, cols, style, sep, brackets and rm_empty_cols\n"))
-
+			return(NULL)
 		}
 
 		lnames[lnames == ""] <- setdiff(names, lnames)[seq_len(sum(lnames == ""))]
@@ -39,9 +41,9 @@ fix <- function (list, names, defaults=NULL) {
 		list <- list[names]
 	}
 
-	if (! is.null(defaults)){
+	if (! is.null(defaults)) {
 
-		for (i in seq_along(list)){
+		for (i in seq_along(list)) {
 
 			if (is.null(list[[i]])) list[[i]] <- defaults[[i]]
 		}
@@ -58,11 +60,10 @@ fix_df_desc <- function (df_desc) {
 	df_desc$style <- if (is.null(df_desc$style)){
 
 		NULL
-
-	}else{
+	}
+	else {
 
 		fix(df_desc$style, c("sep", "brackets", "rm_empty_cols"), defaults = list(" ", c("<", ">"), TRUE))
-
 	}
 
 	df_desc
@@ -72,38 +73,45 @@ fix_df_desc <- function (df_desc) {
 #check df_description
 is_valid_df_desc <- function (df_desc) {
 
+	#dbg df_desc <- design[[1]]
+
 	#TODO: Hier noch andere Checks aus is_invalid_design aus helpers.R ergänzen (zB xml-Ausdrücke checken)
 
-	d <- fix_df_desc(df_desc)
+	d <- fix_df_desc(df_desc = df_desc)
 
 	if (!is.character(d$resource)) {
-		message <- paste0("resource component of data.frame description is ", typeof(d$Resource), " but must be character.")
+
+		message <- paste0("resource component of data.frame description is ", typeof(d$resource), " but must be character.")
 		return(data.frame(valid=FALSE, message))
 	}
 
 	if (!is.null(d$cols) && !is.character(d$cols) && !is.list(d$cols)){
-		message <- paste0("cols component of data.frame description  is ", typeof(d$Columns), " but must be character, list or NULL.")
+		message <- paste0("cols component of data.frame description  is ", typeof(d$cols), " but must be character, list or NULL.")
 		return(data.frame(valid=FALSE, message))
 	}
 
-	if (!is.null(d$style) && ! is.list(d$style)){
-		message <-paste0("style component of data.frame description is ", typeof(d$Decoration), " but must be list or NULL.")
+	if (!is.null(d$style) && ! is.list(d$style)) {
+		message <- paste0("style component of data.frame description is ", typeof(d$style), " but must be list or NULL.")
 		return(data.frame(valid=FALSE, message))
 	}
 
 	if (is.list(d$style)) {
+
 		d <- d$style
+
 		if (!is.null(d$sep) && ! is.character(d$sep)) {
-			message <-paste0("sep element of style component is ", typeof(d$Resource), " but must be character or NULL.")
+
+			message <- paste0("sep element of style component is ", typeof(d$resource), " but must be character or NULL.")
 			return(data.frame(valid=FALSE, message))
 		}
 
-		if (!is.null(d$brackets) && ! is.character(d$brackets)){
-			message <-paste0("brackets element of style component is ", typeof(d$Brackets), " but must be character or list.")
+		if (!is.null(d$brackets) && ! is.character(d$brackets)) {
+
+			message <- paste0("brackets element of style component is ", typeof(d$brackets), " but must be character or list.")
 			return(data.frame(valid=FALSE, message))
 		}
-		if (!is.null(d$rm_empty_cols) && ! is.logical(d$rm_empty_cols)){
-			message <-paste0("rm_empty_cols element of style component is ", typeof(d$Remove_Empty_Columns), " but must be logical or NULL.")
+		if (!is.null(d$rm_empty_cols) && ! is.logical(d$rm_empty_cols)) {
+			message <- paste0("rm_empty_cols element of style component is ", typeof(d$rm_empty_cols), " but must be logical or NULL.")
 			return(data.frame(valid=FALSE, message))
 		}
 	}
@@ -119,17 +127,17 @@ is_valid_design <- function(design){
 	#TODO: Hier noch andere Checks aus is_invalid_design aus helpers.R ergänzen
 
 	#general checks
-	if (is.null(designs)) {
+	if (is.null(design)) {
 		warning("Argument design is NULL")
 		return(FALSE)
 	}
 
-	if (!is.list(designs)) {
+	if (!is.list(design)) {
 		warning("Argument design has to be a list")
 		return(FALSE)
 	}
 
-	if (length(designs) < 1) {
+	if (length(design) < 1) {
 		warning("Argument design has length 0")
 		return(FALSE)
 	}
@@ -137,11 +145,11 @@ is_valid_design <- function(design){
 	#checks of df_descriptions
 	df_descr_results <- plyr::ldply(design, is_valid_df_desc)
 
-	df_descr_results$number <- 1:nrow(df_descr_results)
+	df_descr_results$number <- seq_len(nrow(df_descr_results))
 
 	invalid <- df_descr_results[!df_descr_results$valid,]
 
-	if(nrow(invalid)>0){
+	if (0 < nrow(invalid)){
 		warning(
 			"The following data.frame descriptions in you design seem to be invalid:\n",
 			paste0("Data.frame description no.", invalid$number, " (", invalid$.id,")"," : ", invalid$message, "\n")
@@ -150,7 +158,6 @@ is_valid_design <- function(design){
 	}
 
 	return(TRUE)
-
 }
 
 
@@ -160,8 +167,8 @@ is_valid_design <- function(design){
 
 #richtig mit Namen
 design1 <- list(
-	list(
-		resource = "//Patient",
+	Pat = list(
+		Resource = "//Patient",
 		cols = list(
 			ID = "id"
 		),
@@ -172,16 +179,16 @@ design1 <- list(
 	)
 )
 
-is_valid_design(design1)
+is_valid_design(design = design1)
 
 #Falsche Namen: wirft momentan noch Fehler: In Warnung umwandeln und als invalid markieren?
 design2 <- list(
-	list(
-		Resource = "//Patient",
+	Pat = list(
+		resource = "//Patient",
 		cols = list(
 			ID = "id"
 		),
-		stylE= list(
+		style = list(
 			" ",
 			rm_empty_cols = FALSE
 		)
