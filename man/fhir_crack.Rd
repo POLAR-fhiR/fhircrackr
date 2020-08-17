@@ -10,7 +10,8 @@ fhir_crack(
   sep = " -+- ",
   remove_empty_columns = FALSE,
   brackets = NULL,
-  verbose = 2
+  verbose = 2,
+  add_indices
 )
 }
 \arguments{
@@ -36,13 +37,18 @@ For a more detailed explanation see the package vignette.}
 
 \item{remove_empty_columns}{Logical scalar. Remove empty columns?}
 
-\item{brackets}{A character vector of length two defining the Brackets surrounding the indices. e.g. c( "<", ">"). NULL means no brackets.}
+\item{brackets}{A character vector of length two defining the Brackets surrounding indices for multiple entires, e.g. c( "<", ">").
+If NULL, no indices will be added to multiple entries.}
 
 \item{verbose}{An Integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
-extraction progress will be printed. Defaults to 2.
-#' @return A list of data frames as specified by \code{designs}.}
+extraction progress will be printed. Defaults to 2.}
+
+\item{add_indices}{Deprecated. This argument was used to control adding of indices for multiple entries. This is now
+done via the brackets argument. If brackets is NULL, no indices are added, if brackets is not NULL, indices are added to multiple entries.}
 }
 \value{
+A list of data frames as specified by \code{designs}.
+
 A list of data frames as specified by \code{designs}
 }
 \description{
