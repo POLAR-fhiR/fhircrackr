@@ -341,11 +341,11 @@ fhir_crack <-
 		if (is_invalid_bundles_list(bundles)){
 
 			return(NULL)
-      
+
 		}
 
 
-		designs <- add_attribute_to_design(design)
+		design <- add_attribute_to_design(design)
 
 
 
