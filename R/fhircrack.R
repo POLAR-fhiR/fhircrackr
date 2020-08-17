@@ -324,9 +324,9 @@ fhir_crack <-
 
 			warning("Argument add_indices is deprecated and will be removed eventually.\n In future versions indices will automatically be added when argument brackets is not NULL.")
 
-			if(add_indices & is.null(brackets)) {brackets <- c("<", ">")}
+			if(add_indices && is.null(brackets)) {brackets <- c("<", ">")}
 
-			if(!add_indices & !is.null(brackets)) {brackets <- NULL}
+			if(!add_indices && !is.null(brackets)) {brackets <- NULL}
 
 		}
 
