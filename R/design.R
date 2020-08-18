@@ -67,6 +67,8 @@ fix_df_desc <- function (df_desc) {
 
 		if(is.null(style$sep)) {style$sep <- " "}
 		if(is.null(style$rm_empty_cols)) {style$rm_empty_cols <- TRUE}
+		if(!is.null(style$brackets) && length(style$brackets) < 2) {style$brackets <- c(style$brackets[1], style$brackets[1])}
+		style
 
 	}
 
@@ -112,7 +114,7 @@ is_valid_df_desc <- function (df_desc) {
 					return(data.frame(valid=FALSE, message))
 			}
 		)
-		return(out)
+		if(!is.null(out$valid) && !out$valid) {return(out)}
 	}
 
 	#check style
@@ -137,7 +139,7 @@ is_valid_df_desc <- function (df_desc) {
 			return(data.frame(valid=FALSE, message))
 		}
 
-		if (!is.null(d$brackets) && length(brackets)!=2) {
+		if (!is.null(d$brackets) && length(d$brackets)!=2) {
 
 			message <- paste0("brackets element of style component has length", length(d$brackets), " but must be of length 2.")
 			return(data.frame(valid=FALSE, message))
