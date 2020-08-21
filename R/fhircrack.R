@@ -277,10 +277,14 @@ fhir_load <- function(directory) {
 #' @param verbose An Integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
 #'
+#' @param return_design Logical scalar. If \code{TRUE}, the complete design with automatically by fhir_crack
+#' amended elements is returned as the last element of the returned list. Defaults to \code{FALSE}
+#'
 #' @param add_indices Deprecated. This argument was used to control adding of indices for multiple entries. This is now
 #' done via the brackets argument. If brackets is \code{NULL}, no indices are added, if brackets is not \code{NULL}, indices are added to multiple entries.
 #'
-#' @return A list of data frames as specified by \code{design}.
+#' @return A list of data frames (if \code{return_design = FALSE}) or a list of data frames and the
+#' utilized \code{design}, if \code{return_design = TRUE}.
 #'
 #' @export
 #'
@@ -338,6 +342,7 @@ fhir_crack <- function(bundles,
 			 remove_empty_columns = NULL,
 			 brackets = NULL,
 			 verbose = 2,
+			 return_design = FALSE,
 			 add_indices) {
 
 		#-----------------------# remove once add_indices is removed:
@@ -354,7 +359,6 @@ fhir_crack <- function(bundles,
 		#-----------------------#
 
 		#check input validity
-
 		design_validity <- is_valid_design(design)
 
 		#IF general problems with design
@@ -434,7 +438,11 @@ fhir_crack <- function(bundles,
 			message("FHIR-Resources cracked.")
 		}
 
-		dfs
+		if(return_design){
+			c(dfs, design=list(design))
+		}else{
+			dfs
+			}
 	}
 
 
