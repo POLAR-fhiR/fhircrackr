@@ -61,12 +61,11 @@ fix_brackets <- function(brackets) if (1 == length(brackets)) c(brackets[1], bra
 #fix df description
 fix_df_desc <- function (df_desc) {
 	#dbg
-	#df_desc <- designs[[2]]
+	#df_desc <- design[[1]]
 
 	df_desc <- fix(list = df_desc, names = c("resource", "cols", "style"))
 
 	df_desc$style <- if (is.null(df_desc$style)) NULL else fix(df_desc$style,c("sep", "brackets", "rm_empty_cols"))
-
 
 	df_desc$style$brackets <- fix_brackets(df_desc$style$brackets)
 
@@ -104,6 +103,8 @@ is_valid_df_desc <- function (df_desc) {
 		message <- paste0("cols component of data.frame description is ", typeof(d$cols), " but must be character, list or NULL.")
 		return(data.frame(valid=FALSE, message))
 	}
+
+	testbundle <- xml2::read_xml("<Bundle>   </Bundle>")
 
 	expressions <- unlist(df_desc$cols)
 
