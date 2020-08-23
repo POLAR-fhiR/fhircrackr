@@ -69,19 +69,6 @@ rbind_list_of_data_frames <- function(list) {
 }
 
 
-
-
-
-analyse_design <- function(design) {
-	if (is.null(design)) return('NO_DESIGN')
-	if (0 < length(design)) {
-
-	}
-	else {
-
-	}
-}
-
 #' @description Remove attributes from xpath expressions
 #'
 #' @param design a fhircrackr design list.
