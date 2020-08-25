@@ -382,7 +382,7 @@ fhir_crack <- function(bundles,
 		}
 
 		#complete design
-		design <- lapply(design, fix_df_desc)
+		suppressWarnings(design <- fix_design(design))
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {

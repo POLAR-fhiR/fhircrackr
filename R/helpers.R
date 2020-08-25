@@ -640,7 +640,7 @@ xtrct_columns <- function(child,
 								NA
 						}
 						else {
-							paste0(val, collapse = sep)
+							if (0 < length(val)) {paste0(val, collapse = sep)} else {NA}
 						}
 					})
 
