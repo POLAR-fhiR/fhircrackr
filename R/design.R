@@ -3,31 +3,25 @@
 
 #Fix list by assigning proper names and defaults
 fix <- function (list, names, defaults = NULL) {
+	msg <- NULL
 
 	if (is.null(list)) {
-		# warning("Argument list is NULL")
-		# return(NULL)
+
 		return(list(value = NULL, msg = "is NULL."))
-	}
-	else if (!inherits(list, "list")) {
-		# warning(paste0(
-		# 	"Argument list is a ",
-		# 	class(list),
-		# 	" but must be list or NULL."
-		# ))
-		# return(NULL)
+
+		} else if (!inherits(list, "list")) {
+
 		return(list(value = NULL, msg = paste0("is a ", class(list), " but must be a list.")))
 
 	}
 
 	if(is.null(names(list)) || "" %in% names(list)) {
-		warning("There are some unnamed elements in the data.frame descriptions of the provided design. \n Unnamed elements are assumed to be in the following order: ", paste(names, collapse=", "), "\n")
+		msg <- ("There are unnamed elements in this data.frame description. \n Elements are assumed to be in the following order:  resource, cols, style (with elements sep, brackets, rm_empty_cols) \n")
 	}
 
 	#append missing elements with values NULL
 	if (length(list) < length(names)) {
-		list <-
-			append(list, lapply(seq_len(length(names) - length(list)), function(x) {NULL}))
+		list <- append(list, lapply(seq_len(length(names) - length(list)), function(x) {NULL}))
 	}
 
 	lnames <- names(list)
@@ -41,15 +35,9 @@ fix <- function (list, names, defaults = NULL) {
 		wnames <- setdiff(setdiff(lnames, names), "")
 
 		if (0 < length(wnames)) { #if wrong names in original list
-			# warning(
-			# 	paste0(
-			# 		"Unknown design component ",
-			# 		wnames,
-			# 		". Names of design components can only be resource, cols, style, sep, brackets and rm_empty_cols\n"
-			# 	)
-			# )
-			# return(NULL)
+
 			return(value = NULL, msg = paste0("has unknown component ", wnames, ". Names of design components can only be resource, cols, style, sep, brackets and rm_empty_cols\n"))
+
 		}
 
 		#if missing names in original list
@@ -65,7 +53,8 @@ fix <- function (list, names, defaults = NULL) {
 				list[[i]] <- defaults[[i]]
 		}
 	}
-	return(list(value=list, msg = "fine"))
+
+	return(list(value=list, msg = msg))
 }
 
 
@@ -79,7 +68,7 @@ fix_brackets <- function(brackets){
 fix_df_desc <- function (df_desc) {
 	#dbg
 	#df_desc <- design[[1]]
-
+	msg <- NULL
 	fix_res <- fix(list = df_desc, names = c("resource", "cols", "style"))
 
 	if(is.null(fix_res$value)){
@@ -91,6 +80,7 @@ fix_df_desc <- function (df_desc) {
 	}else{
 
 		df_desc <- fix_res$value
+		msg <- fix_res$msg
 
 	}
 
@@ -115,12 +105,13 @@ fix_df_desc <- function (df_desc) {
 		}else{
 
 			df_desc$style <- fix_res$value
+			if(is.null(msg)) {msg <- fix_res$msg}
 		}
 	}
 
 	df_desc$style$brackets <- fix_brackets(df_desc$style$brackets)
 
-	return(list(value = df_desc, msg="fine"))
+	return(list(value = df_desc, msg=msg))
 }
 
 
@@ -131,17 +122,18 @@ fix_design <- function(design) {
 		fixed <- fix_df_desc(design[[i]])
 
 		if(is.null(fixed$value)){
-			warning("Something is wrong with the data.frame description named", names(design)[i], ":\n", fixed$msg , "\n Returning NULL for this data.frame description. \n")
+			#warning("Something is wrong with the data.frame description named", names(design)[i], ":\n", fixed$msg , "\n Returning NULL for this data.frame description. \n")
 			return(NULL)
 		}else{
+			if(!is.null(fixed$msg)) {
+				warning("\n For data.frame description ", names(design)[i], ": ", fixed$msg, "\n")
+			}
 			fixed$value
 		}
 	})
 
 	names(fixed_design) <- names(design)
 	return(fixed_design)
-	#lapply(design, fix_df_desc)
-
 }
 
 ####validating designs####
@@ -298,7 +290,7 @@ is_valid_design <- function(design) {
 
 	if (0 < nrow(invalid)) {
 		warning(
-			"The following data.frame descriptions in your design seem to be invalid:\n",
+			"The following data.frame descriptions in your design seem to be invalid:\n\n ",
 			paste0("Data.frame description no.", invalid$number, " (", invalid$.id,")"," : ", invalid$message, "\n"),
 			"Returning NULL for all invalid data.frame descriptions. \n"
 		)
