@@ -1,34 +1,4 @@
 #########################################################################################################
-testthat::context( "fhir_crack()" )
-
-xmlfile <- xml2::read_xml( "specimen.xml" )
-
-design <- list(
-
-	Specimen = list(
-		"//extension[@url='https://fhir.bbmri.de/StructureDefinition/StorageTemperature']",
-		list(
-			VCS  = "valueCodeableConcept/coding/system/@value",
-			CODE = "valueCodeableConcept/coding/code/@value"
-		)
-	)
-)
-
-df <- fhir_crack(bundles = list(xmlfile), design)
-
-testthat::test_that(
-	"crack creates a valid data frame", {
-		testthat::expect_false( is.null( df ) )
-		testthat::expect_false( is.null( df$Specimen ) )
-		testthat::expect_true( is.data.frame( df$Specimen ) )
-		testthat::expect_equal( nrow( df$Specimen ), 1 )
-		testthat::expect_equal( df$Specimen$VCS[ 1 ],  "https://fhir.bbmri.de/CodeSystem/StorageTemperature" )
-		testthat::expect_equal( df$Specimen$CODE[ 1 ], "temperature2to10" )
-	}
-)
-
-
-#########################################################################################################
 testthat::context( "fhir_search()" )
 
 
@@ -76,28 +46,6 @@ testthat::test_that(
 )
 
 
-#########################################################################################################
-testthat::context( "fhir_crack()" )
-
-design <- list(
-
-	Pat = list(
-		".//Patient",
-		list(
-			name = "name/family/@value"
-		)
-	)
-)
-
-dfs <- fhir_crack( bundles = myBundles, designs = design, sep = "»" )
-
-testthat::test_that(
-	"fhir_crack creates all required data frames", {
-		testthat::expect_equal( is.null( dfs ), F )
-		testthat::expect_equal( is.list( dfs ), T )
-		testthat::expect_equal( is.data.frame( dfs[[ 1 ]] ), T )
-	}
-)
 
 
 #########################################################################################################
@@ -108,7 +56,7 @@ testthat::test_that(
 
 		testthat::skip_on_cran()
 
-		caps <- fhir_capability_statement( "https://hapi.fhir.org/baseR4", sep = " ~ ")
+		caps <- fhir_capability_statement("https://hapi.fhir.org/baseR4", sep = " ~ ")
 
 		testthat::expect_false( is.null( caps ) )
 		testthat::expect_true( is.list( caps ) )
@@ -118,4 +66,56 @@ testthat::test_that(
 	}
 )
 
+#########################################################################################################
+testthat::context( "fhir_crack()" )
+
+xmlfile <- xml2::read_xml( "specimen.xml" )
+
+design <- list(
+
+	Specimen = list(
+		resource = "//extension[@url='https://fhir.bbmri.de/StructureDefinition/StorageTemperature']",
+		cols = list(
+			VCS  = "valueCodeableConcept/coding/system/@value",
+			CODE = "valueCodeableConcept/coding/code/@value"
+		)
+	)
+)
+
+df <- fhir_crack(bundles = list(xmlfile), design)
+
+testthat::test_that(
+	"crack creates a valid data frame", {
+		testthat::expect_false( is.null( df ) )
+		testthat::expect_false( is.null( df$Specimen ) )
+		testthat::expect_true( is.data.frame( df$Specimen ) )
+		testthat::expect_equal( nrow( df$Specimen ), 1 )
+		testthat::expect_equal( df$Specimen$VCS[ 1 ],  "https://fhir.bbmri.de/CodeSystem/StorageTemperature" )
+		testthat::expect_equal( df$Specimen$CODE[ 1 ], "temperature2to10" )
+	}
+)
+
+design <- list(
+
+	Pat = list(
+		resource = ".//Patient",
+		cols = list(
+			name = "name/family/@value"
+		)
+	)
+)
+
+dfs <- fhir_crack( bundles = myBundles, design = design, sep = "»" )
+
+testthat::test_that(
+	"fhir_crack creates all required data frames", {
+		testthat::expect_equal( is.null( dfs ), F )
+		testthat::expect_equal( is.list( dfs ), T )
+		testthat::expect_equal( is.data.frame( dfs[[ 1 ]] ), T )
+	}
+)
+
+
 unlink( "myBundles", recursive = T )
+
+

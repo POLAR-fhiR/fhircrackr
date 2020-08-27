@@ -107,14 +107,19 @@ df_desc15 <- list(
 	)
 )
 
+df_desc16 <- data.frame(
+	resource = "//Patient"
+)
+
 #correct design
 design1 <- list(
-	pat1 = df_desc2#,
-	# pat2 = df_desc2,
-	# pat3 = df_desc3,
-	# pat4 = df_desc4,
-	# pat5 = df_desc5
+	pat1 = df_desc1,
+	pat2 = df_desc2,
+	pat3 = df_desc3,
+	pat4 = df_desc4,
+	pat5 = df_desc5
 )
+
 ##wrong: missing names
 design2 <- list(
 	pat1 = df_desc1,
@@ -123,7 +128,7 @@ design2 <- list(
 	pat4 = df_desc4
 )
 
-#wrong: invalid df_descriptions
+#invalid df_descriptions
 design3 <- list(
 	pat1 = df_desc1,
 	pat3 = df_desc12,
@@ -135,9 +140,30 @@ design4 <- data.frame(
 	pat1 = "//Patient"
 )
 
+design5 <- list(
+	pat1 = df_desc1,
+	pat2 = df_desc2,
+	pat3 = df_desc3,
+	pat4 = df_desc4,
+	pat5 = df_desc5,
+	pat6 = df_desc6,
+	pat7 = df_desc7,
+	pat8 = df_desc8,
+	pat9 = df_desc9,
+	pat10 = df_desc10,
+	pat11 = df_desc11,
+	pat12 = df_desc12,
+	pat13 = df_desc13,
+	pat14 = df_desc14,
+	pat15 = df_desc15,
+	pat16 = df_desc16
+)
+
 pat_bundles <- fhir_unserialize(patient_bundles)
+
+
 #########################################################################################################
-testthat::context("validating designs")
+testthat::context("is_valid_df_desc()")
 
 testthat::test_that(
 
@@ -159,26 +185,49 @@ testthat::test_that(
 		testthat::expect_false(fhircrackr:::is_valid_df_desc(df_desc13)$valid)
 		testthat::expect_false(fhircrackr:::is_valid_df_desc(df_desc14)$valid)
 		testthat::expect_false(fhircrackr:::is_valid_df_desc(df_desc15)$valid)
+		testthat::expect_false(fhircrackr:::is_valid_df_desc(df_desc16)$valid)
 
 	}
 )
 
+testthat::context("is_valid_design()")
 testthat::test_that(
 
 	"is_valid_design() identifies invalid designs",{
-		testthat::expect_true(fhircrackr:::is_valid_design(design1)[[1]])
 
-		testthat::expect_false(fhircrackr:::is_valid_design(design2)[[1]])
-		testthat::expect_false(fhircrackr:::is_valid_design(design3)[[1]])
-		testthat::expect_false(fhircrackr:::is_valid_design(design4)[[1]])
+		testthat::expect_true(suppressWarnings(fhircrackr:::is_valid_design(design1)[[1]]))
+		testthat::expect_false(suppressWarnings(fhircrackr:::is_valid_design(design2)[[1]]))
+		testthat::expect_false(suppressWarnings(fhircrackr:::is_valid_design(design3)[[1]]))
+		testthat::expect_false(suppressWarnings(fhircrackr:::is_valid_design(design4)[[1]]))
+
 
 	}
 )
 
+testthat::context("fhir_crack design warnings")
 
 testthat::test_that(
 
-	"design fixing works in context of fhir_crack",{
-		fhir_crack(pat_bundles, design1, return_design = T)
+	"design warnings are thrown in fhir_crack",{
+		testthat::expect_warning(fhir_crack(pat_bundles, design1, verbose=0), regexp = "There are unnamed elements")
+		testthat::expect_warning(fhir_crack(pat_bundles, design2, verbose=0), regexp = "Argument design should be a named list of data.frame descriptions")
+		testthat::expect_warning(fhir_crack(pat_bundles, design3, verbose=0), regexp = "The following data.frame descriptions in your design seem to be invalid")
+		testthat::expect_warning(fhir_crack(pat_bundles, design4, verbose=0), regexp = "Argument design has to be a list")
+		testthat::expect_warning(fhir_crack(pat_bundles, design5, verbose=0), regexp = "The following data.frame descriptions in your design seem to be invalid")
+	}
+)
+
+testthat::context("fhir_crack return_design")
+
+testthat::test_that(
+
+	"return_design works", {
+		testthat::expect_length(suppressWarnings(fhir_crack(pat_bundles, design1, return_design = TRUE, verbose = 0)$design), 5)
+		testthat::expect_null(suppressWarnings(fhir_crack(pat_bundles, design2, return_design = TRUE, verbose = 0)$design))
+		testthat::expect_length(suppressWarnings(fhir_crack(pat_bundles, design3, return_design = TRUE, verbose = 0)$design), 3)
+		testthat::expect_null(suppressWarnings(fhir_crack(pat_bundles, design4, return_design = TRUE, verbose = 0)$design))
+		testthat::expect_length(suppressWarnings(fhir_crack(pat_bundles, design5, return_design = TRUE, verbose = 0)$design), 16)
+
+
 	}
 )
