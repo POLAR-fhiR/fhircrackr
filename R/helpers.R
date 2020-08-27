@@ -892,13 +892,21 @@ bundles2dfs <-
 					  		cat("\n", n)
 					  	}
 
-					  	bundles2df(
-					  		bundles = bundles,
-					  		df_desc = df_desc,
-					  		# sep = sep,
-					  		# brackets = brackets,
-					  		verbose = verbose
-					  	)
+					  	if(is.null(df_desc)){
+
+					  		NULL
+
+					  	}else{
+
+					  		bundles2df(
+					  			bundles = bundles,
+					  			df_desc = df_desc,
+					  			# sep = sep,
+					  			# brackets = brackets,
+					  			verbose = verbose
+					  		)
+					  	}
+
 					  })
 
 		if (1 < verbose) {
@@ -906,7 +914,13 @@ bundles2dfs <-
 		}
 
 		#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
-		remove <- sapply(design, function(x){x$style$rm_empty_cols})
+		remove <- sapply(design, function(x){
+			if(is.null(x$style$rm_empty_cols)) {
+				FALSE
+			}else{
+				x$style$rm_empty_cols
+			}
+			})
 
 		dfs_cleaned <- lapply(seq_along(dfs),
 					  function(i) {

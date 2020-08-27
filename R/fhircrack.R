@@ -382,7 +382,7 @@ fhir_crack <- function(bundles,
 		}
 
 		#complete design
-		suppressWarnings(design <- fix_design(design))
+		design <- fix_design(design)
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
@@ -435,7 +435,7 @@ fhir_crack <- function(bundles,
 			)
 
 		if (0 < verbose) {
-			message("FHIR-Resources cracked.")
+			message("FHIR-Resources cracked. \n")
 		}
 
 		if(return_design){
@@ -475,9 +475,9 @@ fhir_capability_statement <-
 						verbose = verbose)
 
 		design <- list(
-			META      = list("/CapabilityStatement", "./*/@*"),
-			REST.META = list("/CapabilityStatement/rest", "./*/@*"),
-			REST      = list("/CapabilityStatement/rest/resource")
+			META      = list(resource = "/CapabilityStatement", cols = "./*/@*"),
+			REST.META = list(resource = "/CapabilityStatement/rest", cols = "./*/@*"),
+			REST      = list(resource = "/CapabilityStatement/rest/resource")
 		)
 
 		fhir_crack(
