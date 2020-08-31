@@ -12,7 +12,7 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",eval=F
 )
 ```
 
@@ -72,23 +72,50 @@ length(patient_bundles)
 str(patient_bundles[[1]])
 ```
 
-If for some reason you cannot connect to a FHIR server at the moment but want to explore the following functions anyway, the package provides an example list of bundles containing Patient and MedicationStatement resources. See `?medication_bundles` for how to use it.
+If for some reason you cannot connect to a FHIR server at the moment but want to explore the following functions anyway, the package provides two example lists of bundles containing Patient and MedicationStatement resources. See `patient_bundles` and `?medication_bundles` for how to use them.
 
 Now we know that inside these xml objects there is the patient data somewhere. To get it out, we will use `fhir_crack()`. The most important argument `fhir_crack()` takes is `bundles`, the list of bundles that is returned by `fhir_search()`. The second important argument is `design`, an object that tells the function which data to extract from the bundle. `fhir_crack()` returns a list of data.frames.
 
-In general, `design` has to be a named list containing one element per data frame that will be created. The element names of `design` are going to be the names of the resulting data frames. It usually makes sense to create one data frame per type of resource. Because we have just downloaded resources of the type Patient, the `design` here would be a list of length 1.
+In general, `design` has to be a named list containing one element per data frame that will be created. These named elements  will be called *data.frame descriptions* from here on. The names of the data.frame descriptions in `design` are also going to be the names of the resulting data frames. It usually makes sense to create one data frame per type of resource. Because we have just downloaded resources of the type Patient, the `design` here would be a list of length 1, containing just one data.frame description. In the following we will first describe the different elements of a data.frame description and will then provide several examples.
 
-The elements of `design` are lists themselves. They can be of length 1 or length 2, depending on the level of precision in extracting the attributes. There are three levels of precision in extracting the data for our data frame with `fhir_crack()`:
+The data.frame description itself is again a list, with 3 elements:
+
+1. *resource*
+A string containing an XPath expression to the resource you want to extract, e.g. `"//Patient"`. If your bundles are the result of a regular FHIR search request, the correct XPath expression will always be `"//<resource name>"`.
+
+2. *cols*
+Can be NULL, a string or a list describing the columns your data frame is going to have.
+
+- If *cols* is NULL, all attributes available in the resources will be extracted and put in one column each, the column names will be chosen automatically and reflect the position of the attribute in the resource.
+
+- If *cols* is a string with an XPath expression indicating a certain level in the bundle, all attributes on this specific level will be extracted. `"./*"` e.g. will extract all attributes that are located (exactly) one level below the root level given by `"//Patient"`.
+
+- If *cols* is a named list of XPath expressions, each element is taken to be the description for one column. `family_name = "name/family"` for example creates a column named family_name which contains the values for the attribute indicated by the XPath expression `"name/family"`.
+
+3. *style*
+Can be NULL or a list of length three with the following named elements:
+
+- *sep*: A string defining the seperator used when multiple entries to the same attribute are pasted together, e.g. `"|"`. 
+
+- *brackets* Either NULL or a character vector of length two. If NULL, multiple entries will be pasted together without indices. If character, the two strings provided here are used as brackets for automatically generated indices to sort out multiple entries (see xx). `brackets = c("[", "]")` e.g. will lead to indices like `[1.1]`.  
+
+- *rm_empty_cols*: Logical. If `TRUE`, columns containing only `NA` values will be removed, if `FALSE`, these columns will be kept.
+
+All three elements of style can also be controlled directly by the `fhir_crack()` arguments `sep`, `brackets` and `remove_empty_columns`. If the function arguments are `NULL` (their default), the values provided in *style* are used, if they are not NULL, they will overwrite any values in *style*. If both the function arguments and the *style* component of the data.frame description are NULL, default values(`sep=" "`, `brackets = NULL`, `rm_empty_cols=TRUE`) will be assumed. 
+
+We will now work through examples using designs of different complexity.
 
 #### 1. Extract all available attributes
-If we want to extract all available attributes, the list describing the data frames inside design is a list of length 1, containing only an Xpath expression to the resource type we want to extract:
+Lets start with an example where we only provide the (mandatory) `resource` component of the data.frame description that is called `Patients`in our example. In this case, `fhir_crack()` will extract all available attributes and revert to default values for the *style* component:
 
 ```{r}
-#define which elements of the resources are of interest
+#define design
 design1 <- list(
-  Patients = list(
-   resource =  "//Patient"
-  )
+ 
+	 Patients = list(
+   
+	 	resource =  "//Patient"
+	 )
 )
 
 #Convert resources
@@ -98,18 +125,21 @@ list_of_tables <- fhir_crack(patient_bundles, design1, verbose = 0)
 list_of_tables$Patients[1:5,1:5]
 ```
 
-Note that this can easily become a rather wide and sparse data frame. This is due to the fact that every attribute appearing in at least one of the resources will be turned into a variable (i.e. column), even if none of the other resources contain this attribute. For those resources, the value on that attribute will be set to `NA`. Depending on the variability of the resources, the resulting data frame can contain a lot of `NA` values. If a resource has multiple entries for an attribute, these are pasted together using the string provided in the argument `sep` as a separator. The column names in this option are automatically generated by pasting together the path to the respective attribute, e.g. `name.given.value`
+As you can see, this can easily become a rather wide and sparse data frame. This is due to the fact that every attribute appearing in at least one of the resources will be turned into a variable (i.e. column), even if none of the other resources contain this attribute. For those resources, the value on that attribute will be set to `NA`. Depending on the variability of the resources, the resulting data frame can contain a lot of `NA` values. If a resource has multiple entries for an attribute, these entries will pasted together using the string provided in `sep` as a separator. The column names in this option are automatically generated by pasting together the path to the respective attribute, e.g. `name.given.value`
 
 #### 2. Extract all attributes at certain levels
-We can extract all attributes that are found on certain levels of the resource, if we specify this level in an XPath expression and provide it as the second element of the list describing the data.frame:
+We can extract all attributes that are found on certain levels of the resource, if we specify this level in an XPath expression and provide it in the `cols` argument of the data.frame description:
 
 ```{r}
-#define which elements of the resources are of interest
+#define design
 design2 <- list(
-  Patients = list(
-   resource =  "//Patient",
-    cols = "./*"
-  )
+  
+	Patients = list(
+   
+		resource =  "//Patient",
+    
+		cols = "./*"
+	 )
 )
 
 #Convert resources
@@ -119,25 +149,27 @@ list_of_tables <- fhir_crack(patient_bundles, design2, verbose = 0)
 head(list_of_tables$Patients)
 ```
 
-`"./*"` for example tells `fhir_crack()` to extract all attributes that are located (exactly) one level below the Patient's level given by the XPath expression `//Patient`. In this case, the column names are still automatically generated. Combinations of XPath expressions with conditions are also allowed.  
+`"./*"`tells `fhir_crack()` to extract all attributes that are located (exactly) one level below the root level. The column names are still automatically generated.
 
 
 #### 3. Extract specific attributes
-If we know exactly which attributes we want to extract, we can specify them in a named list that we provide as the second element of the list describing the data.frame:
+If we know exactly which attributes we want to extract, we can specify them in a named list that we in the `cols` component of the data.frame description:
 
 ```{r}
-#define which elements of the resources are of interest
+#define design
 design3 <- list(
 
 	Patients = list(
+		
 		resource = "//Patient",
+		
 		cols = list(
 			PID           = "id",
-			NAME.USE      = "name/use",
-			NAME.GIVEN    = "name/given",
-			NAME.FAMILY   = "name/family",
-			GENDER        = "gender",
-			BIRTHDAY      = "birthDate"
+			use_name      = "name/use",
+			given_name    = "name/given",
+			family_name   = "name/family",
+			gender        = "gender",
+			birthday      = "birthDate"
 		)
 	)
 )
@@ -147,8 +179,38 @@ list_of_tables <- fhir_crack(patient_bundles, design3, verbose = 0)
 #have look at the results
 head(list_of_tables$Patients)
 ```
-This option will usually return the most tidy and clear data frames, because you have full control over the extracted columns including their name in the resulting data frame. You should always extract the resource id, because this is used to link to other resources you might also extract. If you are not sure which attributes are available or where they are located in the resource, it can be helpful to start by extracting all available attributes. Then you can get an overview over the available attributes and their location and continue by doing a second, more targeted extraction to get your final data frame.
+This option will usually return the most tidy and clear data frames, because you have full control over the extracted columns including their name in the resulting data frame. You should always extract the resource id, because this is used to link to other resources you might also extract. If you are not sure which attributes are available or where they are located in the resource, it can be helpful to start by extracting all available attributes. If you are more comfortable with xml, you can also use `xml2::xml_structure` on one of the bundles from you bundle list, this will print the complete xml structure into you console. Then you can get an overview over the available attributes and their location and continue by doing a second, more targeted extraction to get your final data frame.
 
+
+#### 4. Set *style* component
+Even though our example doesn't contain multiple entries, here is what a complete data.frame description would look like:
+
+```{r}
+design3 <- list(
+
+	Patients = list(
+		
+		resource = "//Patient",
+		
+		cols = list(
+			PID           = "id",
+			use_name      = "name/use",
+			given_name    = "name/given",
+			family_name   = "name/family",
+			gender        = "gender",
+			birthday      = "birthDate"
+		),
+		
+		style = list(
+			sep = "|",
+			brackets = c("[","]"),
+			rm_empty_cols = FALSE
+		)
+	)
+)
+``` 
+
+##Hier Weiter 
 Of course the previous example is using just one resource type. If you are interested in several types of resources, `design` will have more elements and the result will be a list of several data frames.
 
 The abstract form `design` should therefore have is:
