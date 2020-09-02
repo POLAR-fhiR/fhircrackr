@@ -353,11 +353,43 @@ design2xml <- function (design) {
 	xml2::xml_root(xml)
 }
 
-save_design <- function (design, file = "design.xml") {
+
+
+#' Write design to xml
+#' @description Writes a design for use with \code{\link{fhir_crack}} to an xml file
+#'
+#' @param design A list representing a valid design as used in \code{\link{fhir_crack}}
+#' @param file A string specifying the file to write to, defaults to writing "design.xml"
+#' into the current working directory
+#' @export
+#'
+#' @examples
+#' design <- list(
+#'    Pat = list(
+#'       resource = "//Patient",
+#'       cols = "./*"
+#'    )
+#'
+#' )
+#'
+#' fhir_save_design(design, file = tempfile())
+
+fhir_save_design <- function (design, file = "design.xml") {
+
+	validity <- is_valid_design(design)
+
+	if(!validity[[1]]){
+
+		message("Design could not be saved. \n")
+
+		invisible()
+
+		}
 
 	xml <- design2xml(design = design)
 
-	xml2::write_xml(xml, file)
+	invisible(xml2::write_xml(xml, file))
+
 }
 
 
@@ -405,22 +437,26 @@ xml2design <- function(xml) {
 		} else {
 
 			columns <- xml2::xml_find_all(xml_df_desc, "cols")
-			if (length(columns) < 1) {
+
+			if (length(columns) < 1) { #no cols element at all
 				columns_list <- NULL
+				warning(paste0("cols entry missing in data frame description for resource ", resources_names[i], ". Returning NULL for cols. \n"))
+
 			} else {
-				columns_list <- xml2::xml_find_all(columns, "*")
-				if (length(columns_list) < 1) columns_list <- NULL
+
+				columns_list <- xml2::xml_find_all(columns, "*") #look into cols
+				if (length(columns_list) < 1) {columns_list <- NULL} #cols is not a list
 			}
 
-			if (0 < length(columns_list)) {
+			if (0 < length(columns_list)) { #cols is list
 				col_names <- xml2::xml_name(columns_list)
 				col_values <- xml2::xml_attr(columns_list, "value")
 				col_list <- as.list(col_values)
 				names(col_list) <- col_names
-			} else if (1 == length(columns)) {
+
+			} else if (1 == length(columns)) { #cols is single string
 				col_list <- xml2::xml_attr(columns, "value")
 				if (all(is.na(col_list))) {
-					warning(paste0("cols entry missing in data frame description for resource ", resources_names[i], ". Returning NULL for cols. \n"))
 					col_list <- NULL
 				}
 			} else {
@@ -459,8 +495,33 @@ xml2design <- function(xml) {
 	l
 }
 
+#' Load design from xml
+#' @description Loads a design for use with \code{\link{fhir_crack}} from an xml file into R
+#'
+#' @param file A string specifying the file from which to read
+#'
+#' @return A list representing a valid design for \code{\link{fhir_crack}}
+#' @export
+#'
+#' @examples
+#'
+#' #create and save design
+#' design <- list(
+#'    Pat = list(
+#'       resource = "//Patient",
+#'       cols = "./*"
+#'    )
+#'
+#' )
+#' temp <- tempfile()
+#'
+#' fhir_save_design(design, file = temp)
 
-load_design <- function (file) {
+#' design <- fhir_load_design(temp)
+
+
+#'
+fhir_load_design <- function (file) {
 	xml <- xml2::read_xml(file)
 	xml2design(xml)
 }

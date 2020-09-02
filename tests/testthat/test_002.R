@@ -160,8 +160,6 @@ design5 <- list(
 )
 
 pat_bundles <- fhir_unserialize(patient_bundles)
-
-
 #########################################################################################################
 testthat::context("is_valid_df_desc()")
 
@@ -190,6 +188,7 @@ testthat::test_that(
 	}
 )
 
+########################################################################
 testthat::context("is_valid_design()")
 testthat::test_that(
 
@@ -204,6 +203,7 @@ testthat::test_that(
 	}
 )
 
+#################################################################################
 testthat::context("fhir_crack design warnings")
 
 testthat::test_that(
@@ -217,6 +217,7 @@ testthat::test_that(
 	}
 )
 
+#############################################################################################
 testthat::context("fhir_crack return_design")
 
 testthat::test_that(
@@ -229,5 +230,19 @@ testthat::test_that(
 		testthat::expect_length(suppressWarnings(fhir_crack(pat_bundles, design5, return_design = TRUE, verbose = 0)$design), 16)
 
 
+	}
+)
+
+
+##############################################################################
+testthat::context("save/load design")
+
+testthat::test_that(
+
+	"saving/loading design works", {
+		temp <- tempfile()
+		testthat::expect_silent(fhir_save_design(design = list(pat=list(resource = "//Patient")), file =temp))
+		testthat::expect_silent(dsn <- fhir_load_design(temp))
+		testthat::expect_true(is_valid_design(dsn)[[1]])
 	}
 )
