@@ -21,3 +21,18 @@ Wenn resource, cols und style ohne Namen und in der falschen Reihenfolge angegeb
 
 ### Lösung:
 Wenn Listenelemente namenlos sind, wirft fix jetzt eine Warnung, die beschreibt, welche Reihenfolge von Elementen angenommen wird.
+
+
+-----------------------------------------
+-----------------------------------------
+
+## 02.09.2020
+- branch: crack_by_design_jg
+- Funktionen: save_design load_design
+
+### Problem:
+Beide Funktionen passen nicht ins Namensschema, weil sämtliche andere Funktionen mit fhir_ beginnen
+
+### Lösung: 
+Funktionsnamen in fhir_save_design und fhir_load_design geändert. Außerdem Validitätscheck in fhir_save_design eingebaut.
+
