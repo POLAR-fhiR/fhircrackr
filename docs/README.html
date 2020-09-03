@@ -380,23 +380,24 @@ summary {
 </ul>
 </div>
 <div id="download-fhir-resources-from-a-server" class="section level2">
-<h2>Download fhir resources from a server</h2>
+<h2>Download FHIR resources from a server</h2>
 <pre class="r"><code>bundles &lt;- fhir_search(&quot;https://hapi.fhir.org/baseR4/MedicationStatement?_include=MedicationStatement:subject&quot;, max.bundles=5)</code></pre>
 <p>To download resources from a FHIR server into R, you use the function <code>fhir_search()</code>. This function requires you to state a full FHIR search request such as <code>https://hapi.fhir.org/baseR4/MedicationStatement?_include=MedicationStatement:subject</code> in the argument <code>request</code>. This example request downloads all MedicationStatement resources and the Patient resources they link to.</p>
 <p>If you want to connect to a FHIR server that uses basic authentication, you can supply the arguments <code>username</code> and <code>password</code>. Because endpoints can sometimes be hard to reach, <code>fhir_search()</code> will start five attempts to connect to the endpoint before it gives up. With the arguments <code>max_attempts</code> and <code>delay_between_attempts</code> you can control this number as well the time interval between attempts.</p>
 <p>In general, a FHIR search request returns a <em>bundle</em> of the resources you requested. If there are a lot of resources matching your request, the search result isn’t returned in one big bundle but distributed over several of them. If the argument <code>max_bundles</code> is set to its default <code>Inf</code>, <code>fhir_search()</code> will return all available bundles, meaning all resources matching your request. If you set it to another number, the download will stop once it has reached the specified number of bundles. Note that in this case, the result <em>may not contain all</em> the resources from the server matching your request!</p>
 <p><code>fhir_search()</code> returns a list of xml objects where each list element represents one bundle of resources.</p>
 </div>
-<div id="turn-fhir-resources-into-data-frames" class="section level2">
-<h2>Turn fhir resources into data frames</h2>
-<p>If you want to do statistical analyses, the xml format the resources come in is not very useful. Instead, we need the data in some matrix like form, preferably as a data frame.</p>
+<div id="flatten-fhir-resources-into-data-frames" class="section level2">
+<h2>Flatten FHIR resources into data frames</h2>
+<p>If you want to do statistical analyses, the xml format the resources come in is not very useful. Instead, we need the data in some matrix like form, preferably as a data frame. Most of the times it makes sense to create one data frame per type of resource (e.g. Patient, MedicationStatement).</p>
 <p>We can achieve this using the <code>fhir_crack()</code> function.</p>
-<pre class="r"><code>#define which elements of the resources are of interest
-designs &lt;- list(
+<pre class="r"><code>#define design
+
+design &lt;- list(
 
   MedicationStatements = list(
-    &quot;//MedicationStatement&quot;,
-    list(
+    resource = &quot;//MedicationStatement&quot;,
+    cols = list(
       STATUS             = &quot;status&quot;,
       MEDICATION.SYSTEM  = &quot;medicationCodeableConcept/coding/system&quot;,
       MEDICATION.CODE    = &quot;medicationCodeableConcept/coding/code&quot;,
@@ -404,107 +405,100 @@ designs &lt;- list(
       PATIENT            = &quot;subject/reference&quot;,
       START              = &quot;effectivePeriod/start&quot;,
       END                = &quot;effectivePeriod/end&quot;
+    ),
+    style = list(
+    sep = &quot; &quot;,
+    brackets = c(&quot;[&quot;, &quot;]&quot;),
+    rm_empty_cols = FALSE
     )
   ),
 
   Patients = list(
-    &quot;//Patient&quot;,
-    list(
-      NAME.GIVEN  = &quot;name/given&quot;,
-      NAME.FAMILY = &quot;name/family&quot;,
-      SEX         = &quot;gender&quot;,
-      BIRTHDATE   = &quot;birthDate&quot;
-    )
+    resource = &quot;//Patient&quot;,
+    cols = &quot;./*&quot;
   )
 )
 
 #Convert resources
-dfs &lt;- fhir_crack(bundles, designs)
+dfs &lt;- fhir_crack(bundles = bundles, design = design)
 
 #Inspect results
 View(df$Patients)</code></pre>
-<p><code>fhir_crack()</code> takes a list of bundles as returned by <code>fhir_search()</code> and a list of <code>designs</code> defining the data to be extracted from the resources and returns a list of data frames.</p>
-<p><code>designs</code> should be a named list, where each element of <code>designs</code> corresponds to data frame design which defines how the data frame will be created. The element names of <code>designs</code> are going to be the names of the data.frames in the result of the function.</p>
-<p>It makes sense to create one data frame per type of resource (MedicationStatement and Patient in this case). Lets have a look at the element <code>Medication</code> from the above example of <code>design</code> to understand how it works:</p>
-<p><code>Medication</code> is a list of length 2, where the first element is an XPath expression selecting the nodes (i.e. resources) matching a MedicationStatement, so this element is used to define the type of resource in this data frame.</p>
-<p>The second element is again a list, this time a named list. Each element corresponds to one variable (i.e. column) in the resulting data frame. The name (e.g. <code>Status</code>) will be the column name, the column values will be taken from the attribute defined by the following XPath expression (e.g. <code>&quot;status&quot;</code>).</p>
-<p>The abstract form <code>designs</code> therefore has is:</p>
-<pre class="r"><code>list(
-
-  &lt;Name of first data frame&gt; = list(
-    &lt;XPath to resource type&gt;,
-    list(
-      &lt;column name 1&gt; = &lt;XPath to attribute&gt;,
-      &lt;column name 2&gt; = &lt;XPath to attribute&gt;
-      ...
-    )
-  ),
-
-  &lt;Name of second data frame&gt; = list(
-    &lt;XPath to resource type&gt;,
-    list(
-      &lt;column name 1&gt; = &lt;XPath to attribute&gt;,
-      &lt;column name 2&gt; = &lt;XPath to attribute&gt;
-      ...
-    )
-  ),
-  ...
-)</code></pre>
-<p>There are other forms <code>designs</code> can take, for example if you want to extract all attributes or only attributes from a certain level of the resource. To get to know these options, please see the package vignette.</p>
+<p><code>fhir_crack()</code> takes a list of bundles as returned by <code>fhir_search()</code> and a list <code>design</code> which contains one or more data.frame descriptions (two called <code>Patients</code> and <code>MedicationStatements</code> in the above example) defining the data to be extracted from the resources. <code>fhir_crack()</code> returns a list of data frames, one for each data.frame description.</p>
+<p>The <code>design</code> has to follow a specific structure. It must be a named list of data.frame descriptions, where each data.frame description is a list with the following elements:</p>
+<ol style="list-style-type: decimal">
+<li><p><em>resource</em> A string containing an XPath expression to the resource you want to extract, e.g. <code>&quot;//Patient&quot;</code>. If your bundles are the result of a regular FHIR search request, the correct XPath expression will always be <code>&quot;//&lt;resource name&gt;&quot;</code>.</p></li>
+<li><p><em>cols</em> Can be NULL, a string or a list describing the columns your data frame is going to have.</p></li>
+</ol>
+<ul>
+<li><p>If <em>cols</em> is NULL, all attributes available in the resources will be extracted and put in one column each, the column names will be chosen automatically and reflect the position of the attribute in the resource.</p></li>
+<li><p>If <em>cols</em> is a string with an XPath expression indicating a certain level in the bundle, all attributes on this specific level will be extracted. <code>&quot;./*&quot;</code> e.g. will extract all attributes that are located (exactly) one level below the root level given by <code>&quot;//Patient&quot;</code>.</p></li>
+<li><p>If <em>cols</em> is a named list of XPath expressions, each element is taken to be the description for one column. <code>PATIENT = &quot;subject/reference&quot;</code> for example creates a column named PATIENT which contains the values for the attribute indicated by the XPath expression <code>&quot;subject/reference&quot;</code>.</p></li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li><em>style</em> Can be NULL or a list of length three with the following named elements:</li>
+</ol>
+<ul>
+<li><p><em>sep</em>: A string defining the seperator used when multiple entries to the same attribute are pasted together, e.g. <code>&quot; &quot;</code>.</p></li>
+<li><p><em>brackets</em> Either NULL or a character vector of length two. If NULL, multiple entries will be pasted together without indices. If character, the two strings provided here are used as brackets for automatically generated indices to sort out multiple entries. <code>brackets = c(&quot;[&quot;, &quot;]&quot;)</code> e.g. will lead to indices like <code>[1.1]</code>.</p></li>
+<li><p><em>rm_empty_cols</em>: Logical. If <code>TRUE</code>, columns containing only <code>NA</code> values will be removed, if <code>FALSE</code>, these columns will be kept.</p></li>
+</ul>
+<p>All three elements of style can also be controlled directly by the <code>fhir_crack()</code> arguments <code>sep</code>, <code>brackets</code> and <code>remove_empty_columns</code>. If the function arguments are <code>NULL</code> (their default), the values provided in <em>style</em> are used, if they are not NULL, they will overwrite any values in <em>style</em>. If both the function arguments and the <em>style</em> component of the data.frame description are NULL, default values(<code>sep=&quot; &quot;</code>, <code>brackets = NULL</code>, <code>rm_empty_cols=TRUE</code>) will be assumed.</p>
+<p>For detailed examples of the different variants of the <code>design</code> please see the package vignette.</p>
 </div>
 <div id="multiple-entries" class="section level2">
 <h2>Multiple entries</h2>
-<p>When there are multiple entries to one attribute, e.g. multiple addresses for the same Patient resource, <code>fhir_crack()</code> will paste these entries together using the string provided in the argument <code>sep</code>. If you set <code>add_indices=TRUE</code>, the entries will be assigned indices to allow you to distinguish between entries:</p>
+<p>When there are multiple entries to one attribute, e.g. multiple addresses for the same Patient resource, <code>fhir_crack()</code> will paste these entries together using the string provided in the argument <code>sep</code>. If you set <code>brackets=c(&#39;[&#39;, &#39;]&#39;)</code>, the entries will be assigned to indices to allow you to distinguish between entries. The indices are surrounded by the given brackets:</p>
 <pre class="r"><code>#create example bundle with multiple entries
 
 bundle&lt;-xml2::read_xml(
     &quot;&lt;Bundle&gt;
         
         &lt;Patient&gt;
-            &lt;id value='id1'/&gt;
+            &lt;id value=&#39;id1&#39;/&gt;
             &lt;address&gt;
-                &lt;use value='home'/&gt;
-                &lt;city value='Amsterdam'/&gt;
-                &lt;type value='physical'/&gt;
-                &lt;country value='Netherlands'/&gt;
+                &lt;use value=&#39;home&#39;/&gt;
+                &lt;city value=&#39;Amsterdam&#39;/&gt;
+                &lt;type value=&#39;physical&#39;/&gt;
+                &lt;country value=&#39;Netherlands&#39;/&gt;
             &lt;/address&gt;
-            &lt;birthDate value='1992-02-06'/&gt;
+            &lt;birthDate value=&#39;1992-02-06&#39;/&gt;
         &lt;/Patient&gt;
         
         &lt;Patient&gt;
-            &lt;id value='id2'/&gt;
+            &lt;id value=&#39;id2&#39;/&gt;
             &lt;address&gt;
-                &lt;use value='home'/&gt;
-                &lt;city value='Rome'/&gt;
-                &lt;type value='physical'/&gt;
-                &lt;country value='Italy'/&gt;
+                &lt;use value=&#39;home&#39;/&gt;
+                &lt;city value=&#39;Rome&#39;/&gt;
+                &lt;type value=&#39;physical&#39;/&gt;
+                &lt;country value=&#39;Italy&#39;/&gt;
             &lt;/address&gt;
             &lt;address&gt;
-                &lt;use value='work'/&gt;
-                &lt;city value='Stockholm'/&gt;
-                &lt;type value='postal'/&gt;
-                &lt;country value='Sweden'/&gt;
+                &lt;use value=&#39;work&#39;/&gt;
+                &lt;city value=&#39;Stockholm&#39;/&gt;
+                &lt;type value=&#39;postal&#39;/&gt;
+                &lt;country value=&#39;Sweden&#39;/&gt;
             &lt;/address&gt;          
-            &lt;birthDate value='1980-05-23'/&gt;
+            &lt;birthDate value=&#39;1980-05-23&#39;/&gt;
         &lt;/Patient&gt;
         
         &lt;Patient&gt;
-            &lt;id value='id3'/&gt; 
+            &lt;id value=&#39;id3&#39;/&gt; 
             &lt;address&gt;
-                &lt;use value='home'/&gt;
-                &lt;city value='Berlin'/&gt;
+                &lt;use value=&#39;home&#39;/&gt;
+                &lt;city value=&#39;Berlin&#39;/&gt;
             &lt;/address&gt;
             &lt;address&gt;
-                &lt;type value='postal'/&gt;
-                &lt;country value='France'/&gt;
+                &lt;type value=&#39;postal&#39;/&gt;
+                &lt;country value=&#39;France&#39;/&gt;
             &lt;/address&gt;
             &lt;address&gt;
-                &lt;use value='work'/&gt;
-                &lt;city value='London'/&gt;
-                &lt;type value='postal'/&gt;
-                &lt;country value='England'/&gt;
+                &lt;use value=&#39;work&#39;/&gt;
+                &lt;city value=&#39;London&#39;/&gt;
+                &lt;type value=&#39;postal&#39;/&gt;
+                &lt;country value=&#39;England&#39;/&gt;
             &lt;/address&gt;
-            &lt;birthDate value='1974-12-25'/&gt;
+            &lt;birthDate value=&#39;1974-12-25&#39;/&gt;
         &lt;/Patient&gt;      
         
     &lt;/Bundle&gt;&quot;
@@ -555,9 +549,16 @@ head(bundles[[1]])</code></pre>
 <pre class="r"><code>#save bundles as xml files
 fhir_save(patient_bundles, directory=&quot;MyDirectory&quot;)</code></pre>
 <p>To read bundles saved with <code>fhir_save()</code> back into R, you can use <code>fhir_load()</code>:</p>
-<pre class="{r}"><code>bundles &lt;- fhir_load(&quot;MyDirectory&quot;)</code></pre>
+<pre class="r"><code>bundles &lt;- fhir_load(&quot;MyDirectory&quot;)</code></pre>
 <p><code>fhir_load()</code> takes the name of the directory (or path to it) as its only argument. All xml-files in this directory will be read into R and returned as a list of bundles in xml format just as returned by <code>fhir_search()</code>.</p>
 </div>
+</div>
+<div id="save-and-read-designs" class="section level2">
+<h2>Save and read designs</h2>
+<p>If you want to save a design for later or to share with others, you can do so using the <code>fhir_save_design()</code>. This function takes a design and saves it as an xml file:</p>
+<pre class="r"><code>fhir_save_design(design1, file = paste0(temp_dir,&quot;\\design.xml&quot;))</code></pre>
+<p>To read the design back into R, you can use <code>fhir_load_design()</code>:</p>
+<pre class="r"><code>fhir_load_design(paste0(temp_dir,&quot;\\design.xml&quot;))</code></pre>
 </div>
 <div id="acknowledgements" class="section level2">
 <h2>Acknowledgements</h2>

@@ -109,7 +109,7 @@ fix_df_desc <- function (df_desc) {
 		}
 	}
 
-	df_desc$style$brackets <- fix_brackets(df_desc$style$brackets)
+	df_desc$style["brackets"] <- list(fix_brackets(df_desc$style$brackets))
 
 	return(list(value = df_desc, msg=msg))
 }

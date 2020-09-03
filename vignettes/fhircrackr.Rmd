@@ -99,7 +99,7 @@ Can be NULL or a list of length three with the following named elements:
 
 - *sep*: A string defining the seperator used when multiple entries to the same attribute are pasted together, e.g. `"|"`. 
 
-- *brackets* Either NULL or a character vector of length two. If NULL, multiple entries will be pasted together without indices. If character, the two strings provided here are used as brackets for automatically generated indices to sort out multiple entries (see xx). `brackets = c("[", "]")` e.g. will lead to indices like `[1.1]`.  
+- *brackets* Either NULL or a character vector of length two. If NULL, multiple entries will be pasted together without indices. If character, the two strings provided here are used as brackets for automatically generated indices to sort out multiple entries (see paragraph Multiple Entries). `brackets = c("[", "]")` e.g. will lead to indices like `[1.1]`.  
 
 - *rm_empty_cols*: Logical. If `TRUE`, columns containing only `NA` values will be removed, if `FALSE`, these columns will be kept.
 

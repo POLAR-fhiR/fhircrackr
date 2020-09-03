@@ -36,3 +36,15 @@ Beide Funktionen passen nicht ins Namensschema, weil sämtliche andere Funktione
 ### Lösung: 
 Funktionsnamen in fhir_save_design und fhir_load_design geändert. Außerdem Validitätscheck in fhir_save_design eingebaut.
 
+------------------------------------------
+------------------------------------------
+
+## 03.09.2020
+- branch: crack_by_design_jg
+- Funktion : bundle2df()
+
+### Problem: 
+Wenn eine Fehlerhafte Ressource angegeben wird, wird die Warnmedlung, dass die Ressource nicht im Bundle auftaucht wiederholt für jedes Bundle geprintet, d.h. bei vielen Bundles hat man die identische Warnmeldung ganz oft untereinander. 
+
+### Lösung:
+Weil ja sowieso einfach ein leerer df zurückgegeben wird, wenn die Ressource nicht im bundle steckt und "nichts schlimmes" passiert, habe ich die Warnung jetzt erstmal auskommentiert.

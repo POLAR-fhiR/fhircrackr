@@ -687,7 +687,7 @@ bundle2df <- function(bundle,
 
 		df.list <- if (length(children) == 0) {
 
-			warning(paste0(esc(xpath), " seems not to be present in the bundles."))
+			#warning("The following resource you provided seems not to be present in one or more bundle:", paste0(esc(xpath)))
 			list()
 
 		} else {
@@ -749,7 +749,7 @@ bundle2df <- function(bundle,
 				   })
 		}
 
-		rbind_list_of_data_frames(list = df.list)
+		suppressWarnings(rbind_list_of_data_frames(list = df.list))
 	}
 
 #' Convert several bundles to one data frame
@@ -925,7 +925,7 @@ bundles2dfs <-
 		dfs_cleaned <- lapply(seq_along(dfs),
 					  function(i) {
 
-					  	if(remove[i]){
+					  	if(remove[i] && ncol(dfs[[i]]) > 0){
 
 					  	cols <- names(dfs[[i]])[sapply(dfs[[i]], function(col){ 0 < sum(!is.na(col))})]
 

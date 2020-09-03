@@ -387,37 +387,31 @@ fhir_crack <- function(bundles,
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
 
-			lapply(design, function(x){
-					if(is.list(x)){
-						x$style$sep <- sep
-						x
-					}
-				}
-			)
+			design <- lapply(design, function(x){
+							x$style$sep <- sep
+							x
+							}
+						)
 		}
 
 		if(!is.null(brackets)) {
 
-			if(length(brackets) < 2) {brackets <- c(brackets[1], brackets[1])}
+			brackets <- fix_brackets(brackets)
 
-			lapply(design, function(x){
-				if(is.list(x)){
-					x$style$brackets <- brackets
-					x
-				}
-			}
-			)
+			design <-lapply(design, function(x){
+						x$style$brackets <- brackets
+						x
+						}
+					)
 		}
 
 		if(!is.null(remove_empty_columns)) {
 
-			lapply(design, function(x){
-				if(is.list(x)){
-					x$style$rm_empty_cols <- remove_empty_columns
-					x
-				}
-			}
-			)
+			design <- lapply(design, function(x){
+							x$style$rm_empty_cols <- remove_empty_columns
+							x
+							}
+						)
 		}
 
 		#Add attributes to design
