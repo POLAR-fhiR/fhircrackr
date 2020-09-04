@@ -6,44 +6,65 @@
 \usage{
 fhir_crack(
   bundles,
-  designs,
-  sep = " -+- ",
-  remove_empty_columns = FALSE,
+  design,
+  sep = NULL,
+  remove_empty_columns = NULL,
   brackets = NULL,
-  verbose = 2
+  verbose = 2,
+  return_design = FALSE,
+  add_indices
 )
 }
 \arguments{
 \item{bundles}{A FHIR search result as returned by \code{\link{fhir_search}}.}
 
-\item{designs}{A named list specifying which data frame should contain which entries of the bundle.
-The names correspond to the names of the resulting data frames.
+\item{design}{A named list of data frame descriptions.
+Each data frame description will produce one data frame in the list of data frames returned by \code{fhir_crack}, where the data frame has the same name as the data frame description in \code{design}.
 
-Each element of designs is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
-FHIR bundle page. There are 3 options for the second element of that list:
+Each data frame description is a list of 3 named elements:
 
-- There is no second element: all attributes of the resource are extracted
+1) \code{design$resource}: Mandatory. A string with an XPath expression locating the entries for this data frame in a FHIR bundle page. This is usually the path to a resource tpye
+ such as \code{"//Patient"} or \code{"//Observation"}.
 
-- The second element is a string containing a XPath expression to all the values that should be extracted. "./@value" e.g. would extract all
-  values on the root level.
+2) \code{design$cols}: Optional. Either a string containing an XPath expression referencing a certain level of attributes that should be extracted (
+ \code{"./@value"} e.g. would extract all values on the root level) or a named list where the elements are XPath expressions indicating the specific
+  position of attributes to extract and the names of the list elements are the column names of the resulting data frame. If \code{design$cols} is \code{NULL},
+  all available attributes will be extracted.
 
-- The second element is a named list where the elements are XPath expressions indicating the specific position of values to extract,
- where the names of the list elements are the column names of the resulting data frame.
+3) \code{design$style}: Optional. This can be used instead of the function arguments \code{sep}, \code{brackets} and \code{remove_empty_columns}, but will be
+overwritten if the corresponding function arguments are not \code{NULL}.
 
-For a more detailed explanation see the package vignette.}
+A named list with the following optional elements:
 
-\item{sep}{A string to separate pasted multiple entries.}
+   a) \code{design$style$sep} : A string to separate pasted multiple entries.
 
-\item{remove_empty_columns}{Logical scalar. Remove empty columns?}
+   b) \code{design$style$brackets}: A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
+      If \code{NULL}, no indices will be added to multiple entries.
 
-\item{brackets}{A character vector of length two defining the Brackets surrounding the indices. e.g. c( "<", ">"). NULL means no brackets.}
+   c) \code{design$style$rm_empty_cols}: Logical scalar. Remove empty columns?
 
-\item{verbose}{An Integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
-extraction progress will be printed. Defaults to 2.
-#' @return A list of data frames as specified by \code{designs}.}
+For a more detailed explanation and comprehensive examples of \code{design}, please see the package vignette.}
+
+\item{sep}{A string to separate pasted multiple entries. NULL means \code{sep} is looked up in design, if it is \code{NULL} there too, \code{sep} will be set to \code{" "} as the default.}
+
+\item{remove_empty_columns}{Logical scalar. Remove empty columns? \code{NULL} means \code{remove_empty_columns} is looked up in \code{design}, if it is \code{NULL} there too, \code{remove_empty_columns}
+will be set to \code{TRUE} as the default.}
+
+\item{brackets}{A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
+If \code{NULL}, no indices will be added to multiple entries. \code{NULL} means \code{brackets} is looked up in design, if it is \code{NULL} there too, no indices are added.}
+
+\item{verbose}{An Integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
+extraction progress will be printed. Defaults to 2.}
+
+\item{return_design}{Logical scalar. If \code{TRUE}, the complete design with automatically by fhir_crack
+amended elements is returned as the last element of the returned list. Defaults to \code{FALSE}}
+
+\item{add_indices}{Deprecated. This argument was used to control adding of indices for multiple entries. This is now
+done via the brackets argument. If brackets is \code{NULL}, no indices are added, if brackets is not \code{NULL}, indices are added to multiple entries.}
 }
 \value{
-A list of data frames as specified by \code{designs}
+A list of data frames (if \code{return_design = FALSE}) or a list of data frames and the
+utilized \code{design}, if \code{return_design = TRUE}.
 }
 \description{
 Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
@@ -53,38 +74,45 @@ Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of
 bundles <- fhir_unserialize(medication_bundles)
 
 #define attributes to extract
-designs <- list(
+design <- list(
 
  #define specifically which elements to extract
 	MedicationStatement = list(
 
-		".//MedicationStatement",
+		resource = ".//MedicationStatement",
 
-		list(
-			MS.ID              = "id",
-			STATUS.TEXT        = "text/status",
-			STATUS             = "status",
-			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-			MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-			MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-			DOSAGE             = "dosage/text",
-			PATIENT            = "subject/reference",
-			LAST.UPDATE        = "meta/lastUpdated"
-		)
+		cols = list(
+				MS.ID              = "id",
+				STATUS.TEXT        = "text/status",
+				STATUS             = "status",
+				MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+				MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+				MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+				DOSAGE             = "dosage/text",
+				PATIENT            = "subject/reference",
+				LAST.UPDATE        = "meta/lastUpdated"
+		),
+
+		style = list(
+				sep = " ",
+				brackets = c("[", "]"),
+				rm_empty_cols= FALSE
+				)
 	),
 
  #extract all values
 	Patients = list(
 
-		".//Patient"
+		resource = ".//Patient"
 	)
 )
 
 #convert fhir to data frames
-list_of_tables <- fhir_crack(bundles, designs)
+list_of_tables <- fhir_crack(bundles, design)
 
 #check results
 head(list_of_tables$MedicationStatement)
 head(list_of_tables$Patients)
+
 
 }

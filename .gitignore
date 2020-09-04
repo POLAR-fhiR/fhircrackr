@@ -49,3 +49,5 @@ vignettes/*.pdf
 
 tmp/*
 inst/doc
+doc
+Meta

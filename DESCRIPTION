@@ -36,7 +36,8 @@ Imports:
     stringr,
     httr,
     utils,
-    dplyr
+    dplyr,
+    plyr
 Suggests: 
     knitr,
     rmarkdown

@@ -69,65 +69,6 @@ rbind_list_of_data_frames <- function(list) {
 }
 
 
-#' @description Remove attributes from xpath expressions
-#'
-#' @param designs a fhircrackr design list.
-#'
-#' @return A design list without attributes in all xpath expressions.
-#' @noRd
-
-remove_attribute_from_design <- function(designs) {
-	for (n_d in names(designs)) {
-		if (1 < length(designs[[n_d]])) {
-			if (1 < length(designs[[n_d]][[2]])) {
-				for (n_c in names(designs[[n_d]][[2]])) {
-					txt <- designs[[n_d]][[2]][[n_c]]
-					txt <- sub("/@(\\w|\\*)+$", "", txt)
-					designs[[n_d]][[2]][[n_c]] <- txt
-				}
-			}
-			else {
-				txt <- designs[[n_d]][[2]]
-				txt <- sub("/@(\\w|\\*)+$", "", txt)
-				designs[[n_d]][[2]] <- txt
-			}
-		}
-	}
-	designs
-}
-
-#' @description Add attributes to xpath expressions
-#'
-#' @param designs A fhircrackr design list.
-#' @param attrib The attribute that should be added to the xpath expressions. Default is 'value'
-#'
-#' @return A design list with attribute attrib in all xpath expressions.
-#' @noRd
-add_attribute_to_design <- function(designs, attrib = "value") {
-	for (n_d in names(designs)) {
-		if (1 < length(designs[[n_d]])) {
-			if (1 < length(designs[[n_d]][[2]])) {
-				for (n_c in names(designs[[n_d]][[2]])) {
-					txt <- designs[[n_d]][[2]][[n_c]]
-					if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
-						txt <- paste_paths(txt, paste0("@", attrib))
-						designs[[n_d]][[2]][[n_c]] <- txt
-					}
-				}
-			}
-			else {
-				txt <- designs[[n_d]][[2]]
-				if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
-					txt <- paste_paths(txt, paste0("@", attrib))
-					designs[[n_d]][[2]] <- txt
-				}
-			}
-		}
-	}
-	designs
-}
-
-
 #' Download single FHIR bundle
 #' @description Download a single FHIR bundle via FHIR search request and return it as a xml object.
 #'
@@ -343,71 +284,6 @@ check_response <- function(response, log_errors) {
 }
 
 
-
-#' Check design list.
-#' @description Checks whether a design provided to \code{\link{fhir_crack}} is invalid and
-#' issues a warning if it is.
-#' @param designs The design list to be checked
-#' @return TRUE if design is invalid, FALSE if design is valid
-#' @noRd
-is_invalid_design_list <- function(designs) {
-	if (is.null(designs)) {
-		warning("Argument design is NULL, returning NULL.")
-		return(TRUE)
-	}
-
-	if (!is.list(designs)) {
-		warning("Argument design has to be a list, returning NULL.")
-		return(TRUE)
-	}
-
-	if (length(designs) < 1) {
-		warning("Argument design has length 0, returning NULL.")
-		return(TRUE)
-	}
-
-	list.type <- sapply(designs, is.list)
-
-	if (any(!list.type)) {
-		warning("All elements of design have to be of type list. Returning NULL.")
-		return(TRUE)
-	}
-
-	if (is.null(names(designs)) || any(names(designs) == "")) {
-		warning(
-			"Argument design should be a NAMED list but has at least one unnamed element. Returning NULL"
-		)
-		return(TRUE)
-	}
-
-	lengths <- sapply(designs, length)
-
-	if (any(lengths < 1 | 2 < lengths)) {
-		warning(
-			"At least one if the elements of argument design is not a list of length 1 or 2. Returning NUll"
-		)
-		return(TRUE)
-	}
-
-	expressions <- unlist(designs)
-
-	testbundle <- xml2::read_xml("<Bundle>   </Bundle>")
-
-	for (i in 1:length(expressions)) {
-		tryCatch(
-			xml2::xml_find_all(testbundle, expressions[[i]]),
-			warning = function(x) {
-				if (grepl("Invalid expression", x))
-					stop(
-						"One of the strings you have provided as XPath expressions in the design argument is not a valid XPath expression. Please revise the following expression: ",
-						esc(expressions[[i]])
-					)
-			}
-		)
-	}
-
-	return(FALSE)
-}
 #' Check List of Bundles
 #' @description Checks whether a List of Bundles provided to \code{\link{fhir_crack}} is invalid and
 #' issues a warning if it is.
@@ -484,9 +360,10 @@ is_invalid_bundles_list <- function(bundles_list) {
 #'
 xtrct_all_columns <-
 	function(child,
-			 sep = " -+- ",
+			 sep = NULL,
 			 xpath = ".//@*",
 			 brackets = NULL) {
+
 		tree <- xml2::xml_find_all(child, xpath)
 
 		if (length(tree) < 1) {
@@ -581,11 +458,11 @@ xtrct_all_columns <-
 #' #Extract columns
 #' result <- fhircrackr:::xtrct_columns(child, cols)
 
-xtrct_columns <-
-	function(child,
+xtrct_columns <- function(child,
 			 df.columns,
-			 sep = " -+- ",
+			 sep = NULL,
 			 brackets = NULL) {
+
 		xp <- xml2::xml_path(child)
 
 		l <- lapply(lst(names(df.columns)),
@@ -632,7 +509,7 @@ xtrct_columns <-
 								NA
 						}
 						else {
-							paste0(val, collapse = sep)
+							if (0 < length(val)) {paste0(val, collapse = sep)} else {NA}
 						}
 					})
 
@@ -644,8 +521,6 @@ xtrct_columns <-
 #' @param design.df On element of the design from \code{\link{fhir_crack}}, i.e. a list of length 1
 #' or 2, where the first element is a XPath expression to the ressource and the (optional)
 #' second element is either a XPath expression or a named list containing column names and XPath expressions
-#' @param sep A string to separate pasted multiple entries.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">") NULL means no brackets.
 #' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
 #' @noRd
 #' @examples
@@ -667,39 +542,40 @@ xtrct_columns <-
 #'
 #' #convert bundle to data frame
 #' result <- fhircrackr:::bundle2df(bundle, design)
-bundle2df <-
-	function(bundle,
-			 design.df,
-			 sep = " -+- ",
-			 brackets = NULL,
+bundle2df <- function(bundle,
+			 df_desc,
+			 # sep = " -+- ",
+			 # brackets = NULL,
 			 verbose = 2) {
+
 		xml2::xml_ns_strip(bundle)
 
-		xpath <- design.df[[1]]
+		xpath <- df_desc$resource
 
 		children <- xml2::xml_find_all(bundle, xpath)
 
 		df.list <- if (length(children) == 0) {
-			warning(paste0(esc(xpath), " seems not to be present in the bundles."))
 
+			#warning("The following resource you provided seems not to be present in one or more bundle:", paste0(esc(xpath)))
 			list()
-		}
-		else {
+
+		} else {
 			lapply(children,
 				   function(child) {
 				   	#dbg
 				   	#child <- children[[ 1 ]]
 
-				   	if (1 < length(design.df) && is.list(design.df[[2]])) {
-				   		df.columns <- design.df[[2]]
+				   	#if multiple columns are defined
+				   	if (!is.null(df_desc$cols) && is.list(df_desc$cols)) {
 
-				   		res <-
-				   			xtrct_columns(
+				   		df.columns <- df_desc$cols
+
+				   		res <- xtrct_columns(
 				   				child,
 				   				df.columns,
-				   				sep = sep,
-				   				brackets = brackets
-				   			)
+				   				sep = df_desc$style$sep,
+				   				brackets = df_desc$style$brackets
+				   				)
 
 				   		if (1 < verbose) {
 				   			if (all(sapply(res, is.na))) {
@@ -708,20 +584,25 @@ bundle2df <-
 				   				cat(".")
 				   			}
 				   		}
-				   	}
-				   	else{
-				   		xp <- if (1 < length(design.df)) {
-				   			design.df[[2]]
-				   		} else {
+
+				   	} else {
+
+				   		xp <- if (!is.null(df_desc$cols)) {#if cols is character
+
+				   			df_desc$cols
+
+				   		} else {#if cols is NULL
+
 				   			".//@*"
+
 				   		}
 
 				   		res <-
 				   			xtrct_all_columns(
 				   				child = child,
-				   				sep = sep,
+				   				sep = df_desc$style$sep,
 				   				xpath = xp,
-				   				brackets = brackets
+				   				brackets = df_desc$style$brackets
 				   			)
 
 				   		if (1 < verbose) {
@@ -737,7 +618,7 @@ bundle2df <-
 				   })
 		}
 
-		rbind_list_of_data_frames(list = df.list)
+		suppressWarnings(rbind_list_of_data_frames(list = df.list))
 	}
 
 #' Convert several bundles to one data frame
@@ -746,8 +627,6 @@ bundle2df <-
 #' @param design.df On element of the design from \code{\link{fhir_crack}}, i.e. a list of length 1
 #' or 2, where the first element is a XPath expression to the ressource and the (optional)
 #' second element is either a XPath expression or a named list containing column names and XPath expressions
-#' @param sep A string to separate pasted multiple entries.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">") NULL means no brackets.
 #' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
 #' @noRd
 #' @examples
@@ -768,13 +647,13 @@ bundle2df <-
 #' #convert bundles to data frame
 #' result <- fhircrackr:::bundles2df(bundles, design)
 
-bundles2df <-
-	function(bundles,
-			 design.df,
-			 sep = " -+- ",
-			 brackets = NULL,
+bundles2df <- function(bundles,
+			 df_desc,
+			 # sep = " -+- ",
+			 # brackets = NULL,
 			 verbose = 2) {
-		ret <- rbind_list_of_data_frames(lapply(seq_len(length(bundles)),
+
+		ret <- rbind_list_of_data_frames(lapply(seq_along(bundles),
 												function(i) {
 													#dbg
 													#i<-1
@@ -787,16 +666,16 @@ bundles2df <-
 
 													bundle2df(
 														bundle,
-														design.df,
-														sep,
-														brackets = brackets,
+														df_desc,
+														# sep,
+														# brackets = brackets,
 														verbose = verbose
 													)
 												}))
 
 		ret <-
 			ret[apply(ret, 1, function(row)
-				! all(is.na(row))), , drop = FALSE]
+				!all(is.na(row))), , drop = FALSE]
 
 		if (1 < verbose) {
 			cat("\n")
@@ -809,10 +688,10 @@ bundles2df <-
 #' @description Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
 #'
 #' @param bundles A FHIR search result as returned by \code{\link{fhir_search}}.
-#' @param designs A named list specifiying which data frame should contain which entries of the bundle.
+#' @param design A named list specifiying which data frame should contain which entries of the bundle.
 #' The names correspond to the names of the resulting data frames.
 #'
-#' Each element of designs is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
+#' Each element of design is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
 #' FHIR bundle page. There are 3 options for the second element of that list:
 #'
 #' - There is no second element: all attributes of the recource are extracted
@@ -823,12 +702,9 @@ bundles2df <-
 #'
 #' For a more detailed explanation see the package vignette.
 #'
-#' @param sep A string to separate pasted multiple entries.
-#' @param remove_empty_columns Logical scalar. Remove empty columns?
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">") NULL means no brackets.
 #' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
 #' @noRd
-#' @return A list of data frames as specified by \code{designs}.
+#' @return A list of data frames as specified by \code{design}.
 #'
 #'
 #' @examples
@@ -836,7 +712,7 @@ bundles2df <-
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #define attributes to extract
-#' designs <- list(
+#' design <- list(
 #'
 #'  #define specifically which elements to extract
 #' 	MedicationStatement = list(
@@ -864,57 +740,78 @@ bundles2df <-
 #' )
 #'
 #' #convert fhir to data frames
-#' list_of_tables <- fhircrackr:::bundles2dfs(bundles, designs)
+#' list_of_tables <- fhircrackr:::bundles2dfs(bundles, design)
 
 bundles2dfs <-
 	function(bundles,
-			 designs,
-			 sep = " -+- ",
-			 remove_empty_columns = FALSE,
-			 brackets = NULL,
+			 design,
+			 # sep = " -+- ",
+			 # remove_empty_columns = FALSE,
+			 # brackets = NULL,
 			 verbose = 2) {
 
-		if (! is.null(brackets) && length(brackets) < 2)
-				brackets <- c( brackets[1], brackets[1] )
-
-		dfs <- lapply(lst(names(designs)),
+		dfs <- lapply(lst(names(design)),
 					  function(n) {
 					  	#dbg
-					  	#n <- names(designs)[1]
+					  	#n <- names(design)[1]
 
-					  	design.df <- designs[[n]]
+					  	df_desc <- design[[n]]
 
 					  	if (1 < verbose) {
 					  		cat("\n", n)
 					  	}
 
-					  	bundles2df(
-					  		bundles = bundles,
-					  		design.df = design.df,
-					  		sep = sep,
-					  		brackets = brackets,
-					  		verbose = verbose
-					  	)
+					  	if(is.null(df_desc)){
+
+					  		NULL
+
+					  	}else{
+
+					  		bundles2df(
+					  			bundles = bundles,
+					  			df_desc = df_desc,
+					  			# sep = sep,
+					  			# brackets = brackets,
+					  			verbose = verbose
+					  		)
+					  	}
+
 					  })
 
 		if (1 < verbose) {
 			cat("\n")
 		}
 
-		if (remove_empty_columns) {
-			dfs <- lapply(dfs,
-						  function(df) {
-						  	cols <-
-						  		names(df)[sapply(df, function(col)
-						  			0 < sum(!is.na(col)))]
+		#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
+		remove <- sapply(design, function(x){
+			if(is.null(x$style$rm_empty_cols)) {
+				FALSE
+			}else{
+				x$style$rm_empty_cols
+			}
+			})
 
-						  	df <- dplyr::select(df, cols)
+		dfs_cleaned <- lapply(seq_along(dfs),
+					  function(i) {
 
-						  	df
-						  })
-		}
+					  	if(remove[i] && ncol(dfs[[i]]) > 0){
 
-		dfs
+					  	cols <- names(dfs[[i]])[sapply(dfs[[i]], function(col){ 0 < sum(!is.na(col))})]
+
+					  	df <- dplyr::select(dfs[[i]], cols)
+
+					  	df
+
+					  	} else {
+
+					  		dfs[[i]]
+
+					  	}
+					  })
+
+
+		names(dfs_cleaned) <- names(dfs)
+		dfs_cleaned
 	}
 
 #' Escape special characters

@@ -15,7 +15,7 @@ For the moment, this package focuses mostly on downloading and flattening resour
 
 - To specify which attributes of the FHIR resources you want in your data frame, you should have at least some familiarity with XPath expressions, because this package downloads the resources in xml-format. A good tutorial for XPath can be found [here](https://www.w3schools.com/xml/xpath_intro.asp).
 
-## Download fhir resources from a server
+## Download FHIR resources from a server
 
 ```r
 bundles <- fhir_search("https://hapi.fhir.org/baseR4/MedicationStatement?_include=MedicationStatement:subject", max.bundles=5)
@@ -28,91 +28,88 @@ In general, a FHIR search request returns a *bundle* of the resources you reques
 
 `fhir_search()` returns a list of xml objects where each list element represents one bundle of resources.
 
-## Turn fhir resources into data frames
-If you want to do statistical analyses, the xml format the resources come in is not very useful. Instead, we need the data in some matrix like form, preferably as a data frame.
+## Flatten FHIR resources into data frames
+If you want to do statistical analyses, the xml format the resources come in is not very useful. Instead, we need the data in some matrix like form, preferably as a data frame. Most of the times it makes sense to create one data frame per type of resource (e.g. Patient, MedicationStatement).
 
 We can achieve this using the `fhir_crack()` function.
 
 ```r
-#define which elements of the resources are of interest
-designs <- list(
+#define design
+
+design <- list(
 
   MedicationStatements = list(
-    "//MedicationStatement",
-    list(
-      STATUS             = "status",
-      MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-      MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-      MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-      PATIENT            = "subject/reference",
-      START              = "effectivePeriod/start",
-      END                = "effectivePeriod/end"
+    resource = "//MedicationStatement",
+    cols = list(
+		STATUS             = "status",
+		MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+		MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+		MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+		PATIENT            = "subject/reference",
+		START              = "effectivePeriod/start",
+		END                = "effectivePeriod/end"
+    ),
+    style = list(
+	    sep = " ",
+	    brackets = c("[", "]"),
+	    rm_empty_cols = FALSE
     )
   ),
 
   Patients = list(
-    "//Patient",
-    list(
-      NAME.GIVEN  = "name/given",
-      NAME.FAMILY = "name/family",
-      SEX         = "gender",
-      BIRTHDATE   = "birthDate"
-    )
+		resource = "//Patient",
+		cols = "./*"
   )
 )
 
 #Convert resources
-dfs <- fhir_crack(bundles, designs)
+dfs <- fhir_crack(bundles = bundles, design = design)
 
 #Inspect results
-View(df$Patients)
+View(dfs$Patients)
 ```
 
-`fhir_crack()` takes a list of bundles as returned by `fhir_search()` and a list of `designs` defining the data to be extracted from the resources and returns a list of data frames.
+`fhir_crack()` takes a list of bundles as returned by `fhir_search()` and a list `design` which contains one or more data.frame descriptions (in the above example there are two called `Patients` and `MedicationStatements` ) defining the data to be extracted from the resources. `fhir_crack()` returns a list of data frames, one for each data.frame description.
 
-`designs` should be a named list, where each element of `designs` corresponds to data frame design which defines how the data frame will be created. The element names of `designs` are going to be the names of the data.frames in the result of the function.
+The `design` has to follow a specific structure. It must be a named list of data.frame descriptions, where each data.frame description is a list with the following elements:
 
-It makes sense to create one data frame per type of resource (MedicationStatement and Patient in this case). Lets have a look at the element `Medication` from the above example of `design` to understand how it works:
+1. *resource*
 
-`Medication` is a list of length 2, where the first element is an XPath expression selecting the nodes (i.e. resources) matching a MedicationStatement, so this element is used to define the type of resource in this data frame.
+A string containing an XPath expression to the resource you want to extract, e.g. `"//Patient"`. If your bundles are the result of a regular FHIR search request, the correct XPath expression will always be `"//<resource name>"`.
 
-The second element is again a list, this time a named list. Each element corresponds to one variable (i.e. column) in the resulting data frame. The name (e.g. `Status`) will be the column name, the column values will be taken from the attribute defined by the following XPath expression (e.g. `"status"`).
+2. *cols*
 
-The abstract form `designs` therefore has is:
+Can be NULL, a string or a list describing the columns your data frame is going to have.
 
-```r
-list(
+- If *cols* is NULL, all attributes available in the resources will be extracted and put in one column each, the column names will be chosen automatically and reflect the position of the attribute in the resource.
 
-  <Name of first data frame> = list(
-    <XPath to resource type>,
-    list(
-      <column name 1> = <XPath to attribute>,
-      <column name 2> = <XPath to attribute>
-      ...
-    )
-  ),
+- If *cols* is a string with an XPath expression indicating a certain level in the bundle, all attributes on this specific level will be extracted. `"./*"` e.g. will extract all attributes that are located (exactly) one level below the root level given by `"//Patient"`.
 
-  <Name of second data frame> = list(
-    <XPath to resource type>,
-    list(
-      <column name 1> = <XPath to attribute>,
-      <column name 2> = <XPath to attribute>
-      ...
-    )
-  ),
-  ...
-)
-```
-There are other forms `designs` can take, for example if you want to extract all attributes or only attributes from a certain level of the resource. To get to know these options, please see the package vignette.
+- If *cols* is a named list of XPath expressions, each element is taken to be the description for one column. `PATIENT = "subject/reference"` for example creates a column named PATIENT which contains the values for the attribute indicated by the XPath expression `"subject/reference"`.
+
+3. *style*
+
+Can be NULL or a list of length 3 with the following named elements:
+
+- *sep*: A string defining the seperator used for pasting multiple entries to the same attribute together, e.g. `" "`. 
+
+- *brackets* Either NULL or a character vector of length two. If NULL, multiple entries will be pasted together without indices. If character, the two strings provided here are used as brackets for automatically generated indices to sort out multiple entries. `brackets = c("[", "]")` e.g. will lead to indices like `[1.1]`.  
+
+- *rm_empty_cols*: Logical. If `TRUE`, columns containing only `NA` values will be removed, if `FALSE`, these columns will be kept.
+
+All three elements of style can also be controlled directly by the `fhir_crack()` arguments `sep`, `brackets` and `remove_empty_columns`. If the function arguments are `NULL` (their default), the values provided in *style* are used, if they are not NULL, they will overwrite any values in *style*. If both the function arguments and the *style* component of the data.frame description are NULL, default values(`sep=" "`, `brackets = NULL`, `rm_empty_cols=TRUE`) will be assumed. 
+
+
+For detailed examples of the different variants of the `design` please see the package vignette.
 
 
 ## Multiple entries
-When there are multiple entries to one attribute, e.g. multiple addresses for the same Patient resource, `fhir_crack()` will paste these entries together using the string provided in the argument `sep`. If you set `brackets=c('[', ']')`, the entries will be assigned to indices to allow you to distinguish between entries. The indices are surrounded by the given brackets:
+When there are multiple entries to one attribute, e.g. multiple addresses for the same Patient resource, `fhir_crack()` will paste these entries together using the string provided in the argument `sep`. If for example you set `brackets=c("[", "]")`, the indices surrounded by [ ] will be assigned to the entries to allow you to distinguish between them:
 
 ```r
 #create example bundle with multiple entries
 
-bundle<-xml2::read_xml(
+bundle <- xml2::read_xml(
 	"<Bundle>
 		
 		<Patient>
@@ -165,15 +162,15 @@ bundle<-xml2::read_xml(
 	</Bundle>"
 )
 
-bundle_list<-list(bundle)
+bundle_list <- list(bundle)
 
 #define design
 design <- list(
-	Patients = list("//Patient")
+	Patients = list(resource = "//Patient")
 )
 
 #extract data frame
-dfs <- fhir_crack(bundle_list, design, sep = " ", brackets= c("[","]"))
+dfs <- fhir_crack(bundles = bundle_list, design = design, sep = " ", brackets= c("[","]"))
 
 dfs$Patients
 ```
@@ -186,7 +183,7 @@ Since `fhir_crack()` discards of all the data not specified in `design` it makes
 There are two ways of saving the FHIR bundles you downloaded: Either you save them as R objects, or you write them to an xml file.
 
 ### Save and load bundles as R objects
-If you want to save the list of downloaded bundles as an `.rda` or `.RData` file, you cannot just R's `save()`or `save_image()` on it, because this will break the external pointers in the xml objects representing your bundles. Instead, you have to serialize the bundles before saving and unserialize them after loading. For single xml objects the package `xml2` proved serialization functions. For convenience, however, `fhircrackr` provides the functions `fhir_serialize()` and `fhir_unserialize()` that you can use directly on the list of bundles returned by `fhir_search()`:
+If you want to save the list of downloaded bundles as an `.rda` or `.RData` file, you cannot just R's `save()`or `save_image()` on it, because this will break the external pointers in the xml objects representing your bundles. Instead, you have to serialize the bundles before saving and unserialize them after loading. For single xml objects the package `xml2` provides serialization functions. For convenience, however, `fhircrackr` provides the functions `fhir_serialize()` and `fhir_unserialize()` that you can use directly on the list of bundles returned by `fhir_search()`:
 
 ```r
 #serialize bundles
@@ -212,7 +209,7 @@ bundles <- fhir_unserialize(serialized_bundles)
 head(bundles[[1]])
 ```
 
-After unserialization, the pointers are restored and you can continue to work with the bundles. Note that the example bundle `medication_bundles` that is provided with the `fhircrackr` package is also provided in its serialized form and has to be unserialized as described on its help page.
+After unserialization, the pointers are restored and you can continue to work with the bundles. Note that the example bundles `patient_bundles` and `medication_bundles` that are provided with the `fhircrackr` package are also provided in their serialized form and have to be unserialized as described on theit help pages.
 
 ### Save and load bundles as xml files
 If you want to store the bundles in xml files instead of R objects, you can use the functions `fhir_save()` and `fhir_load()`.
@@ -223,15 +220,28 @@ If you want to store the bundles in xml files instead of R objects, you can use 
 fhir_save(patient_bundles, directory="MyDirectory")
 ```
 
-
-
 To read bundles saved with `fhir_save()` back into R, you can use `fhir_load()`:
 
-```{r}
+```r
 bundles <- fhir_load("MyDirectory")
 ```  
 
 `fhir_load()` takes the name of the directory (or path to it) as its only argument. All xml-files in this directory will be read into R and returned as a list of bundles in xml format just as returned by `fhir_search()`.
+
+## Save and read designs
+If you want to save a design for later or to share with others, you can do so using the `fhir_save_design()`. This function takes a design and saves it as an xml file:
+
+```r
+fhir_save_design(design1, file = paste0(temp_dir,"\\design.xml"))
+```
+
+To read the design back into R, you can use `fhir_load_design()`:
+
+```r
+fhir_load_design(paste0(temp_dir,"\\design.xml"))
+```
+
+
 
 
 ## Acknowledgements

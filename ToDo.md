@@ -4,7 +4,6 @@
 
 ## Simplify fhir_crack
 
-- deprecate add_indices (information is taken from brackets argument)
 
 - rename argument designs to design
 
@@ -14,7 +13,7 @@
 
 - update is_invalid_design accordingly
 
-- update documentation, vignette and readme accordingly
+- update documentation, vignette and readme accordingly . nwe version of design, remove add_indices
 
 
 

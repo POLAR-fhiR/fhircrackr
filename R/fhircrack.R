@@ -239,28 +239,53 @@ fhir_load <- function(directory) {
 #' @description Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
 #'
 #' @param bundles A FHIR search result as returned by \code{\link{fhir_search}}.
-#' @param designs A named list specifying which data frame should contain which entries of the bundle.
-#' The names correspond to the names of the resulting data frames.
+#' @param design A named list of data frame descriptions.
+#' Each data frame description will produce one data frame in the list of data frames returned by \code{fhir_crack}, where the data frame has the same name as the data frame description in \code{design}.
 #'
-#' Each element of designs is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
-#' FHIR bundle page. There are 3 options for the second element of that list:
+#' Each data frame description is a list of 3 named elements:
 #'
-#' - There is no second element: all attributes of the resource are extracted
+#' 1) \code{design$resource}: Mandatory. A string with an XPath expression locating the entries for this data frame in a FHIR bundle page. This is usually the path to a resource tpye
+#'  such as \code{"//Patient"} or \code{"//Observation"}.
 #'
-#' - The second element is a string containing a XPath expression to all the values that should be extracted. "./@value" e.g. would extract all
-#'   values on the root level.
+#' 2) \code{design$cols}: Optional. Either a string containing an XPath expression referencing a certain level of attributes that should be extracted (
+#'  \code{"./@value"} e.g. would extract all values on the root level) or a named list where the elements are XPath expressions indicating the specific
+#'   position of attributes to extract and the names of the list elements are the column names of the resulting data frame. If \code{design$cols} is \code{NULL},
+#'   all available attributes will be extracted.
 #'
-#' - The second element is a named list where the elements are XPath expressions indicating the specific position of values to extract,
-#'  where the names of the list elements are the column names of the resulting data frame.
+#' 3) \code{design$style}: Optional. This can be used instead of the function arguments \code{sep}, \code{brackets} and \code{remove_empty_columns}, but will be
+#' overwritten if the corresponding function arguments are not \code{NULL}.
 #'
-#' For a more detailed explanation see the package vignette.
+#' A named list with the following optional elements:
 #'
-#' @param sep A string to separate pasted multiple entries.
-#' @param remove_empty_columns Logical scalar. Remove empty columns?
-#' @param brackets A character vector of length two defining the Brackets surrounding the indices. e.g. c( "<", ">"). NULL means no brackets.
-#' @param verbose An Integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
+#'    a) \code{design$style$sep} : A string to separate pasted multiple entries.
+#'
+#'    b) \code{design$style$brackets}: A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
+#'       If \code{NULL}, no indices will be added to multiple entries.
+#'
+#'    c) \code{design$style$rm_empty_cols}: Logical scalar. Remove empty columns?
+#'
+#' For a more detailed explanation and comprehensive examples of \code{design}, please see the package vignette.
+#'
+#' @param sep A string to separate pasted multiple entries. NULL means \code{sep} is looked up in design, if it is \code{NULL} there too, \code{sep} will be set to \code{" "} as the default.
+#'
+#' @param remove_empty_columns Logical scalar. Remove empty columns? \code{NULL} means \code{remove_empty_columns} is looked up in \code{design}, if it is \code{NULL} there too, \code{remove_empty_columns}
+#'  will be set to \code{TRUE} as the default.
+#'
+#' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
+#'  If \code{NULL}, no indices will be added to multiple entries. \code{NULL} means \code{brackets} is looked up in design, if it is \code{NULL} there too, no indices are added.
+#'
+#' @param verbose An Integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
-#' #' @return A list of data frames as specified by \code{designs}.
+#'
+#' @param return_design Logical scalar. If \code{TRUE}, the complete design with automatically by fhir_crack
+#' amended elements is returned as the last element of the returned list. Defaults to \code{FALSE}
+#'
+#' @param add_indices Deprecated. This argument was used to control adding of indices for multiple entries. This is now
+#' done via the brackets argument. If brackets is \code{NULL}, no indices are added, if brackets is not \code{NULL}, indices are added to multiple entries.
+#'
+#' @return A list of data frames (if \code{return_design = FALSE}) or a list of data frames and the
+#' utilized \code{design}, if \code{return_design = TRUE}.
+#'
 #' @export
 #'
 #' @examples
@@ -268,74 +293,150 @@ fhir_load <- function(directory) {
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #define attributes to extract
-#' designs <- list(
+#' design <- list(
 #'
 #'  #define specifically which elements to extract
 #' 	MedicationStatement = list(
 #'
-#' 		".//MedicationStatement",
+#' 		resource = ".//MedicationStatement",
 #'
-#' 		list(
-#' 			MS.ID              = "id",
-#' 			STATUS.TEXT        = "text/status",
-#' 			STATUS             = "status",
-#' 			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-#' 			MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-#' 			MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-#' 			DOSAGE             = "dosage/text",
-#' 			PATIENT            = "subject/reference",
-#' 			LAST.UPDATE        = "meta/lastUpdated"
-#' 		)
+#' 		cols = list(
+#' 				MS.ID              = "id",
+#' 				STATUS.TEXT        = "text/status",
+#' 				STATUS             = "status",
+#' 				MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+#' 				MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+#' 				MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+#' 				DOSAGE             = "dosage/text",
+#' 				PATIENT            = "subject/reference",
+#' 				LAST.UPDATE        = "meta/lastUpdated"
+#' 		),
+#'
+#' 		style = list(
+#' 				sep = " ",
+#' 				brackets = c("[", "]"),
+#' 				rm_empty_cols= FALSE
+#' 				)
 #' 	),
 #'
 #'  #extract all values
 #' 	Patients = list(
 #'
-#' 		".//Patient"
+#' 		resource = ".//Patient"
 #' 	)
 #' )
 #'
 #' #convert fhir to data frames
-#' list_of_tables <- fhir_crack(bundles, designs)
+#' list_of_tables <- fhir_crack(bundles, design)
 #'
 #' #check results
 #' head(list_of_tables$MedicationStatement)
 #' head(list_of_tables$Patients)
 #'
-#' @return A list of data frames as specified by \code{designs}
 #'
 #' @export
 
-fhir_crack <-
-	function(bundles,
-			 designs,
-			 sep = " -+- ",
-			 remove_empty_columns = FALSE,
+fhir_crack <- function(bundles,
+			 design,
+			 sep = NULL,
+			 remove_empty_columns = NULL,
 			 brackets = NULL,
-			 verbose = 2) {
-		if (is_invalid_design_list(designs))
+			 verbose = 2,
+			 return_design = FALSE,
+			 add_indices) {
+
+		#-----------------------# remove once add_indices is removed:
+		if(!missing("add_indices")){
+
+			warning("Argument add_indices is deprecated and will be removed eventually.\n In future versions indices will automatically be added when brackets are provided.")
+
+			if(add_indices && is.null(brackets)) {brackets <- c("<", ">")}
+
+			if(!add_indices && !is.null(brackets)) {brackets <- NULL}
+
+		}
+
+		#-----------------------#
+
+		#check input validity
+		design_validity <- is_valid_design(design)
+
+		#IF general problems with design
+		if (!design_validity[[1]] && is.null(design_validity[[2]])){
+
+			return(NULL)
+		}
+
+		#If single invalid data.frame descriptions
+		if (!design_validity[[1]] && !is.null(design_validity[[2]])){
+
+			design[design_validity[[2]]] <- "invalid"
+
+		}
+
+		#If invalid bundle list
+		if (is_invalid_bundles_list(bundles)){
+
 			return(NULL)
 
-		if (is_invalid_bundles_list(bundles))
-			return(NULL)
+		}
 
-		designs <- add_attribute_to_design(designs)
+		#complete design
+		design <- fix_design(design)
 
+		#overwrite design with function arguments
+		if(!is.null(sep)) {
+
+			design <- lapply(design, function(x){
+							x$style$sep <- sep
+							x
+							}
+						)
+		}
+
+		if(!is.null(brackets)) {
+
+			brackets <- fix_brackets(brackets)
+
+			design <-lapply(design, function(x){
+						x$style$brackets <- brackets
+						x
+						}
+					)
+		}
+
+		if(!is.null(remove_empty_columns)) {
+
+			design <- lapply(design, function(x){
+							x$style$rm_empty_cols <- remove_empty_columns
+							x
+							}
+						)
+		}
+
+		#Add attributes to design
+		design <- add_attribute_to_design(design)
+
+		#crack
 		dfs <-
 			bundles2dfs(
 				bundles = bundles,
-				designs = designs,
-				sep = sep,
-				remove_empty_columns = remove_empty_columns,
-				brackets = brackets,
+				design = design,
+				# sep = sep,
+				# remove_empty_columns = remove_empty_columns,
+				# brackets = brackets,
 				verbose = verbose
 			)
 
 		if (0 < verbose) {
-			message("FHIR-Resources cracked.")
+			message("FHIR-Resources cracked. \n")
 		}
 
-		dfs
+		if(return_design){
+			c(dfs, design=list(design))
+		}else{
+			dfs
+			}
 	}
 
 
@@ -367,15 +468,15 @@ fhir_capability_statement <-
 			fhir_search(request = paste_paths(url, "/metadata?"),
 						verbose = verbose)
 
-		designs <- list(
-			META      = list("/CapabilityStatement", "./*/@*"),
-			REST.META = list("/CapabilityStatement/rest", "./*/@*"),
-			REST      = list("/CapabilityStatement/rest/resource")
+		design <- list(
+			META      = list(resource = "/CapabilityStatement", cols = "./*/@*"),
+			REST.META = list(resource = "/CapabilityStatement/rest", cols = "./*/@*"),
+			REST      = list(resource = "/CapabilityStatement/rest/resource")
 		)
 
 		fhir_crack(
 			bundles = caps,
-			designs = designs,
+			design = design,
 			sep = sep,
 			remove_empty_columns = remove_empty_columns,
 			brackets = brackets,
@@ -444,11 +545,11 @@ fhir_unserialize <- function(bundles) {
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #crack Patient Resources
-#' designs <- list(
+#' design <- list(
 #'   Patients = list(".//Patient")
 #' )
 #'
-#' dfs <- fhir_crack(bundles, designs)
+#' dfs <- fhir_crack(bundles, design)
 #'
 #' #look at automatically generated names
 #' names(dfs$Patients)
@@ -532,7 +633,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #')
 #'
 #' #crack fhir resources
-#' dfs <- fhir_crack(bundles = list(bundle), designs = list(Patients = list(".//Patient")),
+#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list(".//Patient")),
 #'                   brackets = c("[","]"))
 #'
 #' #find all column names associated with attribute address
@@ -597,7 +698,7 @@ fhir_melt <-
 #' Removes the indices produced by \code{\link{fhir_crack}} when \code{add_indices=TRUE}
 #' @param indexed_data_frame A data frame with indices for multiple entries as produced by \code{\link{fhir_crack}}
 #' @param brackets A string vector of length two defining the brackets that were used in \code{\link{fhir_crack}}
-#' @param columns A string vector of columns, where indices should be removed.
+#' @param columns A string vector of column names, indicating from which columns indices should be removed. Defaults to all columns.
 #'
 #' @return A data frame without indices.
 #' @export
@@ -638,7 +739,7 @@ fhir_melt <-
 #')
 #'
 #'
-#' dfs <- fhir_crack(bundles = list(bundle), designs = list(Patients = list("/Bundle/Patient")),
+#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list("/Bundle/Patient")),
 #'                   verbose = 2)
 #'
 #' df_indices_removed <- fhir_rm_indices(dfs[[1]])
