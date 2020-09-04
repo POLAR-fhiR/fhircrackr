@@ -698,7 +698,7 @@ fhir_melt <-
 #' Removes the indices produced by \code{\link{fhir_crack}} when \code{add_indices=TRUE}
 #' @param indexed_data_frame A data frame with indices for multiple entries as produced by \code{\link{fhir_crack}}
 #' @param brackets A string vector of length two defining the brackets that were used in \code{\link{fhir_crack}}
-#' @param columns A string vector of columns, where indices should be removed.
+#' @param columns A string vector of column names, indicating from which columns indices should be removed. Defaults to all columns.
 #'
 #' @return A data frame without indices.
 #' @export

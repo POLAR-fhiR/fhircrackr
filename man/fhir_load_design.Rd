@@ -29,5 +29,4 @@ temp <- tempfile()
 
 fhir_save_design(design, file = temp)
 design <- fhir_load_design(temp)
-
 }

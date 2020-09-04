@@ -48,3 +48,14 @@ Wenn eine Fehlerhafte Ressource angegeben wird, wird die Warnmedlung, dass die R
 
 ### Lösung:
 Weil ja sowieso einfach ein leerer df zurückgegeben wird, wenn die Ressource nicht im bundle steckt und "nichts schlimmes" passiert, habe ich die Warnung jetzt erstmal auskommentiert.
+
+--------------------------------------------
+--------------------------------------------
+
+## 04.09.2020
+- branch: crack_by_design_jg
+
+### Aufräumarbeiten
+is_invalid_design() (aus helpers.R) is jetzt überflüssig und wurde durch is_valid_design (aus design.R) ersetzt. Habe is_invalid_design() deshalb gelöscht.
+
+add_attribute_to_design() und remove_attribute_from_design() sind jetzt aus helpers.R nach design.R umgezogen.

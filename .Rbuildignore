@@ -6,3 +6,5 @@
 ^ToDo\.md$
 ^docs$
 ^CRAN-RELEASE$
+^doc$
+^Meta$

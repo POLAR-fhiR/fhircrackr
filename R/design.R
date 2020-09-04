@@ -1,7 +1,18 @@
 
 ####Fixing designs####
 
-#Fix list by assigning proper names and defaults
+#' Fix list (like design or style) by assigning proper names and defaults
+#'
+#' @param list The list to fix
+#' @param names The names the list elements should have
+#' @param defaults The default values that should be assigned to empty list elements
+#'
+#' @example fix(list = list(resource = "//Patient"), names = c("resource", "cols", "style"))
+#'
+#' @return A list of length length(names) with proper names in proper order
+#'
+#' @noRd
+
 fix <- function (list, names, defaults = NULL) {
 	msg <- NULL
 
@@ -58,13 +69,39 @@ fix <- function (list, names, defaults = NULL) {
 }
 
 
+#' Duplicate brackets, if just one string is provided as brackets, truncate if more than two
+#' @param brackets a character or NULL
+#'
+#' @return a character of length two or NULL
+#'
+#' @example fix_brackets("|")
+#' @noRd
+#'
+
 fix_brackets <- function(brackets){
 
-	if (1 == length(brackets)) {c(brackets[1], brackets[1])} else {brackets}
+	if (1 == length(brackets)) {
+
+		c(brackets[1], brackets[1])
+
+	} else if (length(brackets) > 2) {
+
+		warning("brackets has to be of length 2, using only the first two elements.")
+		brackets[1:2]
+
+	} else {
+			brackets
+		}
+
 
 }
 
-#fix df description
+#' fix data.frame description
+#' @param df_desc A data.frame description from a design for fhir_crack()
+#' @return a fixed data.frame description with resource, cols, style, sep, brackets and rm_empty_cols
+#' @example fix_df_desc(list(resource="//Patient"))
+#' @noRd
+#'
 fix_df_desc <- function (df_desc) {
 	#dbg
 	#df_desc <- design[[1]]
@@ -114,7 +151,12 @@ fix_df_desc <- function (df_desc) {
 	return(list(value = df_desc, msg=msg))
 }
 
-
+#' fix design
+#' @param design  a design for fhir_crack()
+#' @return a fixed design, where all df description have resource, cols, style, sep, brackets and rm_empty_cols
+#' @example fix_design(listpat=(list(resource="//Patient")))
+#' @noRd
+#'
 fix_design <- function(design) {
 
 	fixed_design <-lapply(seq_along(design), function(i){
@@ -138,7 +180,12 @@ fix_design <- function(design) {
 
 ####validating designs####
 
-#check df_description
+#' check data.frame description
+#' @param df_desc  a data.frame description of a design for fhir_crack()
+#' @return a dataframe of nrow = 1 with two variables: valid (logical) and message (string)
+#' @example is_valid_df_desc(list(resource="//Patient"))
+#' @noRd
+#'
 is_valid_df_desc <- function (df_desc) {
 
 	fixed_df_desc <- fix_df_desc(df_desc = df_desc)
@@ -257,7 +304,13 @@ is_valid_df_desc <- function (df_desc) {
 
 
 
-#check design
+#' check design
+#' @param design a design for fhir_crack()
+#' @return a list of length 2: the first element is a boolean indicating validity,
+#' the second element is NULL or a numeric indicating which df descriptions are invalid.
+#' @example is_valid_design(list(pat=list(resource="//Patient")))
+#' @noRd
+#'
 is_valid_design <- function(design) {
 
 	#general checks
@@ -300,8 +353,81 @@ is_valid_design <- function(design) {
 	return(list(TRUE, NULL))
 }
 
+
+
+
+#' @description Remove attributes from xpath expressions
+#' @param design a design for fhir_crack
+#' @return A design without attributes in all xpath expressions.
+#' @noRd
+
+remove_attribute_from_design <- function(design) {
+	for (n_d in names(design)) {
+		if (1 < length(design[[n_d]])) {
+			if (1 < length(design[[n_d]][[2]])) {
+				for (n_c in names(design[[n_d]][[2]])) {
+					txt <- design[[n_d]][[2]][[n_c]]
+					txt <- sub("/@(\\w|\\*)+$", "", txt)
+					design[[n_d]][[2]][[n_c]] <- txt
+				}
+			}
+			else {
+				txt <- design[[n_d]][[2]]
+				txt <- sub("/@(\\w|\\*)+$", "", txt)
+				design[[n_d]][[2]] <- txt
+			}
+		}
+	}
+	design
+}
+
+#' @description Add attributes to xpath expressions
+#' @param design A fhircrackr design.
+#' @param attrib The attribute that should be added to the xpath expressions. Default is 'value'
+#' @return A design list with attribute attrib in all xpath expressions.
+#' @noRd
+#'
+add_attribute_to_design <- function(design, attrib = "value") {
+
+	for (n_d in names(design)) { #loop through df_desc
+
+		if (!is.null(design[[n_d]]$cols)) { #Only add attrib if xpath expressions are provided
+
+			if (1 < length(design[[n_d]]$cols)) { #when several expressions are provided
+
+				for (n_c in names(design[[n_d]]$cols)) { #loop through cols
+					txt <- design[[n_d]]$cols[[n_c]]
+
+					if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
+						txt <- paste_paths(txt, paste0("@", attrib))
+						design[[n_d]]$cols[[n_c]] <- txt
+					}
+				}
+
+			} else { #wenn cols is just on expression
+
+				txt <- design[[n_d]]$cols
+				if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
+					txt <- paste_paths(txt, paste0("@", attrib))
+					design[[n_d]]$cols<- txt
+				}
+			}
+		}
+	}
+
+	design
+}
+
+
+
+
+
 ####save designs####
 
+#' Convert design into xml format
+#' @param design a design for fhir_crack()
+#' @return the design as an xml object
+#' @noRd
 design2xml <- function (design) {
 
 	design <- fix_design(design)
@@ -357,7 +483,6 @@ design2xml <- function (design) {
 
 #' Write design to xml
 #' @description Writes a design for use with \code{\link{fhir_crack}} to an xml file
-#'
 #' @param design A list representing a valid design as used in \code{\link{fhir_crack}}
 #' @param file A string specifying the file to write to, defaults to writing "design.xml"
 #' into the current working directory
@@ -394,6 +519,12 @@ fhir_save_design <- function (design, file = "design.xml") {
 
 
 ####read designs####
+
+#' Read design from xml object
+#' @param xml an xml object representing a design for fhir_crack()
+#' @return a design (i.e. list) for fhir_crack()
+#' @noRd
+#'
 xml2design <- function(xml) {
 
 	xml_design <- xml2::xml_find_all(xml, "//Design")
@@ -519,199 +650,7 @@ xml2design <- function(xml) {
 
 #' design <- fhir_load_design(temp)
 
-
-#'
 fhir_load_design <- function (file) {
 	xml <- xml2::read_xml(file)
 	xml2design(xml)
 }
-
-#
-# (xml <- xml2::read_xml(paste0(
-# 	"<Design>",
-# 		"<Patient1>",
-# 		"</Patient1>",
-# 		"<Patient2>",
-# 			"<Resource value='//Patient'/>",
-# 			"<Columns value='.//*'/>",
-# 		"</Patient2>",
-# 		"<Patient13>",
-# 			"<Resource value='//Patient'/>",
-# 			"<Columns>",
-# 				"<ID value='id'/>",
-# 				"<VNAME value='name/given'/>",
-# 				"<NNAME value='name/family'/>",
-# 			"</Columns>",
-# 		"</Patient13>",
-# 		"<Patient3>",
-# 			"<Resource value='//Patient'/>",
-# 			"<Columns>",
-# 			"</Columns>",
-# 		"</Patient3>",
-# 		"<Patient4>",
-# 			"<Resource value='//Patient'/>",
-# 			"<Columns>",
-# 				"<ID value='id'/>",
-# 				"<VNAME value='name/given'/>",
-# 				"<NNAME value='name/family'/>",
-# 			"</Columns>",
-# 			"<Style>",
-# 				"<Separator value=' -+- '/>",
-# 				"<Brackets>",
-# #					"<Open value='OPEN'/>",
-# 					"<Close value='CLOSE'/>",
-# 				"</Brackets>",
-# 			"</Style>",
-# 		"</Patient4>",
-# 	"</Design>"
-# )))
-#
-# assign("last.warning", NULL, envir = baseenv())
-# save_design(design = xml2design(xml = xml), "design.xml")
-# warnings()
-# assign("last.warning", NULL, envir = baseenv())
-# design2 <- load_design("design.xml")
-# warnings()
-#
-# #long design mit zwei Fehlern:
-# design <- list(
-# 	Pat1 = list(resource = NULL),
-# 	Pat2 = list(resource = "//Patient",
-# 				cols = ".//*"),
-# 	Pat3 = list(
-# 		resource = "//Patient",
-# 		cols  = list(ID = "id",
-# 					 NAME = "name/family",
-# 					 VNAME = "name/given")
-# 	),
-# 	Pat4 = list(
-# 		resource = 7,
-# 		cols = list(ID = "id"),
-# 		style = list(
-# 			sep = " ",
-# 			brackets = c("[", "]"),
-# 			rm_empty_cols = TRUE
-# 		)
-# 	),
-# 	Pat5 = list(
-# 		resource = "//Patient",
-# 		cols = ".//*",
-# 		style = list(
-# 			sep = " ",
-# 			brackets = c("[", "]"),
-# 			rm_empty_cols = TRUE
-# 		)
-# 	),
-# 	Pat6 = list(
-# 		resource = "//Patient",
-# 		cols = NULL,
-# 		# wuerde man nicht machen
-# 		style = list(
-# 			sep = " ",
-# 			brackets = c("[", "]"),
-# 			rm_empty_cols = TRUE
-# 		)
-# 	),
-# 	Pat7 = list(
-# 		resource = "//Patient",
-# 		cols = NULL,
-# 		# wuerde man nicht machen
-# 		style = list(sep = " ",
-# 					 brackets = "#")
-# 	),
-# 	Pat8 = list(resource = "//Patient",
-# 				cols = NULL, # wuerde man nicht machen
-# 				list(sep = " ")),
-# 	Pat9 = list("//Patient",
-# 				NULL,
-# 				list(NULL,
-# 					 "#")),
-# 	Pat10 = list(resource = "//Patient",
-# 				 style = list(rm_empty_cols = TRUE)),
-# 	Pat11 = list("//Patient"),
-# 	Pat12 = list("//Patient",
-# 				 ".//*"),
-# 	Pat13 = list("//Patient",
-# 				 list(ID = "id", NAME = "name/family")),
-# 	Pat14 = list("//Patient",
-# 				 list(ID = "id"),
-# 				 list(" ",
-# 				 	 c("[", "]"),
-# 				 	 TRUE)),
-# 	Pat15 = list("//Patient",
-# 				 ".//*",
-# 				 list(" ",
-# 				 	 c("[", "]"),
-# 				 	 TRUE)),
-# 	Pat16 = list("//Patient",
-# 				 NULL,
-# 				 list(" ",
-# 				 	 c("[", "]"),
-# 				 	 TRUE)),
-# 	Pat17 = list("//Patient",
-# 				 NULL,
-# 				 list(" ",
-# 				 	 "#")),
-# 	Pat18 = list("//Patient",
-# 				 NULL,
-# 				 list(" ")),
-# 	Pat19 = list("//Patient",
-# 				 NULL,
-# 				 list()),
-# 	Pat20 = list("//Patient",
-# 				 NULL,
-# 				 list(NULL,
-# 				 	 NULL,
-# 				 	 TRUE))
-# )
-#
-# #design <- design[6:7]
-#
-# assign("last.warning", NULL, envir = baseenv())
-# save_design(design = design, "DesignOriginal.xml")
-# warnings()
-# assign("last.warning", NULL, envir = baseenv())
-# design2 <- load_design(file = "DesignOriginal.xml")
-# warnings()
-# assign("last.warning", NULL, envir = baseenv())
-# save_design(design = design2, "DesignResult.xml")
-# warnings()
-# assign("last.warning", NULL, envir = baseenv())
-#
-#
-# design <- list(
-# 	Observations = list(
-# 		"//Observation",
-# 		list(
-# 			O.OID = "id",
-# 			O.PID = "subject/reference",
-# 			O.EID = "encounter/reference",
-# 			DIA   = "component[code/coding/code/@value='8462-4']/valueQuantity/value",
-# 			SYS   = "component[code/coding/code/@value='8480-6']/valueQuantity/value",
-# 			DATE  = "effectiveDateTime"
-# 		),
-# 		list(" -+- ", '#BRACKET#', T)
-# 	),
-# 	Encounters = list(
-# 		"//Encounter",
-# 		".//*",
-# 		list("- + -", c('[', ']'), F)
-# 	),
-# 	Patients = list(
-# 		"//Patient"
-# 	)
-# )
-#
-#
-# assign("last.warning", NULL, envir = baseenv())
-# save_design(design = design, "DesignOriginal2.xml")
-# warnings()
-# assign("last.warning", NULL, envir = baseenv())
-# design2 <- load_design("DesignOriginal2.xml")
-# warnings()
-# assign("last.warning", NULL, envir = baseenv())
-# save_design(design = design2, "DesignResult2.xml")
-# warnings()
-# assign("last.warning", NULL, envir = baseenv())
-#
-#

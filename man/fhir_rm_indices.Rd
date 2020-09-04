@@ -15,7 +15,7 @@ fhir_rm_indices(
 
 \item{brackets}{A string vector of length two defining the brackets that were used in \code{\link{fhir_crack}}}
 
-\item{columns}{A string vector of columns, where indices should be removed.}
+\item{columns}{A string vector of column names, indicating from which columns indices should be removed. Defaults to all columns.}
 }
 \value{
 A data frame without indices.

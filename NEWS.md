@@ -1,3 +1,17 @@
+
+
+- design for fhir_crack has new form now:
+
+1. has now named elements resource, cols, style (with elements sep, brackets, rm_empty_cols)
+
+2. old versions of design still work
+
+
+- argument add_indices from fhir_crack is now deprecated, indices will be added when brackets is not NULL
+
+- new functions fhir_save_design() and fhir_load_design()
+
+
 # fhircrackr 0.1.1.9000
 
 - remove argmument sep from fhir_rm_indices
