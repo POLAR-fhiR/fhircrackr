@@ -6,6 +6,8 @@
 \usage{
 fhir_capability_statement(
   url = "https://hapi.fhir.org/baseR4",
+  username = NULL,
+  password = NULL,
   sep = " ",
   remove_empty_columns = TRUE,
   brackets = c("<", ">"),
@@ -14,6 +16,10 @@ fhir_capability_statement(
 }
 \arguments{
 \item{url}{The URL of the FHIR server endpoint.}
+
+\item{username}{A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.}
+
+\item{password}{A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.}
 
 \item{sep}{A string to separate pasted multiple entries}
 

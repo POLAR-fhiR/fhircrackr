@@ -445,6 +445,8 @@ fhir_crack <- function(bundles,
 #' @description Get the capability statement of a FHIR server.
 #'
 #' @param url The URL of the FHIR server endpoint.
+#' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
+#' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param sep A string to separate pasted multiple entries
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
 #' @param brackets A vector of strings defining the Brackets surrounding the indices. NULL means no brackets. Default is c( "<", ">").
@@ -460,12 +462,16 @@ fhir_crack <- function(bundles,
 
 fhir_capability_statement <-
 	function(url = "https://hapi.fhir.org/baseR4",
+			 username = NULL,
+			 password = NULL,
 			 sep = " ",
 			 remove_empty_columns = TRUE,
 			 brackets = c("<", ">"),
 			 verbose = 2) {
 		caps <-
 			fhir_search(request = paste_paths(url, "/metadata?"),
+						username = username,
+						password = password,
 						verbose = verbose)
 
 		design <- list(
