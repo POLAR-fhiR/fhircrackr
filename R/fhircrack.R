@@ -449,9 +449,12 @@ fhir_crack <- function(bundles,
 #' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param sep A string to separate pasted multiple entries
 #' @param remove_empty_columns Logical scalar. Remove empty columns?
-#' @param brackets A vector of strings defining the Brackets surrounding the indices. NULL means no brackets. Default is c( "<", ">").
+#' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
+#' If \code{NULL}, no indices will be added to multiple entries. \code{NULL} means \code{brackets} is looked up in design, if it is \code{NULL} there too, no indices are added.
 #' @param verbose An integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
 #' downloading/extraction progress will be printed. Defaults to 2.
+#' @param add_indices Deprecated. This argument was used to control adding of indices for multiple entries. This is now
+#' done via the brackets argument. If brackets is \code{NULL}, no indices are added, if brackets is not \code{NULL}, indices are added to multiple entries.
 #'
 #' @return A list of data frames containing the information from the statement
 #' @export
@@ -460,14 +463,15 @@ fhir_crack <- function(bundles,
 #' \donttest{cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")}
 #'
 
-fhir_capability_statement <-
-	function(url = "https://hapi.fhir.org/baseR4",
-			 username = NULL,
-			 password = NULL,
-			 sep = " ",
-			 remove_empty_columns = TRUE,
-			 brackets = c("<", ">"),
-			 verbose = 2) {
+fhir_capability_statement <-function(url = "https://hapi.fhir.org/baseR4",
+									 username = NULL,
+									 password = NULL,
+									 sep = " ",
+									 remove_empty_columns = TRUE,
+									 brackets = NULL,
+									 verbose = 2,
+									 add_indices) {
+
 		caps <-
 			fhir_search(request = paste_paths(url, "/metadata?"),
 						username = username,
@@ -486,7 +490,8 @@ fhir_capability_statement <-
 			sep = sep,
 			remove_empty_columns = remove_empty_columns,
 			brackets = brackets,
-			verbose = verbose
+			verbose = verbose,
+			add_indices = add_indices
 		)
 	}
 
