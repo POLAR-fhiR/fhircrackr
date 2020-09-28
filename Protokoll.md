@@ -53,9 +53,36 @@ Weil ja sowieso einfach ein leerer df zurückgegeben wird, wenn die Ressource ni
 --------------------------------------------
 
 ## 04.09.2020
-- branch: crack_by_design_jg
+- branch: crack_by_design_jg, master
 
 ### Aufräumarbeiten
 is_invalid_design() (aus helpers.R) is jetzt überflüssig und wurde durch is_valid_design (aus design.R) ersetzt. Habe is_invalid_design() deshalb gelöscht.
 
 add_attribute_to_design() und remove_attribute_from_design() sind jetzt aus helpers.R nach design.R umgezogen.
+
+crack_by_design_jg wurde in master gemergt
+
+---------------------------------------------------
+--------------------------------------------------
+
+## 23.09.
+- branch: master
+
+### Problem: 
+fhir_capability_statement() lässt keine Authentifizierung beim FHIR-Server zu, weil Argumente password und username fehlen
+
+### Lösung:
+password und username als neue Argumente, werden an fhir_search() durchgereicht.
+
+## 25.09.
+- branch: master
+
+-----------------------------------------------------------
+------------------------------------------------------------
+
+### Problem:
+fhir_capability_statement wirft einen Fehler, wenn man add_indices setzt, weil das Argument dort hart entfernt wurde, statt deprecated wie in fhir_crack().
+
+### Lösung:
+add_indices als Argument zugefügt und an fhir_crack() durchgereicht, dort wird dann die deprecated-Warnung ausgegeben.
+
