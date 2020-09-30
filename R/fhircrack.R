@@ -677,7 +677,7 @@ fhir_melt <-
 		#dbg
 		#column_prefix <- "id"
 
-		d <- Reduce(rbind,
+		d <- data.table::rbindlist(
 					lapply(seq_len(nrow(
 						indexed_data_frame
 					)),
@@ -695,13 +695,15 @@ fhir_melt <-
 							)
 
 						if (0 < nrow(e))
-							e[seq_len(nrow(e)), id_name] <- row.id
+							e[seq_len(nrow(e)), id_name := row.id]
 
 						e
-					}))
+					}), fill = TRUE)
 
-		if (!is.null(d) && 0 < nrow(d))
-			d[order(d[[id_name]]),]
+		if (!is.null(d) && 0 < nrow(d)) {
+			data.table::setorder(d, id_name)
+			return(d)
+		}
 	}
 
 #' Remove indices from data frame
@@ -760,17 +762,18 @@ fhir_rm_indices <-
 	function(indexed_data_frame,
 			 brackets = c("<", ">"),
 			 columns = names( indexed_data_frame )) {
+
 		brackets.escaped <- esc(brackets)
 
 		pattern.ids <- paste0(brackets.escaped[1], "([0-9]*\\.*)+", brackets.escaped[2])
 
-		for (n in columns) {
+		# for (col in columns) {
+		#
+		# 	indexed_data_frame[[n]] <- gsub( pattern.ids, "", indexed_data_frame[[n]] )
+		# }
 
-			indexed_data_frame[[n]] <- gsub( pattern.ids, "", indexed_data_frame[[n]] )
-		}
-
-		indexed_data_frame
-	}
+		data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_data_frame[,..columns] )))
+}
 
 
 ##### Documentation for medication_bundles data set ######
