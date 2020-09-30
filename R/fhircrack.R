@@ -287,7 +287,7 @@ fhir_load <- function(directory) {
 #' utilized \code{design}, if \code{return_design = TRUE}.
 #'
 #' @export
-#'
+#' @import data.table
 #' @examples
 #' #unserialize example bundle
 #' bundles <- fhir_unserialize(medication_bundles)
@@ -763,14 +763,12 @@ fhir_rm_indices <-
 			 brackets = c("<", ">"),
 			 columns = names( indexed_data_frame )) {
 
+		..columns <- NULL # due to NSE notes in R CMD check
+
 		brackets.escaped <- esc(brackets)
 
 		pattern.ids <- paste0(brackets.escaped[1], "([0-9]*\\.*)+", brackets.escaped[2])
 
-		# for (col in columns) {
-		#
-		# 	indexed_data_frame[[n]] <- gsub( pattern.ids, "", indexed_data_frame[[n]] )
-		# }
 
 		data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_data_frame[,..columns] )))
 }
