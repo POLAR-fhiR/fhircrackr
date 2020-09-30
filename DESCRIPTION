@@ -37,7 +37,8 @@ Imports:
     httr,
     utils,
     dplyr,
-    plyr
+    plyr,
+    data.table
 Suggests: 
     knitr,
     rmarkdown
