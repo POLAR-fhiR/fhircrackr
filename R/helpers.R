@@ -112,7 +112,6 @@ get_bundle <-
 			response <- httr::GET(
 				request,
 				httr::add_headers(Accept = "application/fhir+xml"),
-				httr::content_type("application/fhir+xml;charset=utf-8"),
 				auth
 			)
 
