@@ -686,7 +686,7 @@ bundles2df <- function(bundles,
 													)
 												}), fill=TRUE)
 
-		ret <- ret[rowSums(!is.na(ret)) > 0, ]
+		if(nrow(ret > 0)) {ret <- ret[rowSums(!is.na(ret)) > 0, ]}
 
 		if (1 < verbose) {
 			cat("\n")
