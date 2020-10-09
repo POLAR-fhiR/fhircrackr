@@ -280,6 +280,10 @@ fhir_load <- function(directory) {
 #' @param return_design Logical scalar. If \code{TRUE}, the complete design with automatically by fhir_crack
 #' amended elements is returned as the last element of the returned list. Defaults to \code{FALSE}
 #'
+#' @param data.table Logical scalar. Should tables be returned in data.table format instead of data.frame?
+#' defaults to FALSE.
+#'
+#'
 #' @param add_indices Deprecated. This argument was used to control adding of indices for multiple entries. This is now
 #' done via the brackets argument. If brackets is \code{NULL}, no indices are added, if brackets is not \code{NULL}, indices are added to multiple entries.
 #'
@@ -343,6 +347,7 @@ fhir_crack <- function(bundles,
 			 brackets = NULL,
 			 verbose = 2,
 			 return_design = FALSE,
+			 data.table = FALSE,
 			 add_indices) {
 
 		#-----------------------# remove once add_indices is removed:
@@ -422,6 +427,7 @@ fhir_crack <- function(bundles,
 			bundles2dfs(
 				bundles = bundles,
 				design = design,
+				data.table = data.table,
 				# sep = sep,
 				# remove_empty_columns = remove_empty_columns,
 				# brackets = brackets,
