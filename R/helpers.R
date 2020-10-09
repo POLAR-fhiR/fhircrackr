@@ -26,7 +26,6 @@ lst <- function(...,
 #' @return A single data frame
 #' @noRd
 rbind_list_of_data_frames <- function(list) {
-#	data.table::rbindlist(list)
 	if (is.null(list) || length(list) < 1) {
 		warning("no data in list for rbind_list_of_data_frames(list)")
 
@@ -112,6 +111,7 @@ get_bundle <-
 			response <- httr::GET(
 				request,
 				httr::add_headers(Accept = "application/fhir+xml"),
+				httr::content_type("application/fhir+xml;charset=utf-8"),
 				auth
 			)
 
@@ -367,7 +367,7 @@ xtrct_all_columns <-
 		tree <- xml2::xml_find_all(child, xpath)
 
 		if (length(tree) < 1) {
-			return(data.table::data.table())
+			return(data.frame())
 		}
 
 		xp.child  <- xml2::xml_path(child)
@@ -425,7 +425,7 @@ xtrct_all_columns <-
 			d[[col]] <- paste0(val[col == o[2, ]], collapse = sep)
 		}
 
-		result <- data.table::as.data.table(d)
+		result <- as.data.frame(d, stringsAsFactors = FALSE)
 		names(result) <- gsub("(\\.\\w+)$", "", names(result))
 		result
 	}
@@ -513,7 +513,7 @@ xtrct_columns <- function(child,
 						}
 					})
 
-		data.table::as.data.table(l)
+		as.data.frame(l, stringsAsFactors = FALSE)
 	}
 
 #' Extracts one data frame out of one bundle
@@ -531,23 +531,17 @@ xtrct_columns <- function(child,
 #' bundle <- bundles[[1]]
 #'
 #' #define design
-#' df_desc <- list(
-#'      resource = ".//MedicationStatement",
-#'      cols = list(
+#' design <- list(
+#'      ".//MedicationStatement",
+#'      list(
 #' 	      SYSTEM  = "medicationCodeableConcept/coding/system/@value",
 #' 	      CODE    = "medicationCodeableConcept/coding/code/@value",
 #' 	      DISPLAY = "medicationCodeableConcept/coding/display/@value"
-#' 	      ),
-#' 	      style = list(
-#' 	      sep = " ",
-#' 	      brackets = c("<", ">"),
-#' 	      rm_empty_cols = TRUE
 #' 	      )
-#'
 #' 	 )
 #'
 #' #convert bundle to data frame
-#' result <- fhircrackr:::bundle2df(bundle, df_desc)
+#' result <- fhircrackr:::bundle2df(bundle, design)
 bundle2df <- function(bundle,
 			 df_desc,
 			 # sep = " -+- ",
@@ -624,7 +618,7 @@ bundle2df <- function(bundle,
 				   })
 		}
 
-		data.table::rbindlist(l = df.list, fill=TRUE)
+		suppressWarnings(rbind_list_of_data_frames(list = df.list))
 	}
 
 #' Convert several bundles to one data frame
@@ -640,24 +634,18 @@ bundle2df <- function(bundle,
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #define design
-#' df_desc <- list(
-#'      resource = ".//MedicationStatement",
-#'      cols = list(
+#' design <- list(
+#'      ".//MedicationStatement",
+#'      list(
 #' 	      SYSTEM  = "medicationCodeableConcept/coding/system/@value",
 #' 	      CODE    = "medicationCodeableConcept/coding/code/@value",
 #' 	      DISPLAY = "medicationCodeableConcept/coding/display/@value"
-#' 	      ),
-#' 	      style = list(
-#' 	      sep = " ",
-#' 	      brackets = c("<", ">"),
-#' 	      rm_empty_cols = TRUE
 #' 	      )
-#'
 #' 	 )
 #'
 #'
 #' #convert bundles to data frame
-#' result <- fhircrackr:::bundles2df(bundles, df_desc)
+#' result <- fhircrackr:::bundles2df(bundles, design)
 
 bundles2df <- function(bundles,
 			 df_desc,
@@ -665,7 +653,7 @@ bundles2df <- function(bundles,
 			 # brackets = NULL,
 			 verbose = 2) {
 
-		ret <- data.table::rbindlist(lapply(seq_along(bundles),
+		ret <- rbind_list_of_data_frames(lapply(seq_along(bundles),
 												function(i) {
 													#dbg
 													#i<-1
@@ -683,9 +671,11 @@ bundles2df <- function(bundles,
 														# brackets = brackets,
 														verbose = verbose
 													)
-												}), fill=TRUE)
+												}))
 
-		if(nrow(ret > 0)) {ret <- ret[rowSums(!is.na(ret)) > 0, ]}
+		ret <-
+			ret[apply(ret, 1, function(row)
+				!all(is.na(row))), , drop = FALSE]
 
 		if (1 < verbose) {
 			cat("\n")
@@ -727,9 +717,9 @@ bundles2df <- function(bundles,
 #'  #define specifically which elements to extract
 #' 	MedicationStatement = list(
 #'
-#' 		resource = ".//MedicationStatement",
+#' 		".//MedicationStatement",
 #'
-#' 		cols = list(
+#' 		list(
 #' 			MS.ID              = "id/@value",
 #' 			STATUS.TEXT        = "text/status/@value",
 #' 			STATUS             = "status/@value",
@@ -739,25 +729,13 @@ bundles2df <- function(bundles,
 #' 			DOSAGE             = "dosage/text/@value",
 #' 			PATIENT            = "subject/reference/@value",
 #' 			LAST.UPDATE        = "meta/lastUpdated/@value"
-#' 		),
-#'
-#' 		style = list(
-#' 		brackets = c("<", ">"),
-#' 		sep = " ",
-#' 		rm_empty_cols=T
 #' 		)
 #' 	),
 #'
 #'  #extract all values
 #' 	Patients = list(
 #'
-#' 		resource = ".//Patient",
-#' 		cols = NULL,
-#' 		style = list(
-#'  		brackets = c("<", ">"),
-#' 	    	sep = " ",
-#' 		    rm_empty_cols=T
-#' 		)
+#' 		".//Patient"
 #' 	)
 #' )
 #'
@@ -818,7 +796,11 @@ bundles2dfs <-
 
 					  	if(remove[i] && ncol(dfs[[i]]) > 0){
 
-					  	dfs[[i]][, colSums(!is.na(dfs[[i]]))>0, with=F]
+					  	cols <- names(dfs[[i]])[sapply(dfs[[i]], function(col){ 0 < sum(!is.na(col))})]
+
+					  	df <- dplyr::select(dfs[[i]], cols)
+
+					  	df
 
 					  	} else {
 
@@ -862,23 +844,21 @@ melt_row <-
 			 brackets = c("<", ">"),
 			 sep = " -+- ",
 			 all_columns = FALSE) {
-
-		row <- as.data.frame(row)
-
 		col.names.mutable  <- columns
 
 		col.names.constant <- setdiff(names(row), col.names.mutable)
 
-		row.mutable  <- row[, col.names.mutable]
+		row.mutable  <- row[col.names.mutable]
 
-		row.constant <- row[, col.names.constant]
+		row.constant <- row[col.names.constant]
 
 		#dbg
 		#row <- d3.3$Entries[ 1, ]
 
 		brackets.escaped <- esc(brackets)
 
-		pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
+		pattern.ids <-
+			paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 
 		ids <- stringr::str_extract_all(row.mutable, pattern.ids)
 
@@ -886,40 +866,42 @@ melt_row <-
 
 		names(ids) <- col.names.mutable
 
-		pattern.items <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
+		pattern.items <-
+			paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 
 		items <- stringr::str_split(row.mutable, pattern.items)
 
-		items <- lapply(items, function(i) {
-					if (!all(is.na(i)) && i[1] == "") {
-						i[2:length(i)]
-					} else {
-						i
-					}
-			 	})
+		items <-
+			lapply(items, function(i) {
+				if (!all(is.na(i)) && i[1] == "") {
+					i[2:length(i)]
+				} else {
+					i
+				}
+			})
 
 		names(items) <- col.names.mutable
 
 		d <-
 			if (all_columns) {
-				row[0, ,FALSE]
+				row[0, , FALSE]
 			} else {
 				row[0, col.names.mutable, FALSE]
 			}
 
-		for (i in names(ids)) { #loop trough variables
+		for (i in names(ids)) {
 			#dbg
 			#i<-names( ids )[1]
 
-			id <- ids[[i]] #id's of variable i
+			id <- ids[[i]]
 
 			if (!all(is.na(id))) {
-				it <- items[[i]] #respective items (values)
+				it <- items[[i]]
 
 				new.rows        <-
 					gsub(paste0(brackets.escaped[1], "([0-9]+)\\.*.*"),
 						 "\\1",
-						 id) #new row numbers
+						 id)
 				new.ids         <-
 					gsub(
 						paste0(
@@ -931,11 +913,10 @@ melt_row <-
 						),
 						"\\1\\3",
 						id
-					) #new ids
-
+					)
 				unique.new.rows <- unique(new.rows)
 
-				set <- paste0(new.ids, it) #put new ids to items
+				set <- paste0(new.ids, it)
 
 				f <- sapply(unique.new.rows,
 							function(unr) {
@@ -947,7 +928,7 @@ melt_row <-
 								paste0(set[fltr], collapse = "")
 							})
 
-				for (n in unique.new.rows) { #loop trough new rows
+				for (n in unique.new.rows) {
 					d[n, i] <- gsub(paste0(esc(sep), "$"), "", f[n], perl = TRUE)
 				}
 			}
@@ -964,9 +945,5 @@ melt_row <-
 
 		#	names( d )[ names( d ) %in% col.names.mutable ] <- gsub( paste0( "^", column.prefix, "\\." ), "", col.names.mutable )
 
-		data.table::data.table(d)
+		d
 	}
-
-#to ensure data.table version of d[] is called, even though it is not explicitly stated in
-#import section of NAMESPACE file (https://cran.r-project.org/web/packages/data.table/vignettes/datatable-importing.html)
-.datatable.aware = TRUE
