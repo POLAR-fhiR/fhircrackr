@@ -1,10 +1,10 @@
 ---
-title: "fhircrackr: Handling HL7&reg; FHIR&reg; resources in R"
+title: "fhircrackr: Handling HL7&reg; FHIR&reg; Resources in R"
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{fhircrackr: Handling HL7 FHIR resources in R}
+  %\VignetteIndexEntry{fhircrackr: Handling HL7&reg; FHIR&reg; Resources in R}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -30,9 +30,9 @@ We therefore implemented a package that makes it possible to download FHIR resou
 The package is still under development. The CRAN version of the package contains all functions that are already stable, for more recent (but potentially unstable) developments, the development version of the package can be downloaded from GitHub using `devtools::install_github("POLAR-fhiR/fhircrackr")`.
 
 ## Prerequisites
-The complexity of the problem requires a couple of prerequisites both regarding knowledge and access to data. We will shortly list the  preconditions to using the `fhircrackr` package here:  
+The complexity of the problem requires a couple of prerequisites both regarding knowledge and access to data. We will shortly list the  preconditions for using the `fhircrackr` package here:  
 
-1. First of all, you need the endpoint of the FHIR server you want to access. If you don't have your own FHIR server, you can use one of the publicly available servers, such as `https://hapi.fhir.org/baseR4` or `http://fhir.hl7.de:8080/baseDstu3`. The endpoint of a FHIR server is often referred to as [base].
+1. First of all, you need the endpoint of the FHIR server you want to access. If you don't have your own FHIR server, you can use one of the available public servers, such as `https://hapi.fhir.org/baseR4` or `http://fhir.hl7.de:8080/baseDstu3`. The endpoint of a FHIR server is often referred to as [base] or [baseR4] for the HL7 R4 standard for instance.
 
 2. To download resources from the server, you should be familiar with [FHIR search requests](https://www.hl7.org/fhir/search.html). FHIR search allows you to download sets of resources that match very specific requirements. As the focus of this package is dealing with FHIR resources in R rather than the intricacies of FHIR search, we will mostly use simple examples of FHIR search requests. Most of them will have the form `[base]/[type]?parameter(s)`, where `[type]` refers to the type of resource you are looking for and `parameter(s)` characterize specific properties those resources should have.
 `https://hapi.fhir.org/baseR4/Patient?gender=female` for example downloads all Patient resources from the FHIR server at `https://hapi.fhir.org/baseR4/` that represent female patients.
@@ -44,7 +44,7 @@ In the following we'll go through a typical workflow with `fhircrackr` step by s
 ## Download and flatten FHIR resources from a server
 
 ### 1. Download Patient resources
-We will start with a very simple example and use `fhir_search()` to download Patient resources from a publicly available HAPI server after we've loaded the package with `library(fhircrackr)`:
+We will start with a very simple example and use `fhir_search()` to download Patient resources from a public HAPI server after we've loaded the package with `library(fhircrackr)`:
 
 ```{r, eval=F}
 library(fhircrackr)
@@ -185,7 +185,7 @@ head(list_of_tables$Patients)
 ```
 This option will usually return the most tidy and clear data frames, because you have full control over the extracted columns including their name in the resulting data frame. You should always extract the resource id, because this is used to link to other resources you might also extract. 
 
-If you are not sure which attributes are available or where they are located in the resource, it can be helpful to start by extracting all available attributes. If you are more comfortable with xml, you can also use `xml2::xml_structure` on one of the bundles from you bundle list, this will print the complete xml structure into your console. Then you can get an overview over the available attributes and their location and continue by doing a second, more targeted extraction to get your final data frame.
+If you are not sure which attributes are available or where they are located in the resource, it can be helpful to start by extracting all available attributes. If you are more comfortable with xml, you can also use `xml2::xml_structure` on one of the bundles from your bundle list, this will print the complete xml structure into your console. Then you can get an overview over the available attributes and their location and continue by doing a second, more targeted extraction to get your final data frame.
 
 
 #### Set `style` component
@@ -230,7 +230,7 @@ tables_with_design$design
 #### Extract more than one resource type
 Of course the previous example is using just one resource type. If you are interested in several types of resources, `design` will contain several data.frame descriptions and the result will be a list of several data frames.
 
-Consider the following example where we want to download MedicationStatements referring to a certain medication we specify with its snomed code and also the Patient resources these MedicationStatements are linked to.
+Consider the following example where we want to download MedicationStatements referring to a certain medication we specify with its SNOMED CT code and also the Patient resources these MedicationStatements are linked to.
 
 When the FHIR search request gets longer, it can be helpful to build up the request piece by piece like this:
 
