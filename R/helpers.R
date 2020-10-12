@@ -700,7 +700,7 @@ bundles2df <- function(bundles,
 #' list elements are the column names of the resulting data frame.
 #'
 #' For a more detailed explanation see the package vignette.
-#'
+#' @param data.table Logical scalar. Return list of data.tables instead of data.frames? Defaults to FALSE.
 #' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
 #' @noRd
 #' @return A list of data frames as specified by \code{design}.
@@ -747,6 +747,7 @@ bundles2dfs <-
 			 # sep = " -+- ",
 			 # remove_empty_columns = FALSE,
 			 # brackets = NULL,
+			 data.table = FALSE,
 			 verbose = 2) {
 
 		dfs <- lapply(lst(names(design)),
@@ -810,7 +811,14 @@ bundles2dfs <-
 
 
 		names(dfs_cleaned) <- names(dfs)
-		dfs_cleaned
+
+		if(data.table){
+
+			return(dfs_cleaned)
+
+		}else{
+			return(lapply(dfs_cleaned, data.frame))
+		}
 	}
 
 #' Escape special characters
