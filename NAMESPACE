@@ -3,6 +3,7 @@
 export(fhir_capability_statement)
 export(fhir_common_columns)
 export(fhir_crack)
+export(fhir_last_next_link)
 export(fhir_load)
 export(fhir_load_design)
 export(fhir_melt)
