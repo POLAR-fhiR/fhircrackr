@@ -782,12 +782,25 @@ fhir_rm_indices <-
 
 		..columns <- NULL # due to NSE notes in R CMD check
 
+		is_DT <- data.table::is.data.table(indexed_data_frame)
+
+		if(!is_DT){data.table::setDT(indexed_data_frame)}
+
+
 		brackets.escaped <- esc(brackets)
 
 		pattern.ids <- paste0(brackets.escaped[1], "([0-9]*\\.*)+", brackets.escaped[2])
 
 
-		data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_data_frame[,..columns] )))
+		result <- data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_data_frame[,..columns] )))
+
+		if(!is_DT){
+			data.table::setDF(result)
+			return(result)
+		}else{
+			return(result)
+		}
+
 }
 
 

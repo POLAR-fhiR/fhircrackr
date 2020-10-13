@@ -366,7 +366,7 @@ xtrct_all_columns <-
 		tree <- xml2::xml_find_all(child, xpath)
 
 		if (length(tree) < 1) {
-			return(data.frame())
+			return(data.table::data.table())
 		}
 
 		xp.child  <- xml2::xml_path(child)
@@ -424,7 +424,7 @@ xtrct_all_columns <-
 			d[[col]] <- paste0(val[col == o[2, ]], collapse = sep)
 		}
 
-		result <- as.data.frame(d, stringsAsFactors = FALSE)
+		result <- data.table::as.data.table(d)
 		names(result) <- gsub("(\\.\\w+)$", "", names(result))
 		result
 	}
@@ -512,7 +512,7 @@ xtrct_columns <- function(child,
 						}
 					})
 
-		as.data.frame(l, stringsAsFactors = FALSE)
+		data.table::as.data.table(l)
 	}
 
 #' Extracts one data frame out of one bundle
@@ -617,7 +617,7 @@ bundle2df <- function(bundle,
 				   })
 		}
 
-		suppressWarnings(rbind_list_of_data_frames(list = df.list))
+		data.table::rbindlist(l = df.list, fill=TRUE)
 	}
 
 #' Convert several bundles to one data frame
@@ -647,41 +647,39 @@ bundle2df <- function(bundle,
 #' result <- fhircrackr:::bundles2df(bundles, design)
 
 bundles2df <- function(bundles,
-			 df_desc,
-			 # sep = " -+- ",
-			 # brackets = NULL,
-			 verbose = 2) {
+					   df_desc,
+					   # sep = " -+- ",
+					   # brackets = NULL,
+					   verbose = 2) {
 
-		ret <- rbind_list_of_data_frames(lapply(seq_along(bundles),
-												function(i) {
-													#dbg
-													#i<-1
+	ret <- data.table::rbindlist(lapply(seq_along(bundles),
+										function(i) {
+											#dbg
+											#i<-1
 
-													if (1 < verbose) {
-														cat("\n", i)
-													}
+											if (1 < verbose) {
+												cat("\n", i)
+											}
 
-													bundle <- bundles[[i]]
+											bundle <- bundles[[i]]
 
-													bundle2df(
-														bundle,
-														df_desc,
-														# sep,
-														# brackets = brackets,
-														verbose = verbose
-													)
-												}))
+											bundle2df(
+												bundle,
+												df_desc,
+												# sep,
+												# brackets = brackets,
+												verbose = verbose
+											)
+										}), fill=TRUE)
 
-		ret <-
-			ret[apply(ret, 1, function(row)
-				!all(is.na(row))), , drop = FALSE]
+	if(nrow(ret > 0)) {ret <- ret[rowSums(!is.na(ret)) > 0, ]}
 
-		if (1 < verbose) {
-			cat("\n")
-		}
-
-		ret
+	if (1 < verbose) {
+		cat("\n")
 	}
+
+	ret
+}
 
 #' Flatten list of FHIR bundles
 #' @description Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
@@ -796,11 +794,7 @@ bundles2dfs <-
 
 					  	if(remove[i] && ncol(dfs[[i]]) > 0){
 
-					  	cols <- names(dfs[[i]])[sapply(dfs[[i]], function(col){ 0 < sum(!is.na(col))})]
-
-					  	df <- dplyr::select(dfs[[i]], cols)
-
-					  	df
+					  		dfs[[i]][, colSums(!is.na(dfs[[i]]))>0, with=F]
 
 					  	} else {
 
@@ -867,8 +861,7 @@ melt_row <-
 
 		brackets.escaped <- esc(brackets)
 
-		pattern.ids <-
-			paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
+		pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 
 		ids <- stringr::str_extract_all(row.mutable, pattern.ids)
 
@@ -876,8 +869,7 @@ melt_row <-
 
 		names(ids) <- col.names.mutable
 
-		pattern.items <-
-			paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
+		pattern.items <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 
 		items <- stringr::str_split(row.mutable, pattern.items)
 
