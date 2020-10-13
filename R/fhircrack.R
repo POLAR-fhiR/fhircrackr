@@ -1,3 +1,21 @@
+fhircrackr_env <- new.env(parent = emptyenv())
+assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
+
+#' Last Next Link
+#' @description Returns the next link of the recently downloaded bundle.
+#'
+#' @return The next link.
+#' @export
+#'
+#' @examples
+#' \donttest{b10 <- fhir_search("http://hapi.fhir.org/baseR4/Observation?", verbose = 2, max_bundles = 10)
+#' b20 <- fhir_search(fhir_last_next_link(), verbose = 2, max_bundles = 10)
+#' b30 <- fhir_search(fhir_last_next_link(), verbose = 2, max_bundles = 10))
+fhir_last_next_link <- function() {
+
+	fhircrackr_env$last_next_link
+}
+
 #' Concatenate paths
 #' @description Concatenates two strings to path string correctly.
 #'
@@ -133,9 +151,14 @@ fhir_search <-
 							cnt,
 							" bundles, this is less than the total number of bundles available.\n"
 						)
+
+						urls <- xml2::xml_attr(xml2::xml_find_first(links, "./url"), "value")
+
+						assign(x = "last_next_link", value = urls[rels.nxt][1], envir = fhircrackr_env)
 					}
 					else {
 						message("\nDownload completed. All available bundles were downloaded.\n")
+						assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
 					}
 				}
 
