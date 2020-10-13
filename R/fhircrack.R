@@ -172,11 +172,13 @@ fhir_search <-
 					}
 					else {
 						message("\nDownload completed. All available bundles were downloaded.\n")
-						assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
 					}
 				}
 
 				break
+			}
+			else {
+				assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
 			}
 
 			if (!any(!is.na(rels.nxt) & rels.nxt)) {
