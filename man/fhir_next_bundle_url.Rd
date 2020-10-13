@@ -2,13 +2,32 @@
 % Please edit documentation in R/fhircrack.R
 \name{fhir_next_bundle_url}
 \alias{fhir_next_bundle_url}
-\title{Last Next Link}
+\title{Next Bundle's URL}
 \usage{
 fhir_next_bundle_url()
 }
 \value{
-The next link.
+A string containing an url to the next bundle available on the fhir server and NULL if no further bundle is available.
 }
 \description{
-Returns the next link of the recently downloaded bundle.
+fhir_next_bundle_url() gives the url of the next available bundle. This is useful in cases of small memory. Here you want to use max_bundle to download not all available bundles a once but in a loop. See details in the example.
+}
+\examples{
+\donttest{
+# workflow for small memory environments
+# download a small number of bundles!
+# for really small memory environments use also a small _count argument in the request!
+# crack and save them!
+# repeat this until the last bundle is processed!
+# for all bundles in the example remove '&& count < 10' in the while condition
+library(fhircrackr)
+url <- "http://hapi.fhir.org/baseR4/Observation?_count=500"
+count <- 0
+while(!is.null(url) && count < 10){
+	bundles <- fhir_search(url, verbose = 2, max_bundles = 10)
+	tables <- fhir_crack(bundles, list(Obs=list("//Observation")))
+	save(tables, file = paste0("table_", count, ".RData"))
+	count <- count + 1
+}
+}
 }
