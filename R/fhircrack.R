@@ -9,9 +9,9 @@ assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
 #'
 #' @examples
 #' \donttest{b10 <- fhir_search("http://hapi.fhir.org/baseR4/Observation?", verbose = 2, max_bundles = 10)
-#' b20 <- fhir_search(fhir_last_next_link(), verbose = 2, max_bundles = 10)
-#' b30 <- fhir_search(fhir_last_next_link(), verbose = 2, max_bundles = 10))
-fhir_last_next_link <- function() {
+#' b20 <- fhir_search(fhir_next_bundle_url(), verbose = 2, max_bundles = 10)
+#' b30 <- fhir_search(fhir_next_bundle_url(), verbose = 2, max_bundles = 10))
+fhir_next_bundle_url <- function() {
 
 	fhircrackr_env$last_next_link
 }
