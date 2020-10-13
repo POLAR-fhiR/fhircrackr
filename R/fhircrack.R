@@ -680,6 +680,10 @@ fhir_melt <-
 			stop("Not all column names you gave match with the column names in the data frame.")
 		}
 
+		is_DT <- data.table::is.data.table(indexed_data_frame)
+
+		if(!is_DT){data.table::setDT(indexed_data_frame)}
+
 		#dbg
 		#column_prefix <- "id"
 
@@ -708,7 +712,14 @@ fhir_melt <-
 
 		if (!is.null(d) && 0 < nrow(d)) {
 			data.table::setorder(d, id_name)
-			return(d)
+
+			if(!is_DT){
+				setDF(d)
+				return(d)
+			}else{
+				return(d)
+			}
+
 		}
 	}
 

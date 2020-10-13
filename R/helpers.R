@@ -851,6 +851,9 @@ melt_row <-
 			 brackets = c("<", ">"),
 			 sep = " -+- ",
 			 all_columns = FALSE) {
+
+		row <- as.data.frame(row)
+
 		col.names.mutable  <- columns
 
 		col.names.constant <- setdiff(names(row), col.names.mutable)
@@ -952,5 +955,9 @@ melt_row <-
 
 		#	names( d )[ names( d ) %in% col.names.mutable ] <- gsub( paste0( "^", column.prefix, "\\." ), "", col.names.mutable )
 
-		d
+		data.table::data.table(d)
 	}
+
+#to ensure data.table version of d[] is called, even though it is not explicitly stated in
+#import section of NAMESPACE file (https://cran.r-project.org/web/packages/data.table/vignettes/datatable-importing.html)
+.datatable.aware = TRUE
