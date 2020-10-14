@@ -2,29 +2,36 @@ fhircrackr_env <- new.env(parent = emptyenv())
 assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
 
 #' Next Bundle's URL
-#' @description fhir_next_bundle_url() gives the url of the next available bundle. This is useful in cases of small memory. Here you want to use max_bundle to download not all available bundles a once but in a loop. See details in the example.
+#' @description fhir_next_bundle_url() gives the url of the next available bundle.
+#' This is useful when you have not a lot of memory available or when a download of bundles was
+#' interrupted for some reason. In case of small memory, you can use \code{fhir_next_bundle_url} together with the
+#' \code{max_bundle} argument from \code{\link{fhir_search}} to download bundles in smaller batches in a loop.
+#' See details in the example.
 #'
-#' @return A string containing an url to the next bundle available on the fhir server and NULL if no further bundle is available.
+#' @return A string containing an url to the next bundle available on the FHIR server of your last call to
+#' \code{\link{fhir_search}} or NULL if no further bundle is available.
 #' @export
 #'
 #' @examples
 #' \donttest{
-#' # workflow for small memory environments
-#' # download a small number of bundles!
-#' # for really small memory environments use also a small _count argument in the request!
-#' # crack and save them!
-#' # repeat this until the last bundle is processed!
-#' # for all bundles in the example remove '&& count < 10' in the while condition
-#' library(fhircrackr)
-#' url <- "http://hapi.fhir.org/baseR4/Observation?_count=500"
+#' # workflow for small memory environments, downloading small batches of bundles
+#' # for really small memory environments consider also using the _count option in
+#' # your FHIR search request.
+#' # You can iteratively download, crack and save the bundles until all bundles are processed or the
+#' # desired number of bundles is reached.
+
+
+#' url <- "http://hapi.fhir.org/baseR4/Observation"
 #' count <- 0
-#' while(!is.null(url) && count < 10){
-#' 	bundles <- fhir_search(url, verbose = 2, max_bundles = 10)
-#' 	tables <- fhir_crack(bundles, list(Obs=list("//Observation")))
-#' 	save(tables, file = paste0("table_", count, ".RData"))
+#' while(!is.null(url) && count < 5){
+#' 	bundles <- fhir_search(url, verbose = 2, max_bundles = 2)
+#' 	tables <- fhir_crack(bundles, list(Obs=list(resource = "//Observation")))
+#' 	save(tables, file = paste0(tempdir(),"/table_", count, ".RData"))
 #' 	count <- count + 1
+#' 	url <- fhir_next_bundle_url()
 #' }
 #'}
+#'
 fhir_next_bundle_url <- function() {
 
 	fhircrackr_env$last_next_link
@@ -81,7 +88,16 @@ paste_paths <- function(path1 = "w",
 #'
 #' 2: write http response as to xml-file
 #'
-#' @return A list of bundles in xml format.
+#' @param save_to_disc A logical scalar. If TRUE the bundles are saved as numerated xml-files into the directory specified
+#' in the argument \code{directory} and not returned as a bundle list in the R session. This is useful when a lot of
+#' bundles are to be downloaded and keeping them all in one R session might overburden working memory. When download
+#' is complete, the bundles can be loaded into R using \code{\link{fhir_load}}. Defaults to FALSE, i.e. bundles are
+#' returned as a list within the R session.
+#'
+#' @param directory The directory the bundles are saved to when \code{save_to_disc} is TRUE. Defaults to creating a
+#' time-stamped directory into the current working directory.
+#'
+#' @return A list of bundles in xml format when \code{save_to_disc = FALSE} (the default),  else NULL.
 #' @export
 #'
 #' @examples
@@ -95,7 +111,10 @@ fhir_search <-
 			 verbose = 1,
 			 max_attempts = 5,
 			 delay_between_attempts = 10,
-			 log_errors = 0) {
+			 log_errors = 0,
+			 save_to_disc = FALSE,
+			 directory = paste0("FHIR_bundles_", gsub("-| |:","", Sys.time()))) {
+
 		bundles <- list()
 
 		addr <- request
@@ -150,7 +169,20 @@ fhir_search <-
 
 			xml2::xml_ns_strip(bundle)
 
-			bundles[[addr]] <- bundle
+
+			if(save_to_disc){
+
+				if (!dir.exists(directory)){
+					dir.create(directory, recursive = TRUE)
+				}
+
+				xml2::write_xml(
+					bundle,
+					paste_paths(directory, paste0(cnt, ".xml")))
+
+			}else{
+				bundles[[addr]] <- bundle
+			}
 
 			links <- xml2::xml_find_all(bundle, "link")
 
@@ -204,7 +236,15 @@ fhir_search <-
 			}
 		}
 
-		bundles
+		if(save_to_disc){
+
+			return(NULL)
+
+		}else{
+
+			return(bundles)
+
+		}
 	}
 
 
