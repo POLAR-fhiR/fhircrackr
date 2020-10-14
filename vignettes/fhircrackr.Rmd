@@ -2,11 +2,13 @@
 title: "fhircrackr: Handling HL7&reg; FHIR&reg; Resources in R"
 
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:	rmarkdown::html_vignette
+
 vignette: >
   %\VignetteIndexEntry{fhircrackr: Handling HL7&reg; FHIR&reg; Resources in R}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  
 ---
 
 ```{r, include = FALSE}
@@ -29,6 +31,25 @@ We therefore implemented a package that makes it possible to download FHIR resou
 
 The package is still under development. The CRAN version of the package contains all functions that are already stable, for more recent (but potentially unstable) developments, the development version of the package can be downloaded from GitHub using `devtools::install_github("POLAR-fhiR/fhircrackr")`.
 
+This vignette covers the following topics:
+
+- Prerequisites
+
+- Downloading and flattening resources from a FHIR server
+
+- Processing data frames with multiple entries
+
+- Saving and loading downloaded bundles
+
+- Saving and reading designs
+
+- Performance 
+
+- Downloading capability statements
+
+- Further options
+
+
 ## Prerequisites
 The complexity of the problem requires a couple of prerequisites both regarding knowledge and access to data. We will shortly list the  preconditions for using the `fhircrackr` package here:  
 
@@ -41,9 +62,9 @@ The complexity of the problem requires a couple of prerequisites both regarding 
 
 In the following we'll go through a typical workflow with `fhircrackr` step by step.
 
-## Download and flatten FHIR resources from a server
+## Download and flatten FHIR Resources from a server
 
-### 1. Download Patient resources
+### 1. Download Patient Resources
 We will start with a very simple example and use `fhir_search()` to download Patient resources from a public HAPI server after we've loaded the package with `library(fhircrackr)`:
 
 ```{r, eval=F}
@@ -75,8 +96,8 @@ str(patient_bundles[[1]])
 If for some reason you cannot connect to a FHIR server at the moment but want to explore the following functions anyway, the package provides two example lists of bundles containing Patient and MedicationStatement resources. See `?patient_bundles` and `?medication_bundles` for how to use them.
 
 
-### 2. Flatten FHIR resources
-Now we know that inside these xml objects there is the patient data somewhere. To get it out, we will use `fhir_crack()`. The most important argument `fhir_crack()` takes is `bundles`, the list of bundles that is returned by `fhir_search()`. The second important argument is `design`, an object that tells the function which data to extract from the bundle. `fhir_crack()` returns a list of data.frames.
+### 2. Flatten FHIR Resources
+Now we know that inside these xml objects there is the patient data somewhere. To get it out, we will use `fhir_crack()`. The most important argument `fhir_crack()` takes is `bundles`, the list of bundles that is returned by `fhir_search()`. The second important argument is `design`, an object that tells the function which data to extract from the bundle. `fhir_crack()` returns a list of data.frames (the default) or a list of data.tables (if argument `data.tables=TRUE`).
 
 In general, `design` has to be a named list containing one element per data frame that will be created. We call these elements *data.frame descriptions*. The names of the data.frame descriptions in `design` are also going to be the names of the resulting data frames. It usually makes sense to create one data frame per type of resource. Because we have just downloaded resources of the type Patient, the `design` here would be a list of length 1, containing just one data.frame description. In the following we will first describe the different elements of a data.frame description and will then provide several examples.
 
@@ -84,7 +105,6 @@ The data.frame description itself is again a list, with 3 elements:
 
 1. *resource*  
 A string containing an XPath expression to the resource you want to extract, e.g. `"//Patient"`. If your bundles are the result of a regular FHIR search request, the correct XPath expression will always be `"//<resource name>"`.
-
 
 2. *cols*  
 Can be NULL, a string or a list describing the columns your data frame is going to have.
@@ -426,7 +446,7 @@ fhir_canonical_design()
 
 Of course the above example is a very specific case that only occurs if your resources have multiple entries with complementary elements. In the vast majority of cases multiple entries in one resource will have the same structure, thus making numbering of those entries superfluous.
 
-## Process data frames with multiple entries
+## Process Data Frames with multiple Entries
 
 ### 1. Melt data frames with multiple entries
 If the data frame produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. This is where `fhir_melt()` comes into play. `fhir_melt()` takes an indexed data frame with multiple entries in one or several `columns` and spreads (aka melts) these entries over several rows:
@@ -564,7 +584,70 @@ To read the design back into R, you can use `fhir_load_design()`:
 fhir_load_design(paste0(temp_dir,"\\design.xml"))
 ```
 
-## Download capability statement
+## Performance
+If you want to download a lot of resources from a server, you might run into several problems. 
+
+First of all, downloading a lot of resources will require a lot of time, depending on the performance of your FHIR server. Because `fhir_search()` essentially runs a loop pulling bundle after bundle, downloads can usually be accelerated if the bundle size is increased, because that way we can lower the number of requests to the server. You can achieve this by adding `_count=` parameter to your FHIR search request. `http://hapi.fhir.org/baseR4/Patient?_count=500` for example will pull patient resources in bundles of 500 resources from the server.
+
+A problem that is also related to the number of requests to the server is that sometimes servers might crash, when too many requests are sent to them in a row. In that case `fhir_search()` will throw an error. If you set the argument `log_errors` accordingly, you can however retrieve the server errors that caused `fhir_search()` to crash.
+
+The third problem is that large amounts of resources can at some point exceed the working memory you have available. There are two solutions to the problem of crashing servers and working memory:
+
+### 1. Use the save_to_disc argument of fhir_search()
+If you set `save_to_disc=TRUE` in your call to fhir_search(), the bundles will not be combined in a bundle list that is returned when the downloading is done, but will instead be saved as xml-files to the directory specified in the argument `directory` one by one. This way, the R session will only have to keep one bundle at a time in the working memory and if the server crashes halfway trough, all bundles up to the crash are safely saved in your directory:
+
+```{r, eval=F}
+fhir_search("http://hapi.fhir.org/baseR4/Patient", max_bundles = 10, 
+			save_to_disc=TRUE, directory = paste0(temp_dir, "/downloadedBundles"))
+```
+
+### 2. Use fhir_next_bundle_url() 
+Alternatively, you can also use `fhir_next_bundle_url()`. This function returns the url to the next bundle from you most recent call to `fhir_search()`:
+
+```{r, include=F}
+assign(x = "last_next_link", value = "http://hapi.fhir.org/baseR4?_getpages=0be4d713-a4db-4c27-b384-b772deabcbc4&_getpagesoffset=200&_count=20&_pretty=true&_bundletype=searchset", envir = fhircrackr:::fhircrackr_env)
+
+```
+
+```{r}
+fhir_next_bundle_url()
+```
+
+In the link above you can see two interesting numbers: `_count=20` tells you that the queried hapi server has a default bundle size of 20. ` getpagesoffset=200` tells you that the bundle referred to in this link starts after resource no. 200, which makes sense since the `fhir_search()` request above downloaded 10 bundles with 20 resources each, i.e. 200 resources. If you use this link in a new call to `fhir_search`, the download will start from this bundle (i.e. the 11th bundle with resources 201-220) and will go on to the following bundles from there. 
+
+When there is no next bundle (because all available resources have been downloaded), `fhir_next_bundle_url()` returns `NULL`.
+
+If a download with `fhir_search()` is interrupted due to a server error somewhere in between, you can use `fhir_next_bundle_url()` to see where the download was interrupted.
+
+You can also use this function to avoid memory issues. Th following block of code utilizes `fhir_next_bundle_url()` to download all available Observation resources in small batches of 10 bundles that are immediately cracked and saved before the next batch of bundles is downloaded. Note that this example can be very time consuming if there are a lot of resources on the server, to limit the number of iterations uncomment the lines of code that have been commented out here:
+
+```{r, eval=F}
+#Starting fhir search request
+url <- "http://hapi.fhir.org/baseR4/Observation?_count=500"
+
+#count <- 0
+
+while(!is.null(url)){
+	
+	#load 10 bundles
+	bundles <- fhir_search(url, max_bundles = 10) 
+	
+	#crack bundles
+	dfs <- fhir_crack(bundles, list(Obs=list(resource = "//Observation")))
+	
+	#save cracked bundle to RData-file (can be exchanged by other data type)
+	save(tables, file = paste0(tempdir,"/table_", count, ".RData"))
+	
+	#retrieve starting point for next 10 bundles
+	url <- fhir_next_bundle_url()
+	
+	#count <- count + 1
+	#if(count >= 20) {break}
+}
+
+```
+
+## Download Capability Statement
 The [capability statement](https://www.hl7.org/fhir/capabilitystatement.html) documents a set of capabilities (behaviors) of a FHIR Server for a particular version of FHIR. You can download this statement using the function `fhir_capability_statement()`:
 
 ```{r, eval=F}
