@@ -1,5 +1,6 @@
 fhircrackr_env <- new.env(parent = emptyenv())
 assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
+assign(x = "canonical_design", value = NULL, envir = fhircrackr_env)
 
 #' Next Bundle's URL
 #' @description fhir_next_bundle_url() gives the url of the next available bundle.
@@ -35,6 +36,33 @@ assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
 fhir_next_bundle_url <- function() {
 
 	fhircrackr_env$last_next_link
+}
+
+#' Retrieve design of last call to fhir_crack
+#'
+#' @description Returns the complete design of the last call to \code{\link{fhir_crack}} with
+#' automatically amended elements, i.e. the canonical form of the design with elements resource, cols, style
+#' and respective subelements.
+#' @export
+#' @examples
+#' #load example bundles
+#' bundles <- fhir_unserialize(patient_bundles)
+#'
+#' #incomplete but valid design
+#' design <- list(
+#'   Pat = list(
+#'     resource = "//Patient"
+#'     )
+#' )
+#'
+#' result <- fhir_crack(bundles, design)
+#'
+#' fhir_canonical_design()
+#'
+
+fhir_canonical_design <- function() {
+
+	fhircrackr_env$canonical_design
 }
 
 #' Concatenate paths
@@ -356,9 +384,6 @@ fhir_load <- function(directory) {
 #' @param verbose An Integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
 #'
-#' @param return_design Logical scalar. If \code{TRUE}, the complete design with automatically by fhir_crack
-#' amended elements is returned as the last element of the returned list. Defaults to \code{FALSE}
-#'
 #' @param data.table Logical scalar. Should tables be returned in data.table format instead of data.frame?
 #' defaults to FALSE.
 #'
@@ -366,8 +391,8 @@ fhir_load <- function(directory) {
 #' @param add_indices Deprecated. This argument was used to control adding of indices for multiple entries. This is now
 #' done via the brackets argument. If brackets is \code{NULL}, no indices are added, if brackets is not \code{NULL}, indices are added to multiple entries.
 #'
-#' @return A list of data frames (if \code{return_design = FALSE}) or a list of data frames and the
-#' utilized \code{design}, if \code{return_design = TRUE}.
+#' @return A list of data frames (if \code{data.table = FALSE}) or a list of data.tables
+#' if \code{data.table = TRUE}.
 #'
 #' @export
 #' @import data.table
@@ -425,7 +450,6 @@ fhir_crack <- function(bundles,
 			 remove_empty_columns = NULL,
 			 brackets = NULL,
 			 verbose = 2,
-			 return_design = FALSE,
 			 data.table = FALSE,
 			 add_indices) {
 
@@ -517,11 +541,9 @@ fhir_crack <- function(bundles,
 			message("FHIR-Resources cracked. \n")
 		}
 
-		if(return_design){
-			c(dfs, design=list(design))
-		}else{
-			dfs
-			}
+		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
+
+		return(dfs)
 	}
 
 
