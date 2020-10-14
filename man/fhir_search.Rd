@@ -12,7 +12,9 @@ fhir_search(
   verbose = 1,
   max_attempts = 5,
   delay_between_attempts = 10,
-  log_errors = 0
+  log_errors = 0,
+  save_to_disc = FALSE,
+  directory = paste0("FHIR_bundles_", gsub("-| |:", "", Sys.time()))
 )
 }
 \arguments{
@@ -38,9 +40,18 @@ downloading progress will be printed. Defaults to 2.}
 1: tabulate http response and write to csv-file
 
 2: write http response as to xml-file}
+
+\item{save_to_disc}{A logical scalar. If TRUE the bundles are saved as numerated xml-files into the directory specified
+in the argument \code{directory} and not returned as a bundle list in the R session. This is useful when a lot of
+bundles are to be downloaded and keeping them all in one R session might overburden working memory. When download
+is complete, the bundles can be loaded into R using \code{\link{fhir_load}}. Defaults to FALSE, i.e. bundles are
+returned as a list within the R session.}
+
+\item{directory}{The directory the bundles are saved to when \code{save_to_disc} is TRUE. Defaults to creating a
+time-stamped directory into the current working directory.}
 }
 \value{
-A list of bundles in xml format.
+A list of bundles in xml format when \code{save_to_disc = FALSE} (the default),  else NULL.
 }
 \description{
 Downloads all FHIR bundles of a FHIR search request from a FHIR server.

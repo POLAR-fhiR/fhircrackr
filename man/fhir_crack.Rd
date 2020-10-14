@@ -11,7 +11,6 @@ fhir_crack(
   remove_empty_columns = NULL,
   brackets = NULL,
   verbose = 2,
-  return_design = FALSE,
   data.table = FALSE,
   add_indices
 )
@@ -57,9 +56,6 @@ If \code{NULL}, no indices will be added to multiple entries. \code{NULL} means 
 \item{verbose}{An Integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 extraction progress will be printed. Defaults to 2.}
 
-\item{return_design}{Logical scalar. If \code{TRUE}, the complete design with automatically by fhir_crack
-amended elements is returned as the last element of the returned list. Defaults to \code{FALSE}}
-
 \item{data.table}{Logical scalar. Should tables be returned in data.table format instead of data.frame?
 defaults to FALSE.}
 
@@ -67,8 +63,8 @@ defaults to FALSE.}
 done via the brackets argument. If brackets is \code{NULL}, no indices are added, if brackets is not \code{NULL}, indices are added to multiple entries.}
 }
 \value{
-A list of data frames (if \code{return_design = FALSE}) or a list of data frames and the
-utilized \code{design}, if \code{return_design = TRUE}.
+A list of data frames (if \code{data.table = FALSE}) or a list of data.tables
+if \code{data.table = TRUE}.
 }
 \description{
 Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
