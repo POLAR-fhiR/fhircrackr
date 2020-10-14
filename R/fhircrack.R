@@ -808,18 +808,16 @@ fhir_melt <-
 #')
 #'
 #'
-#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list("/Bundle/Patient")),
-#'                   verbose = 2)
+#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list(resource = "/Bundle/Patient")),
+#'                   brackets = c("[", "]"),verbose = 2)
 #'
-#' df_indices_removed <- fhir_rm_indices(dfs[[1]])
+#' df_indices_removed <- fhir_rm_indices(dfs[[1]], brackets=c("[", "]"))
 
 
 fhir_rm_indices <-
 	function(indexed_data_frame,
 			 brackets = c("<", ">"),
 			 columns = names( indexed_data_frame )) {
-
-		..columns <- NULL # due to NSE notes in R CMD check
 
 		is_DT <- data.table::is.data.table(indexed_data_frame)
 
@@ -831,7 +829,7 @@ fhir_rm_indices <-
 		pattern.ids <- paste0(brackets.escaped[1], "([0-9]*\\.*)+", brackets.escaped[2])
 
 
-		result <- data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_data_frame[,..columns] )))
+		result <- data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_data_frame[,columns, with=F] )))
 
 		if(!is_DT){
 			data.table::setDF(result)

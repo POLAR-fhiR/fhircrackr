@@ -59,8 +59,8 @@ bundle <- xml2::read_xml(
 )
 
 
-dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list("/Bundle/Patient")),
-                  verbose = 2)
+dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list(resource = "/Bundle/Patient")),
+                  brackets = c("[", "]"),verbose = 2)
 
-df_indices_removed <- fhir_rm_indices(dfs[[1]])
+df_indices_removed <- fhir_rm_indices(dfs[[1]], brackets=c("[", "]"))
 }
