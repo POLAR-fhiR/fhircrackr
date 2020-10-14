@@ -34,4 +34,5 @@ while(!is.null(url) && count < 5){
 	url <- fhir_next_bundle_url()
 }
 }
+
 }
