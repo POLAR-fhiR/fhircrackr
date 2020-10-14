@@ -9,7 +9,7 @@ fhir_canonical_design()
 \description{
 Returns the complete design of the last call to \code{\link{fhir_crack}} with
 automatically amended elements, i.e. the canonical form of the design with elements resource, cols, style
-and respective subelements.
+and respective sub-elements.
 }
 \examples{
 #load example bundles

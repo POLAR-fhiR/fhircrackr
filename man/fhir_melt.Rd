@@ -32,7 +32,7 @@ A data frame where each entry from the variables in \code{columns} appears in a 
 }
 \description{
 This function divides multiple entries in an indexed data frame as produced by \code{\link{fhir_crack}}
-with \code{add_indices = TRUE} into separate observations.
+into separate observations.
 }
 \details{
 Every row containing values that consist of multiple entries on the variables specified by the argument \code{columns}
@@ -80,7 +80,7 @@ bundle <- xml2::read_xml(
 )
 
 #crack fhir resources
-dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list(".//Patient")),
+dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list(resource = ".//Patient")),
                   brackets = c("[","]"))
 
 #find all column names associated with attribute address

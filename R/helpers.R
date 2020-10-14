@@ -20,54 +20,6 @@ lst <- function(...,
 	v
 }
 
-#' Bind a list of data frames
-#' @description Rowbinds a list of data frames to one data frame
-#' @param list A list of data frames to bind
-#' @return A single data frame
-#' @noRd
-rbind_list_of_data_frames <- function(list) {
-	if (is.null(list) || length(list) < 1) {
-		warning("no data in list for rbind_list_of_data_frames(list)")
-
-		return(as.data.frame(NULL))
-	}
-
-	#dbg
-	#list <- l
-
-	unique.names <- unique(Reduce(union,
-								  sapply(list,
-								  	   function(l) {
-								  	   	names(l)
-								  	   })))
-
-	if (is.null(unique.names)) {
-		warning("no unique names found in rbind_list_of_data_frames(list)")
-
-		return(NULL)
-	}
-
-	d <-
-		as.data.frame(lapply(seq_along(unique.names), function(dummy)
-			character(0)),
-			stringsAsFactors = FALSE)
-
-	names(d) <- unique.names
-
-	for (l in list) {
-		#dbg
-		#l <- list[[ 1 ]]
-
-		n <- nrow(d)
-
-		m <- nrow(l)
-
-		d[(n + 1):(n + m), names(l)] <- dplyr::select(l, names(l))
-	}
-
-	d
-}
-
 
 #' Download single FHIR bundle
 #' @description Download a single FHIR bundle via FHIR search request and return it as a xml object.
@@ -531,20 +483,18 @@ xtrct_columns <- function(child,
 #'
 #' #define design
 #' design <- list(
-#'      ".//MedicationStatement",
-#'      list(
-#' 	      SYSTEM  = "medicationCodeableConcept/coding/system/@value",
-#' 	      CODE    = "medicationCodeableConcept/coding/code/@value",
-#' 	      DISPLAY = "medicationCodeableConcept/coding/display/@value"
-#' 	      )
+#'      resource = ".//MedicationStatement",
+#'      cols = list(
+#' 	           SYSTEM  = "medicationCodeableConcept/coding/system/@value",
+#' 	           CODE    = "medicationCodeableConcept/coding/code/@value",
+#' 	           DISPLAY = "medicationCodeableConcept/coding/display/@value"
+#' 	          )
 #' 	 )
 #'
 #' #convert bundle to data frame
 #' result <- fhircrackr:::bundle2df(bundle, design)
 bundle2df <- function(bundle,
 			 df_desc,
-			 # sep = " -+- ",
-			 # brackets = NULL,
 			 verbose = 2) {
 
 		xml2::xml_ns_strip(bundle)
@@ -555,7 +505,6 @@ bundle2df <- function(bundle,
 
 		df.list <- if (length(children) == 0) {
 
-			#warning("The following resource you provided seems not to be present in one or more bundle:", paste0(esc(xpath)))
 			list()
 
 		} else {
@@ -633,9 +582,9 @@ bundle2df <- function(bundle,
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #define design
-#' design <- list(
-#'      ".//MedicationStatement",
-#'      list(
+#' df_desc <- list(
+#'      resource = ".//MedicationStatement",
+#'      cols = list(
 #' 	      SYSTEM  = "medicationCodeableConcept/coding/system/@value",
 #' 	      CODE    = "medicationCodeableConcept/coding/code/@value",
 #' 	      DISPLAY = "medicationCodeableConcept/coding/display/@value"
@@ -644,12 +593,10 @@ bundle2df <- function(bundle,
 #'
 #'
 #' #convert bundles to data frame
-#' result <- fhircrackr:::bundles2df(bundles, design)
+#' result <- fhircrackr:::bundles2df(bundles, df_desc)
 
 bundles2df <- function(bundles,
 					   df_desc,
-					   # sep = " -+- ",
-					   # brackets = NULL,
 					   verbose = 2) {
 
 	ret <- data.table::rbindlist(lapply(seq_along(bundles),
@@ -666,8 +613,6 @@ bundles2df <- function(bundles,
 											bundle2df(
 												bundle,
 												df_desc,
-												# sep,
-												# brackets = brackets,
 												verbose = verbose
 											)
 										}), fill=TRUE)
@@ -685,13 +630,13 @@ bundles2df <- function(bundles,
 #' @description Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
 #'
 #' @param bundles A FHIR search result as returned by \code{\link{fhir_search}}.
-#' @param design A named list specifiying which data frame should contain which entries of the bundle.
+#' @param design A named list specifying which data frame should contain which entries of the bundle.
 #' The names correspond to the names of the resulting data frames.
 #'
 #' Each element of design is a list of length 1 or 2, where the first element is a XPath expression to locate the entry in a
 #' FHIR bundle page. There are 3 options for the second element of that list:
 #'
-#' - There is no second element: all attributes of the recource are extracted
+#' - There is no second element: all attributes of the resource are extracted
 #' - The second element is string containing a XPath expression to all the values that should be extracted. "./@value" e.g. would extract all
 #'   values on the root level.
 #' - The second element is a named list where the elements are XPath expressions indicating the specific position of values to extract, where the names of the
@@ -714,9 +659,9 @@ bundles2df <- function(bundles,
 #'  #define specifically which elements to extract
 #' 	MedicationStatement = list(
 #'
-#' 		".//MedicationStatement",
+#' 		resource = ".//MedicationStatement",
 #'
-#' 		list(
+#' 		cols= list(
 #' 			MS.ID              = "id/@value",
 #' 			STATUS.TEXT        = "text/status/@value",
 #' 			STATUS             = "status/@value",
@@ -732,7 +677,7 @@ bundles2df <- function(bundles,
 #'  #extract all values
 #' 	Patients = list(
 #'
-#' 		".//Patient"
+#' 		resource = ".//Patient"
 #' 	)
 #' )
 #'
@@ -742,9 +687,6 @@ bundles2df <- function(bundles,
 bundles2dfs <-
 	function(bundles,
 			 design,
-			 # sep = " -+- ",
-			 # remove_empty_columns = FALSE,
-			 # brackets = NULL,
 			 data.table = FALSE,
 			 verbose = 2) {
 
@@ -768,8 +710,6 @@ bundles2dfs <-
 					  		bundles2df(
 					  			bundles = bundles,
 					  			df_desc = df_desc,
-					  			# sep = sep,
-					  			# brackets = brackets,
 					  			verbose = verbose
 					  		)
 					  	}
@@ -865,8 +805,6 @@ melt_row <-
 
 		ids <- stringr::str_extract_all(row.mutable, pattern.ids)
 
-		#if (sum(sapply(ids, length)) < 1) {stop("The brackets you specified don't seem to fit the index brackets in your data.frame, please check.")}
-
 		names(ids) <- col.names.mutable
 
 		pattern.items <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
@@ -944,8 +882,6 @@ melt_row <-
 				d[1, col.names.constant] <-
 					dplyr::select(row, col.names.constant)
 		}
-
-		#	names( d )[ names( d ) %in% col.names.mutable ] <- gsub( paste0( "^", column.prefix, "\\." ), "", col.names.mutable )
 
 		data.table::data.table(d)
 	}
