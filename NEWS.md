@@ -2,7 +2,7 @@
 
 - design for `fhir_crack()` has new form now:
 
-   1. has now named elements resource, cols, style (with elements sep, brackets, rm_empty_cols)
+   1. has now named elements `resource`, `cols`, `style` (with style elements `sep`, `brackets`, `rm_empty_cols`)
 
    2. old versions of design still work
 
