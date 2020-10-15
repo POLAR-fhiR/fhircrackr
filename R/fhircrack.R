@@ -42,7 +42,7 @@ fhir_next_bundle_url <- function() {
 #'
 #' @description Returns the complete design of the last call to \code{\link{fhir_crack}} with
 #' automatically amended elements, i.e. the canonical form of the design with elements resource, cols, style
-#' and respective subelements.
+#' and respective sub-elements.
 #' @export
 #' @examples
 #' #load example bundles
@@ -531,9 +531,6 @@ fhir_crack <- function(bundles,
 				bundles = bundles,
 				design = design,
 				data.table = data.table,
-				# sep = sep,
-				# remove_empty_columns = remove_empty_columns,
-				# brackets = brackets,
 				verbose = verbose
 			)
 
@@ -694,7 +691,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #' Melt multiple entries
 #'
 #' This function divides multiple entries in an indexed data frame as produced by \code{\link{fhir_crack}}
-#' with \code{add_indices = TRUE} into separate observations.
+#' into separate observations.
 #'
 #' Every row containing values that consist of multiple entries on the variables specified by the argument \code{columns}
 #' will be turned into multiple rows, one for each entry. Values on other variables will be repeated in all the new rows.
@@ -751,7 +748,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #')
 #'
 #' #crack fhir resources
-#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list(".//Patient")),
+#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list(resource = ".//Patient")),
 #'                   brackets = c("[","]"))
 #'
 #' #find all column names associated with attribute address
@@ -870,7 +867,8 @@ fhir_melt <-
 #')
 #'
 #'
-#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list(resource = "/Bundle/Patient")),
+#' dfs <- fhir_crack(bundles = list(bundle),
+#'                   design = list(Patients = list(resource = "/Bundle/Patient")),
 #'                   brackets = c("[", "]"),verbose = 2)
 #'
 #' df_indices_removed <- fhir_rm_indices(dfs[[1]], brackets=c("[", "]"))
