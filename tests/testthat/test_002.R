@@ -217,22 +217,6 @@ testthat::test_that(
 	}
 )
 
-#############################################################################################
-testthat::context("fhir_crack return_design")
-
-testthat::test_that(
-
-	"return_design works", {
-		testthat::expect_length(suppressWarnings(fhir_crack(pat_bundles, design1, return_design = TRUE, verbose = 0)$design), 5)
-		testthat::expect_null(suppressWarnings(fhir_crack(pat_bundles, design2, return_design = TRUE, verbose = 0)$design))
-		testthat::expect_length(suppressWarnings(fhir_crack(pat_bundles, design3, return_design = TRUE, verbose = 0)$design), 3)
-		testthat::expect_null(suppressWarnings(fhir_crack(pat_bundles, design4, return_design = TRUE, verbose = 0)$design))
-		testthat::expect_length(suppressWarnings(fhir_crack(pat_bundles, design5, return_design = TRUE, verbose = 0)$design), 16)
-
-
-	}
-)
-
 
 ##############################################################################
 testthat::context("save/load design")
