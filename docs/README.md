@@ -3,7 +3,7 @@ fhircrackr is a package that conveniently downloads FHIR<sup>[1](#hl7stuff)</sup
 
 You can download the development version using `devtools::install_github("POLAR-fhiR/fhircrackr")`.
 
-This readme gives a only short overview over the most important functions in `fhircrackr`. For a more comprehensive introduction see the package vignette.
+This readme gives a only short overview over the most important functions in `fhircrackr`. For a more comprehensive introduction we strongly recommend to read the package vignette.
 
 ## Prerequisites
 For the moment, this package focuses mostly on downloading and flattening resources from a FHIR server. This requires some prerequisites:
@@ -15,7 +15,7 @@ For the moment, this package focuses mostly on downloading and flattening resour
 
 - To specify which attributes of the FHIR resources you want in your data frame, you should have at least some familiarity with XPath expressions, because this package downloads the resources in xml-format. A good tutorial for XPath can be found [here](https://www.w3schools.com/xml/xpath_intro.asp).
 
-## Download FHIR resources from a server
+## Download FHIR Resources from a server
 
 ```r
 bundles <- fhir_search("https://hapi.fhir.org/baseR4/MedicationStatement?_include=MedicationStatement:subject", max.bundles=5)
@@ -28,7 +28,7 @@ In general, a FHIR search request returns a *bundle* of the resources you reques
 
 `fhir_search()` returns a list of xml objects where each list element represents one bundle of resources.
 
-## Flatten FHIR resources into data frames
+## Flatten FHIR Resources into data frames
 If you want to do statistical analyses, the xml format the resources come in is not very useful. Instead, we need the data in some matrix like form, preferably as a data frame. Most of the times it makes sense to create one data frame per type of resource (e.g. Patient, MedicationStatement).
 
 We can achieve this using the `fhir_crack()` function.
@@ -103,7 +103,7 @@ All three elements of style can also be controlled directly by the `fhir_crack()
 For detailed examples of the different variants of the `design` please see the package vignette.
 
 
-## Multiple entries
+## Multiple Entries
 When there are multiple entries to one attribute, e.g. multiple addresses for the same Patient resource, `fhir_crack()` will paste these entries together using the string provided in the argument `sep`. If for example you set `brackets=c("[", "]")`, the indices surrounded by [ ] will be assigned to the entries to allow you to distinguish between them:
 
 ```r
@@ -241,7 +241,10 @@ To read the design back into R, you can use `fhir_load_design()`:
 fhir_load_design(paste0(temp_dir,"\\design.xml"))
 ```
 
+## Performance
+When you want to download a lot of data from the server, you might run into problems with time and memory. To speed up the download of a large number of resources, you can increase the number of resources per bundle by setting the `_count` parameter in your FHIR search request e.g. `https://hapi.fhir.org/baseR4/Patient?_count=500`. This will reduce the number of (potentially time consuming) queries to the server.
 
+When the number of downloaded bundles might overburden your computers working memory, you can either set the `save_to_disc=TRUE` argument of `fhir_search()` to save bundles consecutively to a specified directory instead of loading them into the R session or you can load and process the bundles in several smaller batches by using `fhir_next_bundle_url()`. For examples of both approaches, please see the package vignette.
 
 
 ## Acknowledgements
