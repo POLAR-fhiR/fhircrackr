@@ -4,6 +4,8 @@ title: "fhircrackr: Handling HL7&reg; FHIR&reg; Resources in R"
 date: "`r Sys.Date()`"
 output:	rmarkdown::html_vignette
 
+
+
 vignette: >
   %\VignetteIndexEntry{fhircrackr: Handling HL7&reg; FHIR&reg; Resources in R}
   %\VignetteEngine{knitr::rmarkdown}
@@ -612,8 +614,13 @@ assign(x = "last_next_link", value = "http://hapi.fhir.org/baseR4?_getpages=0be4
 ```{r}
 fhir_next_bundle_url()
 ```
+To get a better overview, we can split this very long link along the `&`:
 
-In the link above you can see two interesting numbers: `_count=20` tells you that the queried hapi server has a default bundle size of 20. ` getpagesoffset=200` tells you that the bundle referred to in this link starts after resource no. 200, which makes sense since the `fhir_search()` request above downloaded 10 bundles with 20 resources each, i.e. 200 resources. If you use this link in a new call to `fhir_search`, the download will start from this bundle (i.e. the 11th bundle with resources 201-220) and will go on to the following bundles from there. 
+```{r}
+strsplit(fhir_next_bundle_url(), "&")
+``` 
+
+You can see two interesting numbers: `_count=20` tells you that the queried hapi server has a default bundle size of 20. ` getpagesoffset=200` tells you that the bundle referred to in this link starts after resource no. 200, which makes sense since the `fhir_search()` request above downloaded 10 bundles with 20 resources each, i.e. 200 resources. If you use this link in a new call to `fhir_search`, the download will start from this bundle (i.e. the 11th bundle with resources 201-220) and will go on to the following bundles from there. 
 
 When there is no next bundle (because all available resources have been downloaded), `fhir_next_bundle_url()` returns `NULL`.
 
