@@ -535,7 +535,7 @@ head(serialized_bundles[[1]])
 temp_dir <- tempdir()
 
 #save
-save(serialized_bundles, file=paste0(temp_dir, "\\bundles.rda"))
+save(serialized_bundles, file=paste0(temp_dir, "/bundles.rda"))
 
 ```
 
@@ -543,7 +543,7 @@ If you load this bundle again, you have to unserialize it before you can work wi
 
 ```{r}
 #load bundles
-load(paste0(temp_dir, "\\bundles.rda"))
+load(paste0(temp_dir, "/bundles.rda"))
 ```
 
 ```{r}
@@ -577,13 +577,13 @@ bundles <- fhir_load(temp_dir)
 If you want to save a design for later or to share with others, you can do so using the `fhir_save_design()`. This function takes a design and saves it as an xml file:
 
 ```{r}
-fhir_save_design(design1, file = paste0(temp_dir,"\\design.xml"))
+fhir_save_design(design1, file = paste0(temp_dir,"/design.xml"))
 ```
 
 To read the design back into R, you can use `fhir_load_design()`:
 
 ```{r}
-fhir_load_design(paste0(temp_dir,"\\design.xml"))
+fhir_load_design(paste0(temp_dir,"/design.xml"))
 ```
 
 ## Performance
@@ -684,6 +684,6 @@ This work was carried out by the SMITH consortium and the cross-consortium use c
 
 ```{r, include=F}
 file.remove(paste0(temp_dir,
-				   c("\\bundles.rda", "\\design.xml", "\\1.xml", "\\2.xml"))
+				   c("/bundles.rda", "/design.xml", "/1.xml", "/2.xml"))
 )
 ``` 
