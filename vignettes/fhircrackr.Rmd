@@ -643,7 +643,7 @@ while(!is.null(url)){
 	dfs <- fhir_crack(bundles, list(Obs=list(resource = "//Observation")))
 	
 	#save cracked bundle to RData-file (can be exchanged by other data type)
-	save(tables, file = paste0(tempdir,"/table_", count, ".RData"))
+	save(tables, file = paste0(temp_dir,"/table_", count, ".RData"))
 	
 	#retrieve starting point for next 10 bundles
 	url <- fhir_next_bundle_url()
@@ -681,3 +681,9 @@ The above example shows that instead of the MedicationStatement resource, we can
 
 ## Acknowledgements
 This work was carried out by the SMITH consortium and the cross-consortium use case POLAR_MI; both are part of the German Initiative for Medical Informatics and funded by the German Federal Ministry of Education and Research (BMBF), grant no. 01ZZ1803A , 01ZZ1803C and 01ZZ1910A.
+
+```{r, include=F}
+file.remove(paste0(temp_dir,
+				   c("\\bundles.rda", "\\design.xml", "\\1.xml", "\\2.xml"))
+)
+``` 
