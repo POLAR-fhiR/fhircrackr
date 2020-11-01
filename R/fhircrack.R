@@ -883,21 +883,17 @@ fhir_rm_indices <-
 
 		if(!is_DT){data.table::setDT(indexed_data_frame)}
 
-
 		brackets.escaped <- esc(brackets)
 
 		pattern.ids <- paste0(brackets.escaped[1], "([0-9]*\\.*)+", brackets.escaped[2])
 
-
 		result <- data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_data_frame[,columns, with=F] )))
 
-		if(!is_DT){
-			data.table::setDF(result)
-			return(result)
-		}else{
-			return(result)
-		}
+		indexed_data_frame[ , columns] <- result
 
+		if(!is_DT) data.table::setDF(indexed_data_frame)
+
+		indexed_data_frame
 }
 
 
