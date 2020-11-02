@@ -783,7 +783,7 @@ melt_row <-
 	function(row,
 			 columns,
 			 brackets = c("<", ">"),
-			 sep = " -+- ",
+			 sep = " ",
 			 all_columns = FALSE) {
 
 		row <- as.data.frame(row)
