@@ -770,13 +770,15 @@ fhir_melt <-
 	function(indexed_data_frame,
 			 columns,
 			 brackets = c("<", ">"),
-			 sep = " -+- ",
+			 sep = " ",
 			 id_name = "resource_identifier",
 			 all_columns = FALSE) {
 
 		if (!all(columns %in% names(indexed_data_frame))) {
 			stop("Not all column names you gave match with the column names in the data frame.")
 		}
+
+		brackets <- fix_brackets(brackets)
 
 		is_DT <- data.table::is.data.table(indexed_data_frame)
 
@@ -811,12 +813,8 @@ fhir_melt <-
 		if (!is.null(d) && 0 < nrow(d)) {
 			data.table::setorder(d, id_name)
 
-			if(!is_DT){
-				setDF(d)
-				return(d)
-			}else{
-				return(d)
-			}
+			if(!is_DT){setDF(d)}
+			return(d)
 
 		}
 	}
@@ -883,14 +881,13 @@ fhir_rm_indices <-
 
 		if(!is_DT){data.table::setDT(indexed_data_frame)}
 
-		if(length(brackets) < 2 ) brackets <- c(brackets[1], brackets[1])
+		brackets <- fix_brackets(brackets)
 
 		brackets.escaped <- esc(brackets)
 
 		pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 
 		result <- data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_data_frame[,columns, with=F])))
-		#result <- data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_data_frame[,columns, with=F])))
 
 		indexed_data_frame[ , columns] <- result
 

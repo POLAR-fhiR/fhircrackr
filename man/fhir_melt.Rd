@@ -8,7 +8,7 @@ fhir_melt(
   indexed_data_frame,
   columns,
   brackets = c("<", ">"),
-  sep = " -+- ",
+  sep = " ",
   id_name = "resource_identifier",
   all_columns = FALSE
 )
