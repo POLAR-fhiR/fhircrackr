@@ -778,18 +778,20 @@ fhir_melt <-
 			stop("Not all column names you gave match with the column names in the data frame.")
 		}
 
+		indexed_dt <- copy(indexed_data_frame) #copy to avoid side effects
+
+		is_DT <- data.table::is.data.table(indexed_dt)
+
+		if(!is_DT){data.table::setDT(indexed_dt)}
+
 		brackets <- fix_brackets(brackets)
-
-		is_DT <- data.table::is.data.table(indexed_data_frame)
-
-		if(!is_DT){data.table::setDT(indexed_data_frame)}
 
 		#dbg
 		#column_prefix <- "id"
 
 		d <- data.table::rbindlist(
 					lapply(seq_len(nrow(
-						indexed_data_frame
+						indexed_dt
 					)),
 					function(row.id) {
 						#dbg
@@ -797,7 +799,7 @@ fhir_melt <-
 
 						e <-
 							melt_row(
-								row = indexed_data_frame[row.id,],
+								row = indexed_dt[row.id,],
 								columns = columns,
 								brackets = brackets,
 								sep = sep,
@@ -805,13 +807,15 @@ fhir_melt <-
 							)
 
 						if (0 < nrow(e))
-							e[seq_len(nrow(e)), id_name := row.id]
+							e[seq_len(nrow(e)), (id_name) := row.id]
 
 						e
 					}), fill = TRUE)
 
-		if (!is.null(d) && 0 < nrow(d)) {
-			data.table::setorder(d, id_name)
+		if(nrow(d) == 0) {warning("The brackets you specified don't seem to appear in the indices of the provided data.frame. Returning NULL.")}
+
+		if(!is.null(d) && 0 < nrow(d)) {
+			data.table::setorderv(d, id_name)
 
 			if(!is_DT){setDF(d)}
 			return(d)
@@ -877,9 +881,12 @@ fhir_rm_indices <-
 			 brackets = c("<", ">"),
 			 columns = names( indexed_data_frame )) {
 
-		is_DT <- data.table::is.data.table(indexed_data_frame)
+		indexed_dt <- copy(indexed_data_frame) #copy to avoid side effects
 
-		if(!is_DT){data.table::setDT(indexed_data_frame)}
+		is_DT <- data.table::is.data.table(indexed_dt)
+
+		if(!is_DT){data.table::setDT(indexed_dt)}
+
 
 		brackets <- fix_brackets(brackets)
 
@@ -887,13 +894,13 @@ fhir_rm_indices <-
 
 		pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 
-		result <- data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_data_frame[,columns, with=F])))
+		result <- data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_dt[,columns, with=F])))
 
-		indexed_data_frame[ , columns] <- result
+		indexed_dt[ , columns] <- result
 
-		if(!is_DT) data.table::setDF(indexed_data_frame)
+		if(!is_DT) data.table::setDF(indexed_dt)
 
-		indexed_data_frame
+		indexed_dt
 }
 
 
