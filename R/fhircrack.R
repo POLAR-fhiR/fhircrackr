@@ -812,7 +812,9 @@ fhir_melt <-
 						e
 					}), fill = TRUE)
 
-		if (!is.null(d) && 0 < nrow(d)) {
+		if(nrow(d) == 0) {warning("The brackets you specified don't seem to appear in the indices of the provided data.frame. Returning NULL.")}
+
+		if(!is.null(d) && 0 < nrow(d)) {
 			data.table::setorderv(d, id_name)
 
 			if(!is_DT){setDF(d)}
