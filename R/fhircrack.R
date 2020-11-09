@@ -805,13 +805,13 @@ fhir_melt <-
 							)
 
 						if (0 < nrow(e))
-							e[seq_len(nrow(e)), id_name := row.id]
+							e[seq_len(nrow(e)), (id_name) := row.id]
 
 						e
 					}), fill = TRUE)
 
 		if (!is.null(d) && 0 < nrow(d)) {
-			data.table::setorder(d, id_name)
+			data.table::setorderv(d, id_name)
 
 			if(!is_DT){setDF(d)}
 			return(d)
