@@ -47,7 +47,7 @@ fix <- function (list, names, defaults = NULL) {
 
 		if (0 < length(wnames)) { #if wrong names in original list
 
-			return(value = NULL, msg = paste0("has unknown component ", wnames, ". Names of design components can only be resource, cols, style, sep, brackets and rm_empty_cols\n"))
+			return(list(value = NULL, msg = paste0("has unknown component ", wnames, ". Names of design components can only be resource, cols, style, sep, brackets and rm_empty_cols\n")))
 
 		}
 
