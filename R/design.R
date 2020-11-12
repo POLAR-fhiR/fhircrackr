@@ -131,7 +131,7 @@ fix_df_desc <- function (df_desc) {
 
 	}else{
 
-		fix_res <- fix(df_desc$style,c("sep", "brackets", "rm_empty_cols"))
+		fix_res <- fix(df_desc$style,c("sep", "brackets", "rm_empty_cols"), defaults = list(" ", NULL, TRUE))
 
 		if(is.null(fix_res$value)){
 
