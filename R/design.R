@@ -60,8 +60,10 @@ fix <- function (list, names, defaults = NULL) {
 	#set defaults
 	if (!is.null(defaults)) {
 		for (i in seq_along(list)) {
-			if (is.null(list[[i]]))
+			if (is.null(list[[i]])&&!is.null(defaults[[i]])){
 				list[[i]] <- defaults[[i]]
+			}
+
 		}
 	}
 
