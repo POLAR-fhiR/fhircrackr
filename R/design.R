@@ -47,7 +47,7 @@ fix <- function (list, names, defaults = NULL) {
 
 		if (0 < length(wnames)) { #if wrong names in original list
 
-			return(value = NULL, msg = paste0("has unknown component ", wnames, ". Names of design components can only be resource, cols, style, sep, brackets and rm_empty_cols\n"))
+			return(list(value = NULL, msg = paste0("has unknown component ", wnames, ". Names of design components can only be resource, cols, style, sep, brackets and rm_empty_cols\n")))
 
 		}
 
@@ -60,8 +60,10 @@ fix <- function (list, names, defaults = NULL) {
 	#set defaults
 	if (!is.null(defaults)) {
 		for (i in seq_along(list)) {
-			if (is.null(list[[i]]))
+			if (is.null(list[[i]])&&!is.null(defaults[[i]])){
 				list[[i]] <- defaults[[i]]
+			}
+
 		}
 	}
 
@@ -131,7 +133,7 @@ fix_df_desc <- function (df_desc) {
 
 	}else{
 
-		fix_res <- fix(df_desc$style,c("sep", "brackets", "rm_empty_cols"))
+		fix_res <- fix(df_desc$style,c("sep", "brackets", "rm_empty_cols"), defaults = list(" ", NULL, TRUE))
 
 		if(is.null(fix_res$value)){
 
