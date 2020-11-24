@@ -1,3 +1,17 @@
+# fhircrackr 0.2.1
+
+- fhir_melt now gives a warning when the brackets provided in the function call don't appear in the data frame 
+
+- A number of bugs have been fixed 
+
+	- unintended type changes from data.frame to data.table are now prevented
+	- `fhir_melt()` now takes the name provided in the argument `id_name` (which because of a bug it didn't before)
+	- inconsistencies in assignment of default values to the design for `fhir_crack()` have been cleared
+	- fixed bug causing column names to disappear when `cols` element of design was of length one
+	
+	
+
+
 # fhircrackr 0.2.0
 
 - design for `fhir_crack()` has new form now:
