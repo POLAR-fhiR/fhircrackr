@@ -395,7 +395,7 @@ add_attribute_to_design <- function(design, attrib = "value") {
 
 		if (!is.null(design[[n_d]]$cols)) { #Only add attrib if xpath expressions are provided
 
-			if (1 < length(design[[n_d]]$cols)) { #when several expressions are provided
+			if (is.list(design[[n_d]]$cols)) { #when cols are provided as list
 
 				for (n_c in names(design[[n_d]]$cols)) { #loop through cols
 					txt <- design[[n_d]]$cols[[n_c]]
@@ -406,7 +406,7 @@ add_attribute_to_design <- function(design, attrib = "value") {
 					}
 				}
 
-			} else { #wenn cols is just on expression
+			} else { #wenn cols is just one expression
 
 				txt <- design[[n_d]]$cols
 				if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
