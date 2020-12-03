@@ -904,6 +904,185 @@ fhir_rm_indices <-
 }
 
 
+
+
+#' Format FHIR base url
+#'
+#' Takes an url string and removes leading/trailing white space and unnecessary slashes.
+#' Is supposed to be used with \code{\link{fhir_build_url}}.
+#' @param url A string containing the base URL of the FHIR server, e.g.  "http://hapi.fhir.org/baseR4"
+#' @return The formatted url in a named character vector
+#' @examples fhir_base(" http://hapi.fhir.org/baseR4/")
+#' @export
+
+fhir_base <- function(url){
+
+	#remove leading/trailing white space
+	url <- stringr::str_trim(url, side="both")
+
+
+	#remove trailing /
+	if(stringr::str_sub(url, -1) =="/"){
+
+		url <- stringr::str_sub(url, 1,-2)
+
+	}
+
+	return(c(base=url))
+}
+
+#' Check and format FHIR resource type for FHIR search
+#'
+#' This function takes a string defining a FHIR resource type and formats it correctly,
+#' removing white space and slashes. It also checks the resource against the list
+#' of resources provided at https://hl7.org/FHIR/resourcelist.html and throws a warning
+#' if the resource doesn't match. \code{fhir_resource} is supposed to be used with
+#' \code{\link{fhir_build_url}}.
+#'
+#' @param resource A string containing the resource type for the fhir search.
+#' Must be one of the official FHIRresource types listed at https://hl7.org/FHIR/resourcelist.html
+#' @return A named character vector with the checked and formatted resource type
+#' @examples fhir_resource("patient")
+#' @export
+fhir_resource <- function(resource){
+
+	#remove / and white space
+	resource <- stringr::str_remove_all(resource, "/| ")
+
+	#convert first character to upper case
+	stringr::str_sub(resource,1,1) <- stringr::str_to_upper(stringr::str_sub(resource,1,1))
+
+	#check for validity
+	if(!resource %in% existing_resource_types){
+		warning("It seems that the resource you provided is not one of the official Resource types from https://hl7.org/FHIR/resourcelist.html. ",
+				"Please note that upper and lower cases within the word matter. ",
+				"If you are sure this resource exists on your server you can ignore this warning.")
+	}
+
+
+	return(c(resource=resource))
+}
+
+#' Build key value pairs for FHIR search
+#'
+#' Takes two strings representing a key value pair for a FHIR search parameter and
+#' encodes the pair properly.  \code{fhir_key_value} is supposed to be used with
+#' \code{\link{fhir_build_url}}
+#'
+#' @param key The name of the search parameter, e.g. "_include", "gender" or "_summary".
+#' For a general overview see https://www.hl7.org/fhir/search.html
+#' and also check out the paragraph on search parameters for the respective ressource,
+#' e.g. http://www.hl7.org/fhir/patient.html#search
+#' @param value The name of the respective value for the parameter, e.g. "Observation:patient",
+#' "female" or "count".
+#' @param url_enc URL encode key value pairs? Defaults to TRUE, which is advisable in most cases.
+#' @return A string with the appropriately encoded key value pairs
+#' @export
+#' @examples
+#' fhir_key_value(key = "gender", value = "female")
+#' fhir_key_value(key = "category", value = "http://snomed.info/sct|116223007")
+
+
+
+fhir_key_value <-function(key, value, url_enc = TRUE){
+
+	#remove leading/trailing whitespace
+	key <- stringr::str_trim(key)
+	value <- stringr::str_trim(value)
+
+	#url encode
+	if(url_enc){
+		key <- utils::URLencode(key, reserved = TRUE, repeated = FALSE)
+		value <- utils::URLencode(value, reserved = TRUE, repeated = FALSE)
+	}
+
+	#paste
+	result <- paste0(key, "=", value)
+
+	return(c(keyval = result))
+
+}
+
+#' Build FHIR search request from base url, resource type and search parameters
+#'
+#' This function takes its arguments from the functions \code{\link{fhir_base}}, \code{\link{fhir_resource}} and \code{\link{fhir_key_value}}
+#' You must provide exactly one call to \code{\link{fhir_base}}, and one call to \code{\link{fhir_resource}}. You can provide none, one or multiple calls
+#' to \code{\link{fhir_key_value}}. See examples.
+#'
+#' @param ... Calls to  \code{\link{fhir_base}}, \code{\link{fhir_resource}} and \code{\link{fhir_key_value}}
+#' @return A string containing a FHIR search request ready for use
+#' @export
+#' @examples
+#'
+#' #Look for all MedicationAdministration resources
+#'
+#' fhir_build_url(fhir_base(url = "http://hapi.fhir.org/baseR4"),
+#'                fhir_resource(resource = "MedicationAdministration")
+#'                )
+#'
+#' #Look for all Condition resources,
+#' #inlcude Patient resources they refer to
+#'
+#' fhir_build_url(fhir_base(url = "http://hapi.fhir.org/baseR4"),
+#'                fhir_resource(resource = "Condition"),
+#'                fhir_key_value(key = "_include", value = "Condition:patient")
+#'                )
+#'
+#' #Look for all Patient resources of Patients born before 1980,
+#' #sort by deathdate
+#'
+#' fhir_build_url(fhir_base("http://hapi.fhir.org/baseR4"),
+#'                fhir_resource("Patient"),
+#'                fhir_key_value("birthdate", "lt1980-01-01"),
+#'                fhir_key_value("_sort", "death-date")
+#'                )
+
+fhir_build_url <- function(...){
+
+	args <- list(...)
+
+	#process base url
+	base <- args[sapply(args, function(x) names(x)=="base")]
+
+	if(length(base) > 1){
+		warning("You provided more than one base url, only the first is used.")
+	}else if(length(base) < 1){
+		stop("You need to provide a base url using fhir_base(<insert URL here>)")
+	}
+
+	base <- base[[1]]
+
+	#process resource
+	resource <- args[sapply(args, function(x) names(x)=="resource")]
+
+	if(length(resource) > 1){
+		warning("You provided more than one resource, only the first is used.")
+	}else if(length(resource) < 1){
+		stop("You need to provide a resource type, e.g. fhir_resource(\"Patient\")")
+	}
+
+	resource <- resource[[1]]
+
+	keyvals <- paste(args[sapply(args, function(x) names(x)=="keyval")], collapse="&")
+
+	if(keyvals != ""){
+
+		return(paste0(base, "/", resource, "?", keyvals))
+
+	}else{
+
+		return(paste0(base, "/", resource))
+
+	}
+
+
+}
+
+
+
+
+
+
 ##### Documentation for medication_bundles data set ######
 
 #' Exemplary FHIR bundles
