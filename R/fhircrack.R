@@ -1,6 +1,8 @@
 fhircrackr_env <- new.env(parent = emptyenv())
 assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
 assign(x = "canonical_design", value = NULL, envir = fhircrackr_env)
+assign(x = "last_resource", value = NULL, envir = fhircrackr_env)
+assign(x = "last_base", value = NULL, envir = fhircrackr_env)
 
 #' Next Bundle's URL
 #' @description fhir_next_bundle_url() gives the url of the next available bundle.
@@ -1040,6 +1042,11 @@ fhir_key_value <-function(key, value, url_enc = TRUE){
 fhir_build_url <- function(...){
 
 	args <- list(...)
+
+	#unlist if arguments come from call to dissect_url
+	if(is.list(args[[1]])){
+		args <- args[[1]]
+	}
 
 	#process base url
 	base <- args[sapply(args, function(x) names(x)=="base")]
