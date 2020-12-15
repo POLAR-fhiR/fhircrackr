@@ -40,6 +40,24 @@ fhir_next_bundle_url <- function() {
 	fhircrackr_env$last_next_link
 }
 
+#' return base url used in last call to fhir_search
+#' @export
+
+
+fhir_last_base <- function() {
+
+	fhircrackr_env$last_base
+}
+
+#' return resource used in last call to fhir_search
+#' @export
+
+
+fhir_last_resource <- function() {
+
+	fhircrackr_env$last_resource
+}
+
 #' Retrieve design of last call to fhir_crack
 #'
 #' @description Returns the complete design of the last call to \code{\link{fhir_crack}} with
@@ -144,6 +162,16 @@ fhir_search <-
 			 log_errors = 0,
 			 save_to_disc = FALSE,
 			 directory = paste0("FHIR_bundles_", gsub("-| |:","", Sys.time()))) {
+
+		search_list <- dissect_url(request)
+
+		assign(x = "last_base",
+			   value = unlist(search_list[sapply(search_list, function(x)names(x)=="base")]),
+			   envir = fhircrackr_env)
+
+		assign(x = "last_resource",
+			   value = unlist(search_list[sapply(search_list, function(x)names(x)=="resource")]),
+			   envir = fhircrackr_env)
 
 		bundles <- list()
 
