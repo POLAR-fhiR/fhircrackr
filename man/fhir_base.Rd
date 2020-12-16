@@ -14,7 +14,7 @@ The formatted url in a named character vector
 }
 \description{
 Takes an url string and removes leading/trailing white space and unnecessary slashes.
-Is supposed to be used with \code{\link{fhir_build_url}}.
+Is supposed to be used with \code{\link{fhir_build_search_url}}.
 }
 \examples{
 fhir_base(" http://hapi.fhir.org/baseR4/")

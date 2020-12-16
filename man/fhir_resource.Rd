@@ -18,7 +18,7 @@ This function takes a string defining a FHIR resource type and formats it correc
 removing white space and slashes. It also checks the resource against the list
 of resources provided at https://hl7.org/FHIR/resourcelist.html and throws a warning
 if the resource doesn't match. \code{fhir_resource} is supposed to be used with
-\code{\link{fhir_build_url}}.
+\code{\link{fhir_build_search_url}}.
 }
 \examples{
 fhir_resource("patient")

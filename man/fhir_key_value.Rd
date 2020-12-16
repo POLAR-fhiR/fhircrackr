@@ -23,7 +23,7 @@ A string with the appropriately encoded key value pairs
 \description{
 Takes two strings representing a key value pair for a FHIR search parameter and
 encodes the pair properly.  \code{fhir_key_value} is supposed to be used with
-\code{\link{fhir_build_url}}
+\code{\link{fhir_build_search_url}}
 }
 \examples{
 fhir_key_value(key = "gender", value = "female")
