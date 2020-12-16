@@ -1,8 +1,8 @@
 fhircrackr_env <- new.env(parent = emptyenv())
 assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
 assign(x = "canonical_design", value = NULL, envir = fhircrackr_env)
-assign(x = "last_resource", value = NULL, envir = fhircrackr_env)
-assign(x = "last_base", value = NULL, envir = fhircrackr_env)
+assign(x = "last_request", value = NULL, envir = fhircrackr_env)
+
 
 #' Next Bundle's URL
 #' @description fhir_next_bundle_url() gives the url of the next available bundle.
@@ -40,23 +40,15 @@ fhir_next_bundle_url <- function() {
 	fhircrackr_env$last_next_link
 }
 
-#' return base url used in last call to fhir_search
+#' return FHIR search request used in last call to fhir_search
 #' @export
 
 
-fhir_last_base <- function() {
+fhir_last_search_url <- function() {
 
-	fhircrackr_env$last_base
+	fhircrackr_env$last_request
 }
 
-#' return resource used in last call to fhir_search
-#' @export
-
-
-fhir_last_resource <- function() {
-
-	fhircrackr_env$last_resource
-}
 
 #' Retrieve design of last call to fhir_crack
 #'
@@ -163,14 +155,8 @@ fhir_search <-
 			 save_to_disc = FALSE,
 			 directory = paste0("FHIR_bundles_", gsub("-| |:","", Sys.time()))) {
 
-		search_list <- dissect_url(request)
-
-		assign(x = "last_base",
-			   value = unlist(search_list[sapply(search_list, function(x)names(x)=="base")]),
-			   envir = fhircrackr_env)
-
-		assign(x = "last_resource",
-			   value = unlist(search_list[sapply(search_list, function(x)names(x)=="resource")]),
+		assign(x = "last_request",
+			   value = request,
 			   envir = fhircrackr_env)
 
 		bundles <- list()
@@ -939,7 +925,7 @@ fhir_rm_indices <-
 #' Format FHIR base url
 #'
 #' Takes an url string and removes leading/trailing white space and unnecessary slashes.
-#' Is supposed to be used with \code{\link{fhir_build_url}}.
+#' Is supposed to be used with \code{\link{fhir_build_search_url}}.
 #' @param url A string containing the base URL of the FHIR server, e.g.  "http://hapi.fhir.org/baseR4"
 #' @return The formatted url in a named character vector
 #' @examples fhir_base(" http://hapi.fhir.org/baseR4/")
@@ -967,7 +953,7 @@ fhir_base <- function(url){
 #' removing white space and slashes. It also checks the resource against the list
 #' of resources provided at https://hl7.org/FHIR/resourcelist.html and throws a warning
 #' if the resource doesn't match. \code{fhir_resource} is supposed to be used with
-#' \code{\link{fhir_build_url}}.
+#' \code{\link{fhir_build_search_url}}.
 #'
 #' @param resource A string containing the resource type for the fhir search.
 #' Must be one of the official FHIRresource types listed at https://hl7.org/FHIR/resourcelist.html
@@ -997,7 +983,7 @@ fhir_resource <- function(resource){
 #'
 #' Takes two strings representing a key value pair for a FHIR search parameter and
 #' encodes the pair properly.  \code{fhir_key_value} is supposed to be used with
-#' \code{\link{fhir_build_url}}
+#' \code{\link{fhir_build_search_url}}
 #'
 #' @param key The name of the search parameter, e.g. "_include", "gender" or "_summary".
 #' For a general overview see https://www.hl7.org/fhir/search.html
@@ -1046,14 +1032,14 @@ fhir_key_value <-function(key, value, url_enc = TRUE){
 #'
 #' #Look for all MedicationAdministration resources
 #'
-#' fhir_build_url(fhir_base(url = "http://hapi.fhir.org/baseR4"),
+#' fhir_build_search_url(fhir_base(url = "http://hapi.fhir.org/baseR4"),
 #'                fhir_resource(resource = "MedicationAdministration")
 #'                )
 #'
 #' #Look for all Condition resources,
 #' #inlcude Patient resources they refer to
 #'
-#' fhir_build_url(fhir_base(url = "http://hapi.fhir.org/baseR4"),
+#' fhir_build_search_url(fhir_base(url = "http://hapi.fhir.org/baseR4"),
 #'                fhir_resource(resource = "Condition"),
 #'                fhir_key_value(key = "_include", value = "Condition:patient")
 #'                )
@@ -1061,13 +1047,13 @@ fhir_key_value <-function(key, value, url_enc = TRUE){
 #' #Look for all Patient resources of Patients born before 1980,
 #' #sort by deathdate
 #'
-#' fhir_build_url(fhir_base("http://hapi.fhir.org/baseR4"),
+#' fhir_build_search_url(fhir_base("http://hapi.fhir.org/baseR4"),
 #'                fhir_resource("Patient"),
 #'                fhir_key_value("birthdate", "lt1980-01-01"),
 #'                fhir_key_value("_sort", "death-date")
 #'                )
 
-fhir_build_url <- function(...){
+fhir_build_search_url <- function(...){
 
 	args <- list(...)
 
@@ -1113,8 +1099,48 @@ fhir_build_url <- function(...){
 
 }
 
+#' Update the URL from the last call to \code{\link{fhir_search}}
+#' @param ... calls to \code{\link{fhir_key_value}}
+#' @param append Logical. Keep key value pairs from previous request? Defaults to FALSE,
+#' meaning only base url and resource type from previous request are kept.
+#' @param return_url Logical. Return string with updated URL? Defaults to TRUE.
+#'
+#' @return  A string with the updated fhir search request or NULL.
 
 
+fhir_update_search_url <- function(..., append = FALSE, return_url = TRUE){
+
+	#newly provided key value pairs
+	args <- list(...)
+
+	#check validity
+	if(any(sapply(args, function(x) names(x)!="keyval"))){
+		stop("Please only use calls to fhir_key_value() inside this function.")
+	}
+
+	if(is.null(fhircrackr_env$last_request)){
+		stop("It seems you haven't used fhir_search() in this session yet. There is no",
+			 "searchURL to update.")
+	}
+
+	#get old search request elements
+	old_elements <- dissect_url(fhircrackr_env$last_request)
+
+	#Remove old key value pairs if new pairs should replace old ones
+	if(!append){
+		old_elements[sapply(old_elements, function(x) names(x)=="keyval")] <-NULL
+	}
+
+	#build new url
+	fhircrackr_env$last_request <-
+		fhir_build_search_url(c(old_elements[sapply(old_elements, function(x) names(x)=="base")],
+						  old_elements[sapply(old_elements, function(x) names(x)=="resource")],
+						  old_elements[sapply(old_elements, function(x) names(x)=="keyval")],
+						  args))
+
+	if(return_url){return(fhircrackr_env$last_request)}
+
+}
 
 
 
