@@ -9,7 +9,7 @@ fhir_key_value(key, value, url_enc = TRUE)
 \arguments{
 \item{key}{The name of the search parameter, e.g. "_include", "gender" or "_summary".
 For a general overview see https://www.hl7.org/fhir/search.html
-and also check out the paragraph on search parameters for the respective ressource,
+and also check out the paragraph on search parameters for the respective resource,
 e.g. http://www.hl7.org/fhir/patient.html#search}
 
 \item{value}{The name of the respective value for the parameter, e.g. "Observation:patient",
@@ -23,7 +23,7 @@ A string with the appropriately encoded key value pairs
 \description{
 Takes two strings representing a key value pair for a FHIR search parameter and
 encodes the pair properly.  \code{fhir_key_value} is supposed to be used with
-\code{\link{fhir_build_search_url}}
+\code{\link{fhir_build_request}}
 }
 \examples{
 fhir_key_value(key = "gender", value = "female")

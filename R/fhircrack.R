@@ -44,7 +44,7 @@ fhir_next_bundle_url <- function() {
 #' @export
 
 
-fhir_current_search_url <- function() {
+fhir_current_request <- function() {
 
 	fhircrackr_env$current_request
 }
@@ -160,13 +160,13 @@ fhir_search <-
 
 		if(missing(request)){
 
-			if(is.null(fhir_current_search_url())){
+			if(is.null(fhir_current_request())){
 				stop("You have not provided a FHIR search request and there is no ",
 					 "current search url fhir_search() can fall back to. See documentation ",
-					 "for fhir_current_search_url()")
+					 "for fhir_current_request()")
 			}
 
-			request <- fhir_current_search_url()
+			request <- fhir_current_request()
 		}
 
 		addr <- request
@@ -936,7 +936,7 @@ fhir_rm_indices <-
 #' Format FHIR base url
 #'
 #' Takes an url string and removes leading/trailing white space and unnecessary slashes.
-#' Is supposed to be used with \code{\link{fhir_build_search_url}}.
+#' Is supposed to be used with \code{\link{fhir_build_request}}.
 #' @param url A string containing the base URL of the FHIR server, e.g.  "http://hapi.fhir.org/baseR4"
 #' @return The formatted url in a named character vector
 #' @examples fhir_base(" http://hapi.fhir.org/baseR4/")
@@ -964,7 +964,7 @@ fhir_base <- function(url){
 #' removing white space and slashes. It also checks the resource against the list
 #' of resources provided at https://hl7.org/FHIR/resourcelist.html and throws a warning
 #' if the resource doesn't match. \code{fhir_resource} is supposed to be used with
-#' \code{\link{fhir_build_search_url}}.
+#' \code{\link{fhir_build_request}}.
 #'
 #' @param resource A string containing the resource type for the fhir search.
 #' Must be one of the official FHIRresource types listed at https://hl7.org/FHIR/resourcelist.html
@@ -994,11 +994,11 @@ fhir_resource <- function(resource){
 #'
 #' Takes two strings representing a key value pair for a FHIR search parameter and
 #' encodes the pair properly.  \code{fhir_key_value} is supposed to be used with
-#' \code{\link{fhir_build_search_url}}
+#' \code{\link{fhir_build_request}}
 #'
 #' @param key The name of the search parameter, e.g. "_include", "gender" or "_summary".
 #' For a general overview see https://www.hl7.org/fhir/search.html
-#' and also check out the paragraph on search parameters for the respective ressource,
+#' and also check out the paragraph on search parameters for the respective resource,
 #' e.g. http://www.hl7.org/fhir/patient.html#search
 #' @param value The name of the respective value for the parameter, e.g. "Observation:patient",
 #' "female" or "count".
@@ -1038,8 +1038,8 @@ fhir_key_value <-function(key, value, url_enc = TRUE){
 #' \code{\link{fhir_resource}}. You can provide none, one or multiple calls
 #' to \code{\link{fhir_key_value}} (See examples).
 #'
-#' Apart from returning the string the function saves the url as the current search url.
-#' It can then be called with \code{\link{fhir_current_search_url}}
+#' Apart from returning the string the function saves the url as the current request.
+#' It can be accessed with \code{\link{fhir_current_request}}
 #'
 #' @param ... Calls to  \code{\link{fhir_base}}, \code{\link{fhir_resource}} and \code{\link{fhir_key_value}}
 #' @return A string containing a FHIR search request ready for use
@@ -1048,31 +1048,31 @@ fhir_key_value <-function(key, value, url_enc = TRUE){
 #'
 #' #Look for all MedicationAdministration resources
 #'
-#' fhir_build_search_url(fhir_base(url = "http://hapi.fhir.org/baseR4"),
+#' fhir_build_request(fhir_base(url = "http://hapi.fhir.org/baseR4"),
 #'                fhir_resource(resource = "MedicationAdministration")
 #'                )
 #'
-#' #current search url is updated to this url:
-#' fhir_current_search_url()
+#' #current search request is updated to this url:
+#' fhir_current_request()
 #'
 #' #Look for all Condition resources,
-#' #inlcude Patient resources they refer to
+#' #include Patient resources they refer to
 #'
-#' fhir_build_search_url(fhir_base(url = "http://hapi.fhir.org/baseR4"),
+#' fhir_build_request(fhir_base(url = "http://hapi.fhir.org/baseR4"),
 #'                fhir_resource(resource = "Condition"),
 #'                fhir_key_value(key = "_include", value = "Condition:patient")
 #'                )
 #'
 #' #Look for all Patient resources of Patients born before 1980,
-#' #sort by deathdate
+#' #sort by death date
 #'
-#' fhir_build_search_url(fhir_base("http://hapi.fhir.org/baseR4"),
+#' fhir_build_request(fhir_base("http://hapi.fhir.org/baseR4"),
 #'                fhir_resource("Patient"),
 #'                fhir_key_value("birthdate", "lt1980-01-01"),
 #'                fhir_key_value("_sort", "death-date")
 #'                )
 
-fhir_build_search_url <- function(...){
+fhir_build_request <- function(...){
 
 	args <- list(...)
 
@@ -1121,23 +1121,23 @@ fhir_build_search_url <- function(...){
 
 }
 
-#' Update the current URL
+#' Update the current FHIR search request
 #'
-#' Takes the current URL (the search URL from either the last call to \code{\link{fhir_search}}
-#' or \code{\link{fhir_build_search_url}}) an updates the search parameters with
-#' new calls to \code{\link{fhir_key_value}}. The updated url can be accessed with
-#' \code{\link{fhir_current_search_url}}.
+#' Takes the current request (the search request URL from either the last call to
+#' \code{\link{fhir_search}} or \code{\link{fhir_build_request}}) an updates the search
+#' parameters with new calls to \code{\link{fhir_key_value}}. The updated request can be
+#' accessed with \code{\link{fhir_current_request}}.
 #'
 #' @param ... calls to \code{\link{fhir_key_value}}
-#' @param append Logical. Keep key value pairs from current search url? Defaults to \code{FALSE},
-#' meaning only base url and resource type from current url are kept. If \code{TRUE},
-#' the new key value pairs will be added to the existing ones.
-#' @param return_url Logical. Return string with updated URL? Defaults to \code{TRUE}.
+#' @param append Logical. Keep key value pairs from current search request?
+#' Defaults to \code{FALSE}, meaning only base url and resource type from current request are kept.
+#' If \code{TRUE}, the new key value pairs will be added to the existing ones.
+#' @param return_request Logical. Return string with updated request? Defaults to \code{TRUE}.
 #'
-#' @return  A string with the updated FHIR search URL or \code{NULL}.
+#' @return  A string with the updated FHIR search request or \code{NULL}.
 
 
-fhir_update_search_url <- function(..., append = FALSE, return_url = TRUE){
+fhir_update_request <- function(..., append = FALSE, return_request = TRUE){
 
 	#newly provided key value pairs
 	args <- list(...)
@@ -1162,12 +1162,12 @@ fhir_update_search_url <- function(..., append = FALSE, return_url = TRUE){
 
 	#build new url
 	fhircrackr_env$current_request <-
-		fhir_build_search_url(c(old_elements[sapply(old_elements, function(x) names(x)=="base")],
+		fhir_build_request(c(old_elements[sapply(old_elements, function(x) names(x)=="base")],
 						  old_elements[sapply(old_elements, function(x) names(x)=="resource")],
 						  old_elements[sapply(old_elements, function(x) names(x)=="keyval")],
 						  args))
 
-	if(return_url){return(fhircrackr_env$current_request)}
+	if(return_request){return(fhircrackr_env$current_request)}
 
 }
 
