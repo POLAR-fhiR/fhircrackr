@@ -13,9 +13,15 @@ fhir_build_search_url(...)
 A string containing a FHIR search request ready for use
 }
 \description{
-This function takes its arguments from the functions \code{\link{fhir_base}}, \code{\link{fhir_resource}} and \code{\link{fhir_key_value}}
-You must provide exactly one call to \code{\link{fhir_base}}, and one call to \code{\link{fhir_resource}}. You can provide none, one or multiple calls
-to \code{\link{fhir_key_value}}. See examples.
+This function takes its arguments from the functions \code{\link{fhir_base}},
+\code{\link{fhir_resource}} and \code{\link{fhir_key_value}}
+You must provide exactly one call to \code{\link{fhir_base}}, and one call to
+\code{\link{fhir_resource}}. You can provide none, one or multiple calls
+to \code{\link{fhir_key_value}} (See examples).
+}
+\details{
+Apart from returning the string the function saves the url as the current search url.
+It can then be called with \code{\link{fhir_current_search_url}}
 }
 \examples{
 
@@ -24,6 +30,9 @@ to \code{\link{fhir_key_value}}. See examples.
 fhir_build_search_url(fhir_base(url = "http://hapi.fhir.org/baseR4"),
                fhir_resource(resource = "MedicationAdministration")
                )
+
+#current search url is updated to this url:
+fhir_current_search_url()
 
 #Look for all Condition resources,
 #inlcude Patient resources they refer to

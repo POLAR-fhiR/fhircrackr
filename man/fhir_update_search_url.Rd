@@ -2,21 +2,25 @@
 % Please edit documentation in R/fhircrack.R
 \name{fhir_update_search_url}
 \alias{fhir_update_search_url}
-\title{Update the URL from the last call to \code{\link{fhir_search}}}
+\title{Update the current URL}
 \usage{
 fhir_update_search_url(..., append = FALSE, return_url = TRUE)
 }
 \arguments{
 \item{...}{calls to \code{\link{fhir_key_value}}}
 
-\item{append}{Logical. Keep key value pairs from previous request? Defaults to FALSE,
-meaning only base url and resource type from previous request are kept.}
+\item{append}{Logical. Keep key value pairs from current search url? Defaults to \code{FALSE},
+meaning only base url and resource type from current url are kept. If \code{TRUE},
+the new key value pairs will be added to the existing ones.}
 
-\item{return_url}{Logical. Return string with updated URL? Defaults to TRUE.}
+\item{return_url}{Logical. Return string with updated URL? Defaults to \code{TRUE}.}
 }
 \value{
-A string with the updated fhir search request or NULL.
+A string with the updated FHIR search URL or \code{NULL}.
 }
 \description{
-Update the URL from the last call to \code{\link{fhir_search}}
+Takes the current URL (the search URL from either the last call to \code{\link{fhir_search}}
+or \code{\link{fhir_build_search_url}}) an updates the search parameters with
+new calls to \code{\link{fhir_key_value}}. The updated url can be accessed with
+\code{\link{fhir_current_search_url}}.
 }

@@ -1,7 +1,7 @@
 fhircrackr_env <- new.env(parent = emptyenv())
 assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
 assign(x = "canonical_design", value = NULL, envir = fhircrackr_env)
-assign(x = "last_request", value = NULL, envir = fhircrackr_env)
+assign(x = "current_request", value = NULL, envir = fhircrackr_env)
 
 
 #' Next Bundle's URL
@@ -44,9 +44,9 @@ fhir_next_bundle_url <- function() {
 #' @export
 
 
-fhir_last_search_url <- function() {
+fhir_current_search_url <- function() {
 
-	fhircrackr_env$last_request
+	fhircrackr_env$current_request
 }
 
 
@@ -155,13 +155,22 @@ fhir_search <-
 			 save_to_disc = FALSE,
 			 directory = paste0("FHIR_bundles_", gsub("-| |:","", Sys.time()))) {
 
-		assign(x = "last_request",
-			   value = request,
-			   envir = fhircrackr_env)
 
 		bundles <- list()
 
+		if(missing(request)){
+
+			if(is.null(fhir_current_search_url())){
+				stop("You have not provided a FHIR search request and there is no ",
+					 "current search url fhir_search() can fall back to. See documentation ",
+					 "for fhir_current_search_url()")
+			}
+
+			request <- fhir_current_search_url()
+		}
+
 		addr <- request
+
 
 		if (0 < verbose) {
 			message(
@@ -279,6 +288,8 @@ fhir_search <-
 				break
 			}
 		}
+
+		fhircrackr_env$current_request <- request
 
 		if(save_to_disc){
 
@@ -1021,9 +1032,14 @@ fhir_key_value <-function(key, value, url_enc = TRUE){
 
 #' Build FHIR search request from base url, resource type and search parameters
 #'
-#' This function takes its arguments from the functions \code{\link{fhir_base}}, \code{\link{fhir_resource}} and \code{\link{fhir_key_value}}
-#' You must provide exactly one call to \code{\link{fhir_base}}, and one call to \code{\link{fhir_resource}}. You can provide none, one or multiple calls
-#' to \code{\link{fhir_key_value}}. See examples.
+#' This function takes its arguments from the functions \code{\link{fhir_base}},
+#' \code{\link{fhir_resource}} and \code{\link{fhir_key_value}}
+#' You must provide exactly one call to \code{\link{fhir_base}}, and one call to
+#' \code{\link{fhir_resource}}. You can provide none, one or multiple calls
+#' to \code{\link{fhir_key_value}} (See examples).
+#'
+#' Apart from returning the string the function saves the url as the current search url.
+#' It can then be called with \code{\link{fhir_current_search_url}}
 #'
 #' @param ... Calls to  \code{\link{fhir_base}}, \code{\link{fhir_resource}} and \code{\link{fhir_key_value}}
 #' @return A string containing a FHIR search request ready for use
@@ -1035,6 +1051,9 @@ fhir_key_value <-function(key, value, url_enc = TRUE){
 #' fhir_build_search_url(fhir_base(url = "http://hapi.fhir.org/baseR4"),
 #'                fhir_resource(resource = "MedicationAdministration")
 #'                )
+#'
+#' #current search url is updated to this url:
+#' fhir_current_search_url()
 #'
 #' #Look for all Condition resources,
 #' #inlcude Patient resources they refer to
@@ -1088,24 +1107,34 @@ fhir_build_search_url <- function(...){
 
 	if(keyvals != ""){
 
-		return(paste0(base, "/", resource, "?", keyvals))
+		result <- paste0(base, "/", resource, "?", keyvals)
 
 	}else{
 
-		return(paste0(base, "/", resource))
+		result <- paste0(base, "/", resource)
 
 	}
 
+	fhircrackr_env$current_request <- result
+
+	return(result)
 
 }
 
-#' Update the URL from the last call to \code{\link{fhir_search}}
-#' @param ... calls to \code{\link{fhir_key_value}}
-#' @param append Logical. Keep key value pairs from previous request? Defaults to FALSE,
-#' meaning only base url and resource type from previous request are kept.
-#' @param return_url Logical. Return string with updated URL? Defaults to TRUE.
+#' Update the current URL
 #'
-#' @return  A string with the updated fhir search request or NULL.
+#' Takes the current URL (the search URL from either the last call to \code{\link{fhir_search}}
+#' or \code{\link{fhir_build_search_url}}) an updates the search parameters with
+#' new calls to \code{\link{fhir_key_value}}. The updated url can be accessed with
+#' \code{\link{fhir_current_search_url}}.
+#'
+#' @param ... calls to \code{\link{fhir_key_value}}
+#' @param append Logical. Keep key value pairs from current search url? Defaults to \code{FALSE},
+#' meaning only base url and resource type from current url are kept. If \code{TRUE},
+#' the new key value pairs will be added to the existing ones.
+#' @param return_url Logical. Return string with updated URL? Defaults to \code{TRUE}.
+#'
+#' @return  A string with the updated FHIR search URL or \code{NULL}.
 
 
 fhir_update_search_url <- function(..., append = FALSE, return_url = TRUE){
@@ -1118,13 +1147,13 @@ fhir_update_search_url <- function(..., append = FALSE, return_url = TRUE){
 		stop("Please only use calls to fhir_key_value() inside this function.")
 	}
 
-	if(is.null(fhircrackr_env$last_request)){
-		stop("It seems you haven't used fhir_search() in this session yet. There is no",
-			 "searchURL to update.")
+	if(is.null(fhircrackr_env$current_request)){
+		stop("It seems you haven't used fhir_search() or fhir_build_search_url()in this session yet. ",
+		"There is no search url to update.")
 	}
 
 	#get old search request elements
-	old_elements <- dissect_url(fhircrackr_env$last_request)
+	old_elements <- dissect_url(fhircrackr_env$current_request)
 
 	#Remove old key value pairs if new pairs should replace old ones
 	if(!append){
@@ -1132,13 +1161,13 @@ fhir_update_search_url <- function(..., append = FALSE, return_url = TRUE){
 	}
 
 	#build new url
-	fhircrackr_env$last_request <-
+	fhircrackr_env$current_request <-
 		fhir_build_search_url(c(old_elements[sapply(old_elements, function(x) names(x)=="base")],
 						  old_elements[sapply(old_elements, function(x) names(x)=="resource")],
 						  old_elements[sapply(old_elements, function(x) names(x)=="keyval")],
 						  args))
 
-	if(return_url){return(fhircrackr_env$last_request)}
+	if(return_url){return(fhircrackr_env$current_request)}
 
 }
 
