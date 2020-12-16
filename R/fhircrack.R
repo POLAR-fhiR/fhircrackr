@@ -1076,7 +1076,7 @@ fhir_build_request <- function(...){
 
 	args <- list(...)
 
-	#unlist if arguments come from call to dissect_url
+	#unlist if arguments come from call to dissect_request
 	if(is.list(args[[1]])){
 		args <- args[[1]]
 	}
@@ -1153,7 +1153,7 @@ fhir_update_request <- function(..., append = FALSE, return_request = TRUE){
 	}
 
 	#get old search request elements
-	old_elements <- dissect_url(fhircrackr_env$current_request)
+	old_elements <- dissect_request(fhircrackr_env$current_request)
 
 	#Remove old key value pairs if new pairs should replace old ones
 	if(!append){

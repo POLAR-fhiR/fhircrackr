@@ -22,11 +22,11 @@ lst <- function(...,
 
 #' Dissect FHIR search request
 #' @description Dissect FHIR search request into base, resource and  key value pairs
-#' @param url The url as a string
+#' @param url The request as a string
 #' @return A list containing the dissected request
 #' @noRd
 
-dissect_url <- function(url){
+dissect_request <- function(request){
 
 	#split base + resource from search parameters
 	split0 <- strsplit(url, "?", fixed = T)[[1]]
