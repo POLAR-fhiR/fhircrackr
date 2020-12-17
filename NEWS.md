@@ -1,3 +1,13 @@
+
+- New function `fhir_build_request()` with associated functions `fhir_base()`, `fhir_resource()` and `fhir_key_value()` helps building a valid FHIR search request for use in `fhir_search()`.
+
+- The most recently used FHIR search request is now implicitly saved whenever `fhir_search()` or `fhir_build_request()` is called. It can be accessed with the new function `fhir_current_request()`.
+
+- New function `fhir_update_requests()` allows to update the request saved as current request with new search parameters.
+
+See documentation for more information on all new functions.
+
+
 # fhircrackr 0.2.1
 
 - fhir_melt now gives a warning when the brackets provided in the function call don't appear in the data frame 
