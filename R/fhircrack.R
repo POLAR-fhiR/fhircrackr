@@ -112,7 +112,7 @@ paste_paths <- function(path1 = "w",
 #' Download Fhir search result
 #' @description Downloads all FHIR bundles of a FHIR search request from a FHIR server.
 #'
-#' @param request A string containing the full FHIR search request.
+#' @param request A string containing the full FHIR search request. Defaults to \code{\link{fhir_current_request}}
 #' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param max_bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
@@ -144,7 +144,7 @@ paste_paths <- function(path1 = "w",
 #' \donttest{bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)}
 
 fhir_search <-
-	function(request,
+	function(request = fhir_current_request(),
 			 username = NULL,
 			 password = NULL,
 			 max_bundles = Inf,
@@ -158,16 +158,12 @@ fhir_search <-
 
 		bundles <- list()
 
-		if(missing(request)){
-
-			if(is.null(fhir_current_request())){
+			if(is.null(request)){
 				stop("You have not provided a FHIR search request and there is no ",
 					 "current search request fhir_search() can fall back to. See documentation ",
 					 "for fhir_current_request()")
 			}
 
-			request <- fhir_current_request()
-		}
 
 		addr <- request
 
