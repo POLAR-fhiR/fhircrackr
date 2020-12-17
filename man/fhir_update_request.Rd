@@ -24,3 +24,21 @@ Takes the current request (the search request URL from either the last call to
 parameters with new calls to \code{\link{fhir_key_value}}. The updated request can be
 accessed with \code{\link{fhir_current_request}}.
 }
+\examples{
+#build request
+fhir_build_request(fhir_base("http://hapi.fhir.org/baseR4"),
+               fhir_resource("Patient"),
+               fhir_key_value(key = "gender", value = "female"))
+
+#access current request
+fhir_current_request()
+
+#update and keep former key value pairs
+fhir_update_request(fhir_key_value(key = "_count", value = "10"), append=TRUE)
+fhir_current_request()
+
+#update and replace former key value pairs
+fhir_update_request(fhir_key_value(key = "gender", value = "male"),
+append = FALSE, return_request = TRUE)
+
+}

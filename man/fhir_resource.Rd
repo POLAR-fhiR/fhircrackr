@@ -7,8 +7,8 @@
 fhir_resource(resource)
 }
 \arguments{
-\item{resource}{A string containing the resource type for the fhir search.
-Must be one of the official FHIRresource types listed at https://hl7.org/FHIR/resourcelist.html}
+\item{resource}{A string containing the resource type for the FHIR search.
+Should be one of the official FHIR resource types listed at https://hl7.org/FHIR/resourcelist.html}
 }
 \value{
 A named character vector with the checked and formatted resource type

@@ -5,7 +5,7 @@
 \title{Download Fhir search result}
 \usage{
 fhir_search(
-  request,
+  request = fhir_current_request(),
   username = NULL,
   password = NULL,
   max_bundles = Inf,
@@ -18,7 +18,7 @@ fhir_search(
 )
 }
 \arguments{
-\item{request}{A string containing the full FHIR search request.}
+\item{request}{A string containing the full FHIR search request. Defaults to \code{\link{fhir_current_request}}}
 
 \item{username}{A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.}
 
