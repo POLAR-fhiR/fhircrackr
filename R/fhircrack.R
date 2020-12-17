@@ -162,7 +162,7 @@ fhir_search <-
 
 			if(is.null(fhir_current_request())){
 				stop("You have not provided a FHIR search request and there is no ",
-					 "current search url fhir_search() can fall back to. See documentation ",
+					 "current search request fhir_search() can fall back to. See documentation ",
 					 "for fhir_current_request()")
 			}
 
@@ -966,11 +966,12 @@ fhir_base <- function(url){
 #' if the resource doesn't match. \code{fhir_resource} is supposed to be used with
 #' \code{\link{fhir_build_request}}.
 #'
-#' @param resource A string containing the resource type for the fhir search.
-#' Must be one of the official FHIRresource types listed at https://hl7.org/FHIR/resourcelist.html
+#' @param resource A string containing the resource type for the FHIR search.
+#' Should be one of the official FHIR resource types listed at https://hl7.org/FHIR/resourcelist.html
 #' @return A named character vector with the checked and formatted resource type
 #' @examples fhir_resource("patient")
 #' @export
+#'
 fhir_resource <- function(resource){
 
 	#remove / and white space
@@ -1133,6 +1134,25 @@ fhir_build_request <- function(...){
 #' Defaults to \code{FALSE}, meaning only base url and resource type from current request are kept.
 #' If \code{TRUE}, the new key value pairs will be added to the existing ones.
 #' @param return_request Logical. Return string with updated request? Defaults to \code{TRUE}.
+#'
+#' @examples
+#' #build request
+#' fhir_build_request(fhir_base("http://hapi.fhir.org/baseR4"),
+#'                fhir_resource("Patient"),
+#'                fhir_key_value(key = "gender", value = "female"))
+#'
+#' #access current request
+#' fhir_current_request()
+#'
+#' #update and keep former key value pairs
+#' fhir_update_request(fhir_key_value(key = "_count", value = "10"), append=TRUE)
+#' fhir_current_request()
+#'
+#' #update and replace former key value pairs
+#' fhir_update_request(fhir_key_value(key = "gender", value = "male"),
+#' append = FALSE, return_request = TRUE)
+#'
+#' @export
 #'
 #' @return  A string with the updated FHIR search request or \code{NULL}.
 

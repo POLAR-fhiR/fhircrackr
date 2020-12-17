@@ -29,7 +29,7 @@ lst <- function(...,
 dissect_request <- function(request){
 
 	#split base + resource from search parameters
-	split0 <- strsplit(url, "?", fixed = T)[[1]]
+	split0 <- strsplit(request, "?", fixed = T)[[1]]
 
 	#split base from resource
 	split1 <- strsplit(split0[1], "/", fixed=T)[[1]]
