@@ -14,6 +14,7 @@ fhir_search(
   delay_between_attempts = 10,
   log_errors = 0,
   save_to_disc = FALSE,
+  delay_between_pages = 0,
   directory = paste0("FHIR_bundles_", gsub("-| |:", "", Sys.time()))
 )
 }
@@ -46,6 +47,10 @@ in the argument \code{directory} and not returned as a bundle list in the R sess
 bundles are to be downloaded and keeping them all in one R session might overburden working memory. When download
 is complete, the bundles can be loaded into R using \code{\link{fhir_load}}. Defaults to FALSE, i.e. bundles are
 returned as a list within the R session.}
+
+\item{delay_between_pages}{A numeric scalar specifying a time in seconds to wait between pages of the search result,
+i.e. between downloading the current bundle and the next bundle. This can be used to avoid choking a weak server with
+too many requests to quickly. Defaults to zero.}
 
 \item{directory}{The directory the bundles are saved to when \code{save_to_disc} is TRUE. Defaults to creating a
 time-stamped directory into the current working directory.}

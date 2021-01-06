@@ -1,3 +1,5 @@
+- New argument `delay_between_pages` for `fhir_search()` allowing to put a delay between the download of bundles 
+(i.e. pages) in a bigger search request to prevent weak servers from choking.
 
 - New function `fhir_build_request()` with associated functions `fhir_base()`, `fhir_resource()` and `fhir_key_value()` helps building a valid FHIR search request for use in `fhir_search()`.
 
