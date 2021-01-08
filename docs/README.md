@@ -3,17 +3,59 @@ fhircrackr is a package that conveniently downloads FHIR<sup>[1](#hl7stuff)</sup
 
 You can download the development version using `devtools::install_github("POLAR-fhiR/fhircrackr")`.
 
-This readme gives a only short overview over the most important functions in `fhircrackr`. For a more comprehensive introduction we strongly recommend to read the package vignette.
+This readme gives a only short overview over the most important functions in `fhircrackr`. For a more comprehensive introduction we strongly recommend to read the package vignette which you can find in the folder vignettes in this GitHub repository.
 
 ## Prerequisites
 For the moment, this package focuses mostly on downloading and flattening resources from a FHIR server. This requires some prerequisites:
 
 - The endpoint of the FHIR server you want to access. If you don't have your own FHIR server, you can use one of the publicly available servers, such as https&#58;//hapi.fhir.org/baseR4 or http&#58;//fhir.hl7.de:8080/baseDstu3. The endpoint of a FHIR server is often referred to as [base].
 
-- To download resources from the server, you should be familiar with [FHIR search requests](https://www.hl7.org/fhir/search.html). FHIR search allows you to download sets of resources that match very specific requirements. As this package mainly takes care of the downloading and flattening part, we will use very simple examples of FHIR search requests of the form `[base]/[type]?parameter(s)`, where `[type]` refers to the type of resource you are looking for and `parameter(s)` characterize specific properties those resources should have.
-`https://hapi.fhir.org/baseR4/Patient?gender=female` for example downloads all Patient resources from the FHIR server at `https://hapi.fhir.org/baseR4/` that represent female patients.
+- To download resources from the server, you should be familiar with [FHIR search requests](https://www.hl7.org/fhir/search.html). FHIR search allows you to download sets of resources that match very specific requirements. The `fhircrackr` package offers some help building FHIR search requests, for this please see the paragraph on FHIR search requests.
 
 - To specify which attributes of the FHIR resources you want in your data frame, you should have at least some familiarity with XPath expressions, because this package downloads the resources in xml-format. A good tutorial for XPath can be found [here](https://www.w3schools.com/xml/xpath_intro.asp).
+
+##specify FHIR search requests
+This paragraph introduces the basics of FHIR search and some functions to build valid FHIR search requests with `fhircrackr`. If you are already familiar and comfortable with FHIR search, you can skip this paragraph.
+
+A FHIR search request will mostly have the form `[base]/[type]?parameter(s)`, where `[base]` is a URL to the FHIR endpoint you are trying to access, `[type]` refers to the type of resource you are looking for and `parameter(s)` characterize specific properties those resources should have. The function `fhir_build_request()` offers a solution to bring those three components together correctly, taking care of proper formatting for you. You use this function in conjunction with three sub-functions: `fhir_base()`, `fhir_resource()` and `fhir_key_value()`:
+
+```r
+fhir_build_request(
+	fhir_base(" http://hapi.fhir.org/baseR4/"),
+	fhir_resource("patient"),
+	fhir_key_value(key = "birthdate", value = "lt2000-01-01", url_enc = TRUE),
+	fhir_key_value(key = "_count", value = "10")
+)
+```
+You have to provide exactly one base and one resource and can provide none or as many key value pairs as you want. 
+
+### Accessing the current request
+Whenever you call `fhir_build_request()` or `fhir_search()` (see below), the corresponding FHIR search request will be saved implicitly and can be accessed like this:
+
+```{r}
+fhir_current_request()
+```
+
+You can update it with new search parameters using `fhir_update_request()`. If you set the argument `append=FALSE`, the key value pairs in the current request are overwritten:
+
+```r
+fhir_update_request(fhir_key_value(key = "gender", value = "male"),
+					append = FALSE,
+					return_request = TRUE)
+```
+
+If you set `append=TRUE`, the new pairs are appended to the current ones:
+
+```r
+fhir_current_request()
+fhir_update_request(fhir_key_value(key = "birthdate", value = "lt2000-01-01"),
+					append = TRUE,
+					return_request = FALSE)
+fhir_current_request()
+```
+
+You can save the requests you build explicitly in an object and provide this object to the `request` argument of `fhir_search()`. If you call `fhir_search()` without providing an explicit request however, the function will automatically call `fhir_current_request()`.
+
 
 ## Download FHIR Resources from a server
 

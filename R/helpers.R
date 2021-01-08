@@ -20,6 +20,31 @@ lst <- function(...,
 	v
 }
 
+#' Dissect FHIR search request
+#' @description Dissect FHIR search request into base, resource and  key value pairs
+#' @param url The request as a string
+#' @return A list containing the dissected request
+#' @noRd
+
+dissect_request <- function(request){
+
+	#split base + resource from search parameters
+	split0 <- strsplit(request, "?", fixed = T)[[1]]
+
+	#split base from resource
+	split1 <- strsplit(split0[1], "/", fixed=T)[[1]]
+
+	base <- c(base=paste(split1[1:(length(split1)-1)], collapse = "/"))
+
+	resource <- c(resource = split1[length(split1)])
+
+	keyval <- as.list(strsplit(split0[2], "&", fixed=T)[[1]])
+	keyval <- lapply(keyval, function(x){names(x)<-"keyval";x})
+
+
+	c(list(base, resource), keyval)
+}
+
 
 #' Download single FHIR bundle
 #' @description Download a single FHIR bundle via FHIR search request and return it as a xml object.
