@@ -979,15 +979,16 @@ fhir_resource <- function(resource){
 	#remove / and white space
 	resource <- stringr::str_remove_all(resource, "/| ")
 
-	#convert first character to upper case
-	stringr::str_sub(resource,1,1) <- stringr::str_to_upper(stringr::str_sub(resource,1,1))
-
-	#check for validity
-	if(!resource %in% existing_resource_types){
-		warning("It seems that the resource you provided is not one of the official Resource types from https://hl7.org/FHIR/resourcelist.html. ",
-				"Please note that upper and lower cases within the word matter. ",
+	#convert to correct case and check for validity
+	if(tolower(resource) %in% tolower(existing_resource_types)){
+		resource <- existing_resource_types[tolower(resource) == tolower(existing_resource_types)]
+	}else{
+		warning("It seems that the resource you provided is not one of the official resource types from https://hl7.org/FHIR/resourcelist.html. ",
 				"If you are sure this resource exists on your server you can ignore this warning.")
 	}
+
+
+	stringr::str_sub(resource,1,1) <- stringr::str_to_upper(stringr::str_sub(resource,1,1))
 
 
 	return(c(resource=resource))
