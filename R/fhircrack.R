@@ -3,7 +3,7 @@ assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
 assign(x = "canonical_design", value = NULL, envir = fhircrackr_env)
 assign(x = "current_request", value = NULL, envir = fhircrackr_env)
 
-
+#
 #' Next Bundle's URL
 #' @description fhir_next_bundle_url() gives the url of the next available bundle.
 #' This is useful when you have not a lot of memory available or when a download of bundles was
