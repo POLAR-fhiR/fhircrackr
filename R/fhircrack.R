@@ -939,6 +939,7 @@ fhir_melt_all <- function(indexed_data_frame, sep, brackets, rm_indices = TRUE){
 
 	#sort columns to make sure columns belonging to the same element are next to each other
 	d <- data.table::data.table(indexed_data_frame)
+	oldOrder <- copy(names(d))
 	data.table::setcolorder(d, sort(names(d)))
 
 	#determine depth of ids in each column
@@ -971,8 +972,13 @@ fhir_melt_all <- function(indexed_data_frame, sep, brackets, rm_indices = TRUE){
 	#remove resource identifier (useless after multiple melts)
 	d[,"resource_identifier":=NULL]
 
-	#remove indices and return appropriate type
+	#remove indices
 	if(rm_indices){d <- fhir_rm_indices(d, brackets = brackets)}
+
+	#set old order
+	data.table::setcolorder(d, oldOrder)
+
+	#return appropriate type
 	if(!is_DT){data.table::setDF(d)}
 	d
 }
