@@ -851,6 +851,132 @@ fhir_melt <-
 
 		}
 	}
+#' Melt all multiple entries
+#'
+#' This function divides all multiple entries in an indexed data frame as produced by \code{\link{fhir_crack}}
+#' into separate observations.
+#'
+#' Every row containing values that consist of multiple entries will be turned into multiple rows, one for each entry.
+#' Values on other variables will be repeated in all the new rows.
+#'
+#' For a more detailed description on how to use this function please see the package vignette.
+#'
+#' @param indexed_data_frame A data frame with indexed multiple entries.
+#' @param brackets A character vector of length 2, defining the brackets used for the indices.
+#' @param sep A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}.
+#' @param rm_indices Logical of lentgh one. Should indices be removed? Defaults to TRUE as they have no value after comlete melting.
+#' @return A data frame where each muliple entry appears in a separate row.
+#'
+#' @examples
+#' #generate example
+#' bundle <- xml2::read_xml(
+#' 	"<Bundle>
+#'
+#' 		<Patient>
+#' 			<id value='id1'/>
+#' 			<address>
+#' 				<use value='home'/>
+#' 				<city value='Amsterdam'/>
+#' 				<type value='physical'/>
+#' 				<country value='Netherlands'/>
+#' 			</address>
+#' 			<birthDate value='1992-02-06'/>
+#' 		</Patient>
+#'
+#' 		<Patient>
+#' 			<id value='id2'/>
+#' 			<address>
+#' 				<use value='home'/>
+#' 				<city value='Rome'/>
+#' 				<type value='physical'/>
+#' 				<country value='Italy'/>
+#' 			</address>
+#' 			<address>
+#' 				<use value='work'/>
+#' 				<city value='Stockholm'/>
+#' 				<type value='postal'/>
+#' 				<country value='Sweden'/>
+#' 			</address>
+#' 			<birthDate value='1980-05-23'/>
+#' 		</Patient>
+#'
+#' 		<Patient>
+#' 			<id value='id3.1'/>
+#' 			<id value='id3.2'/>
+#' 			<address>
+#' 				<use value='home'/>
+#' 				<city value='Berlin'/>
+#' 			</address>
+#' 			<address>
+#' 				<type value='postal'/>
+#' 				<country value='France'/>
+#' 			</address>
+#' 			<address>
+#' 				<use value='work'/>
+#' 				<city value='London'/>
+#' 				<type value='postal'/>
+#' 				<country value='England'/>
+#' 			</address>
+#' 			<birthDate value='1974-12-25'/>
+#' 		</Patient>
+#'
+#' 	</Bundle>"
+#' )
+#'
+#' #crack fhir resources
+#' design <- list(Patients = list(resource = ".//Patient",
+#'                style = list(brackets = c("[","]"),
+#'                sep = "||")
+#'                ))
+#' dfs <- fhir_crack(bundles = list(bundle), design = design)
+#'
+#' fhir_melt_all(dfs[[1]], brackets = c("[","]"), sep="||")
+#' @export
+
+fhir_melt_all <- function(indexed_data_frame, sep, brackets, rm_indices = TRUE){
+
+	is_DT <- data.table::is.data.table(indexed_data_frame)
+
+	#sort columns to make sure columns belonging to the same element are next to each other
+	d <- data.table::data.table(indexed_data_frame)
+	data.table::setcolorder(d, sort(names(d)))
+
+	#determine depth of ids in each column
+	brackets.escaped <- esc(brackets)
+	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
+	ids <- suppressWarnings(stringr::str_extract_all(d, pattern.ids))
+	depth <- sapply(ids, function(x){unique(stringr::str_count(x,esc(".")))}+1)
+
+	#columns which have multiple values
+	targetCols <- grepl(esc(sep), d)
+	#dissect colnames
+	names <- stringr::str_split(names(d), esc("."), simplify = T)[targetCols,]
+	depth <- depth[targetCols]
+	#find the columns which represent new elements
+	newElement <- !apply(names,2, duplicated, incomparables = "")
+	targetElements <- names[newElement[,1],1]
+	depth <- depth[newElement[,1]]
+
+	#loop through elements
+	for (i in 1:length(targetElements)){
+		cols <- fhir_common_columns(d, targetElements[i])
+
+		#loop through id layers
+		for(j in 1:depth[i]){
+			d <- fhir_melt(d, columns = cols, brackets=brackets, sep=sep, all_columns = T)
+		}
+
+	}
+
+	#remove resource identifier (useless after multiple melts)
+	d[,"resource_identifier":=NULL]
+
+	#remove indices and return appropriate type
+	if(rm_indices){d <- fhir_rm_indices(d, brackets = brackets)}
+	if(!is_DT){data.table::setDF(d)}
+	d
+}
+
 
 #' Remove indices from data frame
 #'
@@ -921,7 +1047,7 @@ fhir_rm_indices <-
 
 		brackets.escaped <- esc(brackets)
 
-		pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
+		pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)*", brackets.escaped[2])
 
 		result <- data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_dt[,columns, with=F])))
 
