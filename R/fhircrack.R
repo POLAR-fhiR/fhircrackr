@@ -951,10 +951,10 @@ fhir_melt_all <- function(indexed_data_frame, sep, brackets, rm_indices = TRUE){
 	#columns which have multiple values
 	targetCols <- grepl(esc(sep), d)
 	#dissect colnames
-	names <- stringr::str_split(names(d), esc("."), simplify = T)[targetCols,]
+	names <- stringr::str_split(names(d), esc("."), simplify = T)[targetCols,,drop=F]
 	depth <- depth[targetCols]
 	#find the columns which represent new elements
-	newElement <- !apply(names,2, duplicated, incomparables = "")
+	newElement <- matrix(!apply(names,2, duplicated, incomparables = ""), nrow=nrow(names))
 	targetElements <- names[newElement[,1],1]
 	depth <- depth[newElement[,1]]
 
