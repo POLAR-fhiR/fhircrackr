@@ -859,13 +859,18 @@ fhir_melt <-
 #' Every row containing values that consist of multiple entries will be turned into multiple rows, one for each entry.
 #' Values on other variables will be repeated in all the new rows.
 #'
+#' If \code{rm_indices=FALSE} the original indices are kept for every entry. These are needed if you want to transform
+#' the data back to FHIR resources.
+#'
 #' For a more detailed description on how to use this function please see the package vignette.
 #'
 #' @param indexed_data_frame A data frame with indexed multiple entries.
 #' @param brackets A character vector of length 2, defining the brackets used for the indices.
 #' @param sep A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}.
-#' @param rm_indices Logical of lentgh one. Should indices be removed? Defaults to TRUE as they have no value after comlete melting.
-#' @return A data frame where each muliple entry appears in a separate row.
+#' @param rm_indices Logical of length one. Should indices be removed? If \code{FALSE} the indices from the input data are preserved
+#' the way they are. They can be extracted with \code{\link{fhir_extract_indices}}, removed with \code{\link{fhir_rm_indices}}
+#' and restored with \code{\link{fhir_restore_indices}}
+#' @return A data frame where each multiple entry appears in a separate row.
 #'
 #' @examples
 #' #generate example
@@ -964,13 +969,12 @@ fhir_melt_all <- function(indexed_data_frame, sep, brackets, rm_indices = TRUE){
 
 		#loop through id layers
 		for(j in 1:depth[i]){
-			d <- fhir_melt(d, columns = cols, brackets=brackets, sep=sep, all_columns = T)
+
+			d <- fhir_melt_preserveID(d, columns = cols, brackets=brackets, sep=sep, all_columns = T)$d_original
+
 		}
 
 	}
-
-	#remove resource identifier (useless after multiple melts)
-	d[,"resource_identifier":=NULL]
 
 	#remove indices
 	if(rm_indices){d <- fhir_rm_indices(d, brackets = brackets)}
@@ -1065,7 +1069,235 @@ fhir_rm_indices <-
 }
 
 
+#' Extract indices from molten data.frame with multiple entries
+#'
+#' Extracts a character matrix with indices from a molten indexed data.frame/data.table as created
+#' by \code{\link{fhir_melt_all}} with \code{rm_indices=FALSE}. After extraction, the indices of the data.frame can be removed,
+#' and the data.frame can be manipulated as desired. As long as dimensions as well as row and column
+#' order are preserved during manipulation, the indices can then be restored again with
+#' \code{\link{fhir_restore_indices}}.
+#'
+#' @param indexed_data_frame A data frame with indices for multiple entries as produced by \code{\link{fhir_melt_all}}.
+#' Please make sure there is no more than one index present per cell, i.e. all multiple entries have been molten into multiple
+#' rows as achieved by \code{\link{fhir_melt_all}} with the argument \code{rm_indices} set to \code{FALSE}.
+#' All columns have to be of class character.
+#' @param brackets A string vector of length two defining the brackets that were used in \code{\link{fhir_crack}}.
+#' @return A character matrix with same dimensions as \code{indexed_data_frame} containing the indices. For use with
+#' \code{\link{fhir_restore_indices}}.
+#'
+#' @examples
+#' #generate example bundle
+#'bundle <- xml2::read_xml(
+#'	"<Bundle>
+#'
+#'		<Patient>
+#'			<id value='id1'/>
+#'			<address>
+#'				<use value='home'/>
+#'				<city value='Amsterdam'/>
+#'				<type value='physical'/>
+#'				<country value='Netherlands'/>
+#'			</address>
+#'			<birthDate value='1992-02-06'/>
+#'		</Patient>
+#'
+#'		<Patient>
+#'			<id value='id2'/>
+#'			<address>
+#'				<use value='home'/>
+#'				<city value='Rome'/>
+#'				<type value='physical'/>
+#'				<country value='Italy'/>
+#'			</address>
+#'			<address>
+#'				<use value='work'/>
+#'				<city value='Stockholm'/>
+#'				<type value='postal'/>
+#'				<country value='Sweden'/>
+#'			</address>
+#'			<birthDate value='1980-05-23'/>
+#'		</Patient>
+#'
+#'		<Patient>
+#'			<id value='id3'/>
+#'			<address>
+#'				<use value='home'/>
+#'				<city value='Berlin'/>
+#'			</address>
+#'			<address>
+#'				<type value='postal'/>
+#'				<country value='France'/>
+#'			</address>
+#'			<address>
+#'				<use value='work'/>
+#'				<city value='London'/>
+#'				<type value='postal'/>
+#'				<country value='England'/>
+#'			</address>
+#'			<birthDate value='1974-12-25'/>
+#'			<birthDate value='1978-11-13'/>
+#'		</Patient>
+#'
+#'	</Bundle>"
+#')
+#'
+#'#crack fhir resources
+#'dfs <- fhir_crack(bundles = list(bundle),
+#'                  design = list(Patients = list(resource = ".//Patient",
+#'				                                  style= list(brackets = c("[","]"),
+#'				                                   sep="||"))))
+#'
+#'#Melt multiple entries
+#'d <- fhir_melt_all(dfs$Patients, brackets = c("[", "]"), sep="||", rm_indices = F)
+#'
+#'#Extract indices
+#'fhir_extract_indices(d, brackets = c("[", "]"))
+#'@export
 
+fhir_extract_indices <- function(indexed_data_frame, brackets){
+
+	if(any(!sapply(indexed_data_frame, is.character))){
+		warning("The indexed_data_frame contains columns that are not of type character. ",
+				"Indices will only be extracted properly if all columns are of type character. ",
+				"Please convert all columns to character before using fhir_extract_indices.")
+	}
+
+	brackets.escaped <- esc(brackets)
+
+	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)*", brackets.escaped[2])
+
+	result <- apply(indexed_data_frame, 2, stringr::str_extract_all, pattern=pattern.ids, simplify = T)
+
+	if(!is.matrix(result)){
+		warning("There seems to be more than one index per cell in indexed_data_frame.",
+				" The result can therefore not be represented in a single matrix. ",
+				"Please make sure you used fhir_melt_all() on your data.frame to ensure every ",
+				"cell only contains a single entry and associated index.")
+	}
+	result
+}
+
+#' Restore indices to molten data.frame with multiple entries
+#'
+#' Takes a molten data.frame/data.table containing no indices as produced by \code{\link{fhir_melt_all}} and
+#' restores its indices from a matrix of indices as produces by \code{\link{fhir_extract_indices}}. Dimensions as
+#' well as row and column ordering of index matrix and data frame have to be identical!
+#'
+#' @param d A data.frame/data.table as produced by \code{\link{fhir_melt_all}} without indices.
+#' @param index_matrix A character matrix with the same dimensions as \code{d}, as produced by \code{\link{fhir_extract_indices}}
+#' @return \code{d} but with the indices from \code{index_matrix}
+#'
+#' @examples
+#' #generate example bundle
+#'bundle <- xml2::read_xml(
+#'	"<Bundle>
+#'
+#'		<Patient>
+#'			<id value='id1'/>
+#'			<address>
+#'				<use value='home'/>
+#'				<city value='Amsterdam'/>
+#'				<type value='physical'/>
+#'				<country value='Netherlands'/>
+#'			</address>
+#'			<birthDate value='1992-02-06'/>
+#'		</Patient>
+#'
+#'		<Patient>
+#'			<id value='id2'/>
+#'			<address>
+#'				<use value='home'/>
+#'				<city value='Rome'/>
+#'				<type value='physical'/>
+#'				<country value='Italy'/>
+#'			</address>
+#'			<address>
+#'				<use value='work'/>
+#'				<city value='Stockholm'/>
+#'				<type value='postal'/>
+#'				<country value='Sweden'/>
+#'			</address>
+#'			<birthDate value='1980-05-23'/>
+#'		</Patient>
+#'
+#'		<Patient>
+#'			<id value='id3'/>
+#'			<address>
+#'				<use value='home'/>
+#'				<city value='Berlin'/>
+#'			</address>
+#'			<address>
+#'				<type value='postal'/>
+#'				<country value='France'/>
+#'			</address>
+#'			<address>
+#'				<use value='work'/>
+#'				<city value='London'/>
+#'				<type value='postal'/>
+#'				<country value='England'/>
+#'			</address>
+#'			<birthDate value='1974-12-25'/>
+#'			<birthDate value='1978-11-13'/>
+#'		</Patient>
+#'
+#'	</Bundle>"
+#')
+#'
+#'#crack fhir resources
+#'dfs <- fhir_crack(bundles = list(bundle),
+#'                  design = list(Patients = list(resource = ".//Patient",
+#'				                                  style= list(brackets = c("[","]"),
+#'				                                   sep="||"))))
+#'#Melt multiple entries
+#'d <- fhir_melt_all(dfs$Patients, brackets = c("[", "]"), sep="||", rm_indices = F)
+#'
+#'#Extract indices
+#'indices <- fhir_extract_indices(d, brackets = c("[", "]"))
+#'
+#'#remove indices
+#'d_removed <- fhir_rm_indices(d, brackets = c("[", "]"))
+#'
+#'#restore indices
+#'d_restored <- fhir_restore_indices(d_removed, indices)
+#'
+#'#compare
+#'identical(d, d_restored)
+#'@export
+
+fhir_restore_indices <- function(d, index_matrix){
+
+	if(any(dim(d)!=dim(index_matrix))){
+		stop("Dimensions of d and index_matrix have to match.")
+	}
+
+	names <- colnames(index_matrix)
+	if(any(!names %in% names(d))){
+		stop("The variable names of d and colnames of index_matrix have to match.")
+	}
+
+	is_DT <- data.table::is.data.table(d)
+
+	indices <- as.data.frame(index_matrix)
+
+	#save NA positions because paste0 will paste NA to NANA
+	na.pos <- which(is.na(d))
+
+
+	result <- data.table::data.table()
+
+	for(name in names){
+		result[,eval(name) := paste0(indices[[name]], d[[name]])]
+	}
+
+	#fix NA values
+	matr_result <- as.matrix(result)
+	matr_result[na.pos] <- NA
+
+	if(is_DT){data.table::as.data.table(matr_result)}else{
+		as.data.frame(matr_result)
+	}
+
+}
 
 #' Format FHIR base url
 #'
