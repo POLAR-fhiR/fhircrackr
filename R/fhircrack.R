@@ -1168,12 +1168,19 @@ fhir_extract_indices <- function(indexed_data_frame, brackets){
 
 	result <- apply(indexed_data_frame, 2, stringr::str_extract_all, pattern=pattern.ids, simplify = T)
 
-	if(!is.matrix(result)){
+	if(is.list(result)){
 		warning("There seems to be more than one index per cell in indexed_data_frame.",
 				" The result can therefore not be represented in a single matrix. ",
 				"Please make sure you used fhir_melt_all() on your data.frame to ensure every ",
 				"cell only contains a single entry and associated index.")
+	}else{
+		result <- matrix(result, ncol=ncol(indexed_data_frame))
+		colnames(result) <- names(indexed_data_frame)
 	}
+
+
+
+
 	result
 }
 
