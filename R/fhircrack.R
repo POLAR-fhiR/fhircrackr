@@ -947,32 +947,26 @@ fhir_melt_all <- function(indexed_data_frame, sep, brackets, rm_indices = TRUE){
 	oldOrder <- copy(names(d))
 	data.table::setcolorder(d, sort(names(d)))
 
-	#determine depth of ids in each column
-	brackets.escaped <- esc(brackets)
-	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
-	ids <- suppressWarnings(stringr::str_extract_all(d, pattern.ids))
-	depth <- sapply(ids, function(x){unique(stringr::str_count(x,esc(".")))}+1)
+	# #determine depth of ids in each column
+	# brackets.escaped <- esc(brackets)
+	# pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
+	# ids <- suppressWarnings(stringr::str_extract_all(d, pattern.ids))
 
 	#columns which have multiple values
 	targetCols <- grepl(esc(sep), d)
+
 	#dissect colnames
 	names <- stringr::str_split(names(d), esc("."), simplify = T)[targetCols,,drop=F]
-	depth <- depth[targetCols]
+
 	#find the columns which represent new elements
 	newElement <- matrix(!apply(names,2, duplicated, incomparables = ""), nrow=nrow(names))
 	targetElements <- names[newElement[,1],1]
-	depth <- depth[newElement[,1]]
 
 	#loop through elements
 	for (i in 1:length(targetElements)){
 		cols <- fhir_common_columns(d, targetElements[i])
 
-		#loop through id layers
-		for(j in 1:depth[i]){
-
-			d <- fhir_melt_preserveID(d, columns = cols, brackets=brackets, sep=sep, all_columns = T)$d_original
-
-		}
+		d <- fhir_melt_dt_preserveID(d, columns = cols, brackets=brackets, sep=sep, all_columns = T)
 
 	}
 
@@ -1148,7 +1142,7 @@ fhir_rm_indices <-
 #'				                                   sep="||"))))
 #'
 #'#Melt multiple entries
-#'d <- fhir_melt_all(dfs$Patients, brackets = c("[", "]"), sep="||", rm_indices = F)
+#'d <- fhir_melt_all(dfs$Patients, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
 #'
 #'#Extract indices
 #'fhir_extract_indices(d, brackets = c("[", "]"))
@@ -1256,7 +1250,7 @@ fhir_extract_indices <- function(indexed_data_frame, brackets){
 #'				                                  style= list(brackets = c("[","]"),
 #'				                                   sep="||"))))
 #'#Melt multiple entries
-#'d <- fhir_melt_all(dfs$Patients, brackets = c("[", "]"), sep="||", rm_indices = F)
+#'d <- fhir_melt_all(dfs$Patients, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
 #'
 #'#Extract indices
 #'indices <- fhir_extract_indices(d, brackets = c("[", "]"))

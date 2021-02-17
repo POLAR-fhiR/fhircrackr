@@ -1,6 +1,7 @@
 
-#'This function does the same as melt_row but returns a list of two data.tables:
-#'One with the reduced indices, one with the original ones
+#'This function does the same as melt_row but returns a data table with
+#'original indices
+#'
 #'@noRd
 
 melt_row_preserveID <-
@@ -104,31 +105,60 @@ melt_row_preserveID <-
 					dplyr::select(row, col.names.constant)
 		}
 
-		#data.table::data.table(d)
-		d_oldID <- d
-
-		if(nrow(d)==1){
-			for(col in col.names.mutable){
-				n <- stringr::str_count(d_oldID[[col]], pattern.ids)
-				for(i in 1:n){
-					locs <- stringr::str_locate_all(d_oldID[[col]], pattern.ids)[[1]]
-					stringr::str_sub(d_oldID[[col]],start = locs[i,1], end=locs[i,2]) <- ids[[col]][i]
-				}
-			}
-		}else{
-			for(col in col.names.mutable){
-				stringr::str_sub(d_oldID[[col]],stringr::str_locate(d_oldID[[col]], pattern.ids)) <- ids[[col]]
-			}
-		}
-
-		list(new=data.table::data.table(d), original = data.table::data.table(d_oldID))
+		data.table::data.table(d)
 	}
 
-#'This function does the same as fhir_melt but returns a list of two data.tables:
-#'One with the reduced indices, one with the original ones
+
+#' This functions melts a row regarding a set
+#' of columns completely, i.e. until there is no seperator left in the
+#' specified columns. It preserves the original ids
+#' @noRd
+melt_row_completely <- function(row,
+								columns,
+								brackets = c("<", ">"),
+								sep = " ",
+								all_columns = FALSE){
+	setDT(row)
+
+	#extract original ids
+	ids <- suppressWarnings(fhir_extract_indices(row, brackets = brackets))
+	if(is.matrix(ids)){ids <- as.data.frame(ids)}
+
+	res <- copy(row)
+
+	#melt
+	while(any(grepl(esc(sep), res[,columns, with=F]))){
+		res <- melt_row_preserveID(res, brackets = brackets, sep=sep,
+								   columns = columns, all_columns = T)
+	}
+
+	#reassign original ids
+	brackets.escaped <- esc(brackets)
+	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)*", brackets.escaped[2])
+
+	for(n in columns){
+		id <- as.matrix(ids[[n]])
+
+		count <- 0
+		for(j in which(!is.na(res[[n]]))){
+			count <- count + 1
+			pos <- stringr::str_locate(res[[n]][j], pattern.ids)
+			cell <- res[j, n, with=F]
+			stringr::str_sub(cell, start=pos[1,1], end = pos[1,2]) <- id[1,count]
+			res[j, (n):=cell][]
+		}
+
+	}
+	return(res)
+
+}
+
+#'This function does the same as fhir_melt but returns a data table
+#'that is molten completely with regard to the specified columns.
+#'It preserves the original ids
 #'@noRd
 
-fhir_melt_preserveID <-
+fhir_melt_dt_preserveID <-
 	function(indexed_data_frame,
 			 columns,
 			 brackets = c("<", ">"),
@@ -141,10 +171,6 @@ fhir_melt_preserveID <-
 
 		indexed_dt <- copy(indexed_data_frame) #copy to avoid side effects
 
-		is_DT <- data.table::is.data.table(indexed_dt)
-
-		if(!is_DT){data.table::setDT(indexed_dt)}
-
 		brackets <- fix_brackets(brackets)
 
 		rowlist <- lapply(seq_len(nrow(
@@ -153,7 +179,7 @@ fhir_melt_preserveID <-
 		function(row.id) {
 
 			e <-
-				melt_row_preserveID(
+				melt_row_completely(
 					row = indexed_dt[row.id,],
 					columns = columns,
 					brackets = brackets,
@@ -164,22 +190,17 @@ fhir_melt_preserveID <-
 			e
 		})
 
-		d_new <- data.table::rbindlist(lapply(rowlist, function(x)x$new), fill = TRUE)
-		d_original <- data.table::rbindlist(lapply(rowlist, function(x)x$original), fill = TRUE)
+		d<- data.table::rbindlist(rowlist, fill = TRUE)
 
-		if(nrow(d_new) == 0) {warning("The brackets you specified don't seem to appear in the indices of the provided data.frame. Returning NULL.")}
+		if(nrow(d) == 0) {warning("The brackets you specified don't seem to appear in the indices of the provided data.frame. Returning NULL.")}
 
-		if(!is.null(d_new) && 0 < nrow(d_new)) {
+		if(!is.null(d) && 0 < nrow(d)) {
 
-			if(!is_DT){setDF(d_new);setDF(d_original)}
-
-			return(list(d_new = d_new, d_original = d_original))
+			return(d)
 
 		}
 	}
 
-
-#TODO: deal with multiple entries
 
 #create empty resource
 create_resource <- function(resourceType, rows, brackets){

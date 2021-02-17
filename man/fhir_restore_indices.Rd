@@ -81,7 +81,7 @@ dfs <- fhir_crack(bundles = list(bundle),
 			                                  style= list(brackets = c("[","]"),
 			                                   sep="||"))))
 #Melt multiple entries
-d <- fhir_melt_all(dfs$Patients, brackets = c("[", "]"), sep="||", rm_indices = F)
+d <- fhir_melt_all(dfs$Patients, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
 
 #Extract indices
 indices <- fhir_extract_indices(d, brackets = c("[", "]"))
