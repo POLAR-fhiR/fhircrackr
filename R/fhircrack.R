@@ -703,7 +703,7 @@ fhir_unserialize <- function(bundles) {
 #' @export
 #'
 fhir_common_columns <- function(data_frame, column_names_prefix) {
-	pattern_column_names  <- paste0("^", column_names_prefix, "\\.*")
+	pattern_column_names  <- paste0("^", column_names_prefix, "($|\\.+)")
 
 	column_names <- names(data_frame)
 
