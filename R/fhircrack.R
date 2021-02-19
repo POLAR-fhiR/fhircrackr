@@ -954,6 +954,11 @@ fhir_melt_all <- function(indexed_data_frame, sep, brackets, rm_indices = TRUE){
 
 	#columns which have multiple values
 	targetCols <- grepl(esc(sep), d)
+	if(!any(targetCols)){
+		warning("There don't seem to be any multiple values in the data. Did you specify the sep argument correctly? ",
+				"Returning unaltered data.")
+		return(indexed_data_frame)
+	}
 
 	#dissect colnames
 	names <- stringr::str_split(names(d), esc("."), simplify = T)[targetCols,,drop=F]
