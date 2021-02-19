@@ -202,8 +202,14 @@ fhir_melt_dt_preserveID <-
 	}
 
 
-#create empty resource
-create_resource <- function(resourceType, rows, brackets){
+#create resource
+create_resource <- function(resourceType, data, brackets){
+
+	rows<- copy(data)
+
+	#remove entirely empty columns
+	na.cols <- rows[, .(which(apply(is.na(.SD),2,all)))]
+	if(nrow(na.cols)>0){rows[, unlist(na.cols):=NULL]}
 
 	colnames <- names(rows)
 
@@ -213,12 +219,13 @@ create_resource <- function(resourceType, rows, brackets){
 	nodes <- strsplit(colnames, esc("."))
 	names(nodes) <- colnames
 
+	values <- fhir_rm_indices(rows, brackets = brackets)
+
+	#find out how often every element appears
 	for(col in colnames){
 		ind <- stringr::str_remove_all(indices[[col]], paste0(esc(brackets[1]), "|", esc(brackets[2])))
 		freq <- t(data.frame(strsplit(ind, esc("."))))
 		freq <- matrix(as.numeric(freq), ncol = length(nodes[[col]]), dimnames = list(NULL, nodes[[col]]))
-		#freq <- apply(freq,2, max, na.rm=T)
-
 		nodes[[col]] <- freq
 
 	}
@@ -228,47 +235,32 @@ create_resource <- function(resourceType, rows, brackets){
 	xml2::xml_add_child(myres, xml2::xml_new_root(resourceType))
 
 	#define nodes
-	#nodes <- strsplit(colnames, esc("."))
 	depth <- sapply(nodes, ncol)
 	max_depth <- max(depth)
-
-	#create one instance of every node
-	# current <- sapply(nodes, function(x){colnames(x)[1]})
-	# parent <- rep(resourceType, length(current))
-	# freq <- sapply(nodes, function(x){x[1]})
-
-
-
 	nodes <- lapply(nodes, data.table::as.data.table)
-	lapply(nodes, function(x){x[,eval(resourceType):=1]})
-	lapply(nodes, function(x){data.table::setcolorder(x, c(resourceType, names(x)[1:(ncol(x)-1)]))})
-
-	#
-	# nodes_reduced <- lapply(nodes, function(x){
-	# 							res <-copy(x)
-	# 		        			res <- res[,max(res[,1], na.rm=T)]
-	# 	        				res <- as.data.table(res)
-	# 	        				names(res) <- names(x)[1]
-	# 	        				res
-	# 	        				 })
+	lapply(nodes, function(x){x[,eval(resourceType):=1]}) #add root node
+	lapply(nodes, function(x){data.table::setcolorder(x, c(ncol(x),1:(ncol(x)-1)))})#put root node in front
 
 
+	#loop through resource depth
 	for(j in 1: max_depth){
 
+		#only look at current and previous level of current j
 		nodes_reduced <- lapply(nodes, function(x){
 			n <- copy(x)
 			if(ncol(n) > j){
 				res <- n[,max(n[,eval(j+1),with=F], na.rm=T), by=eval(names(n)[j])]
 				res <- na.omit(res)
-				names(res) <- names(x)[j:(j+1)]
+				names(res)[1] <- paste(names(x)[1:j], collapse="/")
+				names(res)[2] <- names(x)[j+1]
 				res
 			}
 		})
 
 		nodes_reduced <- nodes_reduced[!sapply(nodes_reduced, is.null)]
 
+		#create list containing information for every node to produce
 		item <- sapply(nodes_reduced, function(x){paste(c(colnames(x)[1], colnames(x)[2]), collapse="/")})
-
 		item_list <- list()
 		for(i in unique(item)){
 			res <- Reduce(rbind, nodes_reduced[item==i])
@@ -276,156 +268,47 @@ create_resource <- function(resourceType, rows, brackets){
 			item_list <- append(item_list, list(res))
 		}
 
-		# item==item_unique[2]
-		# freq <- data.table::as.data.table(sapply(nodes_reduced, function(x)x[,j, with=F]))
-		# names(freq) <- item
-#
-# 		#summarise columns belonging to the same item
-# 		duplicates <- unique(names(freq)[duplicated(names(freq))])
-#
-# 		for(dup in duplicates){
-# 			cols_reduced <- apply(freq[,names(freq) %in% dup, with=F],1,function(x)unique(na.omit(x)))
-# 			freq[,eval(dup):=cols_reduced]
-# 		}
-#
-# 		freq <- freq[,!duplicated(names(freq)), with=F]
-
-		#create nodes
-		# for(i in 1:ncol(freq)){
-		# 	parent_node <- xml2::xml_find_all(myres, parents_reduced[i])
-		#
-		# 	for(r in 1:nrow(freq)){
-		# 		for(k in 1:as.numeric(freq[eval(r),eval(i), with=F])){
-		# 		 xml2::xml_add_child(parent_node, xml2::xml_new_root(names(freq)[i]))
-		# 		 }
-		#
-		# 	}
-		#
-		#
-		# }
-
+		#create appropriate number of nodes
 		for(i in 1:length(item_list)){
 			item <- item_list[[i]]
 			parent_node <- xml2::xml_find_all(myres, names(item)[1])
-			for(j in 1:nrow(item)){
-				frq <- as.numeric(item[eval(j),])
+			for(l in 1:nrow(item)){
+				frq <- as.numeric(item[eval(l),])
 				for(k in 1:frq[2]){
-					xml2::xml_add_child(parent_node[frq[1]], xml2::xml_new_root(names(item)[2]))
+
+
+					#if created node is in colnames of rows: fill with appropriate value
+					current_node <- paste(names(item), collapse="/")
+					current_node <- stringr::str_remove(current_node, paste0(resourceType, "/"))
+					current_node <- stringr::str_replace_all(current_node, "/", ".")
+
+					if(current_node %in% names(rows)){#node is terminal and needs a value
+						#find correct value
+						values <- rows[[current_node]]
+
+						if(j==1){#pattern is different on first level
+							pattern <- paste0(esc(brackets)[1], k, esc(brackets)[2])
+						}else{
+							pattern <- paste0(esc(brackets)[1],
+											  "([[:digit:]]\\.){", j-2, "}",
+											  paste(c(frq[1],k), collapse="."),
+											  esc(brackets)[2])
+						}
+
+						value <- unique(values[grepl(pattern, values)])
+						value <- stringr::str_remove(value, pattern)
+
+						#add and fill node
+						xml2::xml_add_child(parent_node[frq[1]], xml2::xml_new_root(names(item)[2], value=value))
+					}else{#node is a parent and doesnt need value
+						xml2::xml_add_child(parent_node[frq[1]], xml2::xml_new_root(names(item)[2]))
+
+					}
+
 				}
 			}
 		}
-		#remove current first column for every element of nodes
-#
-#
-# 		parent <- parent[!sapply(nodes_reduced, is.null)]
-#
-# 		parent <- paste(parent, sapply(nodes_reduced, function(x){names(x)[j]}), sep="/")
-#
-# 		#nodes <- lapply(nodes, function(x){x[,-1, drop=F]})
-# 		#nodes <- nodes[!sapply(nodes, function(x)ncol(x)==0)]
-#
-# 		parent_red <- parent[!is.na(current)]
-# 		freq_red <- freq[!is.na(current)]
-# 		current_red <- current[!is.na(current)]
-#
-# 		parent_red <- parent_red[!duplicated(current_red)]
-# 		freq_red <- freq_red[!duplicated(current_red)]
-# 		current_red <- current_red[!duplicated(current_red)]
-#
-#
-# 		for (i in 1:length(current_red)){
-# 			parent_node <- xml2::xml_find_all(myres, parent_red[i])
-# 			for(k in 1:freq_red[i]){
-# 				xml2::xml_add_child(parent_node, xml2::xml_new_root(current_red[i]))
-# 			}
-#
-# 		}
-#
-# 		parent <- paste(parent,current, sep="/")
-# 		current <- sapply(nodes, function(x){names(x)[j+1]})
-# 		freq <- sapply(nodes, function(x){x[j+1]})
-#
-# 	}
-#
-# 	if(any(single_nodes_dt$freqency > 1)){
-#
-# 		multiple <- single_nodes_dt[freqency>1]
-#
-#
-#
-#
-# 		#create appropriate number of siblings for every node with multiple entries:
-# 		#reduce to nodes with multiple entries
-# 		nodes_df <- as.data.frame(stringr::str_split(colnames, esc("."), simplify = T))
-# 		setDT(nodes_df)
-# 		nodes_df[,depth:=apply(nodes_df,1,function(x){sum(x!="")})]
-# 		nodes_df[,frequency:=frequency]
-#
-# 		multiple <- nodes_df[frequency > 1,]
-# 		multiple[,max_freq:=max(frequency), by=.(V1)]
-#
-# 		#indices <- fhir_extract_indices(multiple, brackets = brackets  )
-#
-#
-# 		elements <- unlist(c(unique(multiple[,1])))
-#
-# 		for(element in elements){
-# 			multiple_sub <- multiple[multiple$V1==element,]
-# 			# bool <- matrix(apply(multiple_sub[,1:(ncol(multiple_sub)-3)], 2, duplicated, incomparables=""),
-# 			# 			   ncol=ncol(multiple_sub)-3)
-# 			mult <- multiple_sub[, grepl("V", names(multiple_sub)), with=F]
-# 			mult <- mult[,apply(mult,2, function(x){length(unique(x))==1}), with=F]
-#
-# 			multiple_paths <- paste(mult[1,], collapse = esc("/"))
-# 			if(stringr::str_sub(multiple_paths, -1) =="/"){ multiple_paths  <- stringr::str_sub(multiple_paths , 1,-2)}
-# #
-# # 			#paste all elements up to the first FALSE
-# # 			for(k in 1:nrow(multiple_sub)){
-# # 				multiple_paths <- c(multiple_paths,
-# # 									paste(multiple_sub[k,1:(min(which(bool[k,]==F))-1)], collapse=esc("/")))
-# # 			}
-# #
-# # 			multiple_dt <- data.table(multiple_paths, max_freq=multiple_sub$max_freq)
-# # 			#	multiple_dt <- multiple_dt[apply(bool, 1, function(x)sum(x)>0) | multiple$depth==1,]
-# # 			multiple_dt <- multiple_dt[!duplicated(multiple_paths),]#remove duplicates
-#
-# 			#create siblings
-# 			for(l in 1:(multiple_sub$max_freq[1]-1)){
-# 				node <- xml2::xml_child(myres, paste(c(resourceType,multiple_paths), collapse = esc("/")))
-# 				xml2::xml_add_sibling(node, node)
-#
-# 			}
-#
 
-
-#		}
-
-	# 	#find node which needs to be duplicated
-	# 	bool <- matrix(apply(multiple[,1:(ncol(multiple)-3)], 2, duplicated, incomparables=""),ncol=ncol(multiple)-3)
-	#
-	# 	multiple_paths <- c()
-	#
-	# 	#paste all elements up to the first FALSE
-	# 	for(k in 1:nrow(multiple)){
-	# 	#	if(sum(bool[k,])>0 | multiple[k,]$depth==1){ #gets rid of parent node for depth > 1
-	# 			multiple_paths <- c(multiple_paths,
-	# 								paste(multiple[k,1:(min(which(bool[k,]==F))-1)], collapse=esc("/")))
-	# 	#	}
-	#
-	# 	}
-	#
-	# 	multiple_dt <- data.table(multiple_paths, max_freq=multiple$max_freq)
-	# #	multiple_dt <- multiple_dt[apply(bool, 1, function(x)sum(x)>0) | multiple$depth==1,]
-	# 	multiple_dt <- multiple_dt[!duplicated(multiple_paths),]#remove duplicates
-	#
-	# 	#create siblings
-	# 	for(l in 1:nrow(multiple_dt)){
-	# 		node <- xml2::xml_child(myres, paste(c(resourceType,multiple_dt$multiple_paths[l]), collapse = esc("/")))
-	#
-	# 		for(m in 1:(multiple_dt$max_freq[l]-1)){
-	# 			xml2::xml_add_sibling(node, node)
-	# 		}
-	# 	}
 	 }
 
 	myres
@@ -433,56 +316,60 @@ create_resource <- function(resourceType, rows, brackets){
 }
 
 #fill
-fill_resource <- function(resource, rows){
-
-	resourceType <- xml2::xml_name(xml2::xml_child(resource, 1))
-
-	elements <- unique(stringr::str_split(names(rows), esc("."), simplify = T)[,1])
-
-
-
-	for(element in elements){
-		cols <- fhir_common_columns(rows, element)
-		rows_sub <- rows[,cols, with=F]
-		rows_sub <- unique(rows_sub)
-
-		depth <- stringr::str_count(names(rows_sub),esc("."))+1
-
-		for(j in unique(depth)){
-			sub <- rows_sub[,depth==j, with=F]
-			sub <- unique(sub)
-
-			paths <- gsub(esc("."), esc("/"),names(sub))
-			paths <- paste(resourceType, paths, sep="/")
-
-			for(i in 1:ncol(sub)){
-				nodes <- xml2::xml_find_all(resource, paths[i])
-
-				xml2::xml_attr(nodes, "value")  <- unlist(c(sub[,i, with=F]))
-				xml2::xml_remove(nodes[is.na(unlist(c(sub[,i, with=F])))])
-
-			}
-
-		}
-
-		# paths <- gsub(esc("."), esc("/"),names(rows_sub))
-		# paths <- paste(resourceType, paths, sep="/")
-		#
-		# for(i in 1:ncol(rows_sub)){
-		# 	nodes <- xml2::xml_find_all(resource, paths[i])
-		#
-		# 	xml2::xml_attr(nodes, "value")  <- unlist(c(rows_sub[,i, with=F]))
-		# 	xml2::xml_remove(nodes[is.na(unlist(c(rows_sub[,i, with=F])))])
-		#
-		# }
-	}
-
-
-}
-
+# fill_resource <- function(resource, rows, brackets){
+#
+# 	resourceType <- xml2::xml_name(xml2::xml_child(resource, 1))
+#
+# 	elements <- unique(stringr::str_split(names(rows), esc("."), simplify = T)[,1])
+#
+# 	brackets.escaped <- esc(brackets)
+# 	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)*", brackets.escaped[2])
+#
+#     #loop trough resource elements
+# 	for(element in elements){
+# 		cols <- fhir_common_columns(rows, element)
+# 		rows_sub <- rows[,cols, with=F]
+# 		rows_sub <- unique(rows_sub)
+#
+# 		depth <- stringr::str_count(names(rows_sub),esc("."))+1
+#
+# 		#loop through all levels of the element
+# 		for(j in unique(depth)){
+#
+# 			#current level
+# 			sub <- rows_sub[,depth==j, with=F]
+# 			sub <- unique(sub)
+#
+# 			paths <- gsub(esc("."), esc("/"),names(sub))
+# 			paths <- paste(resourceType, paths, sep="/")
+#
+#
+# 			for(i in 1:ncol(sub)){
+# 				nodes <- xml2::xml_find_all(resource, paths[i])
+# 				values <- na.omit(sub[[i]])
+# 				#determine position of every value in parent node list
+# 				if(j==1){#position doesnt matter on first level, there is always just one parent (the resource)
+# 					pos <- 1:length(values)
+# 				}else{
+# 					levelpos <- stringr::str_length(brackets)[1] + (j-1) +(j-2)
+# 					pos <- as.numeric(stringr::str_sub(values, levelpos, levelpos))
+# 				}
+# 				values <- stringr::str_remove_all(values, pattern.ids)
+#
+# 				xml2::xml_attr(nodes, "value")  <- values[pos]
+#
+# 			}
+#
+# 		}
+#
+# 	}
+#
+#
+# }
+#
 
 #
-create_bundle <- function(resourceType, df){
+create_bundle <- function(resourceType, df, brackets = brackets){
 
 	d <- data.table::copy(df)
 	setDT(d)
@@ -503,9 +390,8 @@ create_bundle <- function(resourceType, df){
 
 	for(i in 1:length(resources)){
 		rows <- d[resources[i]]
-		#create and fill resource
-		xml2::xml_add_child(bundle, create_resource(resourceType = resourceType, rows = rows))
-		fill_resource(xml2::xml_child(bundle, i+1), rows = rows)
+		#create  resource
+		xml2::xml_add_child(bundle, create_resource(resourceType = resourceType, data = rows, brackets = brackets))
 		#create entry and request nodes
 		xml2::xml_add_parent(xml2::xml_child(bundle, i+1), xml2::xml_new_root("entry"))
 		xml2::xml_add_child(xml2::xml_child(bundle, i+1), xml2::xml_new_root("request"))
@@ -513,7 +399,7 @@ create_bundle <- function(resourceType, df){
 		xml2::xml_add_child(xml2::xml_find_all(bundle, "entry/request")[[i]],
 							xml2::xml_new_root("url",
 											   value=paste(resourceType,
-											   			xml2::xml_attr(xml2::xml_child(bundle, "entry/resource/*/id"), "value"),
+											   			xml2::xml_attr(xml2::xml_find_all(bundle, "entry/resource/*/id")[i], "value"),
 											   			sep="/")))
 	}
 
