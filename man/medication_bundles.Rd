@@ -17,7 +17,7 @@ code=http://snomed.info/ct|429374003&
 _include=MedicationStatement:subject", max.bundles = 3)
 }
 
-[Downloaded 06-22-20]
+\strong{Downloaded 06-22-20}
 }
 \usage{
 medication_bundles

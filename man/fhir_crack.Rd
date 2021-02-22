@@ -22,26 +22,24 @@ fhir_crack(
 Each data frame description will produce one data frame in the list of data frames returned by \code{fhir_crack}, where the data frame has the same name as the data frame description in \code{design}.
 
 Each data frame description is a list of 3 named elements:
-
-1) \code{design$resource}: Mandatory. A string with an XPath expression locating the entries for this data frame in a FHIR bundle page. This is usually the path to a resource tpye
- such as \code{"//Patient"} or \code{"//Observation"}.
-
-2) \code{design$cols}: Optional. Either a string containing an XPath expression referencing a certain level of attributes that should be extracted (
- \code{"./@value"} e.g. would extract all values on the root level) or a named list where the elements are XPath expressions indicating the specific
-  position of attributes to extract and the names of the list elements are the column names of the resulting data frame. If \code{design$cols} is \code{NULL},
-  all available attributes will be extracted.
-
-3) \code{design$style}: Optional. This can be used instead of the function arguments \code{sep}, \code{brackets} and \code{remove_empty_columns}, but will be
+\enumerate{
+\item \code{design$resource}: Mandatory. A string with an XPath expression locating the entries for this data frame in a FHIR bundle page. This is usually the path to a resource tpye
+such as \code{"//Patient"} or \code{"//Observation"}.
+\item \code{design$cols}: Optional. Either a string containing an XPath expression referencing a certain level of attributes that should be extracted (
+\code{"./@value"} e.g. would extract all values on the root level) or a named list where the elements are XPath expressions indicating the specific
+position of attributes to extract and the names of the list elements are the column names of the resulting data frame. If \code{design$cols} is \code{NULL},
+all available attributes will be extracted.
+\item \code{design$style}: Optional. This can be used instead of the function arguments \code{sep}, \code{brackets} and \code{remove_empty_columns}, but will be
 overwritten if the corresponding function arguments are not \code{NULL}.
+}
 
 A named list with the following optional elements:
-
-   a) \code{design$style$sep} : A string to separate pasted multiple entries.
-
-   b) \code{design$style$brackets}: A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
-      If \code{NULL}, no indices will be added to multiple entries.
-
-   c) \code{design$style$rm_empty_cols}: Logical scalar. Remove empty columns?
+\itemize{
+\item \code{design$style$sep} : A string to separate pasted multiple entries.
+\item \code{design$style$brackets}: A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
+If \code{NULL}, no indices will be added to multiple entries.
+\item \code{design$style$rm_empty_cols}: Logical scalar. Remove empty columns?
+}
 
 For a more detailed explanation and comprehensive examples of \code{design}, please see the package vignette.}
 

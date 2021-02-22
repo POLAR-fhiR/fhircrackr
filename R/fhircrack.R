@@ -393,12 +393,12 @@ fhir_load <- function(directory) {
 #'
 #' A named list with the following optional elements:
 #'
-#'    a) \code{design$style$sep} : A string to separate pasted multiple entries.
+#'    * \code{design$style$sep} : A string to separate pasted multiple entries.
 #'
-#'    b) \code{design$style$brackets}: A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
+#'    * \code{design$style$brackets}: A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
 #'       If \code{NULL}, no indices will be added to multiple entries.
 #'
-#'    c) \code{design$style$rm_empty_cols}: Logical scalar. Remove empty columns?
+#'    * \code{design$style$rm_empty_cols}: Logical scalar. Remove empty columns?
 #'
 #' For a more detailed explanation and comprehensive examples of \code{design}, please see the package vignette.
 #'
