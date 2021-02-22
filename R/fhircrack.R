@@ -1165,6 +1165,9 @@ fhir_extract_indices <- function(indexed_data_frame, brackets){
 
 	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)*", brackets.escaped[2])
 
+	if(!any(grepl(pattern.ids, indexed_data_frame))){stop("There don't seem to be any indices ",
+														  "with the specified brackets.")}
+
 	result <- apply(indexed_data_frame, 2, stringr::str_extract_all, pattern=pattern.ids, simplify = T)
 
 	if(is.list(result)){
@@ -1596,7 +1599,7 @@ fhir_update_request <- function(..., append = FALSE, return_request = TRUE){
 #' _include=MedicationStatement:subject", max.bundles = 3)
 #' }
 #'
-#' [Downloaded 06-22-20]
+#' **Downloaded 06-22-20**
 #'
 
 "medication_bundles"
@@ -1624,7 +1627,7 @@ fhir_update_request <- function(..., append = FALSE, return_request = TRUE){
 #'
 #' \code{fhir_search(request="http://fhir.hl7.de:8080/baseDstu3/Patient?", max_bundles=2)}
 #'
-#' [Downloaded 07-07-20]
+#' **Downloaded 07-07-20**
 #'
 
 "patient_bundles"
