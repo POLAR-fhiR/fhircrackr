@@ -1,3 +1,6 @@
+#To stop devtools::check( from warning about no visible global function definition)
+globalVariables(".")
+
 
 #'This function does the same as melt_row but returns a data table with
 #'original indices
@@ -202,10 +205,87 @@ fhir_melt_dt_preserveID <-
 	}
 
 
-#create resource
-create_resource <- function(resourceType, data, brackets){
+#'Create single FHIR resource from data.frame/data.table
+#'
+#'This function takes a data.frame with 1 or more rows containing information for a single
+#'FHIR resource and builds the FHIR resource as a xml-object.
+#'When there are multiple entries to some of the elements of the resource, the input data
+#'should be rows from a molten data.frame as produced by [fhir_melt_all()] with
+#'`rm_indices=FALSE`. When there are no multiple entries, the data still must contain
+#'indices as produced by [fhir_crack()] when brackets are provided in the design.
+#'
+#'The column names of the input data must reflect the path to the corresponding resource element
+#'with {.} as a seperator, e.g. `code.coding.system`. These names are produced automatically
+#'by [fhir_crack()] when the `cols` element of the design is omitted.
+#'
+#' @param resourceType A string naming the resource Type of the FHIR resource, e.g. "Patient".
+#' @param data A data.frame or data.table containing one ore more rows with information on the
+#' FHIR resource. Ideally, this should have been produced by [fhir_crack()] with the `cols`
+#' element of the design omitted in combination with [fhir_melt_all()] with
+#' `rm_indices=FALSE`. If you wish to manipulate you data before remodeling the FHIR resource
+#' you can store the indices using [fhir_extract_indices()], remove them temporarily
+#' with [fhir_rm_indices()] and restore them again with [fhir_restore_indices()]
+#' before the use of `fhir_create_resource`.
+#' @param brackets A character vector of length two specifying the brackets that surround the indices,
+#' should match the brackets used in [fhir_crack()].
+#'
+#' @return An xml object containing a single FHIR resource of Type `resourceType`. This can
+#' be saved using [xml2::write_xml()].
+#'
+#' @examples
+#' #generate example
+#' bundle <- xml2::read_xml(
+#' 	"<Bundle>
+#' 		<Patient>
+#' 			<id value='id3.1'/>
+#' 			<id value='id3.2'/>
+#' 			<address>
+#' 				<use value='home'/>
+#' 				<city value='Berlin'/>
+#' 			</address>
+#' 			<address>
+#' 				<type value='postal'/>
+#' 				<country value='France'/>
+#' 			</address>
+#' 			<address>
+#' 				<use value='work'/>
+#' 				<city value='London'/>
+#' 				<type value='postal'/>
+#' 				<country value='England'/>
+#' 			</address>
+#' 			<birthDate value='1974-12-25'/>
+#' 		</Patient>
+#' 	</Bundle>"
+#' )
+#'
+#' #crack bundle
+#' design <- list(Patient = list(
+#'                              resource = "//Patient",
+#'                              style = list(brackets = c("[", "]"),
+#'                                           sep="||")))
+#'
+#' dfs <- fhir_crack(list(bundle), design)
+#'
+#'#melt multiple entries
+#' d <- fhir_melt_all(dfs$Patient, sep="||", brackets = c("[", "]"),
+#'                    rm_indices = FALSE)
+#'
+#'#create resource
+#' resource <- fhir_create_resource(resourceType = "Patient",
+#'                                  data = d, brackets = c("[", "]"))
+#'
+#'#save/inspect resource
+#'library(xml2)
+#'tmp <- tempfile(fileext = ".xml")
+#'write_xml(resource, tmp)
+#'readLines(tmp)
+#'
+#' @export
+fhir_create_resource <- function(resourceType, data, brackets){
 
+	if(!is.data.frame(data)){stop("Input data must be of class data.frame or data.table.")}
 	rows<- copy(data)
+	data.table::setDT(rows)
 
 	#remove entirely empty columns
 	na.cols <- rows[, .(which(apply(is.na(.SD),2,all)))]
@@ -250,7 +330,7 @@ create_resource <- function(resourceType, data, brackets){
 			n <- copy(x)
 			if(ncol(n) > j){
 				res <- n[,max(n[,eval(j+1),with=F], na.rm=T), by=eval(names(n)[j])]
-				res <- na.omit(res)
+				res <- stats::na.omit(res)
 				names(res)[1] <- paste(names(x)[1:j], collapse="/")
 				names(res)[2] <- names(x)[j+1]
 				res
@@ -315,63 +395,78 @@ create_resource <- function(resourceType, data, brackets){
 
 }
 
-#fill
-# fill_resource <- function(resource, rows, brackets){
-#
-# 	resourceType <- xml2::xml_name(xml2::xml_child(resource, 1))
-#
-# 	elements <- unique(stringr::str_split(names(rows), esc("."), simplify = T)[,1])
-#
-# 	brackets.escaped <- esc(brackets)
-# 	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)*", brackets.escaped[2])
-#
-#     #loop trough resource elements
-# 	for(element in elements){
-# 		cols <- fhir_common_columns(rows, element)
-# 		rows_sub <- rows[,cols, with=F]
-# 		rows_sub <- unique(rows_sub)
-#
-# 		depth <- stringr::str_count(names(rows_sub),esc("."))+1
-#
-# 		#loop through all levels of the element
-# 		for(j in unique(depth)){
-#
-# 			#current level
-# 			sub <- rows_sub[,depth==j, with=F]
-# 			sub <- unique(sub)
-#
-# 			paths <- gsub(esc("."), esc("/"),names(sub))
-# 			paths <- paste(resourceType, paths, sep="/")
-#
-#
-# 			for(i in 1:ncol(sub)){
-# 				nodes <- xml2::xml_find_all(resource, paths[i])
-# 				values <- na.omit(sub[[i]])
-# 				#determine position of every value in parent node list
-# 				if(j==1){#position doesnt matter on first level, there is always just one parent (the resource)
-# 					pos <- 1:length(values)
-# 				}else{
-# 					levelpos <- stringr::str_length(brackets)[1] + (j-1) +(j-2)
-# 					pos <- as.numeric(stringr::str_sub(values, levelpos, levelpos))
-# 				}
-# 				values <- stringr::str_remove_all(values, pattern.ids)
-#
-# 				xml2::xml_attr(nodes, "value")  <- values[pos]
-#
-# 			}
-#
-# 		}
-#
-# 	}
-#
-#
-# }
-#
+#' Create transaction/batch bundle with FHIR resources to post on a FHIR server
+#'
+#'This function takes a data.frame/data.table containing information for several
+#'FHIR resources of the same resource type and builds a transaction bundle of the
+#'FHIR resources as a xml-object.
+#'
+#'When there are multiple entries to some of the elements of the resource, the input data
+#'should be rows from a molten data.frame as produced by [fhir_melt_all()] with
+#'`rm_indices=FALSE`. When there are no multiple entries, the data still must contain
+#'indices as produced by [fhir_crack()] when brackets are provided in the design.
+#'
+#'The column names of the input data must reflect the path to the corresponding resource element
+#'with {.} as a separator, e.g. `code.coding.system`. These names are produced automatically
+#'by [fhir_crack()] when the `cols` element of the design is omitted.
+#'
+#' @param resourceType A string naming the resource Type of the FHIR resources, e.g. "Patient".
 
-#
-create_bundle <- function(resourceType, df, brackets = brackets){
+#' @param data A data.frame or data.table containing information on the
+#' FHIR resources. Ideally, this should have been produced by [fhir_crack()] with the `cols`
+#' element of the design omitted in combination with [fhir_melt_all()] with
+#' `rm_indices=FALSE`. If you wish to manipulate you data before remodeling the FHIR resource
+#' you can store the indices using [fhir_extract_indices()], remove them temporarily
+#' with [fhir_rm_indices()] and restore them again with [fhir_restore_indices()]
+#' before the use of `fhir_create_bundle`.
+#'
+#' @param brackets A character vector of length two specifying the brackets that surround the indices,
+#' should match the brackets used in [fhir_crack()].
+#'
+#' @param bundleType A string defining the bundle type, should be either `"transaction"` or `"batch"`.
+#' See <https://www.hl7.org/fhir/http.html#transaction> for an explanation of the two.
+#'
+#' @param requestMethod A string defining the request Method that will be applied to every individual resource.
+#' Should be either `"PUT"`, resulting in an *update*, <https://www.hl7.org/fhir/http.html#update>
+#' or `"POST"`, resulting in a *create*, <https://www.hl7.org/fhir/http.html#create>.
+#'
+#' @return An xml object containing a transaction/batch bundle. This can be saved using [xml2::write_xml()]
+#' and be posted to the FHIR server outside of R or inside of R using [httr::POST()].
+#'
+#' @examples
+#' #unserialize example bundles
+#' bundles <- fhir_unserialize(patient_bundles)
+#'
+#' #crack example bundles
+#' design <- list(Patient = list(
+#'                              resource = "//Patient",
+#'                              style = list(brackets = c("[", "]"),
+#'                                           sep="||")))
+#'
+#' dfs <- fhir_crack(bundles, design)
+#'
+#'#melt multiple entries
+#' d <- fhir_melt_all(dfs$Patient, sep="||", brackets = c("[", "]"),
+#'                    rm_indices = FALSE)
+#'
+#'#create bundle
+#'result <- fhir_create_bundle(resourceType = "Patient", data = d, brackets = c("[", "]"))
+#'
+#'#save bundle
+#'library(xml2)
+#'tmp <- tempfile(fileext = ".xml")
+#'write_xml(result, tmp)
+#'
+#'\donttest{
+#'#post bundle
+#'library(httr)
+#'POST(url = "http://fhir.hl7.de:8080/baseDstu3", body = upload_file(tmp))
+#'}
+#'@export
 
-	d <- data.table::copy(df)
+fhir_create_bundle <- function(resourceType, data, brackets, bundleType = "transaction", requestMethod = "PUT"){
+
+	d <- data.table::copy(data)
 	setDT(d)
 
 	#remove any narrative elements https://www.hl7.org/fhir/narrative.html
@@ -382,7 +477,7 @@ create_bundle <- function(resourceType, df, brackets = brackets){
 
 	#create transaction bundle
 	bundle <- xml2::xml_new_root("Bundle")
-	xml2::xml_add_child(bundle, xml2::xml_new_root("type", value= "transaction"))
+	xml2::xml_add_child(bundle, xml2::xml_new_root("type", value= bundleType))
 
 
 	resources <- unique(d$id)
@@ -391,11 +486,11 @@ create_bundle <- function(resourceType, df, brackets = brackets){
 	for(i in 1:length(resources)){
 		rows <- d[resources[i]]
 		#create  resource
-		xml2::xml_add_child(bundle, create_resource(resourceType = resourceType, data = rows, brackets = brackets))
+		xml2::xml_add_child(bundle, fhir_create_resource(resourceType = resourceType, data = rows, brackets = brackets))
 		#create entry and request nodes
 		xml2::xml_add_parent(xml2::xml_child(bundle, i+1), xml2::xml_new_root("entry"))
 		xml2::xml_add_child(xml2::xml_child(bundle, i+1), xml2::xml_new_root("request"))
-		xml2::xml_add_child(xml2::xml_find_all(bundle, "entry/request")[[i]], xml2::xml_new_root("method", value="PUT"))
+		xml2::xml_add_child(xml2::xml_find_all(bundle, "entry/request")[[i]], xml2::xml_new_root("method", value=requestMethod))
 		xml2::xml_add_child(xml2::xml_find_all(bundle, "entry/request")[[i]],
 							xml2::xml_new_root("url",
 											   value=paste(resourceType,
