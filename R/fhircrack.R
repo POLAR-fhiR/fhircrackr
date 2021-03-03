@@ -363,7 +363,16 @@ fhir_save <- function(bundles, directory = "result") {
 #' loaded_bundles <- fhir_load(tempdir())
 
 fhir_load <- function(directory) {
+
+	if(!dir.exists(directory)){
+		stop("Cannot find the specified directory.")
+	}
+
 	xml.files <- dir(directory, "*.xml")
+
+	if(length(xml.files)==0){
+		stop("Cannot find any xml-files in the specified directory.")
+	}
 
 	lapply(lst(xml.files), function(x)
 		xml2::read_xml(paste_paths(directory, x)))
@@ -1051,12 +1060,14 @@ fhir_rm_indices <-
 
 		if(!is_DT){data.table::setDT(indexed_dt)}
 
-
 		brackets <- fix_brackets(brackets)
 
 		brackets.escaped <- esc(brackets)
 
 		pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)*", brackets.escaped[2])
+
+		if(!any(grepl(pattern.ids, indexed_dt))){
+			warning("The brackets you specified don't seem to appear in the data.frame.")}
 
 		result <- data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_dt[,columns, with=F])))
 
