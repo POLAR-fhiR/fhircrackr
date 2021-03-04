@@ -491,11 +491,20 @@ fhir_create_bundle <- function(resourceType, data, brackets, bundleType = "trans
 		xml2::xml_add_parent(xml2::xml_child(bundle, i+1), xml2::xml_new_root("entry"))
 		xml2::xml_add_child(xml2::xml_child(bundle, i+1), xml2::xml_new_root("request"))
 		xml2::xml_add_child(xml2::xml_find_all(bundle, "entry/request")[[i]], xml2::xml_new_root("method", value=requestMethod))
-		xml2::xml_add_child(xml2::xml_find_all(bundle, "entry/request")[[i]],
-							xml2::xml_new_root("url",
-											   value=paste(resourceType,
-											   			xml2::xml_attr(xml2::xml_find_all(bundle, "entry/resource/*/id")[i], "value"),
-											   			sep="/")))
+
+		if(requestMethod=="PUT"){
+			xml2::xml_add_child(xml2::xml_find_all(bundle, "entry/request")[[i]],
+								xml2::xml_new_root("url",
+												   value=paste(resourceType,
+												   			xml2::xml_attr(xml2::xml_find_all(bundle, "entry/resource/*/id")[i], "value"),
+												   			sep="/")))
+		}
+
+	}
+
+	if(requestMethod=="POST"){
+		ids <- xml2::xml_find_all(bundle, "entry/resource/*/id")
+		xml2::xml_remove(ids)
 	}
 
 	bundle
