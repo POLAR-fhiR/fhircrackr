@@ -480,7 +480,7 @@ molten_2 <- fhir_melt(molten_1, columns = "name.given", brackets = c("[","]"),
 					  sep=" | ", all_columns = TRUE)
 molten_2
 ```
-This will give you the appropriate cross product of all multiple entries.
+This will give you the appropriate product of all multiple entries.
 
 
 If you just want all multiple entries molten correctly, you can use `fhir_melt_all()`. This function will find all columns containing multiple entries and melt them appropriately. Note that this will only work if the column names reflect the path to the corresponding resource element with . as a separator, e.g. `name.given`. These names are produced automatically by fhir_crack() when the cols element of the design is omitted or set to `NULL`.
@@ -501,7 +501,7 @@ Once you have sorted out the multiple entries, you might want to get rid of the 
 ```{r}
 fhir_rm_indices(molten_2, brackets=c("[","]"))
 ```
-Again, `brackets` and `sep` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()`respectively.
+Again, `brackets` and `sep` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()` respectively.
 
 
 ```{r, include=F}
