@@ -104,103 +104,71 @@
 #'
 #' @export
 
-fhir_crack <- function(bundles,
-					   design,
-					   sep = NULL,
-					   remove_empty_columns = NULL,
-					   brackets = NULL,
-					   verbose = 2,
-					   data.table = FALSE,
-					   add_indices) {
+fhir_crack <- function(
+	bundles,
+	design,
+	sep = NULL,
+	remove_empty_columns = NULL,
+	brackets = NULL,
+	verbose = 2,
+	data.table = FALSE,
+	add_indices) {
 
 	#-----------------------# remove once add_indices is removed:
-	if(!missing("add_indices")){
-
+	if (!missing("add_indices")) {
 		warning("Argument add_indices is deprecated and will be removed eventually.\n In future versions indices will automatically be added when brackets are provided.")
-
 		if(add_indices && is.null(brackets)) {brackets <- c("<", ">")}
-
 		if(!add_indices && !is.null(brackets)) {brackets <- NULL}
-
 	}
 
 	#-----------------------#
 
 	#check input validity
 	design_validity <- is_valid_design(design)
-
 	#IF general problems with design
-	if (!design_validity[[1]] && is.null(design_validity[[2]])){
-
-		return(NULL)
-	}
-
+	if (!design_validity[[1]] && is.null(design_validity[[2]])){return(NULL)}
 	#If single invalid data.frame descriptions
-	if (!design_validity[[1]] && !is.null(design_validity[[2]])){
-
-		design[design_validity[[2]]] <- "invalid"
-
-	}
-
+	if (!design_validity[[1]] && !is.null(design_validity[[2]])) {design[design_validity[[2]]] <- "invalid"}
 	#If invalid bundle list
-	if (is_invalid_bundles_list(bundles)){
-
-		return(NULL)
-
-	}
-
+	if (is_invalid_bundles_list(bundles)) {return(NULL)}
 	#complete design
 	design <- fix_design(design)
-
 	#overwrite design with function arguments
-	if(!is.null(sep)) {
-
-		design <- lapply(design, function(x){
-			x$style$sep <- sep
-			x
-		}
+	if (!is.null(sep)) {
+		design <- lapply(
+			design,
+			function(x){
+				x$style$sep <- sep
+				x
+			}
 		)
 	}
-
-	if(!is.null(brackets)) {
-
+	if (!is.null(brackets)) {
 		brackets <- fix_brackets(brackets)
-
-		design <-lapply(design, function(x){
-			x$style$brackets <- brackets
-			x
-		}
+		design <-lapply(
+			design,
+			function(x){
+				x$style$brackets <- brackets
+				x
+			}
 		)
 	}
-
-	if(!is.null(remove_empty_columns)) {
-
-		design <- lapply(design, function(x){
-			x$style$rm_empty_cols <- remove_empty_columns
-			x
-		}
+	if (!is.null(remove_empty_columns)) {
+		design <- lapply(
+			design,
+			function(x){
+				x$style$rm_empty_cols <- remove_empty_columns
+				x
+			}
 		)
 	}
-
 	#Add attributes to design
 	design <- add_attribute_to_design(design)
-
 	#crack
-	dfs <-
-		bundles2dfs(
-			bundles = bundles,
-			design = design,
-			data.table = data.table,
-			verbose = verbose
-		)
-
-	if (0 < verbose) {
-		message("FHIR-Resources cracked. \n")
-	}
-
+	dfs <- bundles2dfs(bundles = bundles, design = design, data.table = data.table, verbose = verbose)
+	if (0 < verbose) {message("FHIR-Resources cracked. \n")}
 	assign(x = "canonical_design", value = design, envir = fhircrackr_env)
-
-	return(dfs)
+	dfs
 }
 
 
@@ -217,46 +185,35 @@ fhir_crack <- function(bundles,
 is_invalid_bundles_list <- function(bundles_list) {
 	if (is.null(bundles_list)) {
 		warning("Argument bundles is NULL, returning NULL.")
-
 		return(TRUE)
 	}
-
 	if (!is.list(bundles_list)) {
 		warning("Argument bundles has to be a list, returnin NULL.")
 		return(TRUE)
 	}
-
 	if (length(bundles_list) < 1) {
 		warning("Argument bundles has length 0, returning NULL.")
 		return(TRUE)
 	}
-
 	if (any(sapply(bundles_list, is.raw))) {
-		warning(
-			"Argument bundles seems to contain serialized bundles. Use fhir_unserialize() before proceeding. Returning NULL"
-		)
+		warning("Argument bundles seems to contain serialized bundles. Use fhir_unserialize() before proceeding. Returning NULL")
 		return(TRUE)
 	}
-
-	valid.doc.types <- all(sapply(bundles_list,
-								  function(b) {
-								  	if (is.null(b)) {
-								  		FALSE
-								  	}
-								  	else {
-								  		cl <- class(b)
-								  		length(cl) == 2 ||
-								  			cl[1] == "xml_document" || cl[2] == "xml_node"
-								  	}
-								  }))
-
+	valid.doc.types <- all(
+		sapply(
+			bundles_list,
+			function(b) {
+				if (is.null(b)) {FALSE} else {
+			  		cl <- class(b)
+			  		length(cl) == 2 || cl[1] == "xml_document" || cl[2] == "xml_node"
+			  	}
+			}
+		)
+	)
 	if (!valid.doc.types) {
-		warning(
-			"Argument bundles contains at least one invalid Bundle. Bundles have to be of Class 'xml_document' and 'xml_node'. Returning NULL"
-		)
+		warning("Argument bundles contains at least one invalid Bundle. Bundles have to be of Class 'xml_document' and 'xml_node'. Returning NULL")
 		return(TRUE)
 	}
-
 	FALSE
 }
 
@@ -282,77 +239,48 @@ is_invalid_bundles_list <- function(bundles_list) {
 #' #Extract all columns
 #' result <- fhircrackr:::xtrct_all_columns(child)
 #'
-xtrct_all_columns <-
-	function(child,
-			 sep = NULL,
-			 xpath = ".//@*",
-			 brackets = NULL) {
+xtrct_all_columns <- function(
+	child,
+	sep = NULL,
+	xpath = ".//@*",
+	brackets = NULL) {
 
-		tree <- xml2::xml_find_all(child, xpath)
-
-		if (length(tree) < 1) {
-			return(data.table::data.table())
+	tree <- xml2::xml_find_all(child, xpath)
+	if (length(tree) < 1) {return(data.table::data.table())}
+	xp.child  <- xml2::xml_path(child)
+	xp.remain <- xml2::xml_path(tree)
+	xp.rel    <- substr(xp.remain, nchar(xp.child) + 2, nchar(xp.remain))
+	xp.cols   <- gsub("/", ".", gsub("@", "", unique(gsub("\\[[0-9]+\\]", "", xp.rel))))
+	d <- lapply(1:length(xp.cols), function(dummy)character(0))
+	names(d) <- xp.cols
+	val  <- xml2::xml_text(tree)
+	s <- stringr::str_split(xp.rel, "/")
+	o <- sapply(
+		seq_along(s),
+		function(i) {
+			s. <- s[[i]]
+			i.f <- !grepl("\\[[0-9]+\\]", s.)
+			if (any(i.f)) {s.[i.f] <- paste0(s.[i.f], "[1]")}
+			c(
+				paste0(gsub("]$","",gsub(".*\\[","",s.[-length(s.)])), collapse = "."),
+				gsub("@", "", gsub("\\[[0-9]+\\]", "", paste0(s., collapse = ".")))
+			)
 		}
-
-		xp.child  <- xml2::xml_path(child)
-		xp.remain <- xml2::xml_path(tree)
-		xp.rel    <-
-			substr(xp.remain, nchar(xp.child) + 2, nchar(xp.remain))
-		xp.cols   <-
-			gsub("/", ".", gsub("@", "", unique(gsub(
-				"\\[[0-9]+\\]", "", xp.rel
-			))))
-
-		d <- lapply(1:length(xp.cols), function(dummy)
-			character(0))
-
-		names(d) <- xp.cols
-
-		val  <- xml2::xml_text(tree)
-
-		s <- stringr::str_split(xp.rel, "/")
-
-		o <- sapply(seq_along(s),
-					function(i) {
-						#dbg
-						#i<-1
-
-						s. <- s[[i]]
-
-						i.f <- !grepl("\\[[0-9]+\\]", s.)
-
-						if (any(i.f)) {
-							s.[i.f] <- paste0(s.[i.f], "[1]")
-						}
-
-						c(gsub(".1$", "", paste0(gsub(
-							"[^0-9]", "", s.
-						), collapse = ".")),
-						gsub("@", "", gsub(
-							"\\[[0-9]+\\]", "", paste0(s., collapse = ".")
-						)))
-					})
-
-		if (!is.null(brackets)) {
-
-			is_av_val <- ! is.na(val)
-
-			o. <- o[1, ]
-
-			val[is_av_val] <- paste0(brackets[1], o.[is_av_val], brackets[2], val[is_av_val])
-		}
-
-		for (col in xp.cols) {
-			#dbg
-			#col <- xp.cols[1]
-
-			d[[col]] <- paste0(val[col == o[2, ]], collapse = sep)
-		}
-
-		result <- data.table::as.data.table(d)
-		names(result) <- gsub("(\\.\\w+)$", "", names(result))
-		result
+	)
+	if (!is.null(brackets)) {
+		is_av_val <- ! is.na(val)
+		o. <- o[1, ]
+		val[is_av_val] <- paste0(brackets[1], o.[is_av_val], brackets[2], val[is_av_val])
 	}
+	for (col in xp.cols) {
+		#dbg
+		#col <- xp.cols[1]
+		d[[col]] <- paste0(val[col == o[2, ]], collapse = sep)
+	}
+	result <- data.table::as.data.table(d)
+	names(result) <- gsub("(\\.\\w+)$", "", names(result))
+	result
+}
 
 #' Extract columns
 #'
@@ -382,61 +310,44 @@ xtrct_all_columns <-
 #' #Extract columns
 #' result <- fhircrackr:::xtrct_columns(child, cols)
 
-xtrct_columns <- function(child,
-						  df.columns,
-						  sep = NULL,
-						  brackets = NULL) {
+xtrct_columns <- function(
+	child,
+	df.columns,
+	sep = NULL,
+	brackets = NULL) {
 
 	xp <- xml2::xml_path(child)
-
-	l <- lapply(lst(names(df.columns)),
-				function(column.name)  {
-					#dbg
-					#column.name <- names( df.columns )[ 1 ]
-
-					i.srch <- df.columns[[column.name]]
-
-					loc <- xml2::xml_find_all(x = child, xpath = i.srch)
-
-					val <- xml2::xml_text(loc)
-
-					if (!is.null(brackets)) {
-						loc.xp <- xml2::xml_path(loc)
-
-						loc.xp.rel <- substr(loc.xp, nchar(xp) + 2, nchar(loc.xp))
-
-						s <- stringr::str_split(loc.xp.rel, "/")
-
-						o <- sapply(seq_along(s),
-									function(i) {
-										#dbg
-										#i<-1
-
-										s. <- s[[i]]
-
-										i.f <- !grepl("\\[[0-9]+\\]", s.)
-
-										if (any(i.f)) {
-											s.[i.f] <- paste0(s.[i.f], "[1]")
-										}
-
-										gsub(".1$", "", paste0(gsub("[^0-9]", "", s.), collapse = "."))
-									})
-
-						if (0 < length(val)) {
-
-							is_av <- ! is.na(val)
-
-							paste0(brackets[1], o[is_av], brackets[2], val[is_av], collapse = sep)
-						}
-						else
-							NA
+	l <- lapply(
+		lst(names(df.columns)),
+		function(column.name)  {
+			i.srch <- df.columns[[column.name]]
+			loc <- xml2::xml_find_all(x = child, xpath = i.srch)
+			val <- xml2::xml_text(loc)
+			if (!is.null(brackets)) {
+				loc.xp <- xml2::xml_path(loc)
+				loc.xp.rel <- substr(loc.xp, nchar(xp) + 2, nchar(loc.xp))
+				s <- stringr::str_split(loc.xp.rel, "/")
+				o <- sapply(
+					seq_along(s),
+					function(i) {
+						s. <- s[[i]]
+						i.f <- !grepl("\\[[0-9]+\\]", s.)
+						if (any(i.f)) {s.[i.f] <- paste0(s.[i.f], "[1]")}
+						gsub(".1$", "", paste0(gsub("[^0-9]", "", s.), collapse = "."))
 					}
-					else {
-						if (0 < length(val)) {paste0(val, collapse = sep)} else {NA}
-					}
-				})
+				)
 
+				if (0 < length(val)) {
+					is_av <- ! is.na(val)
+					paste0(brackets[1], o[is_av], brackets[2], val[is_av], collapse = sep)
+				}
+				else {NA}
+			}
+			else {
+				if (0 < length(val)) {paste0(val, collapse = sep)} else {NA}
+			}
+		}
+	)
 	data.table::as.data.table(l)
 }
 
@@ -466,79 +377,41 @@ xtrct_columns <- function(child,
 #'
 #' #convert bundle to data frame
 #' result <- fhircrackr:::bundle2df(bundle, design)
-bundle2df <- function(bundle,
-					  df_desc,
-					  verbose = 2) {
+bundle2df <- function(
+	bundle,
+	df_desc,
+	verbose = 2) {
 
 	xml2::xml_ns_strip(bundle)
-
 	xpath <- df_desc$resource
-
 	children <- xml2::xml_find_all(bundle, xpath)
-
 	df.list <- if (length(children) == 0) {
-
 		list()
-
 	} else {
-		lapply(children,
-			   function(child) {
-			   	#dbg
-			   	#child <- children[[ 1 ]]
+		lapply(
+			children,
+			function(child) {
+		   	#dbg
+		   	#child <- children[[ 1 ]]
 
-			   	#if multiple columns are defined
+		   	#if multiple columns are defined
 			   	if (!is.null(df_desc$cols) && is.list(df_desc$cols)) {
-
 			   		df.columns <- df_desc$cols
-
-			   		res <- xtrct_columns(
-			   			child,
-			   			df.columns,
-			   			sep = df_desc$style$sep,
-			   			brackets = df_desc$style$brackets
-			   		)
-
+			   		res <- xtrct_columns(child, df.columns, sep = df_desc$style$sep, brackets = df_desc$style$brackets)
 			   		if (1 < verbose) {
-			   			if (all(sapply(res, is.na))) {
-			   				cat("x")
-			   			} else {
-			   				cat(".")
-			   			}
+			   			if (all(sapply(res, is.na))) {cat("x")} else {cat(".")}
 			   		}
-
-			   	} else {
-
-			   		xp <- if (!is.null(df_desc$cols)) {#if cols is character
-
-			   			df_desc$cols
-
-			   		} else {#if cols is NULL
-
-			   			".//@*"
-
-			   		}
-
-			   		res <-
-			   			xtrct_all_columns(
-			   				child = child,
-			   				sep = df_desc$style$sep,
-			   				xpath = xp,
-			   				brackets = df_desc$style$brackets
-			   			)
-
+			   	} else {#if cols is character
+			   		xp <- if (!is.null(df_desc$cols)) {df_desc$cols} else {".//@*"} #else cols is NULL
+			   		res <- xtrct_all_columns( child = child, sep = df_desc$style$sep, xpath = xp, brackets = df_desc$style$brackets)
 			   		if (1 < verbose) {
-			   			if (nrow(res) < 1) {
-			   				cat("x")
-			   			} else {
-			   				cat(".")
-			   			}
+			   			if (nrow(res) < 1) {cat("x")} else {cat(".")}
 			   		}
 			   	}
-
-			   	res
-			   })
+				res
+			}
+		)
 	}
-
 	data.table::rbindlist(l = df.list, fill=TRUE)
 }
 
@@ -568,34 +441,26 @@ bundle2df <- function(bundle,
 #' #convert bundles to data frame
 #' result <- fhircrackr:::bundles2df(bundles, df_desc)
 
-bundles2df <- function(bundles,
-					   df_desc,
-					   verbose = 2) {
+bundles2df <- function(
+	bundles,
+	df_desc,
+	verbose = 2) {
 
-	ret <- data.table::rbindlist(lapply(seq_along(bundles),
-										function(i) {
-											#dbg
-											#i<-1
-
-											if (1 < verbose) {
-												cat("\n", i)
-											}
-
-											bundle <- bundles[[i]]
-
-											bundle2df(
-												bundle,
-												df_desc,
-												verbose = verbose
-											)
-										}), fill=TRUE)
-
+	ret <- data.table::rbindlist(
+		lapply(
+			seq_along(bundles),
+			function(i) {
+				#dbg
+				#i<-1
+				if (1 < verbose) {cat("\n", i)}
+				bundle <- bundles[[i]]
+				bundle2df(bundle, df_desc, verbose = verbose)
+			}
+		),
+		fill = TRUE
+	)
 	if(nrow(ret > 0)) {ret <- ret[rowSums(!is.na(ret)) > 0, ]}
-
-	if (1 < verbose) {
-		cat("\n")
-	}
-
+	if (1 < verbose) {cat("\n")}
 	ret
 }
 
@@ -657,75 +522,37 @@ bundles2df <- function(bundles,
 #' #convert fhir to data frames
 #' list_of_tables <- fhircrackr:::bundles2dfs(bundles, design)
 
-bundles2dfs <-
-	function(bundles,
-			 design,
-			 data.table = FALSE,
-			 verbose = 2) {
+bundles2dfs <- function(
+	bundles,
+	design,
+	data.table = FALSE,
+	verbose = 2) {
 
-		dfs <- lapply(lst(names(design)),
-					  function(n) {
-					  	#dbg
-					  	#n <- names(design)[1]
+	dfs <- lapply(
+		lst(names(design)),
+		function(n) {
+			df_desc <- design[[n]]
+		  	if (1 < verbose) {cat("\n", n)}
 
-					  	df_desc <- design[[n]]
-
-					  	if (1 < verbose) {
-					  		cat("\n", n)
-					  	}
-
-					  	if(is.null(df_desc)){
-
-					  		NULL
-
-					  	}else{
-
-					  		bundles2df(
-					  			bundles = bundles,
-					  			df_desc = df_desc,
-					  			verbose = verbose
-					  		)
-					  	}
-
-					  })
-
-		if (1 < verbose) {
-			cat("\n")
+		  	if(is.null(df_desc)){NULL} else {bundles2df(bundles = bundles, df_desc = df_desc, verbose = verbose)}
 		}
-
-		#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
-		remove <- sapply(design, function(x){
-			if(is.null(x$style$rm_empty_cols)) {
-				FALSE
-			}else{
-				x$style$rm_empty_cols
-			}
-		})
-
-		dfs_cleaned <- lapply(seq_along(dfs),
-							  function(i) {
-
-							  	if(remove[i] && ncol(dfs[[i]]) > 0){
-
-							  		dfs[[i]][, colSums(!is.na(dfs[[i]]))>0, with=F]
-
-							  	} else {
-
-							  		dfs[[i]]
-
-							  	}
-							  })
-
-
-		names(dfs_cleaned) <- names(dfs)
-
-		if(data.table){
-
-			return(dfs_cleaned)
-
-		}else{
-			return(lapply(dfs_cleaned, data.frame))
+	)
+	if (1 < verbose) {cat("\n")}
+	#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
+	remove <- sapply(
+		design,
+		function(x){
+			if(is.null(x$style$rm_empty_cols)) {FALSE} else {x$style$rm_empty_cols}
 		}
-	}
-
+	)
+	dfs_cleaned <- lapply(
+		seq_along(dfs),
+		function(i) {
+			if(remove[i] && ncol(dfs[[i]]) > 0){
+				dfs[[i]][, colSums(!is.na(dfs[[i]]))>0, with=F]} else {dfs[[i]]}
+		}
+	)
+	names(dfs_cleaned) <- names(dfs)
+	if(data.table){return(dfs_cleaned)} else {return(lapply(dfs_cleaned, data.frame))}
+}
 
