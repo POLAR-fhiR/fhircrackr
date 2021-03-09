@@ -7,26 +7,30 @@
 fhir_melt_all(indexed_data_frame, sep, brackets, rm_indices = TRUE)
 }
 \arguments{
-\item{indexed_data_frame}{A data frame with indexed multiple entries.}
+\item{indexed_data_frame}{A data frame with indexed multiple entries.column names must
+reflect the path to the corresponding resource element with \code{.} as a separator, e.g. \code{name.given}.
+These names are produced automatically by \code{\link[=fhir_crack]{fhir_crack()}} when the cols element of the design is omitted or set to \code{NULL}.}
 
-\item{sep}{A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}.}
+\item{sep}{A string defining the separator that was used when pasting together multiple entries in \code{\link[=fhir_crack]{fhir_crack()}}.}
 
 \item{brackets}{A character vector of length 2, defining the brackets used for the indices.}
 
 \item{rm_indices}{Logical of length one. Should indices be removed? If \code{FALSE} the indices from the input data are preserved
-the way they are. They can be extracted with \code{\link{fhir_extract_indices}}, removed with \code{\link{fhir_rm_indices}}
-and restored with \code{\link{fhir_restore_indices}}}
+the way they are. They can be extracted with \code{\link[=fhir_extract_indices]{fhir_extract_indices()}}, removed with \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
+and restored with \code{\link[=fhir_restore_indices]{fhir_restore_indices()}}}
 }
 \value{
 A data frame where each multiple entry appears in a separate row.
 }
 \description{
-This function divides all multiple entries in an indexed data frame as produced by \code{\link{fhir_crack}}
+This function divides all multiple entries in an indexed data frame as produced by \code{\link[=fhir_crack]{fhir_crack()}}
 into separate observations.
 }
 \details{
 Every row containing values that consist of multiple entries will be turned into multiple rows, one for each entry.
-Values on other variables will be repeated in all the new rows.
+Values on other variables will be repeated in all the new rows. This function will only work if the column names
+reflect the path to the corresponding resource element with \code{.} as a separator, e.g. \code{name.given}.
+These names are produced automatically by \code{\link[=fhir_crack]{fhir_crack()}} when the cols element of the design is omitted or set to \code{NULL}.
 
 If \code{rm_indices=FALSE} the original indices are kept for every entry. These are needed if you want to transform
 the data back to FHIR resources.

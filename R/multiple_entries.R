@@ -187,23 +187,27 @@ fhir_melt <-
 
 #' Melt all multiple entries
 #'
-#' This function divides all multiple entries in an indexed data frame as produced by \code{\link{fhir_crack}}
+#' This function divides all multiple entries in an indexed data frame as produced by [fhir_crack()]
 #' into separate observations.
 #'
 #' Every row containing values that consist of multiple entries will be turned into multiple rows, one for each entry.
-#' Values on other variables will be repeated in all the new rows.
+#' Values on other variables will be repeated in all the new rows. This function will only work if the column names
+#' reflect the path to the corresponding resource element with `.` as a separator, e.g. `name.given`.
+#' These names are produced automatically by [fhir_crack()] when the cols element of the design is omitted or set to `NULL`.
 #'
-#' If \code{rm_indices=FALSE} the original indices are kept for every entry. These are needed if you want to transform
+#' If `rm_indices=FALSE` the original indices are kept for every entry. These are needed if you want to transform
 #' the data back to FHIR resources.
 #'
 #' For a more detailed description on how to use this function please see the package vignette.
 #'
-#' @param indexed_data_frame A data frame with indexed multiple entries.
+#' @param indexed_data_frame A data frame with indexed multiple entries.column names must
+#' reflect the path to the corresponding resource element with `.` as a separator, e.g. `name.given`.
+#' These names are produced automatically by [fhir_crack()] when the cols element of the design is omitted or set to `NULL`.
 #' @param brackets A character vector of length 2, defining the brackets used for the indices.
-#' @param sep A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}.
-#' @param rm_indices Logical of length one. Should indices be removed? If \code{FALSE} the indices from the input data are preserved
-#' the way they are. They can be extracted with \code{\link{fhir_extract_indices}}, removed with \code{\link{fhir_rm_indices}}
-#' and restored with \code{\link{fhir_restore_indices}}
+#' @param sep A string defining the separator that was used when pasting together multiple entries in [fhir_crack()].
+#' @param rm_indices Logical of length one. Should indices be removed? If `FALSE` the indices from the input data are preserved
+#' the way they are. They can be extracted with [fhir_extract_indices()], removed with [fhir_rm_indices()]
+#' and restored with [fhir_restore_indices()]
 #' @return A data frame where each multiple entry appears in a separate row.
 #'
 #' @examples

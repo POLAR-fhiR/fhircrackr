@@ -41,10 +41,10 @@ library(fhircrackr)
 ## FHIR search requests
 To download FHIR resources from the server, you need to specify which resources you want with a *FHIR search request*. If you are already familiar and comfortable with FHIR search, you can just define your search request as a simple string that you provide to `fhir_search()`. In that case you can skip the following paragraph, as the first part of this vignette introduces the basics of FHIR search and some functions to build valid FHIR search requests with `fhircrackr`. 
 
-A FHIR search request will mostly have the form `[base]/[type]?parameter(s)`, where `[base]` is a URL to the FHIR endpoint you are trying to access, `[type]` refers to the type of resource you are looking for and `parameter(s)` characterize specific properties those resources should have. The function `fhir_build_request()` offers a solution to bring those three components together correctly, taking care of proper formatting for you. You use this function in conjunction with three sub-functions: `fhir_base()`, `fhir_resource()` and `fhir_key_value()`, will format the three components separately, the results of these functions are then fed to `fhir_build_request()`. We'll explain those subfunctions now: 
+A FHIR search request will mostly have the form `[base]/[type]?parameter(s)`, where `[base]` is the base URL to the FHIR server you are trying to access, `[type]` refers to the type of resource you are looking for and `parameter(s)` characterize specific properties those resources should have. The function `fhir_build_request()` offers a solution to bring those three components together correctly, taking care of proper formatting for you. You use this function in conjunction with three sub-functions: `fhir_base()`, `fhir_resource()` and `fhir_key_value()`, will format the three components separately, the results of these functions are then fed to `fhir_build_request()`. We'll explain those subfunctions now: 
 
 ### The base URL
-`fhir_base()` takes a string containing the base URL to your FHIR endpoint, removes white space and trailing slashes and names the string for `fhir_build_request()`:
+`fhir_base()` takes a string containing the base URL to your FHIR server, removes white space and trailing slashes and names the string for `fhir_build_request()`:
 
 ```{r}
 fhir_base(" http://hapi.fhir.org/baseR4/")
@@ -160,7 +160,7 @@ If the argument `max_bundles` is set to its default `Inf`, `fhir_search()` will 
 
 If you want to connect to a FHIR server that uses basic authentication, you can supply the arguments `username` and `password`.
 
-Because endpoints can sometimes be hard to reach, `fhir_search()` will start five attempts to connect to the endpoint before it gives up. With the arguments `max_attempts` and `delay_between_attempts` you can control this number as well the time interval between attempts.
+Because servers can sometimes be hard to reach, `fhir_search()` will start five attempts to connect to the server before it gives up. With the arguments `max_attempts` and `delay_between_attempts` you can control this number as well the time interval between attempts.
 
 As you can see in the next block of code, `fhir_search()` returns a list of xml objects where each list element represents one bundle of resources, so a list of two xml objects in our case:
 
@@ -294,7 +294,7 @@ The [capability statement](https://www.hl7.org/fhir/capabilitystatement.html) do
 cap <- fhir_capability_statement("http://hapi.fhir.org/baseR4/", verbose = 0)
 ```
 
-`fhir_capability_statement()` takes a FHIR server endpoint and returns a list of data frames containing all information from the capability statement of this server. This information can be useful to determine, for example, which FHIR search parameters are implemented in you FHIR server.
+`fhir_capability_statement()` takes the base URL of a FHIR server and returns a list of data frames containing all information from the capability statement of this server. This information can be useful to determine, for example, which FHIR search parameters are implemented in you FHIR server.
 
 ## Next steps
 To learn about how `fhircrackr` allows you to convert the downloaded FHIR resources into data.frames/data.tables, see the vignette on flattening FHIR resources.

@@ -16,7 +16,7 @@ fhir_capability_statement(
 )
 }
 \arguments{
-\item{url}{The URL of the FHIR server endpoint.}
+\item{url}{The base URL of the FHIR server.}
 
 \item{username}{A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.}
 

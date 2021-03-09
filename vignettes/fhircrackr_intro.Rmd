@@ -2,7 +2,7 @@
 title: "fhircrackr Intro: Handling HL7&reg; FHIR&reg; Resources in R"
 
 date: "`r Sys.Date()`"
-output:	rmarkdown::html_vignette
+output:	rmarkdown::pdf_document
 
 
 
@@ -51,7 +51,7 @@ This vignette is an introduction on the basic functionalities of the `fhircrackr
 ## Prerequisites
 The complexity of the problem requires a couple of prerequisites both regarding your knowledge and access to data. We will shortly list the  preconditions for using the `fhircrackr` package here:  
 
-1. First of all, you need the endpoint of the FHIR server you want to access. If you don't have your own FHIR server, you can use one of the available public servers, such as `https://hapi.fhir.org/baseR4` or `http://fhir.hl7.de:8080/baseDstu3`. The endpoint of a FHIR server is often referred to as [base] or [baseR4] for the HL7 R4 standard for instance.
+1. First of all, you need the base URL of the FHIR server you want to access. If you don't have your own FHIR server, you can use one of the available public servers, such as `https://hapi.fhir.org/baseR4` or `http://fhir.hl7.de:8080/baseDstu3`. The base URL of a FHIR server is often referred to as [base].
 
 2. To download resources from the server, you should be familiar with [FHIR search requests](https://www.hl7.org/fhir/search.html). FHIR search allows you to download sets of resources that match very specific requirements. The `fhircrackr` package offers some help building FHIR search requests, for this please see the vignette on downloading FHIR resources.
 
@@ -152,7 +152,7 @@ When the FHIR search request gets longer, it can be helpful to build up the requ
 
 ```{r}
 search_request  <- paste0(
-  "https://hapi.fhir.org/baseR4/", #server endpoint
+  "https://hapi.fhir.org/baseR4/", #base url
   "MedicationStatement?", #look for MedicationsStatements
   "code=http://snomed.info/ct%7C429374003", #only choose resources with this snomed code
   "&_include=MedicationStatement:subject") #include the corresponding Patient resources

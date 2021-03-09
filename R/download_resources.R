@@ -77,7 +77,7 @@ fhir_search <-
 						"ALL!",
 					" bundles of resource type ",
 					gsub("(^.+/)(.+)(\\?).*$", "\\2", request, perl = TRUE),
-					" from FHIR endpoint ",
+					" from FHIR base URL ",
 					gsub("(^.+)(/.+\\?).*$", "\\1", request, perl = TRUE),
 					".\n"
 				)
@@ -511,7 +511,7 @@ fhir_current_request <- function() {
 #' Get capability statement
 #' @description Get the capability statement of a FHIR server.
 #'
-#' @param url The URL of the FHIR server endpoint.
+#' @param url The base URL of the FHIR server.
 #' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param sep A string to separate pasted multiple entries
