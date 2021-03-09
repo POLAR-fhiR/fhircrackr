@@ -557,10 +557,10 @@ bundles <- fhir_unserialize(serialized_bundles)
 #have a look
 head(bundles[[1]])
 #> $node
-#> <pointer: 0x0000000012767750>
+#> <pointer: 0x0000000012628e50>
 #> 
 #> $doc
-#> <pointer: 0x0000000012739e00>
+#> <pointer: 0x00000000125f9980>
 ```
 
 After unserialization, the pointers are restored and you can continue to
