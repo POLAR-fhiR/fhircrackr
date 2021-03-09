@@ -1,6 +1,6 @@
 ---
-title: "README.rmd"
-output: html_document
+title: "README"
+output: github_document
 ---
 
 ```{r, include = FALSE}
