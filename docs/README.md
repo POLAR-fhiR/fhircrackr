@@ -1,0 +1,214 @@
+fhircrackr
+================
+
+## Introduction
+
+`fhircrackr` is a package designed to help analyzing HL7 FHIR\[1\]
+resources.
+
+FHIR stands for *Fast Healthcare Interoperability Resources* and is a
+standard describing data formats and elements (known as “resources”) as
+well as an application programming interface (API) for exchanging
+electronic health records. The standard was created by the Health Level
+Seven International (HL7) health-care standards organization. For more
+information on the FHIR standard, visit <https://www.hl7.org/fhir/>.
+
+While FHIR is a very useful standard to describe and exchange medical
+data in an interoperable way, it is not at all useful for statistical
+analyses of data. This is due to the fact that FHIR data is stored in
+many nested and interlinked resources instead of matrix-like structures.
+
+Thus, to be able to do statistical analyses a tool is needed that allows
+converting these nested resources into data frames. This process of
+tabulating FHIR resources is not trivial, as the unpredictable degree of
+nesting and connectedness of the resources makes generic solutions to
+this problem not feasible.
+
+We therefore implemented a package that makes it possible to download
+FHIR resources from a server into R and to tabulate these resources into
+(multiple) data frames.
+
+The package is still under development. The CRAN version of the package
+contains all functions that are already stable, for more recent (but
+potentially unstable) developments, the development version of the
+package can be downloaded from GitHub using
+`devtools::install_github("POLAR-fhiR/fhircrackr")`.
+
+This vignette is an introduction on the basic functionalities of the
+`fhircrackr` and should give you a broad overview over what the package
+can do. For more detailed instructions on each subtopic please have a
+look the other vignettes. This introduction covers the following topics:
+
+  - Prerequisites
+
+  - Downloading resources from a FHIR server
+
+  - Flattening resources
+
+  - Multiple entries
+
+  - Saving and loading downloaded bundles
+
+  - Creating resources
+
+## Prerequisites
+
+The complexity of the problem requires a couple of prerequisites both
+regarding your knowledge and access to data. We will shortly list the
+preconditions for using the `fhircrackr` package here:
+
+1.  First of all, you need the base URL of the FHIR server you want to
+    access. If you don’t have your own FHIR server, you can use one of
+    the available public servers, such as `https://hapi.fhir.org/baseR4`
+    or `http://fhir.hl7.de:8080/baseDstu3`. The base URL of a FHIR
+    server is often referred to as \[base\].
+
+2.  To download resources from the server, you should be familiar with
+    [FHIR search requests](https://www.hl7.org/fhir/search.html). FHIR
+    search allows you to download sets of resources that match very
+    specific requirements. The `fhircrackr` package offers some help
+    building FHIR search requests, for this please see the vignette on
+    downloading FHIR resources.
+
+3.  In the first step, `fhircrackr` downloads the resources in xml
+    format into R. To specify which elements from the FHIR resources you
+    want in your data frame, you should have at least some familiarity
+    with XPath expressions. A good tutorial on XPath expressions can be
+    found [here](https://www.w3schools.com/xml/xpath_intro.asp).
+
+In the following we’ll go through a typical workflow with `fhircrackr`
+step by step. The first and foremost step is of course, to install and
+load the package:
+
+``` r
+install.packages("fhircrackr")
+library(fhircrackr)
+```
+
+## Downloading resources
+
+To download resources from a FHIR server, you need to send a FHIR search
+request using `fhir_search()`. This introduction will not go into the
+details of building a valid FHIR search request. For that, please see
+the vignette on downloading FHIR resources. Here we will use a simple
+example of downloading all Patient resources from a public HAPI server:
+
+``` r
+patient_bundles <- fhir_search(request="http://fhir.hl7.de:8080/baseDstu3/Patient",
+                               max_bundles=2, verbose = 0)
+```
+
+The minimum information `fhir_search()` requires is a string containing
+the full FHIR search request in the argument `request` which you can
+either provide explicitly or by a call to `fhir_build_url()` before. In
+general, a FHIR search request returns a *bundle* of the resources you
+requested. If there are a lot of resources matching your request, the
+search result isn’t returned in one big bundle but distributed over
+several of them. If the argument `max_bundles` is set to its default
+`Inf`, `fhir_search()` will return all available bundles, meaning all
+resources matching your request. If you set it to `2` as in the example
+above, the download will stop after the first two bundles. Note that in
+this case, the result *may not contain all* the resources from the
+server matching your request.
+
+If you want to connect to a FHIR server that uses basic authentication,
+you can supply the arguments `username` and `password`.
+
+As you can see in the next block of code, `fhir_search()` returns a list
+of xml objects where each list element represents one bundle of
+resources, so a list of two xml objects in our case:
+
+``` r
+length(patient_bundles)
+#> [1] 2
+str(patient_bundles[[1]])
+#> List of 2
+#>  $ node:<externalptr> 
+#>  $ doc :<externalptr> 
+#>  - attr(*, "class")= chr [1:2] "xml_document" "xml_node"
+```
+
+If for some reason you cannot connect to a FHIR server at the moment but
+want to explore the following functions anyway, the package provides two
+example lists of bundles containing Patient and MedicationStatement
+resources. See `?patient_bundles` and `?medication_bundles` for how to
+use them.
+
+## Flattening resources
+
+Now we know that inside these xml objects there is the patient data
+somewhere. To get it out, we will use `fhir_crack()`. The most important
+argument `fhir_crack()` takes is `bundles`, the list of bundles that is
+returned by `fhir_search()`. The second important argument is `design`,
+an object that tells the function which data to extract from the bundle.
+`fhir_crack()` returns a list of data.frames (the default) or a list of
+data.tables (if argument `data.tables=TRUE`).
+
+The proper format of a `design` in `fhir_crack()` is described in detail
+in the vignette on flattening resources. Please refer to this document
+for more information, as we will just use one example of a design here.
+
+In general, `design` is a named list containing one element per data
+frame that will be created. We call these elements *data.frame
+descriptions*. The names of the data.frame descriptions in `design` are
+also going to be the names of the resulting data frames. It usually
+makes sense to create one data frame per type of resource. Because we
+have just downloaded resources of the type Patient, the `design` here
+would be a list of length 1, containing just one data.frame description.
+A full data.frame description is a list with the elements *resource*,
+*cols* and *style* and can look as follows:
+
+``` r
+#define design
+design <- list(
+
+    Patients = list(
+        
+        resource = "//Patient",
+        
+        cols = list(
+            PID           = "id",
+            use_name      = "name/use",
+            given_name    = "name/given",
+            family_name   = "name/family",
+            gender        = "gender",
+            birthday      = "birthDate"
+        ),
+        
+        style = list(
+            sep = "|",
+            brackets = c("[","]"),
+            rm_empty_cols = FALSE
+        )
+    )
+)
+```
+
+All three elements of `style` can also be controlled directly by the
+`fhir_crack()` arguments `sep`, `brackets` and `remove_empty_columns`.
+If the function arguments are `NULL` (their default), the values
+provided in `style` are used, if they are not NULL, they will overwrite
+any values in `style`. If both the function arguments and the `style`
+component of the data.frame description are NULL, default values(`sep="
+"`, `brackets = NULL`, `rm_empty_cols=TRUE`) will be assumed.
+
+After it is defined, the design can be used in `fhir_crack()` like this:
+
+``` r
+#flatten resources
+list_of_tables <- fhir_crack(bundles = patient_bundles, design = design, verbose = 0)
+
+#have look at the results
+head(list_of_tables$Patients)
+#>       PID      use_name    given_name  family_name  gender      birthday
+#> 1 [1]1282 [1.1]official      [1.1]Sam [1.1]Fhirman    <NA>          <NA>
+#> 2  [1]267          <NA> [1.1]Testfall   [1.1]Nr. 1    <NA> [1]1960-10-04
+#> 3  [1]722          <NA>     [1.1]Rick [1.1]Sanchez [1]male [1]1982-01-01
+#> 4  [1]731          <NA>     [1.1]Rick [1.1]Sanchez [1]male [1]1982-01-01
+#> 5  [1]736          <NA>     [1.1]Rick [1.1]Sanchez [1]male [1]1982-01-01
+#> 6  [1]737          <NA>     [1.1]Rick [1.1]Sanchez [1]male [1]1982-01-01
+```
+
+1.  FHIR is the registered trademark of HL7 and is used with the
+    permission of HL7. Use of the FHIR trademark does not constitute
+    endorsement of this product by HL7
