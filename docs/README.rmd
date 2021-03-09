@@ -35,7 +35,6 @@ This vignette is an introduction on the basic functionalities of the `fhircrackr
 
 - Saving and loading downloaded bundles
 
-- Creating resources
 
 
 ## Prerequisites
@@ -130,5 +129,77 @@ After it is defined, the design can be used in `fhir_crack()` like this:
 list_of_tables <- fhir_crack(bundles = patient_bundles, design = design, verbose = 0)
 
 #have look at the results
+head(list_of_tables$Patients)
+```
+
+
+## Extract more than one resource type
+Of course the previous example is using just one resource type. If you are interested in several types of resources, `design` will contain several data.frame descriptions and the result will be a list of several data frames.
+
+Consider the following example where we want to download MedicationStatements referring to a certain medication we specify with its SNOMED CT code and also the Patient resources these MedicationStatements are linked to.
+
+When the FHIR search request gets longer, it can be helpful to build up the request piece by piece like this:
+
+```{r}
+search_request  <- paste0(
+  "https://hapi.fhir.org/baseR4/", #base url
+  "MedicationStatement?", #look for MedicationsStatements
+  "code=http://snomed.info/ct%7C429374003", #only choose resources with this snomed code
+  "&_include=MedicationStatement:subject") #include the corresponding Patient resources
+```
+
+Then we can download the resources:
+
+```{r, eval=F}
+medication_bundles <- fhir_search(request = search_request, max_bundles = 3)
+```
+
+```{r, include=F}
+medication_bundles <- fhir_unserialize(medication_bundles)
+```
+
+Now our `design` needs two data.frame descriptions (called `MedicationStatement` and `Patients` in our example), one for the MedicationStatement resources and one for the Patient resources:
+
+```{r}
+design <- list(
+
+	MedicationStatement = list(
+
+		resource = "//MedicationStatement",
+
+		cols = list(
+			MS.ID              = "id",
+			STATUS.TEXT        = "text/status",
+			STATUS             = "status",
+			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+			MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+			MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+			DOSAGE             = "dosage/text",
+			PATIENT            = "subject/reference",
+			LAST.UPDATE        = "meta/lastUpdated"
+		),
+		
+		style = list(
+			sep = "|",
+			brackets = NULL, 
+			rm_empty_cols = FALSE
+		)
+	),
+
+	Patients = list(
+
+		resource = "//Patient",
+		cols = "./*"
+	)
+)
+```
+
+In this example, we have spelled out the data.frame description MedicationStatement completely, while we have used a short form for Patients. We can now use this `design` for `fhir_crack()`:
+
+```{r}
+list_of_tables <- fhir_crack(bundles = medication_bundles, design = design, verbose = 0)
+
+head(list_of_tables$MedicationStatement)
+
 head(list_of_tables$Patients)
 ```

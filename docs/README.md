@@ -49,8 +49,6 @@ look the other vignettes. This introduction covers the following topics:
 
   - Saving and loading downloaded bundles
 
-  - Creating resources
-
 ## Prerequisites
 
 The complexity of the problem requires a couple of prerequisites both
@@ -207,6 +205,113 @@ head(list_of_tables$Patients)
 #> 4  [1]731          <NA>     [1.1]Rick [1.1]Sanchez [1]male [1]1982-01-01
 #> 5  [1]736          <NA>     [1.1]Rick [1.1]Sanchez [1]male [1]1982-01-01
 #> 6  [1]737          <NA>     [1.1]Rick [1.1]Sanchez [1]male [1]1982-01-01
+```
+
+## Extract more than one resource type
+
+Of course the previous example is using just one resource type. If you
+are interested in several types of resources, `design` will contain
+several data.frame descriptions and the result will be a list of several
+data frames.
+
+Consider the following example where we want to download
+MedicationStatements referring to a certain medication we specify with
+its SNOMED CT code and also the Patient resources these
+MedicationStatements are linked to.
+
+When the FHIR search request gets longer, it can be helpful to build up
+the request piece by piece like this:
+
+``` r
+search_request  <- paste0(
+  "https://hapi.fhir.org/baseR4/", #base url
+  "MedicationStatement?", #look for MedicationsStatements
+  "code=http://snomed.info/ct%7C429374003", #only choose resources with this snomed code
+  "&_include=MedicationStatement:subject") #include the corresponding Patient resources
+```
+
+Then we can download the resources:
+
+``` r
+medication_bundles <- fhir_search(request = search_request, max_bundles = 3)
+```
+
+Now our `design` needs two data.frame descriptions (called
+`MedicationStatement` and `Patients` in our example), one for the
+MedicationStatement resources and one for the Patient resources:
+
+``` r
+design <- list(
+
+    MedicationStatement = list(
+
+        resource = "//MedicationStatement",
+
+        cols = list(
+            MS.ID              = "id",
+            STATUS.TEXT        = "text/status",
+            STATUS             = "status",
+            MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+            MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+            MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+            DOSAGE             = "dosage/text",
+            PATIENT            = "subject/reference",
+            LAST.UPDATE        = "meta/lastUpdated"
+        ),
+        
+        style = list(
+            sep = "|",
+            brackets = NULL, 
+            rm_empty_cols = FALSE
+        )
+    ),
+
+    Patients = list(
+
+        resource = "//Patient",
+        cols = "./*"
+    )
+)
+```
+
+In this example, we have spelled out the data.frame description
+MedicationStatement completely, while we have used a short form for
+Patients. We can now use this `design` for `fhir_crack()`:
+
+``` r
+list_of_tables <- fhir_crack(bundles = medication_bundles, design = design, verbose = 0)
+
+head(list_of_tables$MedicationStatement)
+#>   MS.ID STATUS.TEXT STATUS     MEDICATION.SYSTEM MEDICATION.CODE
+#> 1 30233   generated active http://snomed.info/ct       429374003
+#> 2 42012   generated active http://snomed.info/ct       429374003
+#> 3 42091   generated active http://snomed.info/ct       429374003
+#> 4 45646   generated active http://snomed.info/ct       429374003
+#> 5 45724   generated active http://snomed.info/ct       429374003
+#> 6 45802   generated active http://snomed.info/ct       429374003
+#>   MEDICATION.DISPLAY           DOSAGE       PATIENT
+#> 1   simvastatin 40mg 1 tab once daily Patient/30163
+#> 2   simvastatin 40mg 1 tab once daily Patient/41945
+#> 3   simvastatin 40mg 1 tab once daily Patient/42024
+#> 4   simvastatin 40mg 1 tab once daily Patient/45579
+#> 5   simvastatin 40mg 1 tab once daily Patient/45657
+#> 6   simvastatin 40mg 1 tab once daily Patient/45735
+#>                     LAST.UPDATE
+#> 1 2019-09-26T14:34:44.543+00:00
+#> 2 2019-10-09T20:12:49.778+00:00
+#> 3 2019-10-09T22:44:05.728+00:00
+#> 4 2019-10-11T16:17:42.365+00:00
+#> 5 2019-10-11T16:30:24.411+00:00
+#> 6 2019-10-11T16:32:05.206+00:00
+
+head(list_of_tables$Patients)
+#>      id gender  birthDate
+#> 1 60096   male 2019-11-13
+#> 2 49443 female 1970-10-19
+#> 3 46213 female 2019-10-11
+#> 4 45735   male 1970-10-11
+#> 5 42024 female 1979-10-09
+#> 6 58504   male 2019-11-08
 ```
 
 1.  FHIR is the registered trademark of HL7 and is used with the
