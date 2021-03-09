@@ -2,7 +2,7 @@
 title: "fhircrackr Intro: Handling HL7&reg; FHIR&reg; Resources in R"
 
 date: "`r Sys.Date()`"
-output:	rmarkdown::pdf_document
+output:	rmarkdown::html_vignette
 
 
 
@@ -44,8 +44,6 @@ This vignette is an introduction on the basic functionalities of the `fhircrackr
 - Multiple entries
 
 - Saving and loading downloaded bundles
-
-- Creating resources
 
 
 ## Prerequisites
