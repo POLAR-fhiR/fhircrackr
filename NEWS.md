@@ -1,3 +1,13 @@
+
+
+## New functions in for_master_branch
+
+fhir_extract_indices
+fhir_melt_all
+fhir_restore_indices
+
+## News already in master (but probably not tested yet)
+
 - New argument `delay_between_pages` for `fhir_search()` allowing to put a delay between the download of bundles 
 (i.e. pages) in a bigger search request to prevent weak servers from choking.
 
