@@ -36,6 +36,11 @@
 #' @export
 #'
 fhir_common_columns <- function(data_frame, column_names_prefix) {
+
+	if(!is.data.frame(data_frame)){
+		stop("You need to supply a data.frame or data.table to the argument indexed_data_frame.",
+			 "The object you supplied is of type ", class(data_frame), ".")}
+
 	pattern_column_names  <- paste0("^", column_names_prefix, "($|\\.+)")
 
 	column_names <- names(data_frame)
@@ -135,6 +140,10 @@ fhir_melt <-
 			 sep = " ",
 			 id_name = "resource_identifier",
 			 all_columns = FALSE) {
+
+		if(!is.data.frame(indexed_data_frame)){
+			stop("You need to supply a data.frame or data.table to the argument indexed_data_frame.",
+				 "The object you supplied is of type ", class(indexed_data_frame), ".")}
 
 		if (!all(columns %in% names(indexed_data_frame))) {
 			stop("Not all column names you gave match with the column names in the data frame.")
@@ -278,6 +287,10 @@ fhir_melt <-
 
 fhir_melt_all <- function(indexed_data_frame, sep, brackets, rm_indices = TRUE){
 
+	if(!is.data.frame(indexed_data_frame)){
+		stop("You need to supply a data.frame or data.table to the argument indexed_data_frame.",
+			 "The object you supplied is of type ", class(indexed_data_frame), ".")}
+
 	is_DT <- data.table::is.data.table(indexed_data_frame)
 
 	#sort columns to make sure columns belonging to the same element are next to each other
@@ -382,6 +395,10 @@ fhir_rm_indices <-
 	function(indexed_data_frame,
 			 brackets = c("<", ">"),
 			 columns = names( indexed_data_frame )) {
+
+		if(!is.data.frame(indexed_data_frame)){
+			stop("You need to supply a data.frame or data.table to the argument indexed_data_frame.",
+				 "The object you supplied is of type ", class(indexed_data_frame), ".")}
 
 		indexed_dt <- copy(indexed_data_frame) #copy to avoid side effects
 
@@ -494,6 +511,10 @@ fhir_rm_indices <-
 #'@export
 
 fhir_extract_indices <- function(indexed_data_frame, brackets){
+
+	if(!is.data.frame(indexed_data_frame)){
+		stop("You need to supply a data.frame or data.table to the argument indexed_data_frame.",
+			 "The object you supplied is of type ", class(indexed_data_frame), ".")}
 
 	if(any(!sapply(indexed_data_frame, is.character))){
 		warning("The indexed_data_frame contains columns that are not of type character. ",
@@ -614,6 +635,10 @@ fhir_extract_indices <- function(indexed_data_frame, brackets){
 #'@export
 
 fhir_restore_indices <- function(d, index_matrix){
+
+	if(!is.data.frame(d)){
+		stop("You need to supply a data.frame or data.table to the argument indexed_data_frame.",
+			 "The object you supplied is of type ", class(d), ".")}
 
 	if(any(dim(d)!=dim(index_matrix))){
 		stop("Dimensions of d and index_matrix have to match.")
@@ -756,7 +781,7 @@ melt_row <-
 							})
 
 				for (n in unique.new.rows) {
-					d[n, i] <- gsub(paste0(esc(sep), "$"), "", f[n], perl = TRUE)
+					d[as.numeric(n), i] <- gsub(paste0(esc(sep), "$"), "", f[names(f)==n], perl = TRUE)
 				}
 			}
 		}
@@ -772,119 +797,6 @@ melt_row <-
 
 		data.table::data.table(d)
 	}
-
-
-
-
-#'This function does the same as melt_row but returns a data table with
-#'original indices
-#'
-#'@noRd
-
-melt_row_preserveID <-
-	function(row,
-			 columns,
-			 brackets = c("<", ">"),
-			 sep = " ",
-			 all_columns = FALSE) {
-
-		row <- as.data.frame(row)
-
-		col.names.mutable  <- columns
-
-		col.names.constant <- setdiff(names(row), col.names.mutable)
-
-		row.mutable  <- row[col.names.mutable]
-
-		row.constant <- row[col.names.constant]
-
-		#dbg
-		#row <- d3.3$Entries[ 1, ]
-
-		brackets.escaped <- esc(brackets)
-
-		pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)*", brackets.escaped[2])
-
-		ids <- stringr::str_extract_all(row.mutable, pattern.ids)
-		names(ids) <- col.names.mutable
-
-		items <- stringr::str_split(row.mutable, pattern.ids)
-
-		items <-
-			lapply(items, function(i) {
-				if (!all(is.na(i)) && i[1] == "") {
-					i[2:length(i)]
-				} else {
-					i
-				}
-			})
-
-		names(items) <- col.names.mutable
-
-		d <-
-			if (all_columns) {
-				row[0, , FALSE]
-			} else {
-				row[0, col.names.mutable, FALSE]
-			}
-
-		for (i in names(ids)) {
-			#dbg
-			#i<-names( ids )[1]
-
-			id <- ids[[i]]
-
-			if (!all(is.na(id))) {
-				it <- items[[i]]
-
-				new.rows        <-
-					gsub(paste0(brackets.escaped[1], "([0-9]+)\\.*.*"),
-						 "\\1",
-						 id)
-				new.ids         <-
-					gsub(
-						paste0(
-							"(",
-							brackets.escaped[1],
-							")([0-9]+)\\.*(.*",
-							brackets.escaped[2],
-							")"
-						),
-						"\\1\\3",
-						id
-					)
-				unique.new.rows <- unique(new.rows)
-
-				set <- paste0(new.ids, it)
-
-				f <- sapply(unique.new.rows,
-							function(unr) {
-								#dbg
-								#unr <- unique.new.rows[1]
-
-								fltr <- unr == new.rows
-
-								paste0(set[fltr], collapse = "")
-							})
-
-				for (n in unique.new.rows) {
-					d[n, i] <- gsub(paste0(esc(sep), "$"), "", f[n], perl = TRUE)
-				}
-			}
-		}
-
-		if (0 < length(col.names.constant) && all_columns) {
-			if (0 < nrow(d))
-				d[, col.names.constant] <-
-					dplyr::select(row, col.names.constant)
-			else
-				d[1, col.names.constant] <-
-					dplyr::select(row, col.names.constant)
-		}
-
-		data.table::data.table(d)
-	}
-
 
 #' This functions melts a row regarding a set
 #' of columns completely, i.e. until there is no separator left in the
@@ -905,7 +817,7 @@ melt_row_completely <- function(row,
 
 	#melt
 	while(any(grepl(esc(sep), res[,columns, with=F]))){
-		res <- melt_row_preserveID(res, brackets = brackets, sep=sep,
+		res <- melt_row(res, brackets = brackets, sep=sep,
 								   columns = columns, all_columns = T)
 	}
 
