@@ -1,5 +1,7 @@
 rm(list = ls())
 
+require(DependenciesGraphs)
+
 name <- function(v){
 	names(v) <- v
 	v
