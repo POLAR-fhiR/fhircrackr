@@ -133,66 +133,66 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #'           brackets = c("[","]"), sep = " ", all_columns = TRUE)
 #' @export
 
-fhir_melt <-
-	function(indexed_data_frame,
-			 columns,
-			 brackets = c("<", ">"),
-			 sep = " ",
-			 id_name = "resource_identifier",
-			 all_columns = FALSE) {
+fhir_melt <- function(
+	indexed_data_frame,
+	columns,
+	brackets = c("<", ">"),
+	sep = " ",
+	id_name = "resource_identifier",
+	all_columns = FALSE) {
 
-		if(!is.data.frame(indexed_data_frame)){
-			stop("You need to supply a data.frame or data.table to the argument indexed_data_frame.",
-				 "The object you supplied is of type ", class(indexed_data_frame), ".")}
+	if(!is.data.frame(indexed_data_frame)){
+		stop("You need to supply a data.frame or data.table to the argument indexed_data_frame.",
+			 "The object you supplied is of type ", class(indexed_data_frame), ".")}
 
-		if (!all(columns %in% names(indexed_data_frame))) {
-			stop("Not all column names you gave match with the column names in the data frame.")
-		}
-
-		indexed_dt <- copy(indexed_data_frame) #copy to avoid side effects
-
-		is_DT <- data.table::is.data.table(indexed_dt)
-
-		if(!is_DT){data.table::setDT(indexed_dt)}
-
-		brackets <- fix_brackets(brackets)
-
-		#dbg
-		#column_prefix <- "id"
-
-		d <- data.table::rbindlist(
-			lapply(seq_len(nrow(
-				indexed_dt
-			)),
-			function(row.id) {
-				#dbg
-				#row.id <- 3
-
-				e <-
-					melt_row(
-						row = indexed_dt[row.id,],
-						columns = columns,
-						brackets = brackets,
-						sep = sep,
-						all_columns = all_columns
-					)
-
-				if (0 < nrow(e))
-					e[seq_len(nrow(e)), (id_name) := row.id]
-
-				e
-			}), fill = TRUE)
-
-		if(nrow(d) == 0) {warning("The brackets you specified don't seem to appear in the indices of the provided data.frame. Returning NULL.")}
-
-		if(!is.null(d) && 0 < nrow(d)) {
-			data.table::setorderv(d, id_name)
-
-			if(!is_DT){setDF(d)}
-			return(d)
-
-		}
+	if (!all(columns %in% names(indexed_data_frame))) {
+		stop("Not all column names you gave match with the column names in the data frame.")
 	}
+
+	indexed_dt <- copy(indexed_data_frame) #copy to avoid side effects
+
+	is_DT <- data.table::is.data.table(indexed_dt)
+
+	if(!is_DT){data.table::setDT(indexed_dt)}
+
+	brackets <- fix_brackets(brackets)
+
+	#dbg
+	#column_prefix <- "id"
+
+	d <- data.table::rbindlist(
+		lapply(seq_len(nrow(
+			indexed_dt
+		)),
+		function(row.id) {
+			#dbg
+			#row.id <- 3
+
+			e <-
+				melt_row(
+					row = indexed_dt[row.id,],
+					columns = columns,
+					brackets = brackets,
+					sep = sep,
+					all_columns = all_columns
+				)
+
+			if (0 < nrow(e))
+				e[seq_len(nrow(e)), (id_name) := row.id]
+
+			e
+		}), fill = TRUE)
+
+	if(nrow(d) == 0) {warning("The brackets you specified don't seem to appear in the indices of the provided data.frame. Returning NULL.")}
+
+	if(!is.null(d) && 0 < nrow(d)) {
+		data.table::setorderv(d, id_name)
+
+		if(!is_DT){setDF(d)}
+		return(d)
+
+	}
+}
 
 #' Melt all multiple entries
 #'
@@ -391,38 +391,38 @@ fhir_melt_all <- function(indexed_data_frame, sep, brackets, rm_indices = TRUE){
 #' df_indices_removed <- fhir_rm_indices(dfs[[1]], brackets=c("[", "]"))
 
 
-fhir_rm_indices <-
-	function(indexed_data_frame,
-			 brackets = c("<", ">"),
-			 columns = names( indexed_data_frame )) {
+fhir_rm_indices <- function(
+	indexed_data_frame,
+	brackets = c("<", ">"),
+	columns = names( indexed_data_frame )) {
 
-		if(!is.data.frame(indexed_data_frame)){
-			stop("You need to supply a data.frame or data.table to the argument indexed_data_frame.",
-				 "The object you supplied is of type ", class(indexed_data_frame), ".")}
+	if(!is.data.frame(indexed_data_frame)){
+		stop("You need to supply a data.frame or data.table to the argument indexed_data_frame.",
+			 "The object you supplied is of type ", class(indexed_data_frame), ".")}
 
-		indexed_dt <- copy(indexed_data_frame) #copy to avoid side effects
+	indexed_dt <- copy(indexed_data_frame) #copy to avoid side effects
 
-		is_DT <- data.table::is.data.table(indexed_dt)
+	is_DT <- data.table::is.data.table(indexed_dt)
 
-		if(!is_DT){data.table::setDT(indexed_dt)}
+	if(!is_DT){data.table::setDT(indexed_dt)}
 
-		brackets <- fix_brackets(brackets)
+	brackets <- fix_brackets(brackets)
 
-		brackets.escaped <- esc(brackets)
+	brackets.escaped <- esc(brackets)
 
-		pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)*", brackets.escaped[2])
+	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)*", brackets.escaped[2])
 
-		if(!any(grepl(pattern.ids, indexed_dt))){
-			warning("The brackets you specified don't seem to appear in the data.frame.")}
+	if(!any(grepl(pattern.ids, indexed_dt))){
+		warning("The brackets you specified don't seem to appear in the data.frame.")}
 
-		result <- data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_dt[,columns, with=F])))
+	result <- data.table::data.table(gsub( pattern.ids, "", as.matrix(indexed_dt[,columns, with=F])))
 
-		indexed_dt[ , columns] <- result
+	indexed_dt[ , columns] <- result
 
-		if(!is_DT) data.table::setDF(indexed_dt)
+	if(!is_DT) data.table::setDF(indexed_dt)
 
-		indexed_dt
-	}
+	indexed_dt
+}
 
 
 #' Extract indices from molten data.frame with multiple entries
@@ -540,9 +540,6 @@ fhir_extract_indices <- function(indexed_data_frame, brackets){
 		result <- matrix(result, ncol=ncol(indexed_data_frame))
 		colnames(result) <- names(indexed_data_frame)
 	}
-
-
-
 
 	result
 }
@@ -670,7 +667,6 @@ fhir_restore_indices <- function(d, index_matrix){
 	if(is_DT){data.table::as.data.table(matr_result)}else{
 		as.data.frame(matr_result)
 	}
-
 }
 
 
@@ -691,124 +687,125 @@ fhir_restore_indices <- function(d, index_matrix){
 #' @noRd
 
 
-melt_row <-
-	function(row,
-			 columns,
-			 brackets = c("<", ">"),
-			 sep = " ",
-			 all_columns = FALSE) {
+melt_row <- function(
+	row,
+	columns,
+	brackets = c("<", ">"),
+	sep = " ",
+	all_columns = FALSE) {
 
-		row <- as.data.frame(row)
+	row <- as.data.frame(row)
 
-		col.names.mutable  <- columns
+	col.names.mutable  <- columns
 
-		col.names.constant <- setdiff(names(row), col.names.mutable)
+	col.names.constant <- setdiff(names(row), col.names.mutable)
 
-		row.mutable  <- row[col.names.mutable]
+	row.mutable  <- row[col.names.mutable]
 
-		row.constant <- row[col.names.constant]
+	row.constant <- row[col.names.constant]
 
-		#dbg
-		#row <- d3.3$Entries[ 1, ]
+	#dbg
+	#row <- d3.3$Entries[ 1, ]
 
-		brackets.escaped <- esc(brackets)
+	brackets.escaped <- esc(brackets)
 
-		pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
+	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 
-		ids <- stringr::str_extract_all(row.mutable, pattern.ids)
+	ids <- stringr::str_extract_all(row.mutable, pattern.ids)
 
-		names(ids) <- col.names.mutable
+	names(ids) <- col.names.mutable
 
-		pattern.items <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
+	pattern.items <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 
-		items <- stringr::str_split(row.mutable, pattern.items)
+	items <- stringr::str_split(row.mutable, pattern.items)
 
-		items <-
-			lapply(items, function(i) {
-				if (!all(is.na(i)) && i[1] == "") {
-					i[2:length(i)]
-				} else {
-					i
-				}
-			})
-
-		names(items) <- col.names.mutable
-
-		d <-
-			if (all_columns) {
-				row[0, , FALSE]
+	items <-
+		lapply(items, function(i) {
+			if (!all(is.na(i)) && i[1] == "") {
+				i[2:length(i)]
 			} else {
-				row[0, col.names.mutable, FALSE]
+				i
 			}
+		})
 
-		for (i in names(ids)) {
-			#dbg
-			#i<-names( ids )[1]
+	names(items) <- col.names.mutable
 
-			id <- ids[[i]]
-
-			if (!all(is.na(id))) {
-				it <- items[[i]]
-
-				new.rows        <-
-					gsub(paste0(brackets.escaped[1], "([0-9]+)\\.*.*"),
-						 "\\1",
-						 id)
-				new.ids         <-
-					gsub(
-						paste0(
-							"(",
-							brackets.escaped[1],
-							")([0-9]+)\\.*(.*",
-							brackets.escaped[2],
-							")"
-						),
-						"\\1\\3",
-						id
-					)
-				unique.new.rows <- unique(new.rows)
-
-				set <- paste0(new.ids, it)
-
-				f <- sapply(unique.new.rows,
-							function(unr) {
-								#dbg
-								#unr <- unique.new.rows[1]
-
-								fltr <- unr == new.rows
-
-								paste0(set[fltr], collapse = "")
-							})
-
-				for (n in unique.new.rows) {
-					d[as.numeric(n), i] <- gsub(paste0(esc(sep), "$"), "", f[names(f)==n], perl = TRUE)
-				}
-			}
+	d <-
+		if (all_columns) {
+			row[0, , FALSE]
+		} else {
+			row[0, col.names.mutable, FALSE]
 		}
 
-		if (0 < length(col.names.constant) && all_columns) {
-			if (0 < nrow(d))
-				d[, col.names.constant] <-
-					dplyr::select(row, col.names.constant)
-			else
-				d[1, col.names.constant] <-
-					dplyr::select(row, col.names.constant)
-		}
+	for (i in names(ids)) {
+		#dbg
+		#i<-names( ids )[1]
 
-		data.table::data.table(d)
+		id <- ids[[i]]
+
+		if (!all(is.na(id))) {
+			it <- items[[i]]
+
+			new.rows        <-
+				gsub(paste0(brackets.escaped[1], "([0-9]+)\\.*.*"),
+					 "\\1",
+					 id)
+			new.ids         <-
+				gsub(
+					paste0(
+						"(",
+						brackets.escaped[1],
+						")([0-9]+)\\.*(.*",
+						brackets.escaped[2],
+						")"
+					),
+					"\\1\\3",
+					id
+				)
+			unique.new.rows <- unique(new.rows)
+
+			set <- paste0(new.ids, it)
+
+			f <- sapply(unique.new.rows,
+						function(unr) {
+							#dbg
+							#unr <- unique.new.rows[1]
+
+							fltr <- unr == new.rows
+
+							paste0(set[fltr], collapse = "")
+						})
+
+			for (n in unique.new.rows) {
+				d[as.numeric(n), i] <- gsub(paste0(esc(sep), "$"), "", f[names(f)==n], perl = TRUE)
+			}
+		}
 	}
+
+	if (0 < length(col.names.constant) && all_columns) {
+		if (0 < nrow(d))
+			d[, col.names.constant] <-
+				dplyr::select(row, col.names.constant)
+		else
+			d[1, col.names.constant] <-
+				dplyr::select(row, col.names.constant)
+	}
+
+	data.table::data.table(d)
+}
 
 #' This functions melts a row regarding a set
 #' of columns completely, i.e. until there is no separator left in the
 #' specified columns. It preserves the original ids
 #' @noRd
-melt_row_completely <- function(row,
-								columns,
-								brackets = c("<", ">"),
-								sep = " ",
-								all_columns = FALSE){
-	setDT(row)
+melt_row_completely <- function(
+	row,
+	columns,
+	brackets = c("<", ">"),
+	sep = " ",
+	all_columns = FALSE){
 
+	setDT(row)
 	#extract original ids
 	ids <- suppressWarnings(fhir_extract_indices(row, brackets = brackets))
 	if(is.matrix(ids)){ids <- as.data.frame(ids)}
@@ -839,7 +836,6 @@ melt_row_completely <- function(row,
 
 	}
 	return(res)
-
 }
 
 #'This function does the same as fhir_melt but returns a data table
@@ -847,47 +843,45 @@ melt_row_completely <- function(row,
 #'It preserves the original ids
 #'@noRd
 
-fhir_melt_dt_preserveID <-
-	function(indexed_data_frame,
-			 columns,
-			 brackets = c("<", ">"),
-			 sep = " ",
-			 all_columns = FALSE) {
+fhir_melt_dt_preserveID <- function(
+	indexed_data_frame,
+	columns,
+	brackets = c("<", ">"),
+	sep = " ",
+	all_columns = FALSE) {
 
-		if (!all(columns %in% names(indexed_data_frame))) {
-			stop("Not all column names you gave match with the column names in the data frame.")
-		}
-
-		indexed_dt <- copy(indexed_data_frame) #copy to avoid side effects
-
-		brackets <- fix_brackets(brackets)
-
-		rowlist <- lapply(seq_len(nrow(
-			indexed_dt
-		)),
-		function(row.id) {
-
-			e <-
-				melt_row_completely(
-					row = indexed_dt[row.id,],
-					columns = columns,
-					brackets = brackets,
-					sep = sep,
-					all_columns = all_columns
-				)
-
-			e
-		})
-
-		d<- data.table::rbindlist(rowlist, fill = TRUE)
-
-		if(nrow(d) == 0) {warning("The brackets you specified don't seem to appear in the indices of the provided data.frame. Returning NULL.")}
-
-		if(!is.null(d) && 0 < nrow(d)) {
-
-			return(d)
-
-		}
+	if (!all(columns %in% names(indexed_data_frame))) {
+		stop("Not all column names you gave match with the column names in the data frame.")
 	}
 
+	indexed_dt <- copy(indexed_data_frame) #copy to avoid side effects
 
+	brackets <- fix_brackets(brackets)
+
+	rowlist <- lapply(seq_len(nrow(
+		indexed_dt
+	)),
+	function(row.id) {
+
+		e <-
+			melt_row_completely(
+				row = indexed_dt[row.id,],
+				columns = columns,
+				brackets = brackets,
+				sep = sep,
+				all_columns = all_columns
+			)
+
+		e
+	})
+
+	d<- data.table::rbindlist(rowlist, fill = TRUE)
+
+	if(nrow(d) == 0) {warning("The brackets you specified don't seem to appear in the indices of the provided data.frame. Returning NULL.")}
+
+	if(!is.null(d) && 0 < nrow(d)) {
+
+		return(d)
+
+	}
+}

@@ -66,7 +66,6 @@ fhir_save_design <- function (design, file = "design.xml") {
 	xml <- design2xml(design = design)
 
 	invisible(xml2::write_xml(xml, file))
-
 }
 
 #' Load design from xml
@@ -198,10 +197,8 @@ fix_brackets <- function(brackets){
 		brackets[1:2]
 
 	} else {
-			brackets
-		}
-
-
+		brackets
+	}
 }
 
 #' fix data.frame description

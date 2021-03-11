@@ -41,162 +41,162 @@
 #' @examples
 #' \donttest{bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)}
 
-fhir_search <-
-	function(request = fhir_current_request(),
-			 username = NULL,
-			 password = NULL,
-			 max_bundles = Inf,
-			 verbose = 1,
-			 max_attempts = 5,
-			 delay_between_attempts = 10,
-			 log_errors = 0,
-			 save_to_disc = FALSE,
-			 delay_between_pages = 0,
-			 directory = paste0("FHIR_bundles_", gsub("-| |:","", Sys.time()))) {
+fhir_search <- function(
+	request = fhir_current_request(),
+	username = NULL,
+	password = NULL,
+	max_bundles = Inf,
+	verbose = 1,
+	max_attempts = 5,
+	delay_between_attempts = 10,
+	log_errors = 0,
+	save_to_disc = FALSE,
+	delay_between_pages = 0,
+	directory = paste0("FHIR_bundles_", gsub("-| |:","", Sys.time()))) {
 
 
-		bundles <- list()
+	bundles <- list()
 
-		if(is.null(request)){
-			stop("You have not provided a FHIR search request and there is no ",
-				 "current search request fhir_search() can fall back to. See documentation ",
-				 "for fhir_current_request()")
+	if(is.null(request)){
+		stop("You have not provided a FHIR search request and there is no ",
+			 "current search request fhir_search() can fall back to. See documentation ",
+			 "for fhir_current_request()")
+	}
+
+
+	addr <- request
+
+
+	if (0 < verbose) {
+		message(
+			paste0(
+				"Starting download of ",
+				if (max_bundles < Inf)
+					max_bundles
+				else
+					"ALL!",
+				" bundles of resource type ",
+				gsub("(^.+/)(.+)(\\?).*$", "\\2", request, perl = TRUE),
+				" from FHIR base URL ",
+				gsub("(^.+)(/.+\\?).*$", "\\1", request, perl = TRUE),
+				".\n"
+			)
+		)
+
+		if (9 < max_bundles)
+			message("This may take a while...")
+	}
+
+	cnt <- 0
+
+	repeat {
+		cnt <- cnt + 1
+
+		if (1 < verbose) {
+			cat(paste0("bundle[", cnt, "]"))
 		}
 
-
-		addr <- request
-
-
-		if (0 < verbose) {
-			message(
-				paste0(
-					"Starting download of ",
-					if (max_bundles < Inf)
-						max_bundles
-					else
-						"ALL!",
-					" bundles of resource type ",
-					gsub("(^.+/)(.+)(\\?).*$", "\\2", request, perl = TRUE),
-					" from FHIR base URL ",
-					gsub("(^.+)(/.+\\?).*$", "\\1", request, perl = TRUE),
-					".\n"
-				)
+		bundle <-
+			get_bundle(
+				request = addr,
+				username = username,
+				password = password,
+				verbose = verbose,
+				max_attempts = max_attempts,
+				delay_between_attempts = delay_between_attempts,
+				log_errors = log_errors
 			)
 
-			if (9 < max_bundles)
-				message("This may take a while...")
+		if (is.null(bundle)) {
+			if (0 < verbose) {
+				message("Download interrupted.\n")
+			}
+
+			break
 		}
 
-		cnt <- 0
+		xml2::xml_ns_strip(bundle)
 
-		repeat {
-			cnt <- cnt + 1
-
-			if (1 < verbose) {
-				cat(paste0("bundle[", cnt, "]"))
-			}
-
-			bundle <-
-				get_bundle(
-					request = addr,
-					username = username,
-					password = password,
-					verbose = verbose,
-					max_attempts = max_attempts,
-					delay_between_attempts = delay_between_attempts,
-					log_errors = log_errors
-				)
-
-			if (is.null(bundle)) {
-				if (0 < verbose) {
-					message("Download interrupted.\n")
-				}
-
-				break
-			}
-
-			xml2::xml_ns_strip(bundle)
-
-
-			if(save_to_disc){
-
-				if (!dir.exists(directory)){
-					dir.create(directory, recursive = TRUE)
-				}
-
-				xml2::write_xml(
-					bundle,
-					paste_paths(directory, paste0(cnt, ".xml")))
-
-			}else{
-				bundles[[addr]] <- bundle
-			}
-
-			links <- xml2::xml_find_all(bundle, "link")
-
-			rels.nxt <-
-				xml2::xml_text(xml2::xml_find_first(links, "./relation/@value")) == "next"
-
-			if (cnt == max_bundles) {
-				if (0 < verbose) {
-					if (any(!is.na(rels.nxt) & rels.nxt)) {
-						message(
-							"\nDownload completed. Number of downloaded bundles was limited to ",
-							cnt,
-							" bundles, this is less than the total number of bundles available.\n"
-						)
-
-						urls <- xml2::xml_attr(xml2::xml_find_first(links, "./url"), "value")
-
-						assign(x = "last_next_link", value = urls[rels.nxt][1], envir = fhircrackr_env)
-					}
-					else {
-						message("\nDownload completed. All available bundles were downloaded.\n")
-					}
-				}
-
-				break
-			}
-			else {
-				assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
-			}
-
-			if (!any(!is.na(rels.nxt) & rels.nxt)) {
-				if (0 < verbose) {
-					message("\nDownload completed. All available bundles were downloaded.\n")
-				}
-
-				break
-			}
-
-			urls  <-
-				xml2::xml_attr(xml2::xml_find_first(links, "./url"), "value")
-
-			addr <- urls[rels.nxt][1]
-
-			if (is.null(addr) ||
-				is.na(addr) || length(addr) < 1 || addr == "") {
-				if (0 < verbose) {
-					message("\nDownload completed. All available bundles were downloaded.\n")
-				}
-
-				break
-			}
-			Sys.sleep(delay_between_pages)
-		}
-
-		fhircrackr_env$current_request <- request
 
 		if(save_to_disc){
 
-			return(NULL)
+			if (!dir.exists(directory)){
+				dir.create(directory, recursive = TRUE)
+			}
+
+			xml2::write_xml(
+				bundle,
+				paste_paths(directory, paste0(cnt, ".xml")))
 
 		}else{
-
-			return(bundles)
-
+			bundles[[addr]] <- bundle
 		}
+
+		links <- xml2::xml_find_all(bundle, "link")
+
+		rels.nxt <-
+			xml2::xml_text(xml2::xml_find_first(links, "./relation/@value")) == "next"
+
+		if (cnt == max_bundles) {
+			if (0 < verbose) {
+				if (any(!is.na(rels.nxt) & rels.nxt)) {
+					message(
+						"\nDownload completed. Number of downloaded bundles was limited to ",
+						cnt,
+						" bundles, this is less than the total number of bundles available.\n"
+					)
+
+					urls <- xml2::xml_attr(xml2::xml_find_first(links, "./url"), "value")
+
+					assign(x = "last_next_link", value = urls[rels.nxt][1], envir = fhircrackr_env)
+				}
+				else {
+					message("\nDownload completed. All available bundles were downloaded.\n")
+				}
+			}
+
+			break
+		}
+		else {
+			assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
+		}
+
+		if (!any(!is.na(rels.nxt) & rels.nxt)) {
+			if (0 < verbose) {
+				message("\nDownload completed. All available bundles were downloaded.\n")
+			}
+
+			break
+		}
+
+		urls  <-
+			xml2::xml_attr(xml2::xml_find_first(links, "./url"), "value")
+
+		addr <- urls[rels.nxt][1]
+
+		if (is.null(addr) ||
+			is.na(addr) || length(addr) < 1 || addr == "") {
+			if (0 < verbose) {
+				message("\nDownload completed. All available bundles were downloaded.\n")
+			}
+
+			break
+		}
+		Sys.sleep(delay_between_pages)
 	}
+
+	fhircrackr_env$current_request <- request
+
+	if(save_to_disc){
+
+		return(NULL)
+
+	}else{
+
+		return(bundles)
+
+	}
+}
 
 
 ####Build FHIR Search####
@@ -298,7 +298,6 @@ fhir_key_value <-function(key, value, url_enc = TRUE){
 	result <- paste0(key, "=", value)
 
 	return(c(keyval = result))
-
 }
 
 #' Build FHIR search request from base url, resource type and search parameters
@@ -389,7 +388,6 @@ fhir_build_request <- function(...){
 	fhircrackr_env$current_request <- result
 
 	return(result)
-
 }
 
 #' Update the current FHIR search request
@@ -458,7 +456,6 @@ fhir_update_request <- function(..., append = FALSE, return_request = TRUE){
 							 args))
 
 	if(return_request){return(fhircrackr_env$current_request)}
-
 }
 
 
@@ -705,7 +702,6 @@ dissect_request <- function(request){
 	keyval <- as.list(strsplit(split0[2], "&", fixed=T)[[1]])
 	keyval <- lapply(keyval, function(x){names(x)<-"keyval";x})
 
-
 	c(list(base, resource), keyval)
 }
 
@@ -727,53 +723,53 @@ dissect_request <- function(request){
 #' @examples
 #' bundle<-fhircrackr:::get_bundle(request = "https://hapi.fhir.org/baseR4/Patient?")
 
-get_bundle <-
-	function(request,
-			 username = NULL,
-			 password = NULL,
-			 verbose = 2,
-			 max_attempts = 5,
-			 delay_between_attempts = 10,
-			 log_errors = 0) {
+get_bundle <- function(
+	request,
+	username = NULL,
+	password = NULL,
+	verbose = 2,
+	max_attempts = 5,
+	delay_between_attempts = 10,
+	log_errors = 0) {
+	#dbg
+	#request="https://hapi.fhir.org/baseR4/Medication?_format=xml"
+
+	for (n in 1:max_attempts) {
 		#dbg
-		#request="https://hapi.fhir.org/baseR4/Medication?_format=xml"
+		#n <- 1
 
-		for (n in 1:max_attempts) {
-			#dbg
-			#n <- 1
+		if (1 < verbose)
+			cat(paste0("(", n, "): ", request, "\n"))
 
-			if (1 < verbose)
-				cat(paste0("(", n, "): ", request, "\n"))
-
-			auth <- if (!is.null(username) && !is.null(password)) {
-				httr::authenticate(username, password)
-			}
-
-			response <- httr::GET(
-				request,
-				httr::add_headers(Accept = "application/fhir+xml"),
-				auth
-			)
-
-			check_response(response, log_errors = log_errors)
-
-			payload <-
-				try(httr::content(response, as = "text", encoding = "UTF-8"),
-					silent = TRUE)
-
-			if (class(payload)[1] != "try-error") {
-				xml <- try(xml2::read_xml(payload), silent = TRUE)
-
-				if (class(xml)[1] != "try-error") {
-					return(xml)
-				}
-			}
-
-			Sys.sleep(delay_between_attempts)
+		auth <- if (!is.null(username) && !is.null(password)) {
+			httr::authenticate(username, password)
 		}
 
-		NULL
+		response <- httr::GET(
+			request,
+			httr::add_headers(Accept = "application/fhir+xml"),
+			auth
+		)
+
+		check_response(response, log_errors = log_errors)
+
+		payload <-
+			try(httr::content(response, as = "text", encoding = "UTF-8"),
+				silent = TRUE)
+
+		if (class(payload)[1] != "try-error") {
+			xml <- try(xml2::read_xml(payload), silent = TRUE)
+
+			if (class(xml)[1] != "try-error") {
+				return(xml)
+			}
+		}
+
+		Sys.sleep(delay_between_attempts)
 	}
+
+	NULL
+}
 
 #'log the error message of a http response
 #'
@@ -799,9 +795,6 @@ error_to_file <- function(response, log_errors) {
 	if (log_errors == 2) {
 		xml2::write_xml(xml, paste0("error_", time, ".xml"))
 	}
-
-
-
 }
 #' Check http response
 #'
