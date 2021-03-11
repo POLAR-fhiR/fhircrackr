@@ -63,16 +63,23 @@ attr(dep, "class") <- "dependenciesGraphs"
 
 plot(dep)
 
+(froms <- sort(dep$Nomfun$label[unique(dep$fromto$from)]))
+(tos <- sort(dep$Nomfun$label[unique(dep$fromto$to)]))
+
 # base functions,
 # don't use any functions itself
-setdiff(
-	sort(dep$Nomfun$label[unique(dep$fromto$to)]),
+(bases <- setdiff(
+	really_all_funs,
 	sort(dep$Nomfun$label[unique(dep$fromto$from)])
-)
+))
 
 # end functions,
 # are not used by any other functions
-setdiff(
-	sort(dep$Nomfun$label[unique(dep$fromto$from)]),
+(ends <- setdiff(
+	really_all_funs,
 	sort(dep$Nomfun$label[unique(dep$fromto$to)])
-)
+))
+
+### bases and ends at the same time
+intersect(ends, bases)
+
