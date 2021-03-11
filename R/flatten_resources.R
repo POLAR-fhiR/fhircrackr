@@ -14,10 +14,9 @@
 #' 1) \code{design$resource}: Mandatory. A string with an XPath expression locating the entries for this data frame in a FHIR bundle page. This is usually the path to a resource tpye
 #'  such as \code{"//Patient"} or \code{"//Observation"}.
 #'
-#' 2) \code{design$cols}: Optional. Either a string containing an XPath expression referencing a certain level of attributes that should be extracted (
-#'  \code{"./@value"} e.g. would extract all values on the root level) or a named list where the elements are XPath expressions indicating the specific
+#' 2) \code{design$cols}: Optional. A named list where the elements are XPath expressions indicating the specific
 #'   position of attributes to extract and the names of the list elements are the column names of the resulting data frame. If \code{design$cols} is \code{NULL},
-#'   all available attributes will be extracted.
+#'   all available attributes will be extracted and the column names are generated automatically and reflect the elements position in the resource.
 #'
 #' 3) \code{design$style}: Optional. This can be used instead of the function arguments \code{sep}, \code{brackets} and \code{remove_empty_columns}, but will be
 #' overwritten if the corresponding function arguments are not \code{NULL}.
@@ -90,7 +89,7 @@
 #'  #extract all values
 #' 	Patients = list(
 #'
-#' 		resource = ".//Patient"
+#' 		resource = "//Patient"
 #' 	)
 #' )
 #'
@@ -162,6 +161,19 @@ fhir_crack <- function(
 			}
 		)
 	}
+
+	#Check for dangerous XPath expressions ins cols
+	cols <- lapply(design, function(x){unlist(x$cols)})
+	dangerCols <- sapply(cols, function(x){any(grepl(esc("//"), x))})
+	if(any(dangerCols)){
+		warning("In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
+		"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
+		"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
+		"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
+		"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse=", "))
+	}
+
+
 	#Add attributes to design
 	design <- add_attribute_to_design(design)
 	#crack

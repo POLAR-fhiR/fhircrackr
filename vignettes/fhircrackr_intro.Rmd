@@ -196,8 +196,7 @@ design <- list(
 
 	Patients = list(
 
-		resource = "//Patient",
-		cols = "./*"
+		resource = "//Patient"
 	)
 )
 ```

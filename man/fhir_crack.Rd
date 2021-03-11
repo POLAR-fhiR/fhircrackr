@@ -25,10 +25,9 @@ Each data frame description is a list of 3 named elements:
 \enumerate{
 \item \code{design$resource}: Mandatory. A string with an XPath expression locating the entries for this data frame in a FHIR bundle page. This is usually the path to a resource tpye
 such as \code{"//Patient"} or \code{"//Observation"}.
-\item \code{design$cols}: Optional. Either a string containing an XPath expression referencing a certain level of attributes that should be extracted (
-\code{"./@value"} e.g. would extract all values on the root level) or a named list where the elements are XPath expressions indicating the specific
+\item \code{design$cols}: Optional. A named list where the elements are XPath expressions indicating the specific
 position of attributes to extract and the names of the list elements are the column names of the resulting data frame. If \code{design$cols} is \code{NULL},
-all available attributes will be extracted.
+all available attributes will be extracted and the column names are generated automatically and reflect the elements position in the resource.
 \item \code{design$style}: Optional. This can be used instead of the function arguments \code{sep}, \code{brackets} and \code{remove_empty_columns}, but will be
 overwritten if the corresponding function arguments are not \code{NULL}.
 }
@@ -101,7 +100,7 @@ design <- list(
  #extract all values
 	Patients = list(
 
-		resource = ".//Patient"
+		resource = "//Patient"
 	)
 )
 

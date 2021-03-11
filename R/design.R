@@ -41,7 +41,10 @@ fhir_canonical_design <- function() {
 #' design <- list(
 #'    Pat = list(
 #'       resource = "//Patient",
-#'       cols = "./*"
+#'       cols = list(
+#'          gender = "gender",
+#'          name = "name/family"
+#'       )
 #'    )
 #'
 #' )
@@ -80,7 +83,10 @@ fhir_save_design <- function (design, file = "design.xml") {
 #' design <- list(
 #'    Pat = list(
 #'       resource = "//Patient",
-#'       cols = "./*"
+#'       cols = list(
+#'         gender = "gender",
+#'         name = "name/family"
+#'       )
 #'    )
 #'
 #' )

@@ -19,7 +19,10 @@ Writes a design for use with \code{\link{fhir_crack}} to an xml file
 design <- list(
    Pat = list(
       resource = "//Patient",
-      cols = "./*"
+      cols = list(
+         gender = "gender",
+         name = "name/family"
+      )
    )
 
 )

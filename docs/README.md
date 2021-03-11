@@ -1,4 +1,4 @@
-fhircrackr
+fhircrackr Intro: Handling HL7® FHIR® Resources in R
 ================
 
 ## Introduction
@@ -268,8 +268,7 @@ design <- list(
 
     Patients = list(
 
-        resource = "//Patient",
-        cols = "./*"
+        resource = "//Patient"
     )
 )
 ```
@@ -305,13 +304,34 @@ head(list_of_tables$MedicationStatement)
 #> 6 2019-10-11T16:32:05.206+00:00
 
 head(list_of_tables$Patients)
-#>      id gender  birthDate
-#> 1 60096   male 2019-11-13
-#> 2 49443 female 1970-10-19
-#> 3 46213 female 2019-10-11
-#> 4 45735   male 1970-10-11
-#> 5 42024 female 1979-10-09
-#> 6 58504   male 2019-11-08
+#>      id meta.versionId              meta.lastUpdated       meta.source
+#> 1 60096              1 2019-11-13T09:44:34.212+00:00 #M2nUPHWjWIYLNdAF
+#> 2 49443              1 2019-10-20T02:14:21.948+00:00 #0N2jqztb0fZOVFXh
+#> 3 46213              1 2019-10-12T04:58:43.891+00:00 #67df626831bc809f
+#> 4 45735              1 2019-10-11T16:32:02.707+00:00 #f7af4ec662d5a1a1
+#> 5 42024              1 2019-10-09T22:44:02.137+00:00 #00db4de0b3c226ec
+#> 6 58504              1 2019-11-08T22:57:04.991+00:00 #oF2zm2vIbUVkeHSB
+#>   text.status name.use     name.text name.family name.given gender  birthDate
+#> 1   generated official  Henry Walker      Walker      Henry   male 2019-11-13
+#> 2   generated official   Molly Moore       Moore      Molly female 1970-10-19
+#> 3   generated official Evelyn Morris      Morris     Evelyn female 2019-10-11
+#> 4   generated official   David Evans       Evans      David   male 1970-10-11
+#> 5   generated official  Pippa Walker      Walker      Pippa female 1979-10-09
+#> 6   generated official Vincent Patel       Patel    Vincent   male 2019-11-08
+#>   text.div.div text.div.table identifier.system identifier.value
+#> 1         <NA>           <NA>              <NA>             <NA>
+#> 2         <NA>           <NA>              <NA>             <NA>
+#> 3         <NA>           <NA>              <NA>             <NA>
+#> 4         <NA>           <NA>              <NA>             <NA>
+#> 5         <NA>           <NA>              <NA>             <NA>
+#> 6         <NA>           <NA>              <NA>             <NA>
+#>   managingOrganization.reference
+#> 1                           <NA>
+#> 2                           <NA>
+#> 3                           <NA>
+#> 4                           <NA>
+#> 5                           <NA>
+#> 6                           <NA>
 ```
 
 As you can see, the result now contains two data frames, one for Patient
@@ -557,10 +577,10 @@ bundles <- fhir_unserialize(serialized_bundles)
 #have a look
 head(bundles[[1]])
 #> $node
-#> <pointer: 0x0000000012628e50>
+#> <pointer: 0x00000000127a43d0>
 #> 
 #> $doc
-#> <pointer: 0x00000000125f9980>
+#> <pointer: 0x0000000015256a80>
 ```
 
 After unserialization, the pointers are restored and you can continue to

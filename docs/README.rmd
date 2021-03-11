@@ -1,5 +1,5 @@
 ---
-title: "fhircrackr"
+title: "fhircrackr Intro: Handling HL7&reg; FHIR&reg; Resources in R"
 output: github_document
 ---
 
@@ -188,8 +188,7 @@ design <- list(
 
 	Patients = list(
 
-		resource = "//Patient",
-		cols = "./*"
+		resource = "//Patient"
 	)
 )
 ```
