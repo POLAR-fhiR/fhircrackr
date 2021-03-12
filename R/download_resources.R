@@ -699,8 +699,13 @@ dissect_request <- function(request){
 
 	resource <- c(resource = split1[length(split1)])
 
-	keyval <- as.list(strsplit(split0[2], "&", fixed=T)[[1]])
-	keyval <- lapply(keyval, function(x){names(x)<-"keyval";x})
+	if(length(split0)>1){
+		keyval <- as.list(strsplit(split0[2], "&", fixed=T)[[1]])
+		keyval <- lapply(keyval, function(x){names(x)<-"keyval";x})
+	}else{
+		keyval <- NULL
+	}
+
 
 	c(list(base, resource), keyval)
 }
