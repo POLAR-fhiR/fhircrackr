@@ -125,3 +125,9 @@ while(length(previous_level) < length(really_all_funs)){
 }
 
 hierarchy_names <- lapply(hierarchy, function(x){dep$Nomfun$label[dep$Nomfun$id %in% x]})
+
+i <- 1
+dep_sub <- dep
+dep_sub$Nomfun <- dep$Nomfun[id %in% c(hierarchy[[i]], hierarchy[[i+1]]),]
+plot(dep_sub)
+
