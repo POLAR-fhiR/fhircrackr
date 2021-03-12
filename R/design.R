@@ -458,33 +458,35 @@ is_valid_design <- function(design) {
 	return(list(TRUE, NULL))
 }
 
-
-
-
-#' @description Remove attributes from xpath expressions
-#' @param design a design for fhir_crack
-#' @return A design without attributes in all xpath expressions.
+#' @description Add attributes to xpath expressions
+#' @param design A fhircrackr design.
+#' @param attrib The attribute that should be added to the xpath expressions. Default is 'value'
+#' @return A design list with attribute attrib in all xpath expressions.
 #' @noRd
-
-remove_attribute_from_design <- function(design) {
-	for (n_d in names(design)) {
-		if (1 < length(design[[n_d]])) {
-			if (1 < length(design[[n_d]][[2]])) {
-				for (n_c in names(design[[n_d]][[2]])) {
-					txt <- design[[n_d]][[2]][[n_c]]
-					txt <- sub("/@(\\w|\\*)+$", "", txt)
-					design[[n_d]][[2]][[n_c]] <- txt
+#'
+add_attribute_to_design <- function(design, attrib = "value") {
+	for (n_d in names(design)) { #loop through df_desc
+		if (!is.null(design[[n_d]]$cols)) { #Only add attrib if xpath expressions are provided
+			if (is.list(design[[n_d]]$cols)) { #when cols are provided as list
+				for (n_c in names(design[[n_d]]$cols)) { #loop through cols
+					txt <- design[[n_d]]$cols[[n_c]]
+					if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
+						txt <- paste_paths(txt, paste0("@", attrib))
+						design[[n_d]]$cols[[n_c]] <- txt
+					}
 				}
-			}
-			else {
-				txt <- design[[n_d]][[2]]
-				txt <- sub("/@(\\w|\\*)+$", "", txt)
-				design[[n_d]][[2]] <- txt
+			} else { #wenn cols is just one expression
+				txt <- design[[n_d]]$cols
+				if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
+					txt <- paste_paths(txt, paste0("@", attrib))
+					design[[n_d]]$cols<- txt
+				}
 			}
 		}
 	}
 	design
 }
+
 
 
 ####save designs####
