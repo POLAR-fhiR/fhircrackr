@@ -109,7 +109,7 @@ hierarchy <- list(previous_level)
 
 this_level <- NA
 
-while(length(this_level)>0){
+while(length(previous_level) < length(really_all_funs)){
 
 	set <- unique(dep$fromto$from[dep$fromto$to %in% previous_level]) #depend on previous level
 	rest <- unique(dep$Nomfun[!dep$Nomfun$id %in% previous_level]$id) #depend (also) on higher level functions
@@ -125,9 +125,3 @@ while(length(this_level)>0){
 }
 
 hierarchy_names <- lapply(hierarchy, function(x){dep$Nomfun$label[dep$Nomfun$id %in% x]})
-
-##some functions are left out
-leftout <- setdiff(1:49, previous_level)
-leftout_names <- dep$Nomfun$label[dep$Nomfun$id %in% leftout]
-
-dep$Nomfun$label[dep$Nomfun$id %in% leftout]
