@@ -69,8 +69,6 @@ dep$fromto <- unique(dep$fromto[from != to,])
 
 attr(dep, "class") <- "dependenciesGraphs"
 
-plot(dep)
-
 (froms <- sort(dep$Nomfun$label[unique(dep$fromto$from)]))
 (tos <- sort(dep$Nomfun$label[unique(dep$fromto$to)]))
 
@@ -99,4 +97,6 @@ subplot(
 	plot_ly() %>% add_histogram(factor(really_all_funs[dep$fromto$to], really_all_funs), name = "how often is this function used"),
 	plot_ly() %>% add_histogram(factor(really_all_funs[dep$fromto$from],really_all_funs), name = "how many functions uses this function")
 )
+
+plot(dep)
 
