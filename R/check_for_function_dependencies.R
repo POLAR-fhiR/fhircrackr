@@ -15,7 +15,9 @@ all_txt <- lapply(
 	name(all_scripts),
 	function(as) {
 		txt_ <- readLines(paste0("R/", as))
-		txt_[txt_ != "" & !grepl("^#", txt_)]
+		txt_ <- txt_[txt_ != "" & !grepl("^#", txt_)]
+		txt_ <- gsub("(.*)#", "\\1", txt_)
+		txt_
 	}
 )
 
@@ -95,6 +97,6 @@ intersect(ends, bases)
 subplot(
 	nrows = 2, shareX = T,
 	plot_ly() %>% add_histogram(factor(really_all_funs[dep$fromto$to], really_all_funs), name = "how often is this function used"),
-	plot_ly() %>% add_histogram(factor(really_all_funs[dep$fromto$from],really_all_funs), name = "how many function uses this function")
+	plot_ly() %>% add_histogram(factor(really_all_funs[dep$fromto$from],really_all_funs), name = "how many functions uses this function")
 )
 
