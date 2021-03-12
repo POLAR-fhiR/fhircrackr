@@ -16,6 +16,7 @@ all_txt <- lapply(
 	function(as) {
 		txt_ <- readLines(paste0("R/", as))
 		txt_ <- txt_[txt_ != "" & !grepl("^#", txt_)]
+		txt_ <- gsub("\".*\"", "", txt_)
 		txt_ <- gsub("(.*)#", "\\1", txt_)
 		txt_
 	}
@@ -100,3 +101,33 @@ subplot(
 
 plot(dep)
 
+###
+#Find hierarchy for tests
+previous_level <- dep$Nomfun[dep$Nomfun$label %in% bases]$id #starting point: base functions
+
+hierarchy <- list(previous_level)
+
+this_level <- NA
+
+while(length(this_level)>0){
+
+	set <- unique(dep$fromto$from[dep$fromto$to %in% previous_level]) #depend on previous level
+	rest <- unique(dep$Nomfun[!dep$Nomfun$id %in% previous_level]$id) #depend (also) on higher level functions
+
+	exclude <- unique(dep$fromto$from[dep$fromto$to %in% rest]) #functions in set that also use higher level
+
+	this_level <- unique(setdiff(set, exclude)) #functions in set that only use previous level
+	this_level <- this_level[!this_level %in% previous_level] #drop the ones already in previous
+
+	hierarchy <- append(hierarchy,list(this_level))
+
+	previous_level <- c(this_level, previous_level)
+}
+
+hierarchy_names <- lapply(hierarchy, function(x){dep$Nomfun$label[dep$Nomfun$id %in% x]})
+
+##some functions are left out
+leftout <- setdiff(1:49, previous_level)
+leftout_names <- dep$Nomfun$label[dep$Nomfun$id %in% leftout]
+
+dep$Nomfun$label[dep$Nomfun$id %in% leftout]
