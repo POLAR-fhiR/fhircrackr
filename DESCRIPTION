@@ -1,7 +1,7 @@
 Package: fhircrackr
 Type: Package
 Title: Handling HL7 FHIR Resources in R
-Version: 0.2.1
+Version: 0.2.1.9000
 Date: 2020-11-24
 Authors@R: c(
     person( given = "Thomas", 
@@ -43,5 +43,6 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
 Depends: 
     R (>= 3.5.0)

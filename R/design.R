@@ -1,3 +1,108 @@
+## This file contains all functions concerning the design for fhir_crack##
+## Exported functions are on top, internal functions below ##
+
+
+#' Retrieve design of last call to fhir_crack
+#'
+#' @description Returns the complete design of the last call to \code{\link{fhir_crack}} with
+#' automatically amended elements, i.e. the canonical form of the design with elements resource, cols, style
+#' and respective sub-elements.
+#' @export
+#' @examples
+#' #load example bundles
+#' bundles <- fhir_unserialize(patient_bundles)
+#'
+#' #incomplete but valid design
+#' design <- list(
+#'   Pat = list(
+#'     resource = "//Patient"
+#'     )
+#' )
+#'
+#' result <- fhir_crack(bundles, design)
+#'
+#' fhir_canonical_design()
+#'
+
+fhir_canonical_design <- function() {
+
+	fhircrackr_env$canonical_design
+}
+
+
+#' Write design to xml
+#' @description Writes a design for use with \code{\link{fhir_crack}} to an xml file
+#' @param design A list representing a valid design as used in \code{\link{fhir_crack}}
+#' @param file A string specifying the file to write to, defaults to writing "design.xml"
+#' into the current working directory
+#' @export
+#'
+#' @examples
+#' design <- list(
+#'    Pat = list(
+#'       resource = "//Patient",
+#'       cols = list(
+#'          gender = "gender",
+#'          name = "name/family"
+#'       )
+#'    )
+#'
+#' )
+#'
+#' fhir_save_design(design, file = tempfile())
+
+fhir_save_design <- function (design, file = "design.xml") {
+
+	validity <- is_valid_design(design)
+
+	if(!validity[[1]]){
+
+		message("Design could not be saved. \n")
+
+		invisible()
+
+	}
+
+	xml <- design2xml(design = design)
+
+	invisible(xml2::write_xml(xml, file))
+}
+
+#' Load design from xml
+#' @description Loads a design for use with \code{\link{fhir_crack}} from an xml file into R
+#'
+#' @param file A string specifying the file from which to read
+#'
+#' @return A list representing a valid design for \code{\link{fhir_crack}}
+#' @export
+#'
+#' @examples
+#'
+#' #create and save design
+#' design <- list(
+#'    Pat = list(
+#'       resource = "//Patient",
+#'       cols = list(
+#'         gender = "gender",
+#'         name = "name/family"
+#'       )
+#'    )
+#'
+#' )
+#' temp <- tempfile()
+#'
+#' fhir_save_design(design, file = temp)
+
+#' design <- fhir_load_design(temp)
+
+fhir_load_design <- function (file) {
+	xml <- xml2::read_xml(file)
+	xml2design(xml)
+}
+
+##################################################################################################
+##################################################################################################
+
 
 ####Fixing designs####
 
@@ -92,10 +197,8 @@ fix_brackets <- function(brackets){
 		brackets[1:2]
 
 	} else {
-			brackets
-		}
-
-
+		brackets
+	}
 }
 
 #' fix data.frame description
@@ -355,34 +458,6 @@ is_valid_design <- function(design) {
 	return(list(TRUE, NULL))
 }
 
-
-
-
-#' @description Remove attributes from xpath expressions
-#' @param design a design for fhir_crack
-#' @return A design without attributes in all xpath expressions.
-#' @noRd
-
-remove_attribute_from_design <- function(design) {
-	for (n_d in names(design)) {
-		if (1 < length(design[[n_d]])) {
-			if (1 < length(design[[n_d]][[2]])) {
-				for (n_c in names(design[[n_d]][[2]])) {
-					txt <- design[[n_d]][[2]][[n_c]]
-					txt <- sub("/@(\\w|\\*)+$", "", txt)
-					design[[n_d]][[2]][[n_c]] <- txt
-				}
-			}
-			else {
-				txt <- design[[n_d]][[2]]
-				txt <- sub("/@(\\w|\\*)+$", "", txt)
-				design[[n_d]][[2]] <- txt
-			}
-		}
-	}
-	design
-}
-
 #' @description Add attributes to xpath expressions
 #' @param design A fhircrackr design.
 #' @param attrib The attribute that should be added to the xpath expressions. Default is 'value'
@@ -390,24 +465,17 @@ remove_attribute_from_design <- function(design) {
 #' @noRd
 #'
 add_attribute_to_design <- function(design, attrib = "value") {
-
 	for (n_d in names(design)) { #loop through df_desc
-
 		if (!is.null(design[[n_d]]$cols)) { #Only add attrib if xpath expressions are provided
-
 			if (is.list(design[[n_d]]$cols)) { #when cols are provided as list
-
 				for (n_c in names(design[[n_d]]$cols)) { #loop through cols
 					txt <- design[[n_d]]$cols[[n_c]]
-
 					if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
 						txt <- paste_paths(txt, paste0("@", attrib))
 						design[[n_d]]$cols[[n_c]] <- txt
 					}
 				}
-
 			} else { #wenn cols is just one expression
-
 				txt <- design[[n_d]]$cols
 				if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
 					txt <- paste_paths(txt, paste0("@", attrib))
@@ -416,11 +484,8 @@ add_attribute_to_design <- function(design, attrib = "value") {
 			}
 		}
 	}
-
 	design
 }
-
-
 
 
 
@@ -481,43 +546,6 @@ design2xml <- function (design) {
 	xml2::xml_root(xml)
 }
 
-
-
-#' Write design to xml
-#' @description Writes a design for use with \code{\link{fhir_crack}} to an xml file
-#' @param design A list representing a valid design as used in \code{\link{fhir_crack}}
-#' @param file A string specifying the file to write to, defaults to writing "design.xml"
-#' into the current working directory
-#' @export
-#'
-#' @examples
-#' design <- list(
-#'    Pat = list(
-#'       resource = "//Patient",
-#'       cols = "./*"
-#'    )
-#'
-#' )
-#'
-#' fhir_save_design(design, file = tempfile())
-
-fhir_save_design <- function (design, file = "design.xml") {
-
-	validity <- is_valid_design(design)
-
-	if(!validity[[1]]){
-
-		message("Design could not be saved. \n")
-
-		invisible()
-
-		}
-
-	xml <- design2xml(design = design)
-
-	invisible(xml2::write_xml(xml, file))
-
-}
 
 
 ####read designs####
@@ -628,31 +656,4 @@ xml2design <- function(xml) {
 	l
 }
 
-#' Load design from xml
-#' @description Loads a design for use with \code{\link{fhir_crack}} from an xml file into R
-#'
-#' @param file A string specifying the file from which to read
-#'
-#' @return A list representing a valid design for \code{\link{fhir_crack}}
-#' @export
-#'
-#' @examples
-#'
-#' #create and save design
-#' design <- list(
-#'    Pat = list(
-#'       resource = "//Patient",
-#'       cols = "./*"
-#'    )
-#'
-#' )
-#' temp <- tempfile()
-#'
-#' fhir_save_design(design, file = temp)
 
-#' design <- fhir_load_design(temp)
-
-fhir_load_design <- function (file) {
-	xml <- xml2::read_xml(file)
-	xml2design(xml)
-}
