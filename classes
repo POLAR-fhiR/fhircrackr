@@ -1,0 +1,58 @@
+
+#Level 1
+
+- resource
+- xpath_expression
+- style
+- base
+- params
+- bundle (xml_object, serialization_status)
+
+
+#Level 2
+- columns
+- df_description
+- fhir_url
+- bundle_list
+
+#Level 3
+- design
+- fhir_search_requests
+- cracked_df
+
+#Level 4
+- cracked_dt
+- df_list
+- capability_statement
+
+#Level 5
+- dt_list
+
+
+
+design -> df_descriptions -> resource, cols, style
+
+################################
+fhir_url -> base, params
+
+fhir_search_request -> base, resource, params
+
+(fhir_next_bundle_url) fhir_url -> base, params
+
+################################
+
+bundle_list -> bundle -> xml_object, serialization_status
+
+################################
+
+df_list -> cracked_df -> df, df_desc, indexed
+
+dt_list -> cracked_dt -> dt, df_desc, indexed
+
+################################
+
+capability_statement
+
+
+
+
