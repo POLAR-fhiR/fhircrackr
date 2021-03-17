@@ -1,18 +1,25 @@
 
 #Level 1
 
-- resource
-- xpath_expression
-- style
-- base
-- params
-- bundle (xml_object, serialization_status)
-
+- fhir_resource_type ->  erbt von character (keine slots)
+- fhir_xpath_expression -> erbt von character (keine slots)
+- fhir_style -> slots: sep (character), brackets (character), rm_empty_cols (logical)
+- fhir_base_url (virtual) -> slots: base (character)
+- fhir_parameter -> slots: key (character), value(character)
+- fhir_bundle (virtual) -> slots: bundle(ANY)
+- fhir_body -> muss noch durchdacht werden
 
 #Level 2
-- columns
+- fhir_bundle_xml -> abgeleitet von fhir_bundle, slots: bundle(xml_document)
+- fhir_bundle_serialized -> abgeleitet von fhir_bundle, slots: bundle(raw)
+
+- fhir_GETsearch_url -> abgeleitet von fhir_base_url + zusätzliche slots: fhir_resource_type, parameters = list(fhir_parameter)
+- fhir_POSTsearch_url -> abgeleitet von fhir_base_url + zusätzliche slots fhir_resource_type, parameters = list(fhir_parameter)
+- fhir_POSTbundle_url -> abgeleitet von fhir_base_url + keine zusätzlichen slots
+
+
+- columns -> slots: colnames(character) expressions = list(fhir_xpath_expression)
 - df_description
-- fhir_url
 - bundle_list
 
 #Level 3
@@ -30,14 +37,21 @@
 
 
 
+
+#####################################################################
+
 design -> df_descriptions -> resource, cols, style
 
 ################################
-fhir_url -> base, params
+fhir_base_url (virtual class) -> base(string)
 
-fhir_search_request -> base, resource, params
+fhir_GETsearch_url -> abgeleitet von fhir_base_url + zusätzliche slots fhir_resource, fhir_parameters
+fhir_POSTsearch_url -> abgeleitet von fhir_base_url + zusätzliche slots fhir_resource, fhir_parameters
+fhir_POSTbundle_url -> abgeleitet von fhir_base_url + keine zusätzlichen slots
 
-(fhir_next_bundle_url) fhir_url -> base, params
+
+fhir_search_request -> slots: url (Klasse fhir_base_url), body (Klasse fhir_body)
+
 
 ################################
 
