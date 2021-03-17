@@ -1,9 +1,9 @@
 #Class definition
-setClass("fhir_resource",
+setClass("fhir_resource_type",
 		 contains = "character")
 
 #Validity check
-setValidity("fhir_resource",
+setValidity("fhir_resource_type",
 			method = function(object){
 				messages <- c()
 
@@ -18,7 +18,7 @@ setValidity("fhir_resource",
 
 #' Create fhir_resource object
 #'
-#' This function creates an object of class `fhir_resource` by taking a string defining a FHIR resource type
+#' This function creates an object of class `fhir_resource_type` by taking a string defining a FHIR resource type
 #' and formating it correctly,i.e. removing white space and slashes. It also checks the resource against the list
 #' of resources provided at https://hl7.org/FHIR/resourcelist.html and converts cases appropriately
 #' if the resource is found in that list.
@@ -29,10 +29,10 @@ setValidity("fhir_resource",
 #' @examples fhir_resource("MedicationAdministration")
 #' @export
 #'
-fhir_resource <- function(string){
+fhir_resource_type <- function(string){
 
 	#first time: run for validity checks
-	new("fhir_resource", string)
+	new("fhir_resource_type", string)
 
 	#remove / and white space
 	string <- stringr::str_remove_all(string, "/| ")
@@ -43,5 +43,6 @@ fhir_resource <- function(string){
 	}
 
 	#second time: run with corrected input
-	new("fhir_resource", string)
+	new("fhir_resource_type", string)
 }
+fhir_resource_type("patient")
