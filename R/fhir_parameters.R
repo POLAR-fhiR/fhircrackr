@@ -60,50 +60,52 @@ setMethod("initialize", "fhir_parameters",
 #' Create [fhir_parameters-class] object
 #'
 #' A [fhir_parameters-class] object can be created in three different ways: Either you provide
-#' one length 1 character with all the parameters in the argument `paramstring`, or you provide
-#' two character vectors to the arguments `keys` and `values` or a list with length two character vectors
-#' in the `paramlist` containing one key value pair each. See examples.
+#' one length 1 character or a list with length two character vectors containing all the parameters
+#' in the argument `params`. Or you provide one character vector to the argument `keys` and one character
+#' vector to the argument`values`. See examples.
 #'
-#' @param paramstring A length 1 character containing properly formatted FHIR search parameters, e.g.
-#' `"gender=male&_summary=count"`
+#' @param params Either a length 1 character containing properly formatted FHIR search parameters, e.g.
+#' `"gender=male&_summary=count"` or list of length 2 character vectors each representing one key value pair,
+#' with the first element as the key and the second element as the value, e.g.
+#' `list(c("gender", "male"), c("_summary", "count"))`
+#'
 #' @param keys A character vector containing only keys for FHIR search parameters, e.g. `c("gender", "_summary")`
 #' @param values A character vector containing only values for FHIR search parameters, e.g. `c("male", "count")`.
-#' Must be the same length and order as `keys`
-#' @param paramlist A list of length 2 character vectors each representing one key value pair, with the first
-#' element as the key and the second element as the value, e.g. `list(c("gender", "male"), c("_summary", "count"))`
+#' `values` must be the same length and order as `keys`
 #'
 #' @examples
 #' #Three ways to create the same fhir_parameters object
 #'
-#' #using paramstring argument
-#' fhir_parameters(paramstring = "gender=male&birthdate=le2000-01-01&_summary=count")
+#' #using one string
+#' fhir_parameters(params = "gender=male&birthdate=le2000-01-01&_summary=count")
 #'
+#' #using one list
+#' fhir_parameters(params = list(c("gender", "male"),
+#'                                   c("birthdate", "le2000-01-01"),
+#'                                   c("_summary", "count")))
 #' #using keys and values
 #' fhir_parameters(keys = c("gender", "birthdate", "_summary"),
 #'                 values = c("male", "le2000-01-01", "count"))
 #'
-#' #using paramlist
-#' fhir_parameters(paramlist = list(c("gender", "male"),
-#'                                   c("birthdate", "le2000-01-01"),
-#'                                   c("_summary", "count")))
-setGeneric("fhir_parameters", function(paramstring, keys, values, paramlist){
+
+setGeneric("fhir_parameters", function(params, keys, values){
 	standardGeneric("fhir_parameters")
 })
 
-setMethod("fhir_parameters", signature = c(paramstring= "missing", keys="character",
-										   values="character", paramlist = "missing"),
+setMethod("fhir_parameters", signature = c(params= "missing", keys="character",
+										   values="character"),
 		  function(keys, values){
 		  	new("fhir_parameters", keys=keys, values = values)
 })
 
-setMethod("fhir_parameters", signature = c(paramstring= "character", keys="missing",
-										   values="missing", paramlist = "missing"),
-		  function(paramstring){
-		  	if(length(paramstring)>1){
-		  		stop("Argument paramstring has to be of length one.")
+setMethod("fhir_parameters", signature = c(params= "character", keys="missing",
+										   values="missing"),
+		  function(params){
+		  	if(length(params)>1){
+		  		stop("When using a character, argument params has to be of length one.")
 		  	}
 
-		  	pairs <- strsplit(paramstring, "&", fixed=T)[[1]]
+		  	pairs <- strsplit(params, "&", fixed=T)[[1]]
 		  	pairs <- strsplit(pairs, "=")
 		  	keys <- sapply(pairs, function(x){x[1]})
 		  	values <- sapply(pairs, function(x){x[2]})
@@ -111,20 +113,20 @@ setMethod("fhir_parameters", signature = c(paramstring= "character", keys="missi
 		  	new("fhir_parameters", keys=keys, values = values)
 		  })
 
-setMethod("fhir_parameters", signature = c(paramstring= "missing", keys="missing",
-										   values="missing", paramlist = "list"),
-		  function(paramlist){
+setMethod("fhir_parameters", signature = c(params= "list", keys="missing",
+										   values="missing"),
+		  function(params){
 
-		  	if(any(!sapply(paramlist, is.character))){
-		  		stop("All list elements for argument paramlist must be of type character")
+		  	if(any(!sapply(params, is.character))){
+		  		stop("All list elements for argument params must be of type character")
 		  	}
 
-		  	if(any(sapply(paramlist, length)!=2)){
-		  		stop("All list elements for argument paramlist must have exactly length two")
+		  	if(any(sapply(params, length)!=2)){
+		  		stop("All list elements for argument params must have exactly length two")
 		  	}
 
-		  	keys <- sapply(paramlist, function(x){x[1]})
-		  	values <- sapply(paramlist, function(x){x[2]})
+		  	keys <- sapply(params, function(x){x[1]})
+		  	values <- sapply(params, function(x){x[2]})
 
 		  	new("fhir_parameters", keys=keys, values = values)
 		  })

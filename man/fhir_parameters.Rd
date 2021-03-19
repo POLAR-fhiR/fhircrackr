@@ -4,38 +4,37 @@
 \alias{fhir_parameters}
 \title{Create \linkS4class{fhir_parameters} object}
 \usage{
-fhir_parameters(paramstring, keys, values, paramlist)
+fhir_parameters(params, keys, values)
 }
 \arguments{
-\item{paramstring}{A length 1 character containing properly formatted FHIR search parameters, e.g.
-\code{"gender=male&_summary=count"}}
+\item{params}{Either a length 1 character containing properly formatted FHIR search parameters, e.g.
+\code{"gender=male&_summary=count"} or list of length 2 character vectors each representing one key value pair,
+with the first element as the key and the second element as the value, e.g.
+\code{list(c("gender", "male"), c("_summary", "count"))}}
 
 \item{keys}{A character vector containing only keys for FHIR search parameters, e.g. \code{c("gender", "_summary")}}
 
 \item{values}{A character vector containing only values for FHIR search parameters, e.g. \code{c("male", "count")}.
-Must be the same length and order as \code{keys}}
-
-\item{paramlist}{A list of length 2 character vectors each representing one key value pair, with the first
-element as the key and the second element as the value, e.g. \code{list(c("gender", "male"), c("_summary", "count"))}}
+\code{values} must be the same length and order as \code{keys}}
 }
 \description{
 A \linkS4class{fhir_parameters} object can be created in three different ways: Either you provide
-one length 1 character with all the parameters in the argument \code{paramstring}, or you provide
-two character vectors to the arguments \code{keys} and \code{values} or a list with length two character vectors
-in the \code{paramlist} containing one key value pair each. See examples.
+one length 1 character or a list with length two character vectors containing all the parameters
+in the argument \code{params}. Or you provide one character vector to the argument \code{keys} and one character
+vector to the argument\code{values}. See examples.
 }
 \examples{
 #Three ways to create the same fhir_parameters object
 
-#using paramstring argument
-fhir_parameters(paramstring = "gender=male&birthdate=le2000-01-01&_summary=count")
+#using one string
+fhir_parameters(params = "gender=male&birthdate=le2000-01-01&_summary=count")
 
+#using one list
+fhir_parameters(params = list(c("gender", "male"),
+                                  c("birthdate", "le2000-01-01"),
+                                  c("_summary", "count")))
 #using keys and values
 fhir_parameters(keys = c("gender", "birthdate", "_summary"),
                 values = c("male", "le2000-01-01", "count"))
 
-#using paramlist
-fhir_parameters(paramlist = list(c("gender", "male"),
-                                  c("birthdate", "le2000-01-01"),
-                                  c("_summary", "count")))
 }
