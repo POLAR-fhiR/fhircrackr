@@ -4,28 +4,37 @@
 \alias{fhir_parameters}
 \title{Create \linkS4class{fhir_parameters} object}
 \usage{
-fhir_parameters(params)
+fhir_parameters(...)
 }
 \arguments{
-\item{params}{Either a length 1 character containing properly formatted FHIR search parameters, e.g.
+\item{...}{Either a length 1 character containing properly formatted FHIR search parameters, e.g.
 \code{"gender=male&_summary=count"} or list of length 2 character vectors each representing one key value pair,
 with the first element as the key and the second element as the value, e.g.
-\code{list(c("gender", "male"), c("_summary", "count"))}}
+\code{list(c("gender", "male"), c("_summary", "count"))}or one or multiple fhir_key_value_pair objects}
 }
 \description{
-A \linkS4class{fhir_parameters} object can be created in two different ways: Either you provide
-a length 1 character with all the search parameters pasted together properly.
-Or you provide a list with length two character vectors containing key value pairs.See examples.
+A \linkS4class{fhir_parameters} object can be created in three ways:
+\itemize{
+\item You provide a length 1 character with all the search parameters pasted together properly
+\item You provide a list with length two character vectors containing key value pairs.
+\item You pass a number of fhir_key_value_pair objects to the function.
+See examples.
+}
 }
 \examples{
-#Two ways to create the same fhir_parameters object
+#Three ways to create the same fhir_parameters object
 
 #using a string
-fhir_parameters(params = "gender=male&birthdate=le2000-01-01&_summary=count")
+fhir_parameters("gender=male&birthdate=le2000-01-01&_summary=count")
 
 #using a list
-fhir_parameters(params = list(c("gender", "male"),
-                                  c("birthdate", "le2000-01-01"),
-                                  c("_summary", "count")))
-
+fhir_parameters(list(c("gender", "male"),
+                     c("birthdate", "le2000-01-01"),
+                     c("_summary", "count")
+                 )
+ )
+# using key value pairs
+fhir_parameters(new("fhir_key_value_pair", key="gender", value="male"),
+                new("fhir_key_value_pair", key="birthdate", value="le2000-01-01"),
+                new("fhir_key_value_pair", key="_summary", value="count"))
 }
