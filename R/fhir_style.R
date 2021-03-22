@@ -21,9 +21,9 @@ setValidity(
 	"fhir_style",
 	method = function(object) {
 		messages <- c()
-		if(1 < length(object@sep)) messages <- c(messages, "sep must be character of length 1")
+		if(1 < length(object@sep))                messages <- c(messages, "sep must be character of length 1")
 		if(!length(object@brackets) %in% c(0, 2)) messages <- c(messages, "brackets must be character of length 2 or empty")
-		if(1 < length(object@rm_empty_cols)) messages <- c(messages, "remove_empty_columns must be logical of length 1")
+		if(1 < length(object@rm_empty_cols))      messages <- c(messages, "remove_empty_columns must be logical of length 1")
 		if(0 < length(messages)) messages else TRUE
 	}
 )
