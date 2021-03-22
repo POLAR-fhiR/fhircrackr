@@ -10,11 +10,6 @@ Objects of this class should always be created with a call to \code{\link[=fhir_
 \section{Slots}{
 
 \describe{
-\item{\code{keys}}{A character vector defining the parameter keys}
-
-\item{\code{values}}{A character vector defining the parameter values}
-
-\item{\code{paramstring}}{A length 1 character containing properly formatted FHIR search parameters.
-This slot is never set explicitly but is created automatically from the other slots.}
+\item{\code{params}}{A list of fhir_key_value_pair objects}
 }}
 
