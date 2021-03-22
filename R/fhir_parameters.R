@@ -77,9 +77,9 @@ setMethod(
 #'                  )
 #'  )
 #' # using key value pairs
-#' fhir_parameters(new("fhir_key_value_pair", key="gender", value="male"),
-#'                 new("fhir_key_value_pair", key="birthdate", value="le2000-01-01"),
-#'                 new("fhir_key_value_pair", key="_summary", value="count"))
+#' fhir_parameters(fhir_key_value_pair(key="gender", value="male"),
+#'                 fhir_key_value_pair(key="birthdate", value="le2000-01-01"),
+#'                 fhir_key_value_pair(key="_summary", value="count"))
 
 setGeneric(
 	"fhir_parameters",

@@ -42,3 +42,33 @@ setMethod("initialize", "fhir_key_value_pair",
 			.Object
 
 		  })
+
+#constructor for user
+
+#' Create [fhir_key_value_pair-class] object
+#'
+#' This function creates an URL encoded key value pair for FHIR search parameters
+#'
+#' @param key A length 1 character specifying a search parameter key, e.g `"gender"` or `"_summary"`
+#' @param value A length 1 character specifying a search parameter value, e.g `"male"` or `"count"`
+#' @examples
+#' fhir_key_value_pair(key="gender", value="male")
+#' fhir_key_value_pair(key="_summary", value="count")
+
+fhir_key_value_pair <- function(key, value){
+	new("fhir_key_value_pair", key=key, value=value)
+}
+
+setMethod(
+	"show",
+	"fhir_key_value_pair",
+	function(object){
+		cat(
+			paste0(
+				"A fhir_key_value_pair:\n",
+				object@key, "=", object@value
+			)
+
+		)
+	})
+
