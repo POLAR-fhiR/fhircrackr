@@ -13,7 +13,8 @@ testthat::test_that(
 	"fhir_style throws error for invalid input", {
 
 		testthat::expect_error(fhir_style(sep = 3))
-		testthat::expect_error(fhir_style(brackets = c("[")))
+		testthat::expect_error(fhir_style(brackets = c("[", NA)))
+		testthat::expect_error(fhir_style(brackets = c(NA, "]")))
 		testthat::expect_error(fhir_style(rm_empty_cols = 2))
 	}
 )
