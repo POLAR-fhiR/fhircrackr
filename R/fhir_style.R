@@ -34,9 +34,9 @@ setValidity(
 #'
 #' This function creates an object of class `fhir_style`. It contains the three elements `sep`, `brackets` and `rm_empty_cols`
 
-#' @param sep A string to separate pasted multiple entries. Defaults to `" "`
+#' @param sep A character vector of length 1 to separate pasted multiple entries. Defaults to `" "`
 #' @param brackets  A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`.
-#' If this is empty (i.e. character of length 0, the default), no indices will be added to multiple entries.
+#' If this is empty (i.e. character of length 0, the default) or 'NULL', no indices will be added to multiple entries.
 #' @param rm_empty_cols Logical scalar. Remove empty columns? Defaults to `TRUE`.
 #' @return A fhir_style object
 #' @examples
@@ -44,6 +44,12 @@ setValidity(
 
 
 fhir_style <- function(sep=" ", brackets=character(), rm_empty_cols=TRUE) {
+
+	if(is.null(brackets)){brackets <- character()}
+	if(any(is.na(brackets))){stop("You cannot use NA in brackets.")}
+
+	brackets <- fix_brackets(brackets)
+
 	new("fhir_style", sep=sep, brackets=brackets, rm_empty_cols=rm_empty_cols)
 }
 
