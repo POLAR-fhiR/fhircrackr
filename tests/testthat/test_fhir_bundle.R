@@ -21,3 +21,17 @@ testthat::test_that(
 
 	}
 )
+
+testthat::test_that(
+	"fhir_bundle_xml throws error for incorrect input", {
+		testthat::expect_error(fhir_bundle_xml(patient_bundles[[1]]))
+		testthat::expect__error(fhir_bundle_xml(xml2::read_xml("<foo><bar /></foo>")))
+	}
+)
+
+testthat::test_that(
+	"fhir_bundle_serialized throws error for incorrect input", {
+		pat <- xml2::xml_unserialize(patient_bundles[[1]])
+		testthat::expect_error(fhir_bundle_serialized(pat))
+	}
+)
