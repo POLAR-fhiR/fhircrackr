@@ -161,7 +161,7 @@ setMethod(
 	"fhir_parameters",
 	function(object){
 		cat(paste0(
-			"URL-encoded parameter string for FHIR search:\n", object@param_string,"\n\n"		  		)
+			"URL-encoded parameter string for FHIR search:\n", object@param_string		  		)
 		)
 	}
 )
