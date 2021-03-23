@@ -66,7 +66,6 @@ setMethod(
 	function(object){
 		cat(
 			paste0(
-				"A fhir_key_value_pair:\n",
 				object@key, "=", object@value
 			)
 
