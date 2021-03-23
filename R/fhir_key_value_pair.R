@@ -56,6 +56,7 @@ setMethod("initialize", "fhir_key_value_pair",
 #' fhir_key_value_pair(key="_summary", value="count")
 
 fhir_key_value_pair <- function(key, value){
+	if(is.numeric(value)){value <- as.character(value)}
 	new("fhir_key_value_pair", key=key, value=value)
 }
 
