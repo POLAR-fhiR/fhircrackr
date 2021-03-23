@@ -1,3 +1,4 @@
+
 #Class definition
 
 #' A representation of a FHIR resource type
@@ -9,13 +10,12 @@ setClass(
 #Validity check
 setValidity(
 	"fhir_resource_type",
-	method = function(object){
+	method = function(object) {
 		messages <- c()
-
-		if(length(object) > 1 ){
+		if(1 < length(object)) {
 			messages <- c(messages, paste0("Please provide only a single string to define the FHIR resource."))
 		}
-		if(length(messages)>0){messages}else{TRUE}
+		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
 
@@ -32,7 +32,7 @@ setValidity(
 #' @examples fhir_resource("MedicationAdministration")
 #' @export
 #'
-fhir_resource_type <- function(string){
+fhir_resource_type <- function(string) {
 
 	#first time: run for validity checks
 	new("fhir_resource_type", string)
