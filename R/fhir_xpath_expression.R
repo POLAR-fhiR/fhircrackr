@@ -10,25 +10,24 @@ setClass(
 #validity check
 setValidity(
 	"fhir_xpath_expression",
-	method = function(object){
+	method = function(object) {
 		messages <- c()
 		if(length(object)>1){
-			messages <- c(messages, "A fhir_xpath_expression hs to be of lenght 1.")
+			messages <- c(messages, "A fhir_xpath_expression has to be of length 1.")
 		}
 
 		#slightly hacky solution: use xml2 function and catch warning message
 		#this will validate xpath expression with libxml2 (accessed by xml2)
-		testbundle <- xml2::read_xml("<Bundle>   </Bundle>")
-
+		testbundle <- xml2::read_xml("<Bundle><Resource><item value='1'/></Resource></Bundle>")
 		tryCatch(
 			xml2::xml_find_all(testbundle, object),
 			warning = function(x) {
-				if (grepl("Invalid expression", x))
-					messages <<- c(messages, paste(esc(object),"is not a valid XPath expression.")
-								   )
-					}
-				)
-		if(length(messages)>0){messages}else{TRUE}
+				if (grepl("Invalid expression", x)) {
+					messages <<- c(messages, paste(esc(object),"is not a valid XPath expression."))
+				}
+			}
+		)
+		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
 

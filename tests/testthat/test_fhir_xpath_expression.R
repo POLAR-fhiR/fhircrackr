@@ -1,16 +1,19 @@
 
 testthat::test_that(
 	"fhir_xpath_expression produces valid objects", {
-		e1 <- fhir_xpath_expression("//Patient")
-		e2 <- fhir_xpath_expression("name/given")
-		testthat::expect_s4_class(e1, "fhir_xpath_expression")
-		testthat::expect_s4_class(e1, "fhir_xpath_expression")
+
+		testthat::expect_s4_class(fhir_xpath_expression("Bundle"), "fhir_xpath_expression")
+		testthat::expect_s4_class(fhir_xpath_expression("./Resource"), "fhir_xpath_expression")
+		testthat::expect_s4_class(fhir_xpath_expression("./item/*"), "fhir_xpath_expression")
+		testthat::expect_s4_class(fhir_xpath_expression(".//item/*[@value='1']"), "fhir_xpath_expression")
 	}
 )
 
 testthat::test_that(
 	"fhir_xpath_expression throws error for invalid expressions", {
+		testthat::expect_error(fhir_xpath_expression())
 		testthat::expect_error(fhir_xpath_expression("\\Patient"))
+		testthat::expect_error(fhir_xpath_expression("Patient@value"))
 	}
 )
 
