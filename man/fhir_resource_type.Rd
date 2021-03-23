@@ -7,18 +7,16 @@
 fhir_resource_type(string)
 }
 \arguments{
-\item{string}{A string containing the resource type. Will mostly be one of the official FHIR resource
+\item{string}{A length one character vector containing the resource type. Will mostly be one of the official FHIR resource
 types listed at https://hl7.org/FHIR/resourcelist.html}
 }
 \value{
 An fhir_resource object
 }
 \description{
-This function creates an object of class \link{fhir_resource_type_class} by taking a string defining a FHIR resource type
-and formating it correctly,i.e. removing white space and slashes. It also checks the resource against the list
-of resources provided at https://hl7.org/FHIR/resourcelist.html and converts cases appropriately
-if the resource is found in that list.
+This function creates an object of class \link{fhir_resource_type_class}. It checks the resource type against the list
+of resource types provided at https://hl7.org/FHIR/resourcelist.html and throws a warning if it cannot be found there.
 }
 \examples{
-fhir_resource("MedicationAdministration")
+fhir_resource_type("MedicationAdministration")
 }

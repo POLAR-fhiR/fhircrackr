@@ -21,31 +21,25 @@ setValidity(
 
 #' Create [fhir_resource_type-class] object
 #'
-#' This function creates an object of class [fhir_resource_type_class] by taking a string defining a FHIR resource type
-#' and formating it correctly,i.e. removing white space and slashes. It also checks the resource against the list
-#' of resources provided at https://hl7.org/FHIR/resourcelist.html and converts cases appropriately
-#' if the resource is found in that list.
+#' This function creates an object of class [fhir_resource_type_class]. It checks the resource type against the list
+#' of resource types provided at https://hl7.org/FHIR/resourcelist.html and throws a warning if it cannot be found there.
 #'
-#' @param string A string containing the resource type. Will mostly be one of the official FHIR resource
+#' @param string A length one character vector containing the resource type. Will mostly be one of the official FHIR resource
 #' types listed at https://hl7.org/FHIR/resourcelist.html
 #' @return An fhir_resource object
-#' @examples fhir_resource("MedicationAdministration")
+#' @examples fhir_resource_type("MedicationAdministration")
 #' @export
 #'
 fhir_resource_type <- function(string) {
 
-	#first time: run for validity checks
-	new("fhir_resource_type", string)
+	if(!is.character(string)){stop("string must be of type character")}
+	if(length(string)>1){stop("string must be of length 1")}
 
-	#remove / and white space
-	string <- stringr::str_remove_all(string, "/| ")
-
-	#fix capitals
-	if(tolower(string) %in% tolower(existing_resource_types)){
-		string <- existing_resource_types[tolower(string) == tolower(existing_resource_types)]
+	if(!string %in% existing_resource_types){
+		warning("The string you provided doesn't match any of the resource types under https://hl7.org/FHIR/resourcelist.html. ",
+				"Case matters! If you are sure the resource type is correct anyway, you can ignore this warning.")
 	}
 
-	#second time: run with corrected input
 	new("fhir_resource_type", string)
 }
 
