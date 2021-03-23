@@ -2,8 +2,14 @@
 testthat::test_that(
 	"fhir_style is constructed correctly", {
 
-		style <- fhir_style(sep = "|", brackets = c("[", "]"), rm_empty_cols = T)
+		style_default <- fhir_style()
+		testthat::expect_s4_class(style_default, "fhir_style")
+		testthat::expect_s4_class(style_default, "fhir_style")
+		testthat::expect_equal(style_default@sep, ' ')
+		testthat::expect_equal(style_default@brackets, character(0))
+		testthat::expect_equal(style_default@rm_empty_cols, TRUE)
 
+		style <- fhir_style(sep = "|", brackets = c("[", "]"), rm_empty_cols = T)
 		testthat::expect_s4_class(style, "fhir_style")
 	}
 )
