@@ -9,7 +9,7 @@
 
 setClass(
 	"fhir_parameters",
-	slots = c(param_pairs="list", param_string = "character")
+	slots = c(param_pairs="list")
 )
 
 #validity
@@ -22,29 +22,8 @@ setValidity(
 			messages <- c(messages, "fhir_parameters can only contain fhir_key_value_pair objects.")
 		}
 
-		if(length(object@param_string)>1){
-			messages <- c(messages, "param_string must be of length one")
-		}
-
 		if(length(messages)>0){messages}else{TRUE}
 	}
-)
-
-
-#Initialize function
-#only for internal use, creates param_string
-setMethod(
-	"initialize",
-	"fhir_parameters",
-	function(.Object,...){
-	  	.Object <- callNextMethod()
-
-	  	#paste
-	  	pairs <- lapply(.Object@param_pairs, function(x){paste(x@key, x@value, sep="=")})
-	  	.Object@param_string <- paste(pairs, collapse = "&")
-
-	  	.Object
-	 }
 )
 
 
@@ -160,12 +139,26 @@ setMethod(
 	"show",
 	"fhir_parameters",
 	function(object){
-		cat(
-			paste0(
-				"URL-encoded parameter string for FHIR search:\n",
-				object@param_string
-			)
-		)
+		keys <- sapply(object@param_pairs, function(x)x@key)
+		values <- sapply(object@param_pairs, function(x)x@value)
+		pairs <- paste(keys, values, sep="=")
+		string <- paste(pairs, collapse = "&")
+		colwidth1 <- max(stringr::str_length(keys))+1
+		colwidth2 <- max(stringr::str_length(values))+1
+		header <- paste(stringr::str_pad("key", colwidth1-1, side="right"), "| ",
+						"value", "\n",
+						paste(rep("-",colwidth1+colwidth2),collapse=""), "\n",
+						collapse = "")
+		cat(paste0(
+			"A fhir parameters object:\n\n",
+			header,
+			paste(
+				paste0(stringr::str_pad(keys, colwidth1, side="right"), "| ", values),
+				collapse="\n"
+
+			),"\n\n",
+			"URL-encoded parameter string for FHIR search:\n",
+			string))
 	}
 )
 
