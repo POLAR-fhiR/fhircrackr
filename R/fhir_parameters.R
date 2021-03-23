@@ -35,16 +35,18 @@ setValidity(
 #' A [fhir_parameters-class] object can be created in three ways:
 #'  - You provide a length 1 character with all the search parameters pasted together properly
 #'  - You provide a list with length two character vectors containing key value pairs.
-#'  - You pass a number of fhir_key_value_pair objects to the function.
+#'  - You provide a list of fhir_key_value_pair objects to the function.
+#'  - You pass a number of fhir_key_value_pair objects to the function (not as a list).
 #'  See examples.
 #'
 #' @param ... Either a length 1 character containing properly formatted FHIR search parameters, e.g.
 #' `"gender=male&_summary=count"` or list of length 2 character vectors each representing one key value pair,
 #' with the first element as the key and the second element as the value, e.g.
 #' `list(c("gender", "male"), c("_summary", "count"))`or one or multiple fhir_key_value_pair objects
+#' (can be wrapped) in a list.
 #'
 #' @examples
-#' #Three ways to create the same fhir_parameters object
+#' #Four ways to create the same fhir_parameters object
 #'
 #' #using a string
 #' fhir_parameters("gender=male&birthdate=le2000-01-01&_summary=count")
@@ -59,6 +61,15 @@ setValidity(
 #' fhir_parameters(fhir_key_value_pair(key="gender", value="male"),
 #'                 fhir_key_value_pair(key="birthdate", value="le2000-01-01"),
 #'                 fhir_key_value_pair(key="_summary", value="count"))
+#'
+#' # using a list of key value pairs
+#' fhir_parameters(list(
+#'                 fhir_key_value_pair(key="gender", value="male"),
+#'                 fhir_key_value_pair(key="birthdate", value="le2000-01-01"),
+#'                 fhir_key_value_pair(key="_summary", value="count")
+#'                 )
+#' )
+
 
 setGeneric(
 	"fhir_parameters",
@@ -120,15 +131,20 @@ setMethod(
 
 		l <- unlist(l, recursive = F)
 
-	  	if(any(!sapply(l, is.character))){
-	  		stop("All list elements of the provided list must be of type character")
+	  	if(any(!sapply(l, function(x){is.character(x)|class(x)=="fhir_key_value_pair"}))){
+	  		stop("The provided list must have elements be of type character or of class fhir_key_value_pair")
 	  	}
 
-	  	if(any(sapply(l, length)!=2)){
-	  		stop("All list elements must be exactly of length two")
-	  	}
+		if(is.character(l[[1]])){
+			if(any(sapply(l, length)!=2)){
+				stop("All list elements must be exactly of length two")
+			}
 
-	  	list <- lapply(l, function(x){new("fhir_key_value_pair", key= x[1], value=x[2])})
+			list <- lapply(l, function(x){new("fhir_key_value_pair", key= x[1], value=x[2])})
+		}else{
+
+			list <- l
+		}
 
 	  	new("fhir_parameters", param_pairs = list)
 	}
