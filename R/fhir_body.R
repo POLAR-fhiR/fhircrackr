@@ -15,23 +15,26 @@
 #' @slot content a length 1 character representing the body for the post
 #' @slot type a length 1 character defining the type of the body e.g. `"application/x-www-form-urlencoded"` or `"xml"`
 
-setClass("fhir_body",
-		 slots = c(content = "character", type="character"))
+setClass(
+	"fhir_body",
+	slots = c(content = "character", type="character")
+)
 
 #validity
-setValidity("fhir_body",
-			function(object){
-				messages <- c()
+setValidity(
+	"fhir_body",
+	function(object){
+		messages <- c()
+		if(length(object@type)>1){
+			messages <- c(messages, "the type of a fhir_body must have length 1")
+		}
+		if(length(object@content)>1){
+			messages <- c(messages, "the content of a fhir_body must have length 1")
+		}
 
-				if(length(object@type)>1){
-					messages <- c(messages, "the type of a fhir_body must have length 1")
-				}
-				if(length(object@content)>1){
-					messages <- c(messages, "the content of a fhir_body must have length 1")
-				}
-
-				if(length(messages)>0){messages}else{TRUE}
-			})
+		if(length(messages)>0){messages}else{TRUE}
+	}
+)
 
 #constructor
 #generic method to allow for different input types
@@ -54,37 +57,51 @@ setValidity("fhir_body",
 #' fhir_body(content = fhir_parameters(list(c("gender", "female"), c("_summary", "count"))))
 
 
-setGeneric("fhir_body", function(content, type){
-	standardGeneric("fhir_body")
-})
-
-setMethod("fhir_body", c(content = "fhir_parameters", type="missing"),
-		  function(content){
-			new("fhir_body", content = utils::URLdecode(content@paramstring), type="application/x-www-form-urlencoded")
-		  }
+setGeneric(
+	"fhir_body",
+	function(content, type){
+		standardGeneric("fhir_body")
+	}
 )
 
-setMethod("fhir_body", c(content = "fhir_parameters", type="character"),
-		  function(content, type){
-		  	message("When body is a fhir_parameters object, the type you provided ",
-		  	"will be overwritten with 'application/x-www-form-urlencoded'")
-		  	new("fhir_body", content = utils::URLdecode(content@paramstring), type="application/x-www-form-urlencoded")
-		  }
+setMethod(
+	"fhir_body",
+	c(content = "fhir_parameters", type="missing"),
+	function(content){
+		new("fhir_body", content = utils::URLdecode(content@paramstring), type="application/x-www-form-urlencoded")
+	}
 )
 
-setMethod("fhir_body", c(content = "character", type="character"),
-		  function(content, type){
-		  	new("fhir_body", content=content, type=type)
-		  }
+setMethod(
+	"fhir_body",
+	c(content = "fhir_parameters", type="character"),
+	function(content, type){
+		message("When body is a fhir_parameters object, the type you provided ",
+				"will be overwritten with 'application/x-www-form-urlencoded'")
+		new("fhir_body", content = utils::URLdecode(content@paramstring), type="application/x-www-form-urlencoded")
+	}
+)
+
+setMethod(
+	"fhir_body",
+	c(content = "character", type="character"),
+	function(content, type){
+		new("fhir_body", content=content, type=type)
+	}
 )
 
 #show
-setMethod("show", "fhir_body",
-		  function(object){
-			cat(paste0(
+setMethod(
+	"show",
+	"fhir_body",
+	function(object){
+		cat(
+			paste0(
 				object@content,"\n\n",
 				"type: ", object@type
-			))
-		  })
+			)
+		)
+	}
+)
 
 
