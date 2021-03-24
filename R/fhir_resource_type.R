@@ -32,12 +32,14 @@ setValidity(
 #'
 fhir_resource_type <- function(string) {
 
-	if(!is.character(string)) {stop("string must be of type character")}
-	if(length(string)>1) {stop("string must be of length 1")}
+	result <- new("fhir_resource_type", string)
+
 	if(!string %in% existing_resource_types) {
 		warning("The string you provided doesn't match any of the resource types defined under https://hl7.org/FHIR/resourcelist.html. ",
 				"Case matters! If you are sure the resource type is correct anyway, you can ignore this warning.")
 	}
-	new("fhir_resource_type", string)
+
+	result
+
 }
 
