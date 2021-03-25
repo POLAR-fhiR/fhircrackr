@@ -1,6 +1,6 @@
 
 
-
+p <- fhir_parameters(fhir_key_value_pair("a", "n"), fhir_key_value_pair("x", "y"))
 
 ## Ich hab erst hinterher gemerkt, dass es sinnvoll wäre hier fhir_parameters im Konstruktor zuzulassen
 ## Deshalb lässt sich diese Klasse erst in Gänze testen, wenn sie mit den anderen Level 1 Klassen in den S4 Branch
@@ -68,7 +68,11 @@ setMethod(
 	"fhir_body",
 	c(content = "fhir_parameters", type="missing"),
 	function(content){
-		new("fhir_body", content = utils::URLdecode(content@paramstring), type="application/x-www-form-urlencoded")
+		keys <- sapply(content@param_pairs, function(x)x@key)
+		values <- sapply(content@param_pairs, function(x)x@value)
+		pairs <- paste(keys, values, sep = "=")
+		string <- paste(pairs, collapse = "&")
+		new("fhir_body", content = utils::URLdecode(string), type="application/x-www-form-urlencoded")
 	}
 )
 
@@ -78,7 +82,13 @@ setMethod(
 	function(content, type){
 		message("When body is a fhir_parameters object, the type you provided ",
 				"will be overwritten with 'application/x-www-form-urlencoded'")
-		new("fhir_body", content = utils::URLdecode(content@paramstring), type="application/x-www-form-urlencoded")
+
+
+		keys <- sapply(content@param_pairs, function(x)x@key)
+		values <- sapply(content@param_pairs, function(x)x@value)
+		pairs <- paste(keys, values, sep = "=")
+		string <- paste(pairs, collapse = "&")
+		new("fhir_body", content = utils::URLdecode(string), type="application/x-www-form-urlencoded")
 	}
 )
 
@@ -103,5 +113,6 @@ setMethod(
 		)
 	}
 )
+
 
 
