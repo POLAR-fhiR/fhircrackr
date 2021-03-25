@@ -9,7 +9,6 @@ testthat::test_that(
 
 testthat::test_that(
 	"errors are thrown for incorrect input", {
-
 		testthat::expect_error(fhir_body(content = "a"))
 		testthat::expect_error(fhir_body(content = c("a", "b"), type="a"))
 	}
