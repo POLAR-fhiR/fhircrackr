@@ -9,20 +9,18 @@
 
 setClass(
 	"fhir_parameters",
-	slots = c(param_pairs="list")
+	slots = c(param_pairs = "list")
 )
 
 #validity
 setValidity(
 	"fhir_parameters",
-	function(object){
+	function(object) {
 		messages <- c()
-
-		if(any(!sapply(object@param_pairs, function(x){class(x)=="fhir_key_value_pair"}))){
+		if(any(!sapply(object@param_pairs, function(x) {class(x) == "fhir_key_value_pair"}))) {
 			messages <- c(messages, "fhir_parameters can only contain fhir_key_value_pair objects.")
 		}
-
-		if(length(messages)>0){messages}else{TRUE}
+		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
 
@@ -70,7 +68,6 @@ setValidity(
 #'                 )
 #' )
 
-
 setGeneric(
 	"fhir_parameters",
 	function(...){
@@ -84,68 +81,54 @@ setMethod(
 	function(...){
 		l <- list(...)
 		classes <- sapply(l, class)
-
-		if(length(unique(classes))>1){stop("You cannot mix input classes")}
-
+		if(1 < length(unique(classes))) {stop("You cannot mix input classes")}
 		new("fhir_parameters", param_pairs = l)
 	}
 )
 
 setMethod(
 	"fhir_parameters",
-	signature = c(...= "character"),
-	function(...){
+	signature = c(... = "character"),
+	function(...) {
 		l <- list(...)
 		classes <- sapply(l, class)
-
-		if(length(unique(classes))>1){stop("You cannot mix input classes")}
-
-		if(length(l)>1){
+		if(length(unique(classes))>1) {stop("You cannot mix input classes")}
+		if(1 < length(l)) {
 	  		stop("You can only provide one character to this function.")
 	  	}
 		l <- unlist(l)
-		if(length(l)>1){
+		if(1 < length(l)) {
 			stop("If you provide a character to this function, it has to be of length 1.")
 		}
-	  	pairs <- strsplit(l, "&", fixed=T)[[1]]
+	  	pairs <- strsplit(l, "&", fixed=TRUE)[[1]]
 	  	pairs <- strsplit(pairs, "=")
-
-	  	list <- lapply(pairs, function(x){new("fhir_key_value_pair", key= x[1], value=x[2])})
-
+	  	list <- lapply(pairs, function(x) {new("fhir_key_value_pair", key=x[1], value=x[2])})
 	  	new("fhir_parameters", param_pairs=list)
 	}
 )
 
 setMethod(
 	"fhir_parameters",
-	signature = c(...="list"),
+	signature = c(... = "list"),
 	function(...){
 		l <- list(...)
 		classes <- sapply(l, class)
-
-		if(length(unique(classes))>1){stop("You cannot mix input classes")}
-
-		if(length(l)>1){
+		if(1 < length(unique(classes))) {stop("You cannot mix input classes")}
+		if(1 < length(l)) {
 			stop("You can only provide one list to this function.")
 		}
-
-		l <- unlist(l, recursive = F)
-
-	  	if(any(!sapply(l, function(x){is.character(x)|class(x)=="fhir_key_value_pair"}))){
+		l <- unlist(l, recursive = FALSE)
+	  	if(any(!sapply(l, function(x) {is.character(x)|class(x)=="fhir_key_value_pair"}))) {
 	  		stop("The provided list must have elements be of type character or of class fhir_key_value_pair")
 	  	}
-
-		if(is.character(l[[1]])){
-			if(any(sapply(l, length)!=2)){
+		if(is.character(l[[1]])) {
+			if(any(sapply(l, length) != 2)) {
 				stop("All list elements must be exactly of length two")
 			}
-
-			list <- lapply(l, function(x){new("fhir_key_value_pair", key= x[1], value=x[2])})
-		}else{
-
+			list <- lapply(l, function(x){new("fhir_key_value_pair", key=x[1], value=x[2])})
+		} else {
 			list <- l
 		}
-
 	  	new("fhir_parameters", param_pairs = list)
 	}
 )
@@ -157,24 +140,29 @@ setMethod(
 	function(object){
 		keys <- sapply(object@param_pairs, function(x)x@key)
 		values <- sapply(object@param_pairs, function(x)x@value)
-		pairs <- paste(keys, values, sep="=")
+		pairs <- paste(keys, values, sep = "=")
 		string <- paste(pairs, collapse = "&")
-		colwidth1 <- max(stringr::str_length(keys))+1
-		colwidth2 <- max(stringr::str_length(values))+1
-		header <- paste(stringr::str_pad("key", colwidth1-1, side="right"), "| ",
-						"value", "\n",
-						paste(rep("-",colwidth1+colwidth2),collapse=""), "\n",
-						collapse = "")
-		cat(paste0(
-			"A fhir parameters object:\n\n",
-			header,
-			paste(
-				paste0(stringr::str_pad(keys, colwidth1, side="right"), "| ", values),
-				collapse="\n"
-
-			),"\n\n",
-			"URL-encoded parameter string for FHIR search:\n",
-			string))
+		colwidth1 <- max(stringr::str_length(keys)) + 1
+		colwidth2 <- max(stringr::str_length(values)) + 1
+		header <- paste(
+			stringr::str_pad("key", colwidth1 - 1, side="right"),
+			"| value", "\n",
+			paste(rep("-", colwidth1 + colwidth2), collapse=""),
+			"\n",
+			collapse = ""
+		)
+		cat(
+			paste0(
+				"A fhir parameters object:\n\n",
+				header,
+				paste(
+					paste0(stringr::str_pad(keys, colwidth1, side="right"), "| ", values),
+					collapse = "\n"
+				),
+				"\n\nURL-encoded parameter string for FHIR search:\n",
+				string
+			)
+		)
 	}
 )
 
