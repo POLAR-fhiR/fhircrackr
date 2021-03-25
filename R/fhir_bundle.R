@@ -16,13 +16,13 @@ setValidity(
 	"fhir_bundle_xml",
 	function(object){
 		messages <- c()
-
-		if(xml2::xml_name(object)!="Bundle"){
-			messages <- c(messages,
-						  "This xml doesn't seem to represent a bundle, its name is not 'Bundle'. Use xml2::xml_name() to check.")
+		if(xml2::xml_name(object) != "Bundle") {
+			messages <- c(
+				messages,
+				"This xml doesn't seem to represent a bundle, its name is not 'Bundle'. Use xml2::xml_name() to check."
+			)
 		}
-
-	if(length(messages)>0){messages}else{TRUE}
+		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
 
@@ -34,14 +34,14 @@ setValidity(
 #' @examples
 #' fhir_bundle_xml(xml2::xml_unserialize(patient_bundles[[1]]))
 #'
-fhir_bundle_xml <- function(bundle){
+fhir_bundle_xml <- function(bundle) {
 	new("fhir_bundle_xml", bundle)
 }
 
 setMethod(
 	"show",
 	"fhir_bundle_xml",
-	function(object){
+	function(object) {
 		cat(paste0("A fhir_bundle_xml object with ", length(xml2::xml_find_all(object, "entry")), " entries:\n\n"))
 		print(object)
     }
@@ -62,6 +62,6 @@ setClass(
 #' fhir_bundle_serialized(patient_bundles[[1]])
 
 #constructor
-fhir_bundle_serialized <- function(bundle){
+fhir_bundle_serialized <- function(bundle) {
 	new("fhir_bundle_serialized", bundle)
 }
