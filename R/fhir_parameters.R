@@ -139,6 +139,9 @@ setMethod(
 	"show",
 	"fhir_parameters",
 	function(object){
+
+		if(length(object@param_pairs)==0){cat("An empty fhir_parameters object"); return()}
+
 		keys <- sapply(object@param_pairs, function(x)x@key)
 		values <- sapply(object@param_pairs, function(x)x@value)
 		pairs <- paste(keys, values, sep = "=")
