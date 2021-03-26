@@ -1,12 +1,3 @@
-
-
-p <- fhir_parameters(fhir_key_value_pair("a", "n"), fhir_key_value_pair("x", "y"))
-
-## Ich hab erst hinterher gemerkt, dass es sinnvoll wäre hier fhir_parameters im Konstruktor zuzulassen
-## Deshalb lässt sich diese Klasse erst in Gänze testen, wenn sie mit den anderen Level 1 Klassen in den S4 Branch
-## gemergt wurde.
-
-
 #definition
 
 #'an s4 class to represent a body for a post to a fhir server
@@ -14,6 +5,7 @@ p <- fhir_parameters(fhir_key_value_pair("a", "n"), fhir_key_value_pair("x", "y"
 #'objects of this class should always be created with a call to the function [fhir_body()]
 #' @slot content a length 1 character representing the body for the post
 #' @slot type a length 1 character defining the type of the body e.g. `"application/x-www-form-urlencoded"` or `"xml"`
+#' @include fhir_parameters.R
 
 setClass(
 	"fhir_body",
