@@ -7,12 +7,12 @@
 - fhir_url (virtual) -> slots: base (character)
 - fhir_parameters -> slots: key (character), value(character)
 - fhir_bundle (virtual) -> slots: bundle(ANY)
-- fhir_body -> muss noch durchdacht werden
+- fhir_body -> slots: content (character), type (character)
 
-#Level 2
 - fhir_bundle_xml -> abgeleitet von fhir_bundle, slots: bundle(xml_document)
 - fhir_bundle_serialized -> abgeleitet von fhir_bundle, slots: bundle(raw)
 
+#Level 2
 - fhir_GETsearch_url -> abgeleitet von fhir_base_url + zusätzliche slots: fhir_resource_type, parameters = fhir_parameters
 - fhir_POSTsearch_url -> abgeleitet von fhir_base_url + zusätzliche slots fhir_resource_type, parameters = fhir_parameters
 - fhir_POSTbundle_url -> abgeleitet von fhir_base_url + keine zusätzlichen slots
