@@ -3,7 +3,7 @@
 \docType{class}
 \name{fhir_xpath_expression-class}
 \alias{fhir_xpath_expression-class}
-\title{A}
+\title{A fhir_xpath_expression object}
 \description{
-A
+A fhir_xpath_expression object
 }

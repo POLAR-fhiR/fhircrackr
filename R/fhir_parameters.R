@@ -6,6 +6,7 @@
 #'
 #' @slot params A list of fhir_key_value_pair objects
 #'
+#' @include fhir_key_value_pair.R
 
 setClass(
 	"fhir_parameters",

@@ -10,19 +10,21 @@ fhir_parameters(...)
 \item{...}{Either a length 1 character containing properly formatted FHIR search parameters, e.g.
 \code{"gender=male&_summary=count"} or list of length 2 character vectors each representing one key value pair,
 with the first element as the key and the second element as the value, e.g.
-\code{list(c("gender", "male"), c("_summary", "count"))}or one or multiple fhir_key_value_pair objects}
+\code{list(c("gender", "male"), c("_summary", "count"))}or one or multiple fhir_key_value_pair objects
+(can be wrapped) in a list.}
 }
 \description{
 A \linkS4class{fhir_parameters} object can be created in three ways:
 \itemize{
 \item You provide a length 1 character with all the search parameters pasted together properly
 \item You provide a list with length two character vectors containing key value pairs.
-\item You pass a number of fhir_key_value_pair objects to the function.
+\item You provide a list of fhir_key_value_pair objects to the function.
+\item You pass a number of fhir_key_value_pair objects to the function (not as a list).
 See examples.
 }
 }
 \examples{
-#Three ways to create the same fhir_parameters object
+#Four ways to create the same fhir_parameters object
 
 #using a string
 fhir_parameters("gender=male&birthdate=le2000-01-01&_summary=count")
@@ -37,4 +39,12 @@ fhir_parameters(list(c("gender", "male"),
 fhir_parameters(fhir_key_value_pair(key="gender", value="male"),
                 fhir_key_value_pair(key="birthdate", value="le2000-01-01"),
                 fhir_key_value_pair(key="_summary", value="count"))
+
+# using a list of key value pairs
+fhir_parameters(list(
+                fhir_key_value_pair(key="gender", value="male"),
+                fhir_key_value_pair(key="birthdate", value="le2000-01-01"),
+                fhir_key_value_pair(key="_summary", value="count")
+                )
+)
 }
