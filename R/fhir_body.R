@@ -99,7 +99,7 @@ setMethod(
 	function(object){
 		cat(
 			paste0(
-				object@content,"\n\n",
+				"content:\n", object@content,"\n\n",
 				"type: ", object@type
 			)
 		)

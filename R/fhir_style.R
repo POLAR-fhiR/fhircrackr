@@ -57,16 +57,26 @@ setMethod(
 	"show",
 	signature = "fhir_style",
 	function(object) {
-		sep <- if(object@sep==" ") {paste0("'", object@sep, "'")} else {object@sep}
+		sep <- if(length(object@sep)==0){
+			"character(0)"
+		} else if(object@sep==" ") {paste0("'", object@sep, "'")}else {object@sep}
+
 		brackets <- if(length(object@brackets)==0) {
 			"character(0)"
 		} else {
 			paste0("'", object@brackets[1], "' '", object@brackets[2], "'")
 		}
+
+		rm_empty_cols <- if(length(object@rm_empty_cols)==0) {
+			"logical(0)"
+		} else {
+			object@rm_empty_cols
+		}
+
 		cat(paste0(
 			"fhir_style object with the following elements:\n\nsep: ",
 			sep, "\nbrackets: ", brackets,
-			"\nrm_empty_cols: ", object@rm_empty_cols
+			"\nrm_empty_cols: ", rm_empty_cols
 		))
 	}
 )

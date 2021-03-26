@@ -7,9 +7,14 @@ setClass(
 
 #' An S4 class to represent a FHIR bundle in xml form
 #'
+
+setOldClass("xml_node")
+
+
 setClass(
 	"fhir_bundle_xml",
-	 contains = c("fhir_bundle", "xml_document", "xml_node")
+	contains = c("fhir_bundle", "xml_node"),
+	prototype = prototype(xml2::read_xml("<Bundle></Bundle>"))
 )
 
 setValidity(
@@ -42,6 +47,8 @@ setMethod(
 	"show",
 	"fhir_bundle_xml",
 	function(object) {
+
+
 		cat(paste0("A fhir_bundle_xml object with ", length(xml2::xml_find_all(object, "entry")), " entries:\n\n"))
 		print(object)
     }

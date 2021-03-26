@@ -4,7 +4,6 @@ testthat::test_that(
 		pat <- xml2::xml_unserialize(patient_bundles[[1]])
 		b <- fhir_bundle_xml(pat)
 		testthat::expect_s4_class(b, "fhir_bundle_xml")
-		testthat::expect_s4_class(b, "xml_document")
 		testthat::expect_s4_class(b, "xml_node")
 	}
 )

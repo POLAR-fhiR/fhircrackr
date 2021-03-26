@@ -35,13 +35,14 @@ setMethod(
 	function(.Object,...) {
 		.Object <- callNextMethod()
 
+
 	  	#remove leading/trailing whitespace
 	  	.Object@key <- stringr::str_trim(.Object@key)
 	  	.Object@value <- stringr::str_trim(.Object@value)
 
 	  	#url encode
-	  	.Object@key <- utils::URLencode(.Object@key, reserved = TRUE, repeated = FALSE)
-  		.Object@value <- utils::URLencode(.Object@value, reserved = TRUE, repeated = FALSE)
+	  	if(length(.Object@key)>0){.Object@key <- utils::URLencode(.Object@key, reserved = TRUE, repeated = FALSE)}
+	  	if(length(.Object@value)>0){.Object@value <- utils::URLencode(.Object@value, reserved = TRUE, repeated = FALSE)}
 
 		.Object
 	}
