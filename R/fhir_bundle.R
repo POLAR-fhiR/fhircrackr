@@ -1,16 +1,15 @@
 #Class definition
+#' An S4 class ro represent FHIR bundles
 setClass(
 	"fhir_bundle",
 	contains = "VIRTUAL"
 )
 
 
-#' An S4 class to represent a FHIR bundle in xml form
-#'
-
 setOldClass("xml_node")
 
 
+#' An S4 class to represent a FHIR bundle in xml form
 setClass(
 	"fhir_bundle_xml",
 	contains = c("fhir_bundle", "xml_node"),
@@ -61,7 +60,7 @@ setClass(
 	contains = c("fhir_bundle", "raw")
 )
 
-#' Create [fhir_bundle_xml-class] object
+#' Create [fhir_bundle_serialized-class] object
 #'
 #' @param bundle A serialized xml object representing a FHIR bundle
 #'

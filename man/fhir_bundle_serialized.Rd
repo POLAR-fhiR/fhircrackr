@@ -2,7 +2,7 @@
 % Please edit documentation in R/fhir_bundle.R
 \name{fhir_bundle_serialized}
 \alias{fhir_bundle_serialized}
-\title{Create \linkS4class{fhir_bundle_xml} object}
+\title{Create \linkS4class{fhir_bundle_serialized} object}
 \usage{
 fhir_bundle_serialized(bundle)
 }
@@ -10,7 +10,7 @@ fhir_bundle_serialized(bundle)
 \item{bundle}{A serialized xml object representing a FHIR bundle}
 }
 \description{
-Create \linkS4class{fhir_bundle_xml} object
+Create \linkS4class{fhir_bundle_serialized} object
 }
 \examples{
 fhir_bundle_serialized(patient_bundles[[1]])
