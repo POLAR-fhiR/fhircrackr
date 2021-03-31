@@ -4,12 +4,13 @@
 #'
 #' Objects of this class should always be created with a call to [fhir_parameters()]
 #'
-#' @slot params A list of fhir_key_value_pair objects
-#'
+#' @slot names The names (keys) of the search parameters.
+
 
 setClass(
 	"fhir_parameters",
-	contains = "character"
+	contains = "character",
+	slots = c(names = "character")
 )
 
 #validity
@@ -17,7 +18,7 @@ setValidity(
 	"fhir_parameters",
 	function(object) {
 		messages <- c()
-		if(is.null(names(object))) {
+		if(length(names(object))==0) {
 			messages <- c(messages, "fhir_parameters has to be a *named* character.")
 		}
 		if(0 < length(messages)) {messages} else {TRUE}
@@ -27,18 +28,17 @@ setValidity(
 setMethod(
 	"initialize", "fhir_parameters",
 	function(.Object,...) {
-		.Object <- callNextMethod()
-
-
+		args <- list(...)
+		args <- unlist(args, recursive = F)
 		#remove leading/trailing whitespace
-		.Object <- stringr::str_trim(.Object)
-		names(.Object) <- stringr::str_trim(names(.Object))
+		names <- stringr::str_trim(names(args))
+		args <- stringr::str_trim(args)
 
 		#url encode
-		for(i in 1: length(.Object)){
-			.Object[i] <- utils::URLencode(.Object[i], reserved = TRUE, repeated = FALSE)
+		for(i in 1: length(args)){
+			args[i] <- utils::URLencode(args[i], reserved = TRUE, repeated = FALSE)
 		}
-		.Object
+		callNextMethod(.Object, args, names = names)
 	}
 )
 
@@ -89,7 +89,7 @@ setMethod(
 	  	pairs <- strsplit(pairs, "=")
 	  	keys <- sapply(pairs, function(x) {x[1]})
 	  	values <- sapply(pairs, function(x) {x[2]})
-	  	structure(values, names= keys, class="fhir_parameters")
+	  	new("fhir_parameters", structure(values, names=keys))
 	}
 )
 
@@ -105,7 +105,7 @@ setMethod(
 		}
 		keys <- sapply(parameters, function(x) {x[1]})
 		values <- sapply(parameters, function(x) {x[2]})
-		structure(values, names= keys, class="fhir_parameters")
+		new("fhir_parameters", structure(values, names=keys))
 	}
 )
 
@@ -142,6 +142,3 @@ setMethod(
 		)
 	}
 )
-
-setMethod("print", signature = "fhir_parameters", function(x){show(x)})
-
