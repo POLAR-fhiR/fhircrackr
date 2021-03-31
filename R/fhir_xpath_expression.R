@@ -12,36 +12,34 @@ setValidity(
 	"fhir_xpath_expression",
 	method = function(object) {
 		messages <- c()
-		if(length(object)>1){
-			messages <- c(messages, "A fhir_xpath_expression has to be of length 1.")
-		}
 
 		#slightly hacky solution: use xml2 function and catch warning message
 		#this will validate xpath expression with libxml2 (accessed by xml2)
 		testbundle <- xml2::read_xml("<Bundle><Resource><item value='1'/></Resource></Bundle>")
-		tryCatch(
-			xml2::xml_find_all(testbundle, object),
-			warning = function(x) {
-				if (grepl("Invalid expression", x)) {
-					messages <<- c(messages, paste(esc(object),"is not a valid XPath expression."))
+		for(i in 1:length(object)){
+			tryCatch(
+				xml2::xml_find_all(testbundle, object[i]),
+				warning = function(x) {
+					if (grepl("Invalid expression", x)) {
+						messages <<- c(messages, paste(esc(object[i]),"is not a valid XPath expression."))
+					}
 				}
-			}
-		)
+			)
+		}
 		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
 
 #' Create fhir_xpath_expression
 #'
-#' This function takes a string, checks whether it is a valid XPath expression
+#' This function takes a character vector, checks whether it contains valid XPath expressions
 #' and returns it as an fhir_xpath_expression object
 #'
-#' @param expression A string with the XPath expression
+#' @param expression A character vector of the XPath expressions
 #' @return A XPath expression object
 #' @examples
-#' fhir_xpath_expression("//Patient")
+#' fhir_xpath_expression(c("//Patient", "name/given"))
 #'
-#' fhir_xpath_expression("name/given")
 #'
 fhir_xpath_expression <- function(expression){
 	new("fhir_xpath_expression", expression)

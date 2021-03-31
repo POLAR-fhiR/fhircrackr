@@ -3,7 +3,7 @@ testthat::test_that(
 	"fhir_xpath_expression produces valid objects", {
 
 		testthat::expect_s4_class(fhir_xpath_expression("Bundle"), "fhir_xpath_expression")
-		testthat::expect_s4_class(fhir_xpath_expression("./Resource"), "fhir_xpath_expression")
+		testthat::expect_s4_class(fhir_xpath_expression(c("Bundle", "./Resource")), "fhir_xpath_expression")
 		testthat::expect_s4_class(fhir_xpath_expression("./item/*"), "fhir_xpath_expression")
 		testthat::expect_s4_class(fhir_xpath_expression(".//item/*[@value='1']"), "fhir_xpath_expression")
 	}

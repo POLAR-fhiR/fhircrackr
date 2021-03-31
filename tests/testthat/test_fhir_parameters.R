@@ -9,13 +9,18 @@ testthat::test_that(
 				c("_summary", "count")
 			)
 		)
-		p3 <- fhir_parameters(
-			new("fhir_key_value_pair", key = "gender", value = "male"),
-		    new("fhir_key_value_pair", key = "birthdate", value = "le2000-01-01"),
-		    new("fhir_key_value_pair", key = "_summary", value = "count"))
 
 		testthat::expect_identical(p1, p2)
-		testthat::expect_identical(p3, p2)
+
+	}
+)
+
+testthat::test_that(
+	"names() works on fhir_parameters", {
+		p1 <- fhir_parameters("gender=male&birthdate=le2000-01-01&_summary=count")
+
+		testthat::expect_identical(names(p1), c("gender", "birthdate", "_summary"))
+
 	}
 )
 
