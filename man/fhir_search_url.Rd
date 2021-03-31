@@ -37,23 +37,7 @@ fhir_search_url(
    resource = "Patient",
    parameters = list(c("gender", "male"),
                      c("_summary", "count")
-                     )
- )
-
-fhir_search_url(
-   base = "http://hapi.fhir.org/baseR4",
-   resource = "Patient",
-   parameters = fhir_parameters(
-                  fhir_key_value_pair("gender", "male"),
-                  fhir_key_value_pair("_summary", "count")
                 )
  )
 
-fhir_search_url(
-   base = "http://hapi.fhir.org/baseR4",
-   resource = "Patient",
-   parameters = list(fhir_key_value_pair("gender", "male"),
-                     fhir_key_value_pair("summary", "count")
-                     )
- )
 }

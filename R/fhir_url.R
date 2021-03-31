@@ -67,7 +67,7 @@ setClass(
 #'    resource = "Patient",
 #'    parameters = list(c("gender", "male"),
 #'                      c("_summary", "count")
-#'                      )
+#'                 )
 #'  )
 #'
 
