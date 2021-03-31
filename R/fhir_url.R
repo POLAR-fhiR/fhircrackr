@@ -70,22 +70,7 @@ setClass(
 #'                      )
 #'  )
 #'
-#' fhir_search_url(
-#'    base = "http://hapi.fhir.org/baseR4",
-#'    resource = "Patient",
-#'    parameters = fhir_parameters(
-#'                   fhir_key_value_pair("gender", "male"),
-#'                   fhir_key_value_pair("_summary", "count")
-#'                 )
-#'  )
-#'
-#' fhir_search_url(
-#'    base = "http://hapi.fhir.org/baseR4",
-#'    resource = "Patient",
-#'    parameters = list(fhir_key_value_pair("gender", "male"),
-#'                      fhir_key_value_pair("summary", "count")
-#'                      )
-#'  )
+
 
 setGeneric(
 	"fhir_search_url",
@@ -118,8 +103,8 @@ setMethod("fhir_search_url",
 setMethod(
 	"show", "fhir_search_url",
 	 function(object){
-	 	keys <- sapply(object@parameters@param_pairs, function(x)x@key)
-	 	values <- sapply(object@parameters@param_pairs, function(x)x@value)
+	 	keys <- names(object@parameters)
+	 	values <- object@parameters
 	 	pairs <- paste(keys, values, sep = "=")
 	 	string <- paste(pairs, collapse = "&")
 	 	if(string!=""){string <- paste0("?", string)}
@@ -127,7 +112,7 @@ setMethod(
 		 	"A fhir_search_url object:\n",
 		 	object@base, "/",
 		 	object@resource,
-		 	string
+		 	string, "\n"
 		 ))
 	 }
 )
