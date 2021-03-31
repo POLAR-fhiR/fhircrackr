@@ -49,7 +49,6 @@ Depends:
 Collate: 
     'design.R'
     'download_resources.R'
-    'fhir_key_value_pair.R'
     'fhir_parameters.R'
     'fhir_body.R'
     'fhir_bundle.R'

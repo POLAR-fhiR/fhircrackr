@@ -7,18 +7,17 @@
 fhir_xpath_expression(expression)
 }
 \arguments{
-\item{expression}{A string with the XPath expression}
+\item{expression}{A character vector of the XPath expressions}
 }
 \value{
 A XPath expression object
 }
 \description{
-This function takes a string, checks whether it is a valid XPath expression
+This function takes a character vector, checks whether it contains valid XPath expressions
 and returns it as an fhir_xpath_expression object
 }
 \examples{
-fhir_xpath_expression("//Patient")
+fhir_xpath_expression(c("//Patient", "name/given"))
 
-fhir_xpath_expression("name/given")
 
 }

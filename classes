@@ -13,21 +13,16 @@
 - fhir_bundle_serialized -> abgeleitet von fhir_bundle, slots: bundle(raw)
 
 #Level 2
-- fhir_GETsearch_url -> abgeleitet von fhir_base_url + zusätzliche slots: fhir_resource_type, parameters = fhir_parameters
-- fhir_POSTsearch_url -> abgeleitet von fhir_base_url + zusätzliche slots fhir_resource_type, parameters = fhir_parameters
-- fhir_POSTbundle_url -> abgeleitet von fhir_base_url + keine zusätzlichen slots
-
-
-- columns -> slots: colnames(character) expressions = list(fhir_xpath_expression)
-- df_description
+- fhir_search_url -> abgeleitet von fhir_url + zusätzliche slots: fhir_resource_type, parameters = fhir_parameters
+- columns -> slots: colnames(character), expressions = list(fhir_xpath_expression)
 - bundle_list
 
 #Level 3
-- design
-- fhir_search_requests
+- df_description
 - cracked_df
 
 #Level 4
+- design
 - cracked_dt
 - df_list
 - capability_statement
@@ -35,6 +30,8 @@
 #Level 5
 - dt_list
 
+##Später
+- fhir_POSTbundle_url -> abgeleitet von fhir_base_url + keine zusätzlichen slots
 
 
 
@@ -43,19 +40,15 @@
 design -> df_descriptions -> resource, cols, style
 
 ################################
-fhir_base_url (virtual class) -> base(string)
+fhir_url (virtual class) -> base(string)
 
-fhir_GETsearch_url -> abgeleitet von fhir_base_url + zusätzliche slots fhir_resource, fhir_parameters
-fhir_POSTsearch_url -> abgeleitet von fhir_base_url + zusätzliche slots fhir_resource, fhir_parameters
-fhir_POSTbundle_url -> abgeleitet von fhir_base_url + keine zusätzlichen slots
-
-
-fhir_search_request -> slots: url (Klasse fhir_base_url), body (Klasse fhir_body)
+fhir_search_url -> abgeleitet von fhir_url + zusätzliche slots fhir_resource, fhir_parameters
+(später) fhir_POSTbundle_url -> abgeleitet von fhir_base_url + keine zusätzlichen slots
 
 
 ################################
 
-bundle_list -> bundle -> xml_object, serialization_status
+bundle_list -> bundle
 
 ################################
 
