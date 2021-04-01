@@ -10,6 +10,6 @@ Objects of this class should always be created with a call to \code{\link[=fhir_
 \section{Slots}{
 
 \describe{
-\item{\code{params}}{A list of fhir_key_value_pair objects}
+\item{\code{names}}{The names (keys) of the search parameters.}
 }}
 

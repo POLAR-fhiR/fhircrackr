@@ -52,6 +52,7 @@ Collate:
     'fhir_parameters.R'
     'fhir_body.R'
     'fhir_bundle.R'
+    'fhir_bundle_list.R'
     'fhir_resource_type.R'
     'fhir_style.R'
     'fhir_url.R'
