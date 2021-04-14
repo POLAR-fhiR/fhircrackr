@@ -1,7 +1,8 @@
 
-#' A S4 class to represent columns in a fhircrackr design
+#' A S4 class to represent columns in a [fhir_df_description-class]
 #'
-#' An object of class [fhir_columns-class] is part of a fhir_design and holds information on the elements
+#' An object of class [fhir_columns-class] is part of a [fhir_df_description-class]
+#' in a [fhir_design-class] and holds information on the elements
 #' that should be extracted from the FHIR resources, as well as the column names of the resulting data.frame.
 #' The elements to be extracted are indicated by XPath expressions.
 #'

@@ -3,9 +3,10 @@
 \docType{class}
 \name{fhir_columns-class}
 \alias{fhir_columns-class}
-\title{A S4 class to represent columns in a fhircrackr design}
+\title{A S4 class to represent columns in a \linkS4class{fhir_df_description}}
 \description{
-An object of class \linkS4class{fhir_columns} is part of a fhir_design and holds information on the elements
+An object of class \linkS4class{fhir_columns} is part of a \linkS4class{fhir_df_description}
+in a \linkS4class{fhir_design} and holds information on the elements
 that should be extracted from the FHIR resources, as well as the column names of the resulting data.frame.
 The elements to be extracted are indicated by XPath expressions.
 }

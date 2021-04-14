@@ -40,3 +40,12 @@ fhir_resource_type <- function(string) {
 	result
 }
 
+
+setMethod(
+	"show",
+	"fhir_resource_type",
+	function(object){
+		cat("A fhir_resource_type object: ")
+		cat(object)
+	}
+)

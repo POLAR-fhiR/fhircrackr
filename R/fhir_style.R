@@ -2,10 +2,10 @@
 #' An S4 class to represent a design for cracking FHIR resources
 #'
 #'
-#' @slot sep A string to separate pasted multiple entries.
+#' @slot sep A string to separate pasted multiple entries. Defaults to `" "`.
 #' @slot brackets  A character vector of length two defining the brackets surrounding indices for multiple entries,
-#' e.g. `c( "<", ">")`. If this is empty (i.e. character of length 0), no indices will be added to multiple entries.
-#' @slot rm_empty_cols Logical scalar. Remove empty columns?
+#' e.g. `c( "<", ">")`. If this is empty (i.e. character of length 0, the default), no indices will be added to multiple entries.
+#' @slot rm_empty_cols Logical scalar. Remove empty columns? Defaults to TRUE.
 #'
 setClass(
 	"fhir_style",
@@ -74,7 +74,7 @@ setMethod(
 		}
 
 		cat(paste0(
-			"fhir_style object with the following elements:\n\nsep: ",
+			"A fhir_style object:\n\nsep: ",
 			sep, "\nbrackets: ", brackets,
 			"\nrm_empty_cols: ", rm_empty_cols
 		))
