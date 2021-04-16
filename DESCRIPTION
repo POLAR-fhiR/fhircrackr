@@ -58,6 +58,7 @@ Collate:
     'fhir_style.R'
     'fhir_resource_type.R'
     'fhir_df_description.R'
+    'fhir_design.R'
     'fhir_url.R'
     'flatten_resources.R'
     'miscellaneous.R'

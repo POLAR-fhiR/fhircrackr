@@ -19,16 +19,14 @@
 
 #Level 3
 - df_description
-- cracked_df
+
 
 #Level 4
 - design
-- cracked_dt
-- df_list
 - capability_statement
 
 #Level 5
-- dt_list
+- fhir_table_list -> fhir_df_list, fhir_dt_list
 
 ##Später
 - fhir_POSTbundle_url -> abgeleitet von fhir_base_url + keine zusätzlichen slots
@@ -51,10 +49,16 @@ fhir_search_url -> abgeleitet von fhir_url + zusätzliche slots fhir_resource, f
 bundle_list -> bundle
 
 ################################
+cracked_df/cracked_dt sind unpraktisch, weil zu viel unerwartetes Verhalten der
+df/DT auftaucht, wenn man die als S4 Klassen hat. (z.B. https://stackoverflow.com/questions/32206351/how-to-use-data-table-as-super-class-in-s4)
 
-df_list -> cracked_df -> df, df_desc, indexed
+Alternative:
 
-dt_list -> cracked_dt -> dt, df_desc, indexed
+Superklasse fhir_table_list: abgeleitet von list + zusätzliche slots indexed (logical) und design
+
+Davon abgeleitet:
+- fhir_df_list: enthält dfs
+- fhir_dt_list: enthält dts
 
 ################################
 

@@ -66,6 +66,22 @@ setGeneric(
 
 setMethod(
 	"fhir_columns",
+	signature = c(expressions = "missing", colnames = "missing"),
+	function(){
+		new("fhir_columns")
+	}
+)
+
+setMethod(
+	"fhir_columns",
+	signature = c(expressions = "NULL", colnames = "missing"),
+	function(expressions){
+		new("fhir_columns")
+	}
+)
+
+setMethod(
+	"fhir_columns",
 	signature = c(expressions = "character", colnames = "character"),
 	function(expressions, colnames){
 		new("fhir_columns", fhir_xpath_expression(expressions), names = colnames)

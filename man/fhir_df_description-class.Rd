@@ -18,7 +18,9 @@ types will be cracked into its own data.frame and needs its own fhir_df_descript
 \item{\code{resource}}{An object of class \linkS4class{fhir_resource_type} defining the resource type that
 should be extracted}
 
-\item{\code{cols}}{An object of class \linkS4class{fhir_columns} describing which columns should be created and how.}
+\item{\code{cols}}{An object of class \linkS4class{fhir_columns} describing which columns should be created and how.
+If this is an empty \linkS4class{fhir_columns} object, the call to \code{\link[=fhir_crack]{fhir_crack()}} will extract all available
+elements and put them in automatically named columns.}
 
 \item{\code{style}}{An object of class \linkS4class{fhir_style} describing how to deal with multiple entries and emtpy columns.}
 }}

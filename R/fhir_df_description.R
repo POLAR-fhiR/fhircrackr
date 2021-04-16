@@ -9,6 +9,8 @@
 #' @slot resource An object of class [fhir_resource_type-class] defining the resource type that
 #' should be extracted
 #' @slot cols An object of class [fhir_columns-class] describing which columns should be created and how.
+#' If this is an empty [fhir_columns-class] object, the call to [fhir_crack()] will extract all available
+#' elements and put them in automatically named columns.
 #' @slot style An object of class [fhir_style-class] describing how to deal with multiple entries and emtpy columns.
 #' @include fhir_resource_type.R fhir_style.R fhir_columns.R
 setClass(
@@ -26,6 +28,9 @@ setClass(
 #' @param cols A [fhir_columns-class] object or something that can be coerced to one,
 #' like a(named) character vector, a (named) list containing xpath expressions,
 #' or a [fhir_xpath_expressions-class] object. See [fhir_columns()] and the examples.
+#' If this argument is omitted, an empty [fhir_columns-class] object will be supplied.
+#' This means that in the call to [fhir_crack()], all available elements are extracted in put
+#' in automatically named columns.
 #' @param style Optional A [fhir_style-class] object, as created by [fhir_style()].
 #' If this argument is omitted, default values will be assumed, see [fhir_style()].
 #'
@@ -67,7 +72,7 @@ setClass(
 
 
 fhir_df_description <- function(resource,
-								cols,
+								cols = fhir_columns(),
 								style = fhir_style()){
 
 	resource <- fhir_resource_type(resource)

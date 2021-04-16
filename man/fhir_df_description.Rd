@@ -4,7 +4,7 @@
 \alias{fhir_df_description}
 \title{Create \linkS4class{fhir_df_description} object}
 \usage{
-fhir_df_description(resource, cols, style = fhir_style())
+fhir_df_description(resource, cols = fhir_columns(), style = fhir_style())
 }
 \arguments{
 \item{resource}{A character vector of length one or \linkS4class{fhir_resource_type} object,
@@ -12,7 +12,10 @@ indicating which resource type should be extracted.}
 
 \item{cols}{A \linkS4class{fhir_columns} object or something that can be coerced to one,
 like a(named) character vector, a (named) list containing xpath expressions,
-or a \linkS4class{fhir_xpath_expressions} object. See \code{\link[=fhir_columns]{fhir_columns()}} and the examples.}
+or a \linkS4class{fhir_xpath_expressions} object. See \code{\link[=fhir_columns]{fhir_columns()}} and the examples.
+If this argument is omitted, an empty \linkS4class{fhir_columns} object will be supplied.
+This means that in the call to \code{\link[=fhir_crack]{fhir_crack()}}, all available elements are extracted in put
+in automatically named columns.}
 
 \item{style}{Optional A \linkS4class{fhir_style} object, as created by \code{\link[=fhir_style]{fhir_style()}}.
 If this argument is omitted, default values will be assumed, see \code{\link[=fhir_style]{fhir_style()}}.}
