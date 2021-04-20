@@ -7,21 +7,25 @@
 fhir_design(..., names)
 }
 \arguments{
-\item{...}{One ore more \linkS4class{fhir_df_description} objects}
+\item{...}{One ore more \linkS4class{fhir_df_description} objects or a named list containing
+\linkS4class{fhir_df_description} objects, see examples.}
 
-\item{names}{The names of the df_descriptions. Those will also be the names of the
-resulting data.frames.}
+\item{names}{The names of the df_descriptions. This argument is not necessary when df_descriptions are
+provided in a named list and will be ignored in this case.
+The names will also be the names of the resulting data.frames in \code{\link[=fhir_crack]{fhir_crack()}}.}
 }
 \description{
 A \linkS4class{fhir_design} is a list of \linkS4class{fhir_df_description} objects and should be created
-using the constructor functions for this class. For backwards compatibility
+using the function described here. For backwards compatibility
 it is for the moment also possible to build it from an old-style design as used in
 \verb{fhircrackr (< 1.0.0)}. See examples.
 }
 \examples{
 
 ###Example 1 ####
+
 #create fhir_df_descriptions
+
 df_desc1 <- fhir_df_description(resource = "Patient",
                     cols = c(name = "name/family",
                              gender = "gender",
@@ -37,13 +41,14 @@ df_desc2 <- fhir_df_description(resource = "Observation",
             )
 
 #create design
+
 #First option
 design <- fhir_design(df_desc1, df_desc2, names = c("Patients", "Observations"))
 
 #second option
 design <- fhir_design(list(Patients = df_desc1, Observations = df_desc2))
 
-#have a look
+#have a look at the design
 design
 
 ###Example 2###
@@ -73,6 +78,8 @@ old_design <- list(
               )
 
 new_design <- fhir_design(old_design)
+
+#have a look at the design
 new_design
 
 }

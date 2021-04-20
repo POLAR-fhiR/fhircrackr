@@ -1,12 +1,9 @@
-
-#TODO: Beautify show(), write tests
-
 #' A S4 class containing a design for [fhir_crack()]
 #'
 #' A fhir_design is a named list of [fhir_df_desciption-class] objects. Each df_description
 #' contains information on how to flatten one resource type which will result in one
 #' data.frame. The fhir_design is passed to the function [fhir_crack()] along with a
-#' list of bundles containing fhir resources.
+#' list of bundles containing FHIR resources.
 #'
 #' @slot names The names of the df_descriptions. Those will also be the names of the
 #' resulting data.frames.
@@ -35,18 +32,22 @@ setValidity(
 #' Create a [fhir_design-class] object
 #'
 #' A [fhir_design-class] is a list of [fhir_df_description-class] objects and should be created
-#' using the constructor functions for this class. For backwards compatibility
+#' using the function described here. For backwards compatibility
 #' it is for the moment also possible to build it from an old-style design as used in
 #' `fhircrackr (< 1.0.0)`. See examples.
 #'
-#' @param ... One ore more [fhir_df_description-class] objects
-#' @param names The names of the df_descriptions. Those will also be the names of the
-#' resulting data.frames.
+#' @param ... One ore more [fhir_df_description-class] objects or a named list containing
+#' [fhir_df_description-class] objects, see examples.
+#' @param names The names of the df_descriptions. This argument is not necessary when df_descriptions are
+#' provided in a named list and will be ignored in this case.
+#' The names will also be the names of the resulting data.frames in [fhir_crack()].
 #'
 #' @examples
 #'
 #' ###Example 1 ####
+#'
 #' #create fhir_df_descriptions
+#'
 #' df_desc1 <- fhir_df_description(resource = "Patient",
 #'                     cols = c(name = "name/family",
 #'                              gender = "gender",
@@ -62,13 +63,14 @@ setValidity(
 #'             )
 #'
 #' #create design
+#'
 #' #First option
 #' design <- fhir_design(df_desc1, df_desc2, names = c("Patients", "Observations"))
 #'
 #' #second option
 #' design <- fhir_design(list(Patients = df_desc1, Observations = df_desc2))
 #'
-#' #have a look
+#' #have a look at the design
 #' design
 #'
 #' ###Example 2###
@@ -98,6 +100,8 @@ setValidity(
 #'               )
 #'
 #' new_design <- fhir_design(old_design)
+#'
+#' #have a look at the design
 #' new_design
 #'
 
@@ -154,12 +158,16 @@ setMethod(
 	"show",
 	"fhir_design",
 	function(object){
-		cat(paste0("A fhir_design with ", length(object), " df_descriptions:\n\n\n"))
+		cat(paste0("A fhir_design with ", length(object), " df_descriptions:\n"))
 		lapply(1:length(object), function(i){
-			cat(names(object)[i])
-			cat(":\n")
-			show(object[[i]])
-			cat("\n\n\n")
+			df_desc <- object[[i]]
+			cat("=====================================================\n")
+			cat(paste0("Name: ", names(object)[i]))
+			cat("\n\n")
+			cat(paste0("Resource type: ", as.character(df_desc@resource), "\n\n"))
+			cat("Columns: \n"); show(df_desc@cols)
+			cat("\n\nStyle: \n");	show(df_desc@style)
+			cat("\n")
 			})
 
 	})

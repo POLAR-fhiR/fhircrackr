@@ -8,7 +8,7 @@
 A fhir_design is a named list of \linkS4class{fhir_df_desciption} objects. Each df_description
 contains information on how to flatten one resource type which will result in one
 data.frame. The fhir_design is passed to the function \code{\link[=fhir_crack]{fhir_crack()}} along with a
-list of bundles containing fhir resources.
+list of bundles containing FHIR resources.
 }
 \section{Slots}{
 

@@ -74,8 +74,8 @@ setMethod(
 		}
 
 		cat(paste0(
-			"A fhir_style object:\n\nsep: ",
-			sep, "\nbrackets: ", brackets,
+		#	"A fhir_style object:\n\n",
+			"sep: ",sep, "\nbrackets: ", brackets,
 			"\nrm_empty_cols: ", rm_empty_cols
 		))
 	}

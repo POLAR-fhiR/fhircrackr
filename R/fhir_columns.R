@@ -136,7 +136,7 @@ setMethod(
 		)
 		cat(
 			paste0(
-				"A fhir_columns object:\n\n",
+			#	"A fhir_columns object:\n\n",
 				header,
 				paste(
 					paste0(stringr::str_pad(names(object), colwidth1, side="right"), "| ", object),
