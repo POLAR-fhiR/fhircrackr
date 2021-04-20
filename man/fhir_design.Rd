@@ -8,17 +8,21 @@ fhir_design(..., names)
 }
 \arguments{
 \item{...}{One ore more \linkS4class{fhir_df_description} objects or a named list containing
-\linkS4class{fhir_df_description} objects, see examples.}
+\linkS4class{fhir_df_description} objects, or an object of class \linkS4class{fhir_df_list} or \linkS4class{fhir_dt_list}.
+See examples.}
 
-\item{names}{The names of the df_descriptions. This argument is not necessary when df_descriptions are
-provided in a named list and will be ignored in this case.
-The names will also be the names of the resulting data.frames in \code{\link[=fhir_crack]{fhir_crack()}}.}
+\item{names}{The names of the df_descriptions. This argument is only necessary when df_descriptions are
+provided individually and will be ignored otherwise.}
 }
 \description{
 A \linkS4class{fhir_design} is a list of \linkS4class{fhir_df_description} objects and should be created
 using the function described here. For backwards compatibility
 it is for the moment also possible to build it from an old-style design as used in
 \verb{fhircrackr (< 1.0.0)}. See examples.
+}
+\details{
+If this function is given an object of class \linkS4class{fhir_df_list} or \linkS4class{fhir_dt_list}, it will
+extract the design that was used to create the respective list.
 }
 \examples{
 
@@ -81,5 +85,9 @@ new_design <- fhir_design(old_design)
 
 #have a look at the design
 new_design
+
+###Example 3###
+#Extract design from fhir_df_list/fhir_dt_list
+TODO: Create example when fhir_crack is ready.
 
 }

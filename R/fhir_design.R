@@ -36,11 +36,14 @@ setValidity(
 #' it is for the moment also possible to build it from an old-style design as used in
 #' `fhircrackr (< 1.0.0)`. See examples.
 #'
+#' If this function is given an object of class [fhir_df_list-class] or [fhir_dt_list-class], it will
+#' extract the design that was used to create the respective list.
+#'
 #' @param ... One ore more [fhir_df_description-class] objects or a named list containing
-#' [fhir_df_description-class] objects, see examples.
-#' @param names The names of the df_descriptions. This argument is not necessary when df_descriptions are
-#' provided in a named list and will be ignored in this case.
-#' The names will also be the names of the resulting data.frames in [fhir_crack()].
+#' [fhir_df_description-class] objects, or an object of class [fhir_df_list-class] or [fhir_dt_list-class].
+#' See examples.
+#' @param names The names of the df_descriptions. This argument is only necessary when df_descriptions are
+#' provided individually and will be ignored otherwise.
 #'
 #' @examples
 #'
@@ -104,6 +107,10 @@ setValidity(
 #' #have a look at the design
 #' new_design
 #'
+#' ###Example 3###
+#' #Extract design from fhir_df_list/fhir_dt_list
+#' TODO: Create example when fhir_crack is ready.
+#'
 
 setGeneric(
 	"fhir_design",
@@ -112,6 +119,8 @@ setGeneric(
 	},
 	signature = "..."
 )
+
+#method for fhir_table_list in fhir_table_list.R
 
 setMethod(
 	"fhir_design",
@@ -158,16 +167,21 @@ setMethod(
 	"show",
 	"fhir_design",
 	function(object){
-		cat(paste0("A fhir_design with ", length(object), " df_descriptions:\n"))
-		lapply(1:length(object), function(i){
-			df_desc <- object[[i]]
-			cat("=====================================================\n")
-			cat(paste0("Name: ", names(object)[i]))
-			cat("\n\n")
-			cat(paste0("Resource type: ", as.character(df_desc@resource), "\n\n"))
-			cat("Columns: \n"); show(df_desc@cols)
-			cat("\n\nStyle: \n");	show(df_desc@style)
-			cat("\n")
+		if(length(object)==0){
+			cat("An empty fhir_design_object")
+		}else{
+			cat(paste0("A fhir_design with ", length(object), " df_descriptions:\n"))
+			lapply(1:length(object), function(i){
+				df_desc <- object[[i]]
+				cat("=====================================================\n")
+				cat(paste0("Name: ", names(object)[i]))
+				cat("\n\n")
+				cat(paste0("Resource type: ", as.character(df_desc@resource), "\n\n"))
+				cat("Columns: \n"); show(df_desc@cols)
+				cat("\n\nStyle: \n");	show(df_desc@style)
+				cat("\n")
 			})
+			}
+
 
 	})
