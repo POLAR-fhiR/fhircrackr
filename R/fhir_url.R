@@ -46,7 +46,7 @@ setClass(
 #'
 #' @param base A character of length 1 with the base URL to the FHIR server, e.g. `"http://hapi.fhir.org/baseR4"`
 #' @param resource A character of length 1 with the resource type to be searched, e.g. `"Patient"`
-#' @param parameters Optional. An object of type [fhir_parameters-class] or a string or list that can be
+#' @param parameters Optional. An object of type [fhir_parameters-class] or a character vector or list that can be
 #' converted into an [fhir_parameters-class] object. See the help for [fhir_parameters()] for more info.
 #'
 #' @examples
@@ -65,9 +65,7 @@ setClass(
 #' fhir_search_url(
 #'    base = "http://hapi.fhir.org/baseR4",
 #'    resource = "Patient",
-#'    parameters = list(c("gender", "male"),
-#'                      c("_summary", "count")
-#'                 )
+#'    parameters = c("gender" = "male", "_summary" = "count")
 #'  )
 #'
 

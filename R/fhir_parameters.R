@@ -42,19 +42,19 @@ setMethod(
 	}
 )
 
-#constructor for user
-#Generic method to allow for different input types
 
 #' Create [fhir_parameters-class] object
 #'
-#' A [fhir_parameters-class] object can be created in two ways:
+#' A [fhir_parameters-class] object can be created in three ways:
 #'  - You provide a length 1 character with all the search parameters pasted together properly
-#'  - You provide a list with length two character vectors containing key value pairs.
-#'  See examples.
+#'  - You provide a named character vector with names representing the keys and values
+#'  representing the values of the search parameters
+#'  - You provide a named list of strings with names representing the keys and values
+#'  representing the values of the search parameters
 #'
 #' @param parameters Either a length 1 character containing properly formatted FHIR search parameters, e.g.
-#' `"gender=male&_summary=count"` or list of length 2 character vectors each representing one key value pair,
-#' with the first element as the key and the second element as the value, e.g. `list(c("gender", "male"), c("_summary", "count"))`
+#' `"gender=male&_summary=count"` or a named list or named character vector e.g. `list(gender="male", "_summary"="count")`
+#' or `c(gender="male", "_summary"="count")`. Note that parameters beginning with `_` have to be put in quotation marks!
 #'
 #' @examples
 #' #two ways to create the same fhir_parameters object
@@ -62,12 +62,11 @@ setMethod(
 #' #using a string
 #' fhir_parameters("gender=male&birthdate=le2000-01-01&_summary=count")
 #'
+#' #using a character vector
+#' fhir_parameters(c(gender="male", birthdate="le2000-01-01", "_summary"="count"))
+#'
 #' #using a list
-#' fhir_parameters(list(c("gender", "male"),
-#'                      c("birthdate", "le2000-01-01"),
-#'                      c("_summary", "count")
-#'                  )
-#'  )
+#' fhir_parameters(list(gender="male", birthdate="le2000-01-01", "_summary"="count"))
 
 
 setGeneric(
@@ -82,14 +81,20 @@ setMethod(
 	"fhir_parameters",
 	signature = c(parameters = "character"),
 	function(parameters) {
-		if(1 < length(parameters)) {
-	  		stop("You can only provide a character vector of lenth 1 to this function.")
+		if(length(parameters)==1 && grepl("=", parameters)) {
+			pairs <- strsplit(parameters, "&", fixed=TRUE)[[1]]
+			pairs <- strsplit(pairs, "=")
+			keys <- sapply(pairs, function(x) {x[1]})
+			values <- sapply(pairs, function(x) {x[2]})
+			new("fhir_parameters", structure(values, names=keys))
+		}else{
+	  		if(is.null(names(parameters))){
+	  			stop("A character vector has to be named to create parameters from it.")
+	  		}
+			new("fhir_parameters", parameters)
+
 	  	}
-	  	pairs <- strsplit(parameters, "&", fixed=TRUE)[[1]]
-	  	pairs <- strsplit(pairs, "=")
-	  	keys <- sapply(pairs, function(x) {x[1]})
-	  	values <- sapply(pairs, function(x) {x[2]})
-	  	new("fhir_parameters", structure(values, names=keys))
+
 	}
 )
 
@@ -100,11 +105,11 @@ setMethod(
 	  	if(any(!sapply(parameters, function(x) {is.character(x)}))) {
 	  		stop("The provided list must have elements of type character")
 	  	}
-		if(any(sapply(parameters, length) != 2)) {
-				stop("All list elements must be exactly of length two")
+		if(is.null(names(parameters))) {
+				stop("Please provide a named list.")
 		}
-		keys <- sapply(parameters, function(x) {x[1]})
-		values <- sapply(parameters, function(x) {x[2]})
+		keys <- names(parameters)
+		values <- unlist(parameters)
 		new("fhir_parameters", structure(values, names=keys))
 	}
 )

@@ -8,7 +8,7 @@ testthat::test_that(
 		u2 <- fhir_search_url(
 			base = "http://hapi.fhir.org/baser4",
 			resource = "Patient",
-			parameters = list(c("gender", "male"), c("_summary", "count")))
+			parameters = list("gender"= "male", "_summary" = "count"))
 
 		testthat::expect_s4_class(u1, "fhir_search_url")
 		testthat::expect_s4_class(u2, "fhir_search_url")
@@ -21,7 +21,7 @@ testthat::test_that(
 		u1 <- fhir_search_url(
 			base = "http://hapi.fhir.org/baser4",
 			resource = "Patient",
-			parameters = list(c("gender", "male"), c("_summary", "count")))
+			parameters =list("gender"= "male", "_summary" = "count"))
 
 
 		u2 <- fhir_search_url(
