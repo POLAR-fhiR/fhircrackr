@@ -2,19 +2,20 @@
 % Please edit documentation in R/download_resources.R
 \name{fhir_unserialize}
 \alias{fhir_unserialize}
-\title{Unserialize a FHIR Bundle list}
+\title{Unserialize a \linkS4class{fhir_bundle} or \linkS4class{fhir_bundle_list}}
 \usage{
 fhir_unserialize(bundles)
 }
 \arguments{
-\item{bundles}{A list of serialized xml objects representing FHIR bundles as returned by \code{\link{fhir_search}}}
+\item{bundles}{A \linkS4class{fhir_bundle} or \linkS4class{fhir_bundle_list} object.}
 }
 \value{
-A list of unserialized xml objects
+A  \linkS4class{fhir_bundle_serialized} or \linkS4class{fhir_bundle_list} object.
 }
 \description{
 Unserializes a list of FHIR bundles that have been serialized to allow for saving in .rda or .RData format.
 }
 \examples{
 bundles <- fhir_unserialize(medication_bundles)
+
 }

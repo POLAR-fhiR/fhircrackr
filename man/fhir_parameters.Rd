@@ -8,15 +8,17 @@ fhir_parameters(parameters)
 }
 \arguments{
 \item{parameters}{Either a length 1 character containing properly formatted FHIR search parameters, e.g.
-\code{"gender=male&_summary=count"} or list of length 2 character vectors each representing one key value pair,
-with the first element as the key and the second element as the value, e.g. \code{list(c("gender", "male"), c("_summary", "count"))}}
+\code{"gender=male&_summary=count"} or a named list or named character vector e.g. \code{list(gender="male", "_summary"="count")}
+or \code{c(gender="male", "_summary"="count")}. Note that parameters beginning with \verb{_} have to be put in quotation marks!}
 }
 \description{
-A \linkS4class{fhir_parameters} object can be created in two ways:
+A \linkS4class{fhir_parameters} object can be created in three ways:
 \itemize{
 \item You provide a length 1 character with all the search parameters pasted together properly
-\item You provide a list with length two character vectors containing key value pairs.
-See examples.
+\item You provide a named character vector with names representing the keys and values
+representing the values of the search parameters
+\item You provide a named list of strings with names representing the keys and values
+representing the values of the search parameters
 }
 }
 \examples{
@@ -25,10 +27,9 @@ See examples.
 #using a string
 fhir_parameters("gender=male&birthdate=le2000-01-01&_summary=count")
 
+#using a character vector
+fhir_parameters(c(gender="male", birthdate="le2000-01-01", "_summary"="count"))
+
 #using a list
-fhir_parameters(list(c("gender", "male"),
-                     c("birthdate", "le2000-01-01"),
-                     c("_summary", "count")
-                 )
- )
+fhir_parameters(list(gender="male", birthdate="le2000-01-01", "_summary"="count"))
 }

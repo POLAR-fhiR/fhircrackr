@@ -1,12 +1,15 @@
 
 
-## New functions in for_master_branch
+## New functions
 
 fhir_extract_indices
 fhir_melt_all
 fhir_restore_indices
 
-## News already in master (but probably not tested yet)
+## News
+
+- Argument log_errors in `fhir_search()` is now logical and writes only xml (no tables anymore), but takes 
+all numbers `> 0` to mean `TRUE` for backwards compatibility. 
 
 - New argument `delay_between_pages` for `fhir_search()` allowing to put a delay between the download of bundles 
 (i.e. pages) in a bigger search request to prevent weak servers from choking.

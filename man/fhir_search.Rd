@@ -19,7 +19,9 @@ fhir_search(
 )
 }
 \arguments{
-\item{request}{A string containing the full FHIR search request. Defaults to \code{\link{fhir_current_request}}}
+\item{request}{An object of class \linkS4class{fhir_search_url} or a string containing the full FHIR search request. It is
+recommended to explicitly create the request via \code{\link[=fhir_search_url]{fhir_search_url()}} as this will do some validity checks and format the url properly.
+TODO: Defaults to \code{\link{fhir_current_request}}}
 
 \item{username}{A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.}
 
@@ -62,5 +64,13 @@ A list of bundles in xml format when \code{save_to_disc = FALSE} (the default), 
 Downloads all FHIR bundles of a FHIR search request from a FHIR server.
 }
 \examples{
-\donttest{bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)}
+\donttest{
+
+#create fhir search url
+request <- fhir_search_url(base = "https://hapi.fhir.org/baseR4",
+                           resource = "Patient",
+                           parameters = c(gender="female"))
+#download bundles
+bundles <- fhir_search(request, max_bundles=3)
+}
 }

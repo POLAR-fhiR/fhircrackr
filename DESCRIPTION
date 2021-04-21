@@ -48,11 +48,11 @@ Depends:
     R (>= 3.5.0)
 Collate: 
     'design.R'
+    'fhir_bundle.R'
+    'fhir_bundle_list.R'
     'download_resources.R'
     'fhir_parameters.R'
     'fhir_body.R'
-    'fhir_bundle.R'
-    'fhir_bundle_list.R'
     'fhir_xpath_expression.R'
     'fhir_columns.R'
     'fhir_style.R'

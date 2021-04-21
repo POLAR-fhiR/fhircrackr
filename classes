@@ -23,13 +23,13 @@
 
 #Level 4
 - design
-- capability_statement
 
 #Level 5
 - fhir_table_list -> fhir_df_list, fhir_dt_list
 
 ##Später
 - fhir_POSTbundle_url -> abgeleitet von fhir_base_url + keine zusätzlichen slots
+- capability_statement
 
 
 
