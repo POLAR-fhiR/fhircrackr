@@ -7,7 +7,7 @@
 fhir_next_bundle_url()
 }
 \value{
-A string containing an url to the next bundle available on the FHIR server of your last call to
+A \linkS4class{fhir_url} object referencing next bundle available on the FHIR server of your last call to
 \code{\link{fhir_search}} or NULL if no further bundle is available.
 }
 \description{
@@ -24,7 +24,7 @@ See details in the example.
 # your FHIR search request.
 # You can iteratively download, crack and save the bundles until all bundles are processed or the
 # desired number of bundles is reached.
-url <- "http://hapi.fhir.org/baseR4/Observation"
+url <- fhir_url("http://hapi.fhir.org/baseR4/Observation")
 count <- 0
 while(!is.null(url) && count < 5){
 	bundles <- fhir_search(url, verbose = 2, max_bundles = 2)

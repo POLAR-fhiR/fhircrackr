@@ -2,20 +2,23 @@
 % Please edit documentation in R/download_resources.R
 \name{fhir_serialize}
 \alias{fhir_serialize}
-\title{Serialize a FHIR Bundle list}
+\title{Serialize a \linkS4class{fhir_bundle} or \linkS4class{fhir_bundle_list}}
 \usage{
 fhir_serialize(bundles)
 }
 \arguments{
-\item{bundles}{A list of xml objects representing FHIR bundles as returned by \code{\link{fhir_search}}}
+\item{bundles}{A \linkS4class{fhir_bundle} or \linkS4class{fhir_bundle_list} object.}
 }
 \value{
-A list of serialized xml objects
+A  \linkS4class{fhir_bundle_xml} or \linkS4class{fhir_bundle_list} object.
 }
 \description{
-Serializes a list of FHIR bundles to allow for saving in .rda or .RData format without losing integrity of pointers
+Serializes FHIR bundles to allow for saving in .rda or .RData format without losing integrity of pointers
+i.e. it turns a \linkS4class{fhir_bundle_xml} object into an \linkS4class{fhir_bundle_serialized} object.
 }
 \examples{
+
+TODO: update example
 #example bundles are serialized, unserialize like this:
 bundles <- fhir_unserialize(medication_bundles)
 

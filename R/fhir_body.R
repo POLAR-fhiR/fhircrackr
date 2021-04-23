@@ -5,7 +5,6 @@
 #'objects of this class should always be created with a call to the function [fhir_body()]
 #' @slot content a length 1 character representing the body for the post
 #' @slot type a length 1 character defining the type of the body e.g. `"application/x-www-form-urlencoded"` or `"xml"`
-#' @include fhir_parameters.R
 
 setClass(
 	"fhir_body",
@@ -33,20 +32,19 @@ setValidity(
 
 #' create [fhir_body-class] object
 #'
-#' @param content a string representing the body for the post in the format specified in `type` or
-#' a [fhir_params-class] object. In the latter case the `type` argument should be omitted
-#' and is automatically set to `"application/x-www-form-urlencoded"`
+#' @param content A string representing the body for the post in the format specified in `type`.
+#' If you provide a named list here, it will be taken as key value pairs of FHIR search parameters
+#' and will be concatenated appropriately, in which case the `type` will automatically be set to
+#' `"application/x-www-form-urlencoded"`. See examples.
 #'
-#' @param type a string defining the type of the body e.g. `"application/x-www-form-urlencoded"` or `"xml"`
+#' @param type A string defining the type of the body e.g. `"application/x-www-form-urlencoded"` or `"xml"`.
 #'
-#' @return an object of type [fhir_body-class]
+#' @return An object of type [fhir_body-class]
 #'
 #' @examples
 #'  #body that could be used in a FHIR seach request POSTed to an URL like baseurl/Patient/_search
 #' fhir_body(content = "gender=female&_summary=count", type="application/x-www-form-urlencoded")
-#'
-#' #same request providing a fhir_parameters object
-#' fhir_body(content = fhir_parameters(list(c("gender", "female"), c("_summary", "count"))))
+#' fhir_body(content = list("gender" = "female", "_summary" = "count"))
 
 
 setGeneric(
@@ -58,29 +56,45 @@ setGeneric(
 
 setMethod(
 	"fhir_body",
-	c(content = "fhir_parameters", type="missing"),
+	c(content = "list", type="missing"),
 	function(content){
-		keys <- sapply(content@param_pairs, function(x)x@key)
-		values <- sapply(content@param_pairs, function(x)x@value)
+		if(any(!sapply(content, function(x) {is.character(x)}))) {
+			stop("The provided list must have elements of type character")
+		}
+		if(is.null(names(content))) {
+			stop("Please provide a named list.")
+		}
+
+		keys <- names(content)
+		values <- unlist(content)
 		pairs <- paste(keys, values, sep = "=")
 		string <- paste(pairs, collapse = "&")
-		new("fhir_body", content = utils::URLdecode(string), type="application/x-www-form-urlencoded")
+
+		new("fhir_body", content = string, type="application/x-www-form-urlencoded")
 	}
 )
 
+
+
 setMethod(
 	"fhir_body",
-	c(content = "fhir_parameters", type="character"),
+	c(content = "list", type="character"),
 	function(content, type){
-		message("When body is a fhir_parameters object, the type you provided ",
-				"will be overwritten with 'application/x-www-form-urlencoded'")
+		message("When content is a list, the type you provided will be overwritten with 'application/x-www-form-urlencoded'")
 
+		if(any(!sapply(content, function(x) {is.character(x)}))) {
+			stop("The provided list must have elements of type character")
+		}
+		if(is.null(names(content))) {
+			stop("Please provide a named list.")
+		}
 
-		keys <- sapply(content@param_pairs, function(x)x@key)
-		values <- sapply(content@param_pairs, function(x)x@value)
+		keys <- names(content)
+		values <- unlist(content)
 		pairs <- paste(keys, values, sep = "=")
 		string <- paste(pairs, collapse = "&")
-		new("fhir_body", content = utils::URLdecode(string), type="application/x-www-form-urlencoded")
+
+		new("fhir_body", content = string, type="application/x-www-form-urlencoded")
 	}
 )
 
@@ -88,6 +102,7 @@ setMethod(
 	"fhir_body",
 	c(content = "character", type="character"),
 	function(content, type){
+
 		new("fhir_body", content=content, type=type)
 	}
 )

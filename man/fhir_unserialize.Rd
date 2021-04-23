@@ -13,9 +13,10 @@ fhir_unserialize(bundles)
 A  \linkS4class{fhir_bundle_serialized} or \linkS4class{fhir_bundle_list} object.
 }
 \description{
-Unserializes a list of FHIR bundles that have been serialized to allow for saving in .rda or .RData format.
+Unserializes FHIR bundles that have been serialized to allow for saving in .rda or .RData format,
+i.e. it turns a \linkS4class{fhir_bundle_serialized} object into an \linkS4class{fhir_bundle_xml} object.
 }
 \examples{
-bundles <- fhir_unserialize(medication_bundles)
+TODO: update example bundles <- fhir_unserialize(medication_bundles)
 
 }

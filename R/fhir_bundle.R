@@ -1,8 +1,11 @@
 #Class definition
 #' An S4 class ro represent FHIR bundles
+#' @include fhir_url.R
 setClass(
 	"fhir_bundle",
-	contains = "VIRTUAL"
+	contains = "VIRTUAL",
+	slots = c(next_url = "fhir_url",
+			  self_url = "fhir_url")
 )
 
 
@@ -39,15 +42,19 @@ setValidity(
 #' fhir_bundle_xml(xml2::xml_unserialize(patient_bundles[[1]]))
 #'
 fhir_bundle_xml <- function(bundle) {
-	new("fhir_bundle_xml", bundle)
+
+	links <- xml2::xml_find_all(bundle, "link")
+	rels.nxt <-	xml2::xml_text(xml2::xml_find_first(links, "./relation/@value")) == "next"
+	rels.self <- xml2::xml_text(xml2::xml_find_first(links, "./relation/@value")) == "self"
+	urls <- xml2::xml_attr(xml2::xml_find_all(links, "url"), "value")
+
+	new("fhir_bundle_xml", bundle, next_url = fhir_url(urls[rels.nxt]), self_url = fhir_url(urls[rels.self]))
 }
 
 setMethod(
 	"show",
 	"fhir_bundle_xml",
 	function(object) {
-
-
 		cat(paste0("A fhir_bundle_xml object with ", length(xml2::xml_find_all(object, "entry")), " entries:\n\n"))
 		print(object)
     }

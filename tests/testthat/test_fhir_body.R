@@ -2,7 +2,7 @@
 testthat::test_that(
 	"methods for fhir_body() create identical results", {
 		b1 <- fhir_body(content = "gender=female&_summary=count", type="application/x-www-form-urlencoded")
-		b2 <- fhir_body(content = fhir_parameters(list(c("gender", "female"), c("_summary", "count"))))
+		b2 <- fhir_body(content = list("gender"="female", "_summary"= "count"))
 		testthat::expect_identical(b1, b2)
 	}
 )

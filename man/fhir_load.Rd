@@ -10,12 +10,13 @@ fhir_load(directory)
 \item{directory}{A string containing the path to the folder were the files are stored.}
 }
 \value{
-A list of bundles in xml format.
+A \linkS4class{fhir_bundle_list}.
 }
 \description{
 Reads all bundles stored as xml files from a directory.
 }
 \examples{
+TODO
 #unserialize example bundle
 bundles <- fhir_unserialize(medication_bundles)
 

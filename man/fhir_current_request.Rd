@@ -2,10 +2,13 @@
 % Please edit documentation in R/download_resources.R
 \name{fhir_current_request}
 \alias{fhir_current_request}
-\title{return FHIR search request used in last call to fhir_search}
+\title{Return FHIR search request used in last call to \code{\link[=fhir_search]{fhir_search()}} or \code{\link[=fhir_search_url]{fhir_search_url()}}}
 \usage{
 fhir_current_request()
 }
+\value{
+An object of class \code{\link[=fhir_search_url]{fhir_search_url()}}
+}
 \description{
-return FHIR search request used in last call to fhir_search
+Return FHIR search request used in last call to \code{\link[=fhir_search]{fhir_search()}} or \code{\link[=fhir_search_url]{fhir_search_url()}}
 }

@@ -19,8 +19,8 @@ fhir_search(
 )
 }
 \arguments{
-\item{request}{An object of class \linkS4class{fhir_search_url} or a string containing the full FHIR search request. It is
-recommended to explicitly create the request via \code{\link[=fhir_search_url]{fhir_search_url()}} as this will do some validity checks and format the url properly.
+\item{request}{An object of class \linkS4class{fhir_url} or a string containing the full FHIR search request. It is
+recommended to explicitly create the request via \code{\link[=fhir_url]{fhir_url()}} as this will do some validity checks and format the url properly.
 TODO: Defaults to \code{\link{fhir_current_request}}}
 
 \item{username}{A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.}

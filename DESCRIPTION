@@ -48,10 +48,10 @@ Depends:
     R (>= 3.5.0)
 Collate: 
     'design.R'
+    'fhir_url.R'
     'fhir_bundle.R'
     'fhir_bundle_list.R'
     'download_resources.R'
-    'fhir_parameters.R'
     'fhir_body.R'
     'fhir_xpath_expression.R'
     'fhir_columns.R'
@@ -60,7 +60,6 @@ Collate:
     'fhir_df_description.R'
     'fhir_design.R'
     'fhir_table_list.R'
-    'fhir_url.R'
     'flatten_resources.R'
     'miscellaneous.R'
     'multiple_entries.R'

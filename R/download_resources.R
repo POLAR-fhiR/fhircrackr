@@ -1,13 +1,11 @@
 ## This file contains all functions for downloading/loading/saving resources##
 ## Exported functions are on top, internal functions below ##
 
-#TODO von unten nach oben hoch, bei fhir_update_request weiter machen
-
 #' Download FHIR search result
 #' @description Downloads all FHIR bundles of a FHIR search request from a FHIR server.
 #'
-#' @param request An object of class [fhir_search_url-class] or a string containing the full FHIR search request. It is
-#' recommended to explicitly create the request via [fhir_search_url()] as this will do some validity checks and format the url properly.
+#' @param request An object of class [fhir_url-class] or a string containing the full FHIR search request. It is
+#' recommended to explicitly create the request via [fhir_url()] as this will do some validity checks and format the url properly.
 #' TODO: Defaults to \code{\link{fhir_current_request}}
 #' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
@@ -74,7 +72,7 @@ fhir_search <- function(
 	}
 
 
-	addr <- collapse_fhir_search_url(request)
+	addr <- fhir_url(request)
 
 	#starting message
 	if (0 < verbose) {
@@ -209,266 +207,6 @@ fhir_search <- function(
 }
 
 
-####Build FHIR Search####
-
-
-#' Format FHIR base url
-#'
-#' Takes an url string and removes leading/trailing white space and unnecessary slashes.
-#' Is supposed to be used with \code{\link{fhir_build_request}}.
-#' @param url A string containing the base URL of the FHIR server, e.g.  "http://hapi.fhir.org/baseR4"
-#' @return The formatted url in a named character vector
-#' @examples fhir_base(" http://hapi.fhir.org/baseR4/")
-#' @export
-
-fhir_base <- function(url){
-
-	#remove leading/trailing white space
-	url <- stringr::str_trim(url, side="both")
-
-
-	#remove trailing /
-	if(stringr::str_sub(url, -1) =="/"){
-
-		url <- stringr::str_sub(url, 1,-2)
-
-	}
-
-	return(c(base=url))
-}
-
-#' Check and format FHIR resource type for FHIR search
-#'
-#' This function takes a string defining a FHIR resource type and formats it correctly,
-#' removing white space and slashes. It also checks the resource against the list
-#' of resources provided at https://hl7.org/FHIR/resourcelist.html and throws a warning
-#' if the resource doesn't match. \code{fhir_resource} is supposed to be used with
-#' \code{\link{fhir_build_request}}.
-#'
-#' @param resource A string containing the resource type for the FHIR search.
-#' Should be one of the official FHIR resource types listed at https://hl7.org/FHIR/resourcelist.html
-#' @return A named character vector with the checked and formatted resource type
-#' @examples fhir_resource("patient")
-#' @export
-#'
-fhir_resource <- function(resource){
-
-	#remove / and white space
-	resource <- stringr::str_remove_all(resource, "/| ")
-
-	#convert to correct case and check for validity
-	if(tolower(resource) %in% tolower(existing_resource_types)){
-		resource <- existing_resource_types[tolower(resource) == tolower(existing_resource_types)]
-	}else{
-		warning("It seems that the resource you provided is not one of the official resource types from https://hl7.org/FHIR/resourcelist.html. ",
-				"If you are sure this resource exists on your server you can ignore this warning.")
-	}
-
-
-	stringr::str_sub(resource,1,1) <- stringr::str_to_upper(stringr::str_sub(resource,1,1))
-
-
-	return(c(resource=resource))
-}
-
-#' Build key value pairs for FHIR search
-#'
-#' Takes two strings representing a key value pair for a FHIR search parameter and
-#' encodes the pair properly.  \code{fhir_key_value} is supposed to be used with
-#' \code{\link{fhir_build_request}}
-#'
-#' @param key The name of the search parameter, e.g. "_include", "gender" or "_summary".
-#' For a general overview see https://www.hl7.org/fhir/search.html
-#' and also check out the paragraph on search parameters for the respective resource,
-#' e.g. http://www.hl7.org/fhir/patient.html#search
-#' @param value The name of the respective value for the parameter, e.g. "Observation:patient",
-#' "female" or "count".
-#' @param url_enc URL encode key value pairs? Defaults to TRUE, which is advisable in most cases.
-#' @return A string with the appropriately encoded key value pairs
-#' @export
-#' @examples
-#' fhir_key_value(key = "gender", value = "female")
-#' fhir_key_value(key = "category", value = "http://snomed.info/sct|116223007")
-
-
-
-fhir_key_value <-function(key, value, url_enc = TRUE){
-
-	#remove leading/trailing whitespace
-	key <- stringr::str_trim(key)
-	value <- stringr::str_trim(value)
-
-	#url encode
-	if(url_enc){
-		key <- utils::URLencode(key, reserved = TRUE, repeated = FALSE)
-		value <- utils::URLencode(value, reserved = TRUE, repeated = FALSE)
-	}
-
-	#paste
-	result <- paste0(key, "=", value)
-
-	return(c(keyval = result))
-}
-
-#' Build FHIR search request from base url, resource type and search parameters
-#'
-#' This function takes its arguments from the functions \code{\link{fhir_base}},
-#' \code{\link{fhir_resource}} and \code{\link{fhir_key_value}}
-#' You must provide exactly one call to \code{\link{fhir_base}}, and one call to
-#' \code{\link{fhir_resource}}. You can provide none, one or multiple calls
-#' to \code{\link{fhir_key_value}} (See examples).
-#'
-#' Apart from returning the string the function saves the url as the current request.
-#' It can be accessed with \code{\link{fhir_current_request}}
-#'
-#' @param ... Calls to  \code{\link{fhir_base}}, \code{\link{fhir_resource}} and \code{\link{fhir_key_value}}
-#' @return A string containing a FHIR search request ready for use
-#' @export
-#' @examples
-#'
-#' #Look for all MedicationAdministration resources
-#'
-#' fhir_build_request(fhir_base(url = "http://hapi.fhir.org/baseR4"),
-#'                fhir_resource(resource = "MedicationAdministration")
-#'                )
-#'
-#' #current search request is updated to this url:
-#' fhir_current_request()
-#'
-#' #Look for all Condition resources,
-#' #include Patient resources they refer to
-#'
-#' fhir_build_request(fhir_base(url = "http://hapi.fhir.org/baseR4"),
-#'                fhir_resource(resource = "Condition"),
-#'                fhir_key_value(key = "_include", value = "Condition:patient")
-#'                )
-#'
-#' #Look for all Patient resources of Patients born before 1980,
-#' #sort by death date
-#'
-#' fhir_build_request(fhir_base("http://hapi.fhir.org/baseR4"),
-#'                fhir_resource("Patient"),
-#'                fhir_key_value("birthdate", "lt1980-01-01"),
-#'                fhir_key_value("_sort", "death-date")
-#'                )
-
-fhir_build_request <- function(...){
-
-	args <- list(...)
-
-	#unlist if arguments come from call to dissect_request
-	if(is.list(args[[1]])){
-		args <- args[[1]]
-	}
-
-	#process base url
-	base <- args[sapply(args, function(x) names(x)=="base")]
-
-	if(length(base) > 1){
-		warning("You provided more than one base url, only the first is used.")
-	}else if(length(base) < 1){
-		stop("You need to provide a base url using fhir_base(<insert URL here>)")
-	}
-
-	base <- base[[1]]
-
-	#process resource
-	resource <- args[sapply(args, function(x) names(x)=="resource")]
-
-	if(length(resource) > 1){
-		warning("You provided more than one resource, only the first is used.")
-	}else if(length(resource) < 1){
-		stop("You need to provide a resource type, e.g. fhir_resource(\"Patient\")")
-	}
-
-	resource <- resource[[1]]
-
-	keyvals <- paste(args[sapply(args, function(x) names(x)=="keyval")], collapse="&")
-
-	if(keyvals != ""){
-
-		result <- paste0(base, "/", resource, "?", keyvals)
-
-	}else{
-
-		result <- paste0(base, "/", resource)
-
-	}
-
-	fhircrackr_env$current_request <- result
-
-	return(result)
-}
-
-#' Update the current FHIR search request
-#'
-#' Takes the current request (the search request URL from either the last call to
-#' \code{\link{fhir_search}} or \code{\link{fhir_build_request}}) an updates the search
-#' parameters with new calls to \code{\link{fhir_key_value}}. The updated request can be
-#' accessed with \code{\link{fhir_current_request}}.
-#'
-#' @param ... calls to \code{\link{fhir_key_value}}
-#' @param append Logical. Keep key value pairs from current search request?
-#' Defaults to \code{FALSE}, meaning only base url and resource type from current request are kept.
-#' If \code{TRUE}, the new key value pairs will be added to the existing ones.
-#' @param return_request Logical. Return string with updated request? Defaults to \code{TRUE}.
-#'
-#' @examples
-#' #build request
-#' fhir_build_request(fhir_base("http://hapi.fhir.org/baseR4"),
-#'                fhir_resource("Patient"),
-#'                fhir_key_value(key = "gender", value = "female"))
-#'
-#' #access current request
-#' fhir_current_request()
-#'
-#' #update and keep former key value pairs
-#' fhir_update_request(fhir_key_value(key = "_count", value = "10"), append=TRUE)
-#' fhir_current_request()
-#'
-#' #update and replace former key value pairs
-#' fhir_update_request(fhir_key_value(key = "gender", value = "male"),
-#' append = FALSE, return_request = TRUE)
-#'
-#' @export
-#'
-#' @return  A string with the updated FHIR search request or \code{NULL}.
-
-
-fhir_update_request <- function(..., append = FALSE, return_request = TRUE){
-
-	#newly provided key value pairs
-	args <- list(...)
-
-	#check validity
-	if(any(sapply(args, function(x) names(x)!="keyval"))){
-		stop("Please only use calls to fhir_key_value() inside this function.")
-	}
-
-	if(is.null(fhircrackr_env$current_request)){
-		stop("It seems you haven't used fhir_search() or fhir_build_search_url()in this session yet. ",
-			 "There is no search url to update.")
-	}
-
-	#get old search request elements
-	old_elements <- dissect_request(fhircrackr_env$current_request)
-
-	#Remove old key value pairs if new pairs should replace old ones
-	if(!append){
-		old_elements[sapply(old_elements, function(x) names(x)=="keyval")] <-NULL
-	}
-
-	#build new url
-	fhircrackr_env$current_request <-
-		fhir_build_request(c(old_elements[sapply(old_elements, function(x) names(x)=="base")],
-							 old_elements[sapply(old_elements, function(x) names(x)=="resource")],
-							 old_elements[sapply(old_elements, function(x) names(x)=="keyval")],
-							 args))
-
-	if(return_request){return(fhircrackr_env$current_request)}
-}
-
-
 #' Next Bundle's URL
 #' @description fhir_next_bundle_url() gives the url of the next available bundle.
 #' This is useful when you have not a lot of memory available or when a download of bundles was
@@ -476,7 +214,7 @@ fhir_update_request <- function(..., append = FALSE, return_request = TRUE){
 #' \code{max_bundle} argument from \code{\link{fhir_search}} to download bundles in smaller batches in a loop.
 #' See details in the example.
 #'
-#' @return A string containing an url to the next bundle available on the FHIR server of your last call to
+#' @return A [fhir_url-class] object referencing next bundle available on the FHIR server of your last call to
 #' \code{\link{fhir_search}} or NULL if no further bundle is available.
 #' @export
 #'
@@ -488,8 +226,8 @@ fhir_update_request <- function(..., append = FALSE, return_request = TRUE){
 #' # You can iteratively download, crack and save the bundles until all bundles are processed or the
 #' # desired number of bundles is reached.
 
-
-#' url <- "http://hapi.fhir.org/baseR4/Observation"
+#TODO
+#' url <- fhir_url("http://hapi.fhir.org/baseR4/Observation")
 #' count <- 0
 #' while(!is.null(url) && count < 5){
 #' 	bundles <- fhir_search(url, verbose = 2, max_bundles = 2)
@@ -505,7 +243,9 @@ fhir_next_bundle_url <- function() {
 	fhircrackr_env$last_next_link
 }
 
-#' return FHIR search request used in last call to fhir_search
+#' Return FHIR search request used in last call to [fhir_search()] or [fhir_search_url()]
+#'
+#' @return An object of class [fhir_search_url()]
 #' @export
 
 
@@ -783,9 +523,6 @@ get_bundle <- function(
 	max_attempts = 5,
 	delay_between_attempts = 10,
 	log_errors = FALSE) {
-
-	#convert fhir_search_url to string
-	if(is(request, "fhir_search_url")){request <- collapse_fhir_search_url(request)}
 
 	#download response
 	for (n in 1:max_attempts) {
