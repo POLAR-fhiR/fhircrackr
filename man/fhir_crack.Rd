@@ -11,105 +11,78 @@ fhir_crack(
   remove_empty_columns = NULL,
   brackets = NULL,
   verbose = 2,
-  data.table = FALSE,
-  add_indices
+  data.table = FALSE
 )
 }
 \arguments{
-\item{bundles}{A FHIR search result as returned by \code{\link{fhir_search}}.}
+\item{bundles}{A FHIR search result as returned by \code{\link[=fhir_search]{fhir_search()}}.}
 
-\item{design}{A named list of data frame descriptions.
-Each data frame description will produce one data frame in the list of data frames returned by \code{fhir_crack}, where the data frame has the same name as the data frame description in \code{design}.
+\item{design}{A \linkS4class{fhir_design} object. See \code{?fhir_design} and the corresponding vignette
+(\code{vignette("flattenResources", package ="fhircrackr")}) for a more detailed explanation and
+comprehensive examples of a \linkS4class{fhir_design}.}
 
-Each data frame description is a list of 3 named elements:
-\enumerate{
-\item \code{design$resource}: Mandatory. A string with an XPath expression locating the entries for this data frame in a FHIR bundle page. This is usually the path to a resource tpye
-such as \code{"//Patient"} or \code{"//Observation"}.
-\item \code{design$cols}: Optional. A named list where the elements are XPath expressions indicating the specific
-position of attributes to extract and the names of the list elements are the column names of the resulting data frame. If \code{design$cols} is \code{NULL},
-all available attributes will be extracted and the column names are generated automatically and reflect the elements position in the resource.
-\item \code{design$style}: Optional. This can be used instead of the function arguments \code{sep}, \code{brackets} and \code{remove_empty_columns}, but will be
-overwritten if the corresponding function arguments are not \code{NULL}.
-}
+\item{sep}{Optional. A string to separate pasted multiple entries which will overwrite the \code{sep} defined in the
+\code{design}. If \code{sep=NULL}, it is looked up in the \code{design}, where the default is \code{" "}.}
 
-A named list with the following optional elements:
-\itemize{
-\item \code{design$style$sep} : A string to separate pasted multiple entries.
-\item \code{design$style$brackets}: A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
-If \code{NULL}, no indices will be added to multiple entries.
-\item \code{design$style$rm_empty_cols}: Logical scalar. Remove empty columns?
-}
+\item{remove_empty_columns}{Optional. Remove empty columns? Logical scalar which will overwrite the \code{rm_empty_cols} defined in the
+\code{design}. If \code{remove_empty_columns=NULL}, it is looked up in the \code{design}, where the default is \code{TRUE}.}
 
-For a more detailed explanation and comprehensive examples of \code{design}, please see the package vignette.}
-
-\item{sep}{A string to separate pasted multiple entries. NULL means \code{sep} is looked up in design, if it is \code{NULL} there too, \code{sep} will be set to \code{" "} as the default.}
-
-\item{remove_empty_columns}{Logical scalar. Remove empty columns? \code{NULL} means \code{remove_empty_columns} is looked up in \code{design}, if it is \code{NULL} there too, \code{remove_empty_columns}
-will be set to \code{TRUE} as the default.}
-
-\item{brackets}{A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
-If \code{NULL}, no indices will be added to multiple entries. \code{NULL} means \code{brackets} is looked up in design, if it is \code{NULL} there too, no indices are added.}
+\item{brackets}{Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")},
+which will overwrite the \code{brackets} defined in the \code{design}. If \code{brackets=NULL}, it is looked up in the \code{design}, where the default is \code{character(0)},
+i.e. no indices are added to multiple entries.}
 
 \item{verbose}{An Integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 extraction progress will be printed. Defaults to 2.}
 
 \item{data.table}{Logical scalar. Should tables be returned in data.table format instead of data.frame?
 defaults to FALSE.}
-
-\item{add_indices}{Deprecated. This argument was used to control adding of indices for multiple entries. This is now
-done via the brackets argument. If brackets is \code{NULL}, no indices are added, if brackets is not \code{NULL}, indices are added to multiple entries.}
 }
 \value{
-A list of data frames (if \code{data.table = FALSE}) or a list of data.tables
-if \code{data.table = TRUE}.
+A list of data.frames, i.e. a \linkS4class{fhir_df_list} object, or a list of data.tables, i.e. a \linkS4class{fhir_dt_list} object.
 }
 \description{
-Converts all FHIR bundles (the result of \code{\link{fhir_search}}) to a list of data frames.
+Converts a \linkS4class{fhir_bundle_list} (the result of \code{\link[=fhir_search]{fhir_search()}} to a list of data.frames/data.tables,
+i.e. a \linkS4class{fhir_df_list}/\linkS4class{fhir_dt_list}
 }
 \examples{
 #unserialize example bundle
 bundles <- fhir_unserialize(medication_bundles)
 
 #define attributes to extract
-design <- list(
-
- #define specifically which elements to extract
-	MedicationStatement = list(
-
-		resource = ".//MedicationStatement",
-
-		cols = list(
-				MS.ID              = "id",
-				STATUS.TEXT        = "text/status",
-				STATUS             = "status",
-				MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-				MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-				MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-				DOSAGE             = "dosage/text",
-				PATIENT            = "subject/reference",
-				LAST.UPDATE        = "meta/lastUpdated"
-		),
-
-		style = list(
-				sep = " ",
-				brackets = c("[", "]"),
-				rm_empty_cols= FALSE
-				)
-	),
-
- #extract all values
-	Patients = list(
-
-		resource = "//Patient"
-	)
+medications <- fhir_df_description(
+   resource = "MedicationStatement",
+   cols = c(
+			    	MS.ID              = "id",
+				    STATUS.TEXT        = "text/status",
+			    	STATUS             = "status",
+			    	MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+			    	MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+			    	MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+			    	DOSAGE             = "dosage/text",
+			    	PATIENT            = "subject/reference",
+			    	LAST.UPDATE        = "meta/lastUpdated"
+	    	),
+	 style = fhir_style(
+ 			sep = " ",
+	        	brackets = c("[", "]"),
+    		    rm_empty_cols= FALSE
+    		)
 )
 
-#convert fhir to data frames
-list_of_tables <- fhir_crack(bundles, design)
+patients <- fhir_df_description(
+   resource = "Patient"
+)
+
+design <- fhir_design(medications, patients)
+
+#convert bundles to data frames
+tables <- fhir_crack(bundles, design)
 
 #check results
-head(list_of_tables$MedicationStatement)
-head(list_of_tables$Patients)
+head(tables$medications)
+head(tables$patients)
 
+#The design that was used can be extracted from the tables like this:
+fhir_design(tables)
 
 }

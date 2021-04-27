@@ -2,13 +2,24 @@
 % Please edit documentation in R/download_resources.R
 \name{fhir_current_request}
 \alias{fhir_current_request}
-\title{Return FHIR search request used in last call to \code{\link[=fhir_search]{fhir_search()}} or \code{\link[=fhir_search_url]{fhir_search_url()}}}
+\title{Return FHIR search request used in last call to \code{\link[=fhir_search]{fhir_search()}} or \code{\link[=fhir_url]{fhir_url()}}}
 \usage{
 fhir_current_request()
 }
 \value{
-An object of class \code{\link[=fhir_search_url]{fhir_search_url()}}
+An object of class \code{\link[=fhir_url]{fhir_url()}}
 }
 \description{
-Return FHIR search request used in last call to \code{\link[=fhir_search]{fhir_search()}} or \code{\link[=fhir_search_url]{fhir_search_url()}}
+Return FHIR search request used in last call to \code{\link[=fhir_search]{fhir_search()}} or \code{\link[=fhir_url]{fhir_url()}}
+}
+\examples{
+\donttest{
+request <- fhir_url(url = "https://hapi.fhir.org/baseR4", resource = "Patient")
+fhir_current_request()
+
+fhir_search("https://hapi.fhir.org/baseR4/Medication")
+fhir_current_request()
+}
+
+
 }

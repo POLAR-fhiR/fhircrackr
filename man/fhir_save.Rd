@@ -69,7 +69,6 @@ fhir_crack(
 Save FHIR bundles as xml-files
 }
 \examples{
-TODO
 #unserialize example bundle
 bundles <- fhir_unserialize(medication_bundles)
 

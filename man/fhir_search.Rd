@@ -12,8 +12,8 @@ fhir_search(
   verbose = 1,
   max_attempts = 5,
   delay_between_attempts = 10,
-  log_errors = 0,
-  save_to_disc = FALSE,
+  log_errors = NULL,
+  save_to_disc = NULL,
   delay_between_pages = 0,
   directory = paste0("FHIR_bundles_", gsub("-| |:", "", Sys.time()))
 )
@@ -21,7 +21,7 @@ fhir_search(
 \arguments{
 \item{request}{An object of class \linkS4class{fhir_url} or a string containing the full FHIR search request. It is
 recommended to explicitly create the request via \code{\link[=fhir_url]{fhir_url()}} as this will do some validity checks and format the url properly.
-TODO: Defaults to \code{\link{fhir_current_request}}}
+Defaults to \code{\link[=fhir_current_request]{fhir_current_request()}}}
 
 \item{username}{A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.}
 
@@ -36,29 +36,23 @@ downloading progress will be printed. Defaults to 2.}
 
 \item{delay_between_attempts}{A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.}
 
-\item{log_errors}{Takes values 0, 1 or 2. Controls the logging of errors. 1 and 2 will write a file to the current working directory.
+\item{log_errors}{Either \code{NULL} or a string indicating the name of a file in which to save the http errors.
+\code{NULL} means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to \code{NULL}}
 
-0: no logging of errors,
-
-1: tabulate http response and write to csv-file
-
-2: write http response as to xml-file}
-
-\item{save_to_disc}{A logical scalar. If TRUE the bundles are saved as numerated xml-files into the directory specified
-in the argument \code{directory} and not returned as a bundle list in the R session. This is useful when a lot of
-bundles are to be downloaded and keeping them all in one R session might overburden working memory. When download
-is complete, the bundles can be loaded into R using \code{\link{fhir_load}}. Defaults to FALSE, i.e. bundles are
-returned as a list within the R session.}
+\item{save_to_disc}{Either \code{NULL} or a string indicating the name of a directory in which to save the bundles.
+If a directory name is provided, the bundles are saved as numerated xml-files into the directory specified
+and not returned as a bundle list in the R session. This is useful when a lot of bundles are to be downloaded and keeping them all
+in one R session might overburden working memory. When the download is complete, the bundles can be loaded into R using \code{\link[=fhir_load]{fhir_load()}}.
+Defaults to \code{NULL}, i.e. bundles are returned as a list within the R session.}
 
 \item{delay_between_pages}{A numeric scalar specifying a time in seconds to wait between pages of the search result,
 i.e. between downloading the current bundle and the next bundle. This can be used to avoid choking a weak server with
 too many requests to quickly. Defaults to zero.}
 
-\item{directory}{The directory the bundles are saved to when \code{save_to_disc} is TRUE. Defaults to creating a
-time-stamped directory into the current working directory.}
+\item{directory}{Deprecated. Please specify the directory directly in the \code{save_to_disc} argument.}
 }
 \value{
-A list of bundles in xml format when \code{save_to_disc = FALSE} (the default),  else NULL.
+A \linkS4class{fhir_bundle_list} when\code{save_to_disc = NULL} (the default),  else \code{NULL}.
 }
 \description{
 Downloads all FHIR bundles of a FHIR search request from a FHIR server.
@@ -67,10 +61,10 @@ Downloads all FHIR bundles of a FHIR search request from a FHIR server.
 \donttest{
 
 #create fhir search url
-request <- fhir_search_url(base = "https://hapi.fhir.org/baseR4",
-                           resource = "Patient",
-                           parameters = c(gender="female"))
+request <- fhir_url(url = "https://server.fire.ly",
+                    resource = "Patient",
+                    parameters = c(gender="female"))
 #download bundles
-bundles <- fhir_search(request, max_bundles=3)
+bundles <- fhir_search(request, max_bundles = 5)
 }
 }

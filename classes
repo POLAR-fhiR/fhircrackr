@@ -6,14 +6,14 @@
 - fhir_style -> slots: sep (character), brackets (character), rm_empty_cols (logical)
 - fhir_url (virtual) -> slots: base (character)
 - fhir_parameters -> slots: key (character), value(character)
-- fhir_bundle (virtual) -> slots: bundle(ANY)
+- fhir_bundle (virtual)
 - fhir_body -> slots: content (character), type (character)
 
-- fhir_bundle_xml -> abgeleitet von fhir_bundle, slots: bundle(xml_document)
-- fhir_bundle_serialized -> abgeleitet von fhir_bundle, slots: bundle(raw)
+- fhir_bundle_xml -> abgeleitet von fhir_bundle und xml_document, slots: self_url (fhir_url), next_url (fhir_url)
+- fhir_bundle_serialized -> abgeleitet von fhir_bundle und raw
 
 #Level 2
-- fhir_search_url -> abgeleitet von fhir_url + zusätzliche slots: fhir_resource_type, parameters = fhir_parameters
+- fhir_url -> abgeleitet von character
 - columns -> slots: colnames(character), expressions = list(fhir_xpath_expression)
 - bundle_list
 
@@ -28,25 +28,10 @@
 - fhir_table_list -> fhir_df_list, fhir_dt_list
 
 ##Später
-- fhir_POSTbundle_url -> abgeleitet von fhir_base_url + keine zusätzlichen slots
 - capability_statement
 
 
 
-#####################################################################
-
-design -> df_descriptions -> resource, cols, style
-
-################################
-fhir_url (virtual class) -> base(string)
-
-fhir_search_url -> abgeleitet von fhir_url + zusätzliche slots fhir_resource, fhir_parameters
-(später) fhir_POSTbundle_url -> abgeleitet von fhir_base_url + keine zusätzlichen slots
-
-
-################################
-
-bundle_list -> bundle
 
 ################################
 cracked_df/cracked_dt sind unpraktisch, weil zu viel unerwartetes Verhalten der
@@ -54,7 +39,7 @@ df/DT auftaucht, wenn man die als S4 Klassen hat. (z.B. https://stackoverflow.co
 
 Alternative:
 
-Superklasse fhir_table_list: abgeleitet von list + zusätzliche slots indexed (logical) und design
+Superklasse fhir_table_list: abgeleitet von list + zusätzlicher slot design
 
 Davon abgeleitet:
 - fhir_df_list: enthält dfs
@@ -62,7 +47,7 @@ Davon abgeleitet:
 
 ################################
 
-capability_statement
+
 
 
 

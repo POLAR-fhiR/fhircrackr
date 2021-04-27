@@ -2,7 +2,6 @@
 #' Virtual superclass for [fhir_df_list-class] and [fhir_dt_list-class]
 #'
 #' @slot names Character vector containing the names of the tables
-#' @slot indexed Logical vector indicating which of the tables has indices for multiple entries
 #' @slot design An object of class [fhir_design-class] that was used to create the table list
 #' @include fhir_design.R
 setClass(
@@ -10,7 +9,6 @@ setClass(
 	contains = c("VIRTUAL", "list"),
 	slots = c(
 		names = "character",
-		indexed = "logical",
 		design = "fhir_design"
 	)
 )
@@ -19,9 +17,6 @@ setValidity(
 	"fhir_table_list",
 	function(object){
 		messages <- c()
-		if(length(object) != length(object@indexed)) {
-			messages <- c(messages, "Slot indexed has to have the same length as the list.")
-		}
 		if(length(object) != length(object@indexed)) {
 			messages <- c(messages, "Slot names has to have the same length as the list.")
 		}
@@ -41,10 +36,9 @@ setValidity(
 #'
 #' Objects of this class are returned by [fhir_crack()] when `data.table=FALSE` (the default).
 #' They behave like an ordinary named list of data.frames but have some additional information
-#' in the slots `indexed` and `design`.
+#' in the slot `design`.
 #'
 #' @slot names Character vector containing the names of the data.frames
-#' @slot indexed Logical vector indicating which of the data.frames contains indices for multiple entries
 #' @slot design An object of class [fhir_design-class] that was used to create the df_list
 #'
 setClass(
@@ -65,10 +59,9 @@ setValidity(
 #'
 #' Objects of this class are returned by [fhir_crack()] when `data.table=TRUE`.
 #' They behave like an ordinary named list of data.tables but have some additional information
-#' in the slots `indexed` and `design`.
+#' in the slot `design`.
 #'
 #' @slot names Character vector containing the names of the data.tables
-#' @slot indexed Logical vector indicating which of the data.tables contains indices for multiple entries
 #' @slot design An object of class [fhir_design-class] that was used to create the dt_list
 #'
 setClass(
@@ -113,8 +106,7 @@ setValidity(
 #' fhir_df_list(df_list, design)
 #' @noRd
 fhir_df_list <- function(df_list, design){
-	indexed <- sapply(design, function(x){length(x@style@brackets)!=0})
-	new("fhir_df_list", dt_list, indexed = indexed, design = design)
+	new("fhir_df_list", df_list, design = design)
 }
 #' create fhir_dt_list
 #'
@@ -145,8 +137,7 @@ fhir_df_list <- function(df_list, design){
 #' fhir_dt_list(dt_list, design)
 #' @noRd
 fhir_dt_list <- function(dt_list, design){
-	indexed <- sapply(design, function(x){length(x@style@brackets)!=0})
-	new("fhir_dt_list", dt_list, indexed = indexed, design = design)
+	new("fhir_dt_list", dt_list, design = design)
 }
 
 #corresponding generic in fhir_design.R

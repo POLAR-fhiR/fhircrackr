@@ -25,13 +25,19 @@ setValidity(
 		if(any(sapply(object, function(x){class(x)!="fhir_df_description"}))){
 			messages <- c(messages, "A fhir_design can only contain fhir_df_descriptions")
 		}
+		#check df descriptions
+	 	messages <- c(messages, unlist(sapply(object, function(o){
+						 		v <- validObject(o, complete=T, test=T)
+						 		if(is.character(v)){v}
+						 		}))
+	 		)
 		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
 
 #' Create a [fhir_design-class] object
 #'
-#' A [fhir_design-class] is a list of [fhir_df_description-class] objects and should be created
+#' A [fhir_design-class] is a named list of [fhir_df_description-class] objects and should be created
 #' using the function described here. For backwards compatibility
 #' it is for the moment also possible to build it from an old-style design as used in
 #' `fhircrackr (< 1.0.0)`. See examples.
@@ -40,10 +46,10 @@ setValidity(
 #' extract the design that was used to create the respective list.
 #'
 #' @param ... One ore more [fhir_df_description-class] objects or a named list containing
-#' [fhir_df_description-class] objects, or an object of class [fhir_df_list-class] or [fhir_dt_list-class].
+#' [fhir_df_description-class] objects, or an object of class [fhir_df_list-class]/[fhir_dt_list-class].
 #' See examples.
-#' @param names The names of the df_descriptions. This argument is only necessary when df_descriptions are
-#' provided individually and will be ignored otherwise.
+#' @param names Optional. The names of the df_descriptions. If no names are provided, the names of the object(s) that
+#' were used in creating the design are taken as the names.
 #'
 #' @examples
 #'
@@ -51,7 +57,7 @@ setValidity(
 #'
 #' #create fhir_df_descriptions
 #'
-#' df_desc1 <- fhir_df_description(resource = "Patient",
+#' pat <- fhir_df_description(resource = "Patient",
 #'                     cols = c(name = "name/family",
 #'                              gender = "gender",
 #'                              id = "id"),
@@ -61,20 +67,21 @@ setValidity(
 #'                             )
 #'              )
 #'
-#' df_desc2 <- fhir_df_description(resource = "Observation",
+#' obs <- fhir_df_description(resource = "Observation",
 #'                     cols = c("code/coding/system", "code/coding/code")
 #'             )
 #'
 #' #create design
 #'
-#' #First option
-#' design <- fhir_design(df_desc1, df_desc2, names = c("Patients", "Observations"))
+#' #First option: explicitly define names
+#' fhir_design(pat, obs, names = c("Patients", "Observations"))
 #'
-#' #second option
-#' design <- fhir_design(list(Patients = df_desc1, Observations = df_desc2))
+#' #Second option: Names are taken from the df_descriptions
+#' fhir_design(pat, obs))
 #'
-#' #have a look at the design
-#' design
+#' #Third option: named list
+#' fhir_design(list(Patients = pat, Observations = obs))
+#'
 #'
 #' ###Example 2###
 #' #This option will be deprecated at some point
@@ -126,6 +133,8 @@ setMethod(
 	"fhir_design",
 	signature = c(...="fhir_df_description"),
 	function(..., names){
+		argnames <- sapply(substitute(list(...))[-1], deparse)
+		if(missing(names)){names <-argnames}
 		args <- list(...)
 		new("fhir_design", args, names = names)
 	}
@@ -150,7 +159,7 @@ setMethod(
 				d <- fix_design(args)
 
 				df_desc <-lapply(d, function(x){
-					resource <- fhir_resource(gsub(paste0(esc("."),"|", esc("/")), "", x$resource))
+					resource <- fhir_resource_type(gsub(paste0(esc("."),"|", esc("/")), "", x$resource))
 					style <- fhir_style(sep = x$style$sep, brackets =x$style$brackets, rm_empty_cols = x$style$rm_empty_cols)
 					fhir_df_description(resource, fhir_columns(x$cols), style)
 				})

@@ -14,39 +14,39 @@ fhir_melt(
 )
 }
 \arguments{
-\item{indexed_data_frame}{A data frame with indexed multiple entries.}
+\item{indexed_data_frame}{A data.frame/data.table with indexed multiple entries.}
 
 \item{columns}{A character vector specifying the names of all columns that should be molten simultaneously.
 It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!}
 
 \item{brackets}{A character vector of length 2, defining the brackets used for the indices.}
 
-\item{sep}{A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}.}
+\item{sep}{A string defining the separator that was used when pasting together multiple entries in \code{\link[=fhir_crack]{fhir_crack()}}.}
 
 \item{id_name}{A string, the name of the column that will hold the identification of the origin of the new rows.}
 
 \item{all_columns}{A logical scalar. Return all columns or only the ones specified in \code{columns}?}
 }
 \value{
-A data frame where each entry from the variables in \code{columns} appears in a separate row.
+A data.frame/data.table where each entry from the variables in \code{columns} appears in a separate row.
 }
 \description{
-This function divides multiple entries in an indexed data frame as produced by \code{\link{fhir_crack}}
-into separate observations.
+This function divides multiple entries in an indexed data frame as produced by \code{\link[=fhir_crack]{fhir_crack()}}.
+into separate rows.
 }
 \details{
 Every row containing values that consist of multiple entries on the variables specified by the argument \code{columns}
 will be turned into multiple rows, one for each entry. Values on other variables will be repeated in all the new rows.
 
-The new data frame will contain only the molten variables (if \code{all_cloumns = FALSE}) or all variables
-(if \code{all_columns = TRUE}) as well as an additional variable \code{resource_identificator} that maps which rows came
+The new data.frame will contain only the molten variables (if \code{all_cloumns = FALSE}) or all variables
+(if \code{all_columns = TRUE}) as well as an additional variable \code{resource_identifier} that maps which rows came
 from the same origin. The name of this column can be changed in the argument \code{id_name}.
 
-For a more detailed description on how to use this function please see the package vignette.
+For a more detailed description on how to use this function please see the corresponding package vignette.
 }
 \examples{
 #generate example
-bundle <- xml2::read_xml(
+bundle <- fhir_bundle_xml(xml2::read_xml(
 "<Bundle>
 
     <Patient>
@@ -77,10 +77,11 @@ bundle <- xml2::read_xml(
         <birthDate value='1980-05-23'/>
     </Patient>
 </Bundle>"
-)
+))
 
 #crack fhir resources
-dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list(resource = ".//Patient")),
+dfs <- fhir_crack(bundles = list(bundle),
+                  design = fhir_design(fhir_df_description(resource = "Patient"), names = "Patients"),
                   brackets = c("[","]"))
 
 #find all column names associated with attribute address
@@ -91,7 +92,7 @@ dfs$Patients
 
 #only keep address columns
 fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,
-          brackets = c("[","]", sep = " "))
+          brackets = c("[","]"), sep = " ")
 
 #keep all columns
 fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,

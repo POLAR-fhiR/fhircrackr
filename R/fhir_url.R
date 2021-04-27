@@ -86,7 +86,9 @@ setMethod(
 	signature = c(url="character", resource = "missing", parameters = "missing"),
 	function(url){
 
-		new("fhir_url", URLencode(url))
+		if(length(url)>0){url <- URLencode(url)}
+
+		new("fhir_url", url)
 
 	}
 )

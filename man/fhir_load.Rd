@@ -16,7 +16,6 @@ A \linkS4class{fhir_bundle_list}.
 Reads all bundles stored as xml files from a directory.
 }
 \examples{
-TODO
 #unserialize example bundle
 bundles <- fhir_unserialize(medication_bundles)
 

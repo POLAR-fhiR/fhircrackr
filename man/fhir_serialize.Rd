@@ -18,10 +18,13 @@ i.e. it turns a \linkS4class{fhir_bundle_xml} object into an \linkS4class{fhir_b
 }
 \examples{
 
-TODO: update example
 #example bundles are serialized, unserialize like this:
 bundles <- fhir_unserialize(medication_bundles)
 
 #Serialize like this:
 bundles_for_saving <- fhir_serialize(bundles)
+
+#works also on single bundles
+fhir_serialize(bundles[[1]])
+
 }

@@ -17,6 +17,11 @@ Unserializes FHIR bundles that have been serialized to allow for saving in .rda 
 i.e. it turns a \linkS4class{fhir_bundle_serialized} object into an \linkS4class{fhir_bundle_xml} object.
 }
 \examples{
-TODO: update example bundles <- fhir_unserialize(medication_bundles)
+
+#unserialize bundle list
+fhir_unserialize(patient_bundles)
+
+#unserialize single bundle
+fhir_unserialize(patient_bundles[[1]])
 
 }

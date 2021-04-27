@@ -7,14 +7,12 @@
 \description{
 Objects of this class are returned by \code{\link[=fhir_crack]{fhir_crack()}} when \code{data.table=FALSE} (the default).
 They behave like an ordinary named list of data.frames but have some additional information
-in the slots \code{indexed} and \code{design}.
+in the slot \code{design}.
 }
 \section{Slots}{
 
 \describe{
 \item{\code{names}}{Character vector containing the names of the data.frames}
-
-\item{\code{indexed}}{Logical vector indicating which of the data.frames contains indices for multiple entries}
 
 \item{\code{design}}{An object of class \linkS4class{fhir_design} that was used to create the df_list}
 }}

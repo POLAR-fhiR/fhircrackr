@@ -36,7 +36,8 @@ setValidity(
 
 #' @param sep A character vector of length 1 to separate pasted multiple entries. Defaults to `" "`
 #' @param brackets  A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`.
-#' If this is empty (i.e. character of length 0, the default) or 'NULL', no indices will be added to multiple entries.
+#' If this is empty (i.e. character of length 0, the default) or 'NULL', no indices will be added to multiple entries. If it is a character
+#' vector of length 1, it will be recycled to length two, i.e. `"|"` will become `c("|", "|")`.
 #' @param rm_empty_cols Logical scalar. Remove empty columns? Defaults to `TRUE`.
 #' @return A fhir_style object
 #' @examples

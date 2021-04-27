@@ -7,18 +7,18 @@ fhir_melt_all
 fhir_restore_indices
 
 ## News
+- The deprecated argument `add_indices` in `fhir_crack()` is now fully removed.
 
-- Argument log_errors in `fhir_search()` is now logical and writes only xml (no tables anymore), but takes 
-all numbers `> 0` to mean `TRUE` for backwards compatibility. 
+- Argument `save_to_file` in `fhir_search()` now takes `NULL` or a string with a directory name and saves the bundles only if there is a specified directory. For backwards compatibility `TRUE`/`FALSE` in combination with `directory` are still allowed but discouraged with a warning.
+
+- Argument log_errors in `fhir_search()` now takes a string with a filename and writes an xml (no tables anymore) to the specified file. For backwards compatibility numbers are still allowed but discouraged with a warning. 
 
 - New argument `delay_between_pages` for `fhir_search()` allowing to put a delay between the download of bundles 
 (i.e. pages) in a bigger search request to prevent weak servers from choking.
 
-- New function `fhir_build_request()` with associated functions `fhir_base()`, `fhir_resource()` and `fhir_key_value()` helps building a valid FHIR search request for use in `fhir_search()`.
+- The most recently used FHIR search request is now implicitly saved whenever `fhir_search()` or `fhir_url()` is called. It can be accessed with the new function `fhir_current_request()`.
 
-- The most recently used FHIR search request is now implicitly saved whenever `fhir_search()` or `fhir_build_request()` is called. It can be accessed with the new function `fhir_current_request()`.
 
-- New function `fhir_update_requests()` allows to update the request saved as current request with new search parameters.
 
 See documentation for more information on all new functions.
 

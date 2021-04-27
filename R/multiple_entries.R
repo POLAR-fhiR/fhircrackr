@@ -6,24 +6,26 @@
 #' Find common columns
 #'
 #' This is a convenience function to find all column names in a data frame starting with the same string that can
-#' then be used for \code{\link{fhir_melt}}.
+#' then be used for [fhir_melt()].
 #'
-#' It is intended for use on data frames with column names that have been automatically produced by \code{\link{fhir_crack}}
-#' and follow the form \code{level1.level2.level3} such as \code{name.given.value} or \code{code.coding.system.value}.
-#' Note that this function will only work on column names following exactly this schema.
+#' It is intended for use on data frames with column names that have been automatically produced by [fhir_design()]/[fhir_crack()]
+#' and follow the form `level1.level2.level3` such as `name.given` or `code.coding.system`.
+#' Note that this function will only work on column names following exactly this scheme.
 #'
-#' The resulting character vector can be used for melting all columns belonging to the same attribute in an indexed data frame, see \code{?fhir_melt}.
+#' The resulting character vector can be used for melting all columns belonging to the same attribute in an indexed data frame,
+#' see `?fhir_melt`.
 #'
-#' @param data_frame A data frame with automatically named columns as produced by \code{\link{fhir_crack}}.
+#' @param data_frame A data.frame/data.table with automatically named columns as produced by [fhir_crack()].
 #' @param column_names_prefix A string containing the common prefix of the desired columns.
-#' @return A character vector with the names of all columns matching \code{column_names_prefix}.
+#' @return A character vector with the names of all columns matching `column_names_prefix`.
 #' @examples
 #' #unserialize example bundles
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #crack Patient Resources
-#' design <- list(
-#'   Patients = list(".//Patient")
+#' design <- fhir_design(
+#'   fhir_df_description(resource = "Patient"),
+#'   names = "Patients"
 #' )
 #'
 #' dfs <- fhir_crack(bundles, design)
@@ -57,31 +59,31 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 
 #' Melt multiple entries
 #'
-#' This function divides multiple entries in an indexed data frame as produced by \code{\link{fhir_crack}}
-#' into separate observations.
+#' This function divides multiple entries in an indexed data frame as produced by [fhir_crack()].
+#' into separate rows.
 #'
-#' Every row containing values that consist of multiple entries on the variables specified by the argument \code{columns}
+#' Every row containing values that consist of multiple entries on the variables specified by the argument `columns`
 #' will be turned into multiple rows, one for each entry. Values on other variables will be repeated in all the new rows.
 #'
-#' The new data frame will contain only the molten variables (if \code{all_cloumns = FALSE}) or all variables
-#' (if \code{all_columns = TRUE}) as well as an additional variable \code{resource_identificator} that maps which rows came
-#' from the same origin. The name of this column can be changed in the argument \code{id_name}.
+#' The new data.frame will contain only the molten variables (if `all_cloumns = FALSE`) or all variables
+#' (if `all_columns = TRUE`) as well as an additional variable `resource_identifier` that maps which rows came
+#' from the same origin. The name of this column can be changed in the argument `id_name`.
 #'
-#' For a more detailed description on how to use this function please see the package vignette.
+#' For a more detailed description on how to use this function please see the corresponding package vignette.
 #'
-#' @param indexed_data_frame A data frame with indexed multiple entries.
+#' @param indexed_data_frame A data.frame/data.table with indexed multiple entries.
 #' @param columns A character vector specifying the names of all columns that should be molten simultaneously.
 #' It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!
 #' @param brackets A character vector of length 2, defining the brackets used for the indices.
-#' @param sep A string defining the separator that was used when pasting together multiple entries in \code{\link{fhir_crack}}.
+#' @param sep A string defining the separator that was used when pasting together multiple entries in [fhir_crack()].
 #' @param id_name A string, the name of the column that will hold the identification of the origin of the new rows.
-#' @param all_columns A logical scalar. Return all columns or only the ones specified in \code{columns}?
+#' @param all_columns A logical scalar. Return all columns or only the ones specified in `columns`?
 #'
-#' @return A data frame where each entry from the variables in \code{columns} appears in a separate row.
+#' @return A data.frame/data.table where each entry from the variables in `columns` appears in a separate row.
 #'
 #' @examples
 #' #generate example
-#' bundle <- xml2::read_xml(
+#' bundle <- fhir_bundle_xml(xml2::read_xml(
 #' "<Bundle>
 #'
 #'     <Patient>
@@ -112,10 +114,11 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #'         <birthDate value='1980-05-23'/>
 #'     </Patient>
 #' </Bundle>"
-#')
+#'))
 #'
 #' #crack fhir resources
-#' dfs <- fhir_crack(bundles = list(bundle), design = list(Patients = list(resource = ".//Patient")),
+#' dfs <- fhir_crack(bundles = list(bundle),
+#'                   design = fhir_design(fhir_df_description(resource = "Patient"), names = "Patients"),
 #'                   brackets = c("[","]"))
 #'
 #' #find all column names associated with attribute address
@@ -126,7 +129,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #'
 #' #only keep address columns
 #' fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,
-#'           brackets = c("[","]", sep = " "))
+#'           brackets = c("[","]"), sep = " ")
 #'
 #' #keep all columns
 #' fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,
@@ -196,24 +199,27 @@ fhir_melt <- function(
 
 #' Melt all multiple entries
 #'
-#' This function divides all multiple entries in an indexed data frame as produced by [fhir_crack()]
+#' This function divides all multiple entries in a (list of)indexed data frame as produced by [fhir_crack()]
 #' into separate observations.
 #'
 #' Every row containing values that consist of multiple entries will be turned into multiple rows, one for each entry.
 #' Values on other variables will be repeated in all the new rows. This function will only work if the column names
 #' reflect the path to the corresponding resource element with `.` as a separator, e.g. `name.given`.
-#' These names are produced automatically by [fhir_crack()] when the cols element of the design is omitted or set to `NULL`.
+#' These names are produced automatically by [fhir_design()] when the cols element of the
+#' design is unnamed or omitted.
 #'
-#' If `rm_indices=FALSE` the original indices are kept for every entry. These are needed if you want to transform
-#' the data back to FHIR resources.
+#' If `rm_indices=FALSE` the original indices are kept for every entry. These are useful if you need to keep in mind the
+#' original structure of the resource.
 #'
 #' For a more detailed description on how to use this function please see the package vignette.
 #'
-#' @param indexed_data_frame A data frame with indexed multiple entries.column names must
-#' reflect the path to the corresponding resource element with `.` as a separator, e.g. `name.given`.
-#' These names are produced automatically by [fhir_crack()] when the cols element of the design is omitted or set to `NULL`.
-#' @param brackets A character vector of length 2, defining the brackets used for the indices.
+#' @param indexed_data_frame A data.frame/data.table with indexed multiple entries or an object of class
+#' [fhir_df_list-class]/[fhir_dt_list-class]. Column names mustreflect the path to the corresponding resource
+#' element with `.` as a separator, e.g. `name.given`.
+#' @param brackets A character vector of length 2, defining the brackets used for the indices. If a
+#' [fhir_df_list-class]/[fhir_dt_list-class] is provided for `indexed_data_frame`, this argument is ignored.
 #' @param sep A string defining the separator that was used when pasting together multiple entries in [fhir_crack()].
+#' If a [fhir_df_list-class]/[fhir_dt_list-class] is provided for `indexed_data_frame`, this argument is ignored.
 #' @param rm_indices Logical of length one. Should indices be removed? If `FALSE` the indices from the input data are preserved
 #' the way they are. They can be extracted with [fhir_extract_indices()], removed with [fhir_rm_indices()]
 #' and restored with [fhir_restore_indices()]
@@ -221,7 +227,7 @@ fhir_melt <- function(
 #'
 #' @examples
 #' #generate example
-#' bundle <- xml2::read_xml(
+#' bundle <- fhir_bundle_xml(xml2::read_xml(
 #' 	"<Bundle>
 #'
 #' 		<Patient>
@@ -271,72 +277,66 @@ fhir_melt <- function(
 #' 			</address>
 #' 			<birthDate value='1974-12-25'/>
 #' 		</Patient>
-#'
+#' 		<Observation>
+#' 		<id value = '1'/>
+#'		<code>
+#'			<coding>
+#'			   <system value='http://loinc.org'/>
+#'			   <code value='29463-7'/>
+#'			   <display value='Body Weight'/>
+#'			</coding>
+#'			<coding>
+#'			   <system value='http://snomed.info/sct'/>
+#'		 	   <code value='27113001'/>
+#'			   <display value='Body weight'/>
+#'			</coding>
+#'		</code>
+#' 		</Observation>
 #' 	</Bundle>"
-#' )
+#' ))
 #'
 #' #crack fhir resources
-#' design <- list(Patients = list(resource = ".//Patient",
-#'                style = list(brackets = c("[","]"),
-#'                sep = "||")
-#'                ))
-#' dfs <- fhir_crack(bundles = list(bundle), design = design)
+#' patients <- fhir_df_description(resource = "Patient")
 #'
-#' fhir_melt_all(dfs[[1]], brackets = c("[","]"), sep="||")
+#' observations <- fhir_df_description(resource = "Observation")
+#'
+#' design <- fhir_design(patients, observations)
+#'
+#' dfs <- fhir_crack(bundles = list(bundle), design = design, sep="||", brackets = c("[","]"))
+#'
+#' #use on the list of tables: all tables are molten, brackets and sep are inferred from the attached design
+#' fhir_melt_all(dfs)
+#'
+#' #use on single df
+#' fhir_melt_all(dfs$patients, brackets = c("[","]"), sep="||")
 #' @export
 
-fhir_melt_all <- function(indexed_data_frame, sep, brackets, rm_indices = TRUE){
+setGeneric(
+	"fhir_melt_all",
+	function(indexed_data_frame, sep, brackets, rm_indices=TRUE){
+		standardGeneric("fhir_melt_all")
+	},
+	signature = "indexed_data_frame"
+)
 
-	if(!is.data.frame(indexed_data_frame)){
-		stop("You need to supply a data.frame or data.table to the argument indexed_data_frame.",
-			 "The object you supplied is of type ", class(indexed_data_frame), ".")}
+setMethod(
+	"fhir_melt_all",
+	signature = c(indexed_data_frame = "data.frame"),
+	function(indexed_data_frame, sep, brackets, rm_indices=TRUE){melt_all(indexed_data_frame, sep, brackets, rm_indices)}
+)
 
-	is_DT <- data.table::is.data.table(indexed_data_frame)
-
-	#sort columns to make sure columns belonging to the same element are next to each other
-	d <- data.table::data.table(indexed_data_frame)
-	oldOrder <- copy(names(d))
-	data.table::setcolorder(d, sort(names(d)))
-
-	# #determine depth of ids in each column
-	# brackets.escaped <- esc(brackets)
-	# pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
-	# ids <- suppressWarnings(stringr::str_extract_all(d, pattern.ids))
-
-	#columns which have multiple values
-	targetCols <- grepl(esc(sep), d)
-	if(!any(targetCols)){
-		warning("There don't seem to be any multiple values in the data. Did you specify the sep argument correctly? ",
-				"Returning unaltered data.")
-		return(indexed_data_frame)
+setMethod(
+	"fhir_melt_all",
+	signature = c(indexed_data_frame = "fhir_table_list"),
+	function(indexed_data_frame, rm_indices=TRUE){
+		lapply(lst(names(indexed_data_frame)), function(name){
+			melt_all(indexed_data_frame[[name]],
+					 sep = indexed_data_frame@design[[name]]@style@sep,
+					 brackets = indexed_data_frame@design[[name]]@style@brackets,
+					 rm_indices = rm_indices)
+			})
 	}
-
-	#dissect colnames
-	names <- stringr::str_split(names(d), esc("."), simplify = T)[targetCols,,drop=F]
-
-	#find the columns which represent new elements
-	newElement <- matrix(!apply(names,2, duplicated, incomparables = ""), nrow=nrow(names))
-	targetElements <- names[newElement[,1],1]
-
-	#loop through elements
-	for (i in 1:length(targetElements)){
-		cols <- fhir_common_columns(d, targetElements[i])
-
-		d <- fhir_melt_dt_preserveID(d, columns = cols, brackets=brackets, sep=sep, all_columns = T)
-
-	}
-
-	#remove indices
-	if(rm_indices){d <- fhir_rm_indices(d, brackets = brackets)}
-
-	#set old order
-	data.table::setcolorder(d, oldOrder)
-
-	#return appropriate type
-	if(!is_DT){data.table::setDF(d)}
-	d
-}
-
+)
 
 #' Remove indices from data frame
 #'
@@ -884,4 +884,54 @@ fhir_melt_dt_preserveID <- function(
 		return(d)
 
 	}
+}
+
+
+####This function is wrapped in the generic fhir_melt_all
+####
+melt_all <- function(indexed_data_frame, sep, brackets, rm_indices = TRUE){
+
+	if(!is.data.frame(indexed_data_frame)){
+		stop("You need to supply a data.frame or data.table to the argument indexed_data_frame.",
+			 "The object you supplied is of type ", class(indexed_data_frame), ".")}
+
+	is_DT <- data.table::is.data.table(indexed_data_frame)
+
+	#sort columns to make sure columns belonging to the same element are next to each other
+	d <- data.table::data.table(indexed_data_frame)
+	oldOrder <- copy(names(d))
+	data.table::setcolorder(d, sort(names(d)))
+
+	#columns which have multiple values
+	targetCols <- grepl(esc(sep), d)
+	if(!any(targetCols)){
+		warning("There don't seem to be any multiple values in the data. Did you specify the sep argument correctly? ",
+				"Returning unaltered data.")
+		return(indexed_data_frame)
+	}
+
+	#dissect colnames
+	names <- stringr::str_split(names(d), esc("."), simplify = T)[targetCols,,drop=F]
+
+	#find the columns which represent new elements
+	newElement <- matrix(!apply(names,2, duplicated, incomparables = ""), nrow=nrow(names))
+	targetElements <- names[newElement[,1],1]
+
+	#loop through elements
+	for (i in 1:length(targetElements)){
+		cols <- fhir_common_columns(d, targetElements[i])
+
+		d <- fhir_melt_dt_preserveID(d, columns = cols, brackets=brackets, sep=sep, all_columns = T)
+
+	}
+
+	#remove indices
+	if(rm_indices){d <- fhir_rm_indices(d, brackets = brackets)}
+
+	#set old order
+	data.table::setcolorder(d, oldOrder)
+
+	#return appropriate type
+	if(!is_DT){data.table::setDF(d)}
+	d
 }

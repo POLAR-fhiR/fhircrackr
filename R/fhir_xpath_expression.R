@@ -11,6 +11,8 @@ setClass(
 setValidity(
 	"fhir_xpath_expression",
 	method = function(object) {
+		if(length(object)==0){return(TRUE)}
+
 		messages <- c()
 
 		#slightly hacky solution: use xml2 function and catch warning message

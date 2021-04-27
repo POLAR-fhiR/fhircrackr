@@ -3,9 +3,7 @@
 #' @include fhir_url.R
 setClass(
 	"fhir_bundle",
-	contains = "VIRTUAL",
-	slots = c(next_url = "fhir_url",
-			  self_url = "fhir_url")
+	contains = "VIRTUAL"
 )
 
 
@@ -13,9 +11,13 @@ setOldClass("xml_node")
 
 
 #' An S4 class to represent a FHIR bundle in xml form
+#' @slot next_link A [fhir_url-class] pointing to the next bundle on the server
+#' @slot self_link A [fhir_url-class] pointing to this bundle on the server
 setClass(
 	"fhir_bundle_xml",
 	contains = c("fhir_bundle", "xml_node"),
+	slots = c(next_link = "fhir_url",
+			  self_link = "fhir_url"),
 	prototype = prototype(xml2::read_xml("<Bundle></Bundle>"))
 )
 
@@ -43,19 +45,23 @@ setValidity(
 #'
 fhir_bundle_xml <- function(bundle) {
 
+	xml2::xml_ns_strip(bundle)
 	links <- xml2::xml_find_all(bundle, "link")
 	rels.nxt <-	xml2::xml_text(xml2::xml_find_first(links, "./relation/@value")) == "next"
 	rels.self <- xml2::xml_text(xml2::xml_find_first(links, "./relation/@value")) == "self"
 	urls <- xml2::xml_attr(xml2::xml_find_all(links, "url"), "value")
 
-	new("fhir_bundle_xml", bundle, next_url = fhir_url(urls[rels.nxt]), self_url = fhir_url(urls[rels.self]))
+	new("fhir_bundle_xml", bundle, next_link = fhir_url(urls[rels.nxt]), self_link = fhir_url(urls[rels.self]))
 }
 
 setMethod(
 	"show",
 	"fhir_bundle_xml",
 	function(object) {
-		cat(paste0("A fhir_bundle_xml object with ", length(xml2::xml_find_all(object, "entry")), " entries:\n\n"))
+		cat(paste0("A fhir_bundle_xml object\n",
+				   "No. of entries : ", length(xml2::xml_find_all(object, "entry")), "\n",
+				   "Self Link: ", object@self_link, "\n",
+				   "Next Link: ", object@next_link), "\n\n")
 		print(object)
     }
 )

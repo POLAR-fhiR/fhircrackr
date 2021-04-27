@@ -7,13 +7,15 @@
 fhir_melt_all(indexed_data_frame, sep, brackets, rm_indices = TRUE)
 }
 \arguments{
-\item{indexed_data_frame}{A data frame with indexed multiple entries.column names must
-reflect the path to the corresponding resource element with \code{.} as a separator, e.g. \code{name.given}.
-These names are produced automatically by \code{\link[=fhir_crack]{fhir_crack()}} when the cols element of the design is omitted or set to \code{NULL}.}
+\item{indexed_data_frame}{A data.frame/data.table with indexed multiple entries or an object of class
+\linkS4class{fhir_df_list}/\linkS4class{fhir_dt_list}. Column names mustreflect the path to the corresponding resource
+element with \code{.} as a separator, e.g. \code{name.given}.}
 
-\item{sep}{A string defining the separator that was used when pasting together multiple entries in \code{\link[=fhir_crack]{fhir_crack()}}.}
+\item{sep}{A string defining the separator that was used when pasting together multiple entries in \code{\link[=fhir_crack]{fhir_crack()}}.
+If a \linkS4class{fhir_df_list}/\linkS4class{fhir_dt_list} is provided for \code{indexed_data_frame}, this argument is ignored.}
 
-\item{brackets}{A character vector of length 2, defining the brackets used for the indices.}
+\item{brackets}{A character vector of length 2, defining the brackets used for the indices. If a
+\linkS4class{fhir_df_list}/\linkS4class{fhir_dt_list} is provided for \code{indexed_data_frame}, this argument is ignored.}
 
 \item{rm_indices}{Logical of length one. Should indices be removed? If \code{FALSE} the indices from the input data are preserved
 the way they are. They can be extracted with \code{\link[=fhir_extract_indices]{fhir_extract_indices()}}, removed with \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
@@ -23,23 +25,24 @@ and restored with \code{\link[=fhir_restore_indices]{fhir_restore_indices()}}}
 A data frame where each multiple entry appears in a separate row.
 }
 \description{
-This function divides all multiple entries in an indexed data frame as produced by \code{\link[=fhir_crack]{fhir_crack()}}
+This function divides all multiple entries in a (list of)indexed data frame as produced by \code{\link[=fhir_crack]{fhir_crack()}}
 into separate observations.
 }
 \details{
 Every row containing values that consist of multiple entries will be turned into multiple rows, one for each entry.
 Values on other variables will be repeated in all the new rows. This function will only work if the column names
 reflect the path to the corresponding resource element with \code{.} as a separator, e.g. \code{name.given}.
-These names are produced automatically by \code{\link[=fhir_crack]{fhir_crack()}} when the cols element of the design is omitted or set to \code{NULL}.
+These names are produced automatically by \code{\link[=fhir_design]{fhir_design()}} when the cols element of the
+design is unnamed or omitted.
 
-If \code{rm_indices=FALSE} the original indices are kept for every entry. These are needed if you want to transform
-the data back to FHIR resources.
+If \code{rm_indices=FALSE} the original indices are kept for every entry. These are useful if you need to keep in mind the
+original structure of the resource.
 
 For a more detailed description on how to use this function please see the package vignette.
 }
 \examples{
 #generate example
-bundle <- xml2::read_xml(
+bundle <- fhir_bundle_xml(xml2::read_xml(
 	"<Bundle>
 
 		<Patient>
@@ -89,16 +92,36 @@ bundle <- xml2::read_xml(
 			</address>
 			<birthDate value='1974-12-25'/>
 		</Patient>
-
+		<Observation>
+		<id value = '1'/>
+	<code>
+		<coding>
+		   <system value='http://loinc.org'/>
+		   <code value='29463-7'/>
+		   <display value='Body Weight'/>
+		</coding>
+		<coding>
+		   <system value='http://snomed.info/sct'/>
+	 	   <code value='27113001'/>
+		   <display value='Body weight'/>
+		</coding>
+	</code>
+		</Observation>
 	</Bundle>"
-)
+))
 
 #crack fhir resources
-design <- list(Patients = list(resource = ".//Patient",
-               style = list(brackets = c("[","]"),
-               sep = "||")
-               ))
-dfs <- fhir_crack(bundles = list(bundle), design = design)
+patients <- fhir_df_description(resource = "Patient")
 
-fhir_melt_all(dfs[[1]], brackets = c("[","]"), sep="||")
+observations <- fhir_df_description(resource = "Observation")
+
+design <- fhir_design(patients, observations)
+
+dfs <- fhir_crack(bundles = list(bundle), design = design, sep="||", brackets = c("[","]"))
+
+#use on the list of tables: all tables are molten, brackets and sep are inferred from the attached design
+fhir_melt_all(dfs)
+
+#use on single df
+fhir_melt_all(dfs$patients, brackets = c("[","]"), sep="||")
 }

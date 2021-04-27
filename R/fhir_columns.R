@@ -19,6 +19,7 @@ setValidity(
 	"fhir_columns",
 	function(object) {
 		messages <- c()
+		if(length(object)==0){return(TRUE)}
 		if(length(names(object))==0) {
 			messages <- c(messages, "fhir_columns has to be a *named* character.")
 		}
@@ -93,7 +94,7 @@ setMethod(
 	signature = c(expressions = "character", colnames = "missing"),
 	function(expressions){
 		if(is.null(names(expressions))){
-			new("fhir_columns", fhir_xpath_expression(expressions), names = as.character(sub("/", ".", expressions)))
+			new("fhir_columns", fhir_xpath_expression(expressions), names = as.character(gsub("/", ".", expressions)))
 		}else{
 			new("fhir_columns", fhir_xpath_expression(expressions), names = names(expressions))
 		}
@@ -111,7 +112,7 @@ setMethod(
 			stop("expressions can only contain character vectors of length 1.")
 		}
 		if(is.null(names(expressions))){
-			new("fhir_columns", fhir_xpath_expression(unlist(expressions)), names = sub("/", ".", unlist(expressions)))
+			new("fhir_columns", fhir_xpath_expression(unlist(expressions)), names = gsub("/", ".", unlist(expressions)))
 		}else{
 			new("fhir_columns", fhir_xpath_expression(unlist(expressions)), names = names(expressions))
 		}

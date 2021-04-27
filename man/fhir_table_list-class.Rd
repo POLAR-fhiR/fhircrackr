@@ -12,8 +12,6 @@ Virtual superclass for \linkS4class{fhir_df_list} and \linkS4class{fhir_dt_list}
 \describe{
 \item{\code{names}}{Character vector containing the names of the tables}
 
-\item{\code{indexed}}{Logical vector indicating which of the tables has indices for multiple entries}
-
 \item{\code{design}}{An object of class \linkS4class{fhir_design} that was used to create the table list}
 }}
 

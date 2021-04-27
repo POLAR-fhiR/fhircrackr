@@ -88,9 +88,9 @@ setMethod(
 	"fhir_df_description",
 	function(object){
 		cat("A fhir_df_description with the following elements: \n\n")
-		cat(paste0("fhir_resource_type: ", as.character(df_desc@resource), "\n\n"))
-		cat("fhir_columns: \n"); show(df_desc@cols)
-		cat("\n\nfhir_style: \n");	show(df_desc@style)
+		cat(paste0("fhir_resource_type: ", as.character(object@resource), "\n\n"))
+		cat("fhir_columns: \n"); show(object@cols)
+		cat("\n\nfhir_style: \n");	show(object@style)
 		cat("\n")
 	}
 )

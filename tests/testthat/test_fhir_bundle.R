@@ -29,3 +29,15 @@ testthat::test_that(
 		testthat::expect_error(fhir_bundle_serialized(pat))
 	}
 )
+
+testthat::test_that(
+	"fhir_serialize and fhir_unserialize work on fhir_bundle",{
+		b <- fhir_bundle_xml(xml2::read_xml("<Bundle> <link>  <relation value=\"self\"/> <url value=\"selflink\"/> </link>
+											<link><relation value=\"next\"/> <url value=\"nextlink\"/> </link></Bundle>"))
+		b_serialized <- fhir_serialize(b)
+		b_unserialized <- fhir_unserialize(b_serialized)
+		testthat::expect_s4_class(b_serialized, "fhir_bundle_serialized")
+		testthat::expect_s4_class(b_unserialized, "fhir_bundle_xml")
+	}
+
+)

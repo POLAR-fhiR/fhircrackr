@@ -6,7 +6,7 @@
 #'
 #' @param request An object of class [fhir_url-class] or a string containing the full FHIR search request. It is
 #' recommended to explicitly create the request via [fhir_url()] as this will do some validity checks and format the url properly.
-#' TODO: Defaults to \code{\link{fhir_current_request}}
+#' Defaults to [fhir_current_request()]
 #' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param max_bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
@@ -14,39 +14,30 @@
 #' downloading progress will be printed. Defaults to 2.
 #' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
 #' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
-#' @param log_errors Takes values 0, 1 or 2. Controls the logging of errors. 1 and 2 will write a file to the current working directory.
-#'
-#' 0: no logging of errors,
-#'
-#' 1: tabulate http response and write to csv-file
-#'
-#' 2: write http response as to xml-file
-#'
-#' @param save_to_disc A logical scalar. If TRUE the bundles are saved as numerated xml-files into the directory specified
-#' in the argument \code{directory} and not returned as a bundle list in the R session. This is useful when a lot of
-#' bundles are to be downloaded and keeping them all in one R session might overburden working memory. When download
-#' is complete, the bundles can be loaded into R using \code{\link{fhir_load}}. Defaults to FALSE, i.e. bundles are
-#' returned as a list within the R session.
-#'
-#' @param directory The directory the bundles are saved to when \code{save_to_disc} is TRUE. Defaults to creating a
-#' time-stamped directory into the current working directory.
-#'
+#' @param log_errors Either `NULL` or a string indicating the name of a file in which to save the http errors.
+#' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`
+#' @param save_to_disc Either `NULL` or a string indicating the name of a directory in which to save the bundles.
+#' If a directory name is provided, the bundles are saved as numerated xml-files into the directory specified
+#' and not returned as a bundle list in the R session. This is useful when a lot of bundles are to be downloaded and keeping them all
+#' in one R session might overburden working memory. When the download is complete, the bundles can be loaded into R using [fhir_load()].
+#' Defaults to `NULL`, i.e. bundles are returned as a list within the R session.
+#' @param directory Deprecated. Please specify the directory directly in the `save_to_disc` argument.
 #' @param delay_between_pages A numeric scalar specifying a time in seconds to wait between pages of the search result,
 #' i.e. between downloading the current bundle and the next bundle. This can be used to avoid choking a weak server with
 #' too many requests to quickly. Defaults to zero.
 #'
-#' @return A list of bundles in xml format when \code{save_to_disc = FALSE} (the default),  else NULL.
+#' @return A [fhir_bundle_list-class] when`save_to_disc = NULL` (the default),  else `NULL`.
 #' @export
 #'
 #' @examples
 #' \donttest{
 #'
 #' #create fhir search url
-#' request <- fhir_search_url(base = "https://hapi.fhir.org/baseR4",
-#'                            resource = "Patient",
-#'                            parameters = c(gender="female"))
+#' request <- fhir_url(url = "https://server.fire.ly",
+#'                     resource = "Patient",
+#'                     parameters = c(gender="female"))
 #' #download bundles
-#' bundles <- fhir_search(request, max_bundles=3)
+#' bundles <- fhir_search(request, max_bundles = 5)
 #' }
 
 fhir_search <- function(
@@ -57,13 +48,34 @@ fhir_search <- function(
 	verbose = 1,
 	max_attempts = 5,
 	delay_between_attempts = 10,
-	log_errors = 0,
-	save_to_disc = FALSE,
+	log_errors = NULL,
+	save_to_disc = NULL,
 	delay_between_pages = 0,
 	directory = paste0("FHIR_bundles_", gsub("-| |:","", Sys.time()))) {
 
 
-	bundles <- list()
+
+	####remove at some point####
+	if(is.logical(save_to_disc)){
+		warning("The use of TRUE/FALSE in the argument save_to_disc in combination with the argument directory is ",
+				"deprecated. Please specify the directory name in the save_to_disc argument directly (see ?fhir_search).")
+		if(save_to_disc){
+			message("Setting save_to_disc to '", directory, "'.")
+			save_to_disc <- directory
+			}
+	}
+
+	if(is.numeric(log_errors)){
+		warning("The use of numbers in log_errors is deprecated. Please specify a file name if you want to log erros and NULL if you don't.\n")
+		if(log_errors>0){
+			message("Setting log_errors to 'http_error_fhir_search.xml'.")
+			log_errors <- "http_error_fhir_search.xml"
+		}else{
+			log_errors <- NULL
+		}
+
+	}
+	#######################################################
 
 	if(is.null(request)){
 		stop("You have not provided a FHIR search request and there is no ",
@@ -71,6 +83,7 @@ fhir_search <- function(
 			 "for fhir_current_request()")
 	}
 
+	bundles <- list()
 
 	addr <- fhir_url(request)
 
@@ -123,40 +136,30 @@ fhir_search <- function(
 			break
 		}
 
-		xml2::xml_ns_strip(bundle)
+		if(!is.null(save_to_disc)){
 
-
-		if(save_to_disc){
-
-			if (!dir.exists(directory)){
-				dir.create(directory, recursive = TRUE)
+			if (!dir.exists(save_to_disc)){
+				dir.create(save_to_disc, recursive = TRUE)
 			}
 
 			xml2::write_xml(
 				bundle,
-				paste_paths(directory, paste0(cnt, ".xml")))
+				paste_paths(save_to_disc, paste0(cnt, ".xml")))
 
 		}else{
-			bundles[[addr]] <- bundle
+			bundles[[length(bundles) + 1]] <- bundle
 		}
 
-		links <- xml2::xml_find_all(bundle, "link")
-
-		rels.nxt <-
-			xml2::xml_text(xml2::xml_find_first(links, "./relation/@value")) == "next"
-
-		if (cnt == max_bundles) {
+		if (cnt == max_bundles) { #stop because max_bundles is reached
 			if (0 < verbose) {
-				if (any(!is.na(rels.nxt) & rels.nxt)) {
+				if (length(bundle@next_link)>0) {
 					message(
 						"\nDownload completed. Number of downloaded bundles was limited to ",
 						cnt,
 						" bundles, this is less than the total number of bundles available.\n"
 					)
 
-					urls <- xml2::xml_attr(xml2::xml_find_first(links, "./url"), "value")
-
-					assign(x = "last_next_link", value = urls[rels.nxt][1], envir = fhircrackr_env)
+					assign(x = "last_next_link", value = bundle@next_link, envir = fhircrackr_env)
 				}
 				else {
 					message("\nDownload completed. All available bundles were downloaded.\n")
@@ -165,11 +168,11 @@ fhir_search <- function(
 
 			break
 		}
-		else {
-			assign(x = "last_next_link", value = NULL, envir = fhircrackr_env)
+		else { #finished because there are no more bundles
+			assign(x = "last_next_link", value = new("fhir_url"), envir = fhircrackr_env)
 		}
 
-		if (!any(!is.na(rels.nxt) & rels.nxt)) {
+		if (length(bundle@next_link)==0) {
 			if (0 < verbose) {
 				message("\nDownload completed. All available bundles were downloaded.\n")
 			}
@@ -177,45 +180,39 @@ fhir_search <- function(
 			break
 		}
 
-		urls  <-
-			xml2::xml_attr(xml2::xml_find_first(links, "./url"), "value")
+		addr <- bundle@next_link
 
-		addr <- urls[rels.nxt][1]
-
-		if (is.null(addr) ||
-			is.na(addr) || length(addr) < 1 || addr == "") {
-			if (0 < verbose) {
-				message("\nDownload completed. All available bundles were downloaded.\n")
-			}
-
-			break
-		}
 		Sys.sleep(delay_between_pages)
 	}
 
 	fhircrackr_env$current_request <- request
 
-	if(save_to_disc){
+	if(!is.null(save_to_disc)){
 
 		return(NULL)
 
 	}else{
 
-		return(bundles)
+		return(fhir_bundle_list(bundles))
 
 	}
 }
 
 
 #' Next Bundle's URL
-#' @description fhir_next_bundle_url() gives the url of the next available bundle.
-#' This is useful when you have not a lot of memory available or when a download of bundles was
-#' interrupted for some reason. In case of small memory, you can use \code{fhir_next_bundle_url} together with the
-#' \code{max_bundle} argument from \code{\link{fhir_search}} to download bundles in smaller batches in a loop.
+#' @description fhir_next_bundle_url() gives the link to the next available bundle, either of the bundle
+#' you provided in the argument `bundle` or of the last call to [fhir_search()], if `bundle=NULL` (the default).
+#'
+#' This function is useful when you don't have a lot of memory available or when a download of bundles was
+#' interrupted for some reason. In case of small memory, you can use `fhir_next_bundle_url` together with the
+#' `max_bundle` argument from [fhir_search()] to download bundles in smaller batches in a loop.
 #' See details in the example.
 #'
-#' @return A [fhir_url-class] object referencing next bundle available on the FHIR server of your last call to
-#' \code{\link{fhir_search}} or NULL if no further bundle is available.
+#' @param bundle The bundle from which you wish to extract the next link. If this is `NULL` (the default), the function will
+#' extract the next link from the last bundle that was downloaded in the most recent call to [fhir_search()].
+#'
+#' @return A [fhir_url-class] object referencing next bundle available on the FHIR server.
+#' Empty [fhir_url-class] / character vector, if no further bundle is available.
 #' @export
 #'
 #' @examples
@@ -225,11 +222,10 @@ fhir_search <- function(
 #' # your FHIR search request.
 #' # You can iteratively download, crack and save the bundles until all bundles are processed or the
 #' # desired number of bundles is reached.
-
 #TODO
 #' url <- fhir_url("http://hapi.fhir.org/baseR4/Observation")
 #' count <- 0
-#' while(!is.null(url) && count < 5){
+#' while(length(url)>0 && count < 5){
 #' 	bundles <- fhir_search(url, verbose = 2, max_bundles = 2)
 #' 	tables <- fhir_crack(bundles, list(Obs=list(resource = "//Observation")))
 #' 	save(tables, file = paste0(tempdir(),"/table_", count, ".RData"))
@@ -238,14 +234,38 @@ fhir_search <- function(
 #' }
 #'}
 #'
-fhir_next_bundle_url <- function() {
+fhir_next_bundle_url <- function(bundle=NULL) {
 
-	fhircrackr_env$last_next_link
+	if(!is.null(bundle)){
+		if(!is(bundle, "fhir_bundle")){
+			stop("bundle must be an object of type fhir_bundle")
+		}
+		if(is(bundle, "fhir_bundle_xml")){
+			bundle@next_link
+		}else{
+			b <- fhir_unserialize(b)
+			b@next_link
+		}
+
+	}else{
+		fhircrackr_env$last_next_link
+	}
 }
 
-#' Return FHIR search request used in last call to [fhir_search()] or [fhir_search_url()]
+#' Return FHIR search request used in last call to [fhir_search()] or [fhir_url()]
 #'
-#' @return An object of class [fhir_search_url()]
+#' @return An object of class [fhir_url()]
+#'
+#' @examples
+#' \donttest{
+#' request <- fhir_url(url = "https://hapi.fhir.org/baseR4", resource = "Patient")
+#' fhir_current_request()
+#'
+#' fhir_search("https://hapi.fhir.org/baseR4/Medication")
+#' fhir_current_request()
+#' }
+#'
+#'
 #' @export
 
 
@@ -320,7 +340,6 @@ fhir_current_request <- function() {
 #' @export
 #'
 #' @examples
-#' TODO
 #' #unserialize example bundle
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
@@ -354,7 +373,6 @@ fhir_save <- function(bundles, directory = "result") {
 #' @export
 #'
 #' @examples
-#' TODO
 #' #unserialize example bundle
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
@@ -388,26 +406,20 @@ fhir_load <- function(directory) {
 #'
 #' @description Serializes FHIR bundles to allow for saving in .rda or .RData format without losing integrity of pointers
 #' i.e. it turns a [fhir_bundle_xml-class] object into an [fhir_bundle_serialized-class] object.
-#' @description
 #' @param bundles A [fhir_bundle-class] or [fhir_bundle_list-class] object.
 #' @return A  [fhir_bundle_xml-class] or [fhir_bundle_list-class] object.
 #' @export
 #' @examples
 #'
-#' TODO: update example
 #' #example bundles are serialized, unserialize like this:
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
 #' #Serialize like this:
 #' bundles_for_saving <- fhir_serialize(bundles)
-
-fhir_serialize <- function(bundles) {
-	if (is_invalid_bundles_list(bundles)) {
-		return(NULL)
-	}
-
-	lapply(bundles, xml2::xml_serialize, connection = NULL)
-}
+#'
+#' #works also on single bundles
+#' fhir_serialize(bundles[[1]])
+#'
 
 setGeneric(
 	"fhir_serialize",
@@ -455,7 +467,12 @@ setMethod(
 #' @return A  [fhir_bundle_serialized-class] or [fhir_bundle_list-class] object.
 #' @export
 #' @examples
-#' TODO: update example bundles <- fhir_unserialize(medication_bundles)
+#'
+#' #unserialize bundle list
+#' fhir_unserialize(patient_bundles)
+#'
+#' #unserialize single bundle
+#' fhir_unserialize(patient_bundles[[1]])
 #'
 #' @include fhir_bundle.R fhir_bundle_list.R
 
@@ -507,13 +524,17 @@ setMethod(
 #' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
 #' @param verbose An integer scalar. If > 1,  Downloading progress is printed. Defaults to 2.
 #' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
-#' @param log_errors Save http errors in an xml file? Defaults to FALSE.
+#' @param log_errors Either `NULL` or a string indicating the name of a file in which to save the http errors.
+#' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`
 #'
 #' @return The downloaded bundle as an [fhir_bundle_xml-class].
 #' @noRd
 #'
 #' @examples
+#' \donttest{
 #' bundle<-fhircrackr:::get_bundle(request = "https://hapi.fhir.org/baseR4/Patient?")
+#' }
+#'
 
 get_bundle <- function(
 	request,
@@ -522,7 +543,7 @@ get_bundle <- function(
 	verbose = 2,
 	max_attempts = 5,
 	delay_between_attempts = 10,
-	log_errors = FALSE) {
+	log_errors = NULL) {
 
 	#download response
 	for (n in 1:max_attempts) {
@@ -565,17 +586,15 @@ get_bundle <- function(
 #'log the error message of a http response
 #'
 #' @param response A http response
+#' @param log_errors A string indicating the name of a file in which to save the http errors.
 #' @noRd
 #'
-error_to_file <- function(response) {
+error_to_file <- function(response,log_errors) {
 	payload <- httr::content(response, as = "text", encoding = "UTF-8")
 
 	xml <- xml2::read_xml(payload)
 
-	time <- gsub(" |-", "_", Sys.time())
-	time <- gsub(":", "", time)
-
-	xml2::write_xml(xml, paste0("error_", time, ".xml"))
+	xml2::write_xml(xml, file = log_errors)
 
 }
 #' Check http response
@@ -583,26 +602,27 @@ error_to_file <- function(response) {
 #' Checks the http response and issues an error or warning if necessary
 #'
 #' @param response A http response
-#' @param log_errors Save http errors in an xml file? Defaults to FALSE.
+#' @param log_errors Either `NULL` or a string indicating the name of a file in which to save the http errors.
+#' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file.
 #' @noRd
 #'
 #'
 check_response <- function(response, log_errors) {
 	code <- response$status_code
 
-	if (code != 200 && log_errors > 0) {
-		error_to_file(response)
+	if (code != 200 && !is.null(log_errors)) {
+		error_to_file(response, log_errors)
 	}
 
 	if (code == 400) {
-		if (log_errors > 0) {
+		if (!is.null(log_errors)) {
 			stop(
-				"HTTP code 400 - This can be caused by an invalid FHIR search request or a server issue. For more information see the error file that has been generated in the working directory."
+				"HTTP code 400 - This can be caused by an invalid FHIR search request or a server issue. For more information see the generated error file."
 			)
 
 		} else{
 			stop(
-				"HTTP code 400 - This can be caused by an invalid FHIR search request or a server issue. To print more detailed error information to a file, set argument log_errors to TRUE and rerun fhir_search()."
+				"HTTP code 400 - This can be caused by an invalid FHIR search request or a server issue. To print more detailed error information to a file, set argument log_errors to a filename and rerun fhir_search()."
 			)
 
 		}
@@ -610,14 +630,14 @@ check_response <- function(response, log_errors) {
 	}
 
 	if (code == 401) {
-		if (log_errors > 0) {
+		if (!is.null(log_errors)) {
 			stop(
-				"HTTP code 401 - Authentication needed. For more information see the error file that has been generated in the working directory."
+				"HTTP code 401 - Authentication needed. For more information see the generated error file."
 			)
 
 		} else{
 			stop(
-				"HTTP code 401 - Authentication needed. To print more detailed error information to a file, set argument log_errors to TRUE and rerun fhir_search()."
+				"HTTP code 401 - Authentication needed. To print more detailed error information to a file, set argument log_errors to a filename and rerun fhir_search()."
 			)
 
 		}
@@ -625,14 +645,14 @@ check_response <- function(response, log_errors) {
 	}
 
 	if (code == 404) {
-		if (log_errors > 0) {
+		if (!is.null(log_errors)) {
 			stop(
-				"HTTP code 404 - Not found. Did you misspell the resource? For more information see the error file that has been generated in the working directory."
+				"HTTP code 404 - Not found. Did you misspell the resource? For more information see the generated error file."
 			)
 
 		} else{
 			stop(
-				"HTTP code 404 - Not found. Did you misspell the resource? To print more detailed error information to a file, set argument log_errors to TRUE and rerun fhir_search()."
+				"HTTP code 404 - Not found. Did you misspell the resource? To print more detailed error information to a file, set argument log_errors to a filename and rerun fhir_search()."
 			)
 
 		}
@@ -640,18 +660,18 @@ check_response <- function(response, log_errors) {
 	}
 
 	if (code >= 300 && code < 400) {
-		if (log_errors > 0) {
+		if (!is.null(log_errors)) {
 			warning(
 				"Your request generated a HTTP code ",
 				code,
-				". For more information see the error file that has been generated in the working directory."
+				". For more information see the generated error file ."
 			)
 
 		} else{
 			warning(
 				"Your request generated a HTTP code ",
 				code,
-				". To print more detailed information to a file, set argument log_errors to TRUE and rerun fhir_search()."
+				". To print more detailed information to a file, set argument log_errors to a filename and rerun fhir_search()."
 			)
 
 		}
@@ -659,18 +679,18 @@ check_response <- function(response, log_errors) {
 	}
 
 	if (code >= 400 & code < 500) {
-		if (log_errors > 0) {
+		if (!is.null(log_errors)) {
 			stop(
 				"Your request generated a client error, HTTP code ",
 				code,
-				". For more information see the error file that has been generated in the working directory."
+				". For more information see the generated error file."
 			)
 
 		} else{
 			stop(
 				"Your request generated a client error, HTTP code ",
 				code,
-				". To print more detailed information to a file, set argument log_errors to TRUE and rerun fhir_search()."
+				". To print more detailed information to a file, set argument log_errors to a filename and rerun fhir_search()."
 			)
 
 		}
@@ -678,18 +698,18 @@ check_response <- function(response, log_errors) {
 	}
 
 	if (code >= 500 && code < 600) {
-		if (log_errors > 0) {
+		if (!is.null(log_errors)) {
 			stop(
 				"Your request generated a server error, HTTP code ",
 				code,
-				". For more information see the error file that has been generated in the working directory."
+				". For more information see the generated error file."
 			)
 
 		} else{
 			stop(
 				"Your request generated a server error, HTTP code ",
 				code,
-				". To print more detailed error information to a file, set argument log_errors to TRUE and rerun fhir_search()."
+				". To print more detailed error information to a file, set argument log_errors to a filename and rerun fhir_search()."
 			)
 
 		}
