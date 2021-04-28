@@ -218,20 +218,23 @@ fhir_search <- function(
 #' @examples
 #' \donttest{
 #' # workflow for small memory environments, downloading small batches of bundles
-#' # for really small memory environments consider also using the _count option in
+#' # for really small memory environments consider also using the `_count` option in
 #' # your FHIR search request.
 #' # You can iteratively download, crack and save the bundles until all bundles are processed or the
 #' # desired number of bundles is reached.
-#TODO
-#' url <- fhir_url("http://hapi.fhir.org/baseR4/Observation")
+#' url <- fhir_url("https://server.fire.ly/Patient")
 #' count <- 0
+#' obs <- fhir_df_description(resource = "Patient")
+#' design <- fhir_design(obs)
 #' while(length(url)>0 && count < 5){
-#' 	bundles <- fhir_search(url, verbose = 2, max_bundles = 2)
-#' 	tables <- fhir_crack(bundles, list(Obs=list(resource = "//Observation")))
-#' 	save(tables, file = paste0(tempdir(),"/table_", count, ".RData"))
-#' 	count <- count + 1
-#' 	url <- fhir_next_bundle_url()
+#' 	 bundles <- fhir_search(url, max_bundles = 2)
+#' 	 tables <- fhir_crack(bundles, design)
+#'   save(tables, file = paste0(tempdir(),"/table_", count, ".RData"))
+#'   count <- count + 1
+#'   url <- fhir_next_bundle_url()
 #' }
+#' #you can see the saved tables here:
+#' dir(tempdir())
 #'}
 #'
 fhir_next_bundle_url <- function(bundle=NULL) {
@@ -274,60 +277,124 @@ fhir_current_request <- function() {
 	fhircrackr_env$current_request
 }
 
-#TODO
-#' #' Get capability statement
-#' #' @description Get the capability statement of a FHIR server.
-#' #'
-#' #' @param url The base URL of the FHIR server.
-#' #' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
-#' #' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
-#' #' @param sep A string to separate pasted multiple entries
-#' #' @param remove_empty_columns Logical scalar. Remove empty columns?
-#' #' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
-#' #' If \code{NULL}, no indices will be added to multiple entries. \code{NULL} means \code{brackets} is looked up in design, if it is \code{NULL} there too, no indices are added.
-#' #' @param verbose An integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
-#' #' downloading/extraction progress will be printed. Defaults to 2.
-#' #' @param add_indices Deprecated. This argument was used to control adding of indices for multiple entries. This is now
-#' #' done via the brackets argument. If brackets is \code{NULL}, no indices are added, if brackets is not \code{NULL}, indices are added to multiple entries.
-#' #'
-#' #' @return A list of data frames containing the information from the statement
-#' #' @export
-#' #'
-#' #' @examples
-#' #' \donttest{cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")}
-#' #'
+#' Get capability statement
+#' @description Get the capability statement of a FHIR server.
 #'
-#' fhir_capability_statement <-function(url = "https://hapi.fhir.org/baseR4",
-#' 									 username = NULL,
-#' 									 password = NULL,
-#' 									 sep = " ",
-#' 									 remove_empty_columns = TRUE,
-#' 									 brackets = NULL,
-#' 									 verbose = 2,
-#' 									 add_indices) {
+#' This function downloads a capability statement and creates three data.frames from it:
+#' - `Meta` contains general information on the server
+#' - `Rest` contains information on the Rest operations the server supports
+#' - `Resources` contains information on the supported resource types
 #'
-#' 	caps <-
-#' 		fhir_search(request = paste_paths(url, "/metadata?"),
-#' 					username = username,
-#' 					password = password,
-#' 					verbose = verbose)
+#' When there is more than one piece of information regarding a variable in these data.frames,
+#' they are divided by the string specified in `sep`. If `brackets` is not NULL, those entries
+#' will also be assigned indices so you can melt them using [fhir_melt()].
 #'
-#' 	design <- list(
-#' 		META      = list(resource = "/CapabilityStatement", cols = "./*/@*"),
-#' 		REST.META = list(resource = "/CapabilityStatement/rest", cols = "./*/@*"),
-#' 		REST      = list(resource = "/CapabilityStatement/rest/resource")
-#' 	)
+#' @param url The base URL of the FHIR server.
+#' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
+#' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
+#' @param sep A string to separate pasted multiple entries
+#' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`.
+#' If `NULL`, no indices will be added to multiple entries.
+#' @param verbose An integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
+#' downloading/extraction progress will be printed. Defaults to 2.
+#' @return A list of data frames containing the information from the statement
+#' @export
 #'
-#' 	fhir_crack(
-#' 		bundles = caps,
-#' 		design = design,
-#' 		sep = sep,
-#' 		remove_empty_columns = remove_empty_columns,
-#' 		brackets = brackets,
-#' 		verbose = verbose,
-#' 		add_indices = add_indices
-#' 	)
-#' }
+#' @examples
+#' \donttest{
+#' #without indices
+#' cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")
+#'
+#' #with indices
+#' cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4", brackets = c("[","]"))
+#'
+#' #melt searchInclude variable
+#' resources <- fhir_melt(cap$Resources,
+#'                        columns = "searchInclude",
+#'                        brackets = c("[", "]"), sep = " || ",
+#'                        all_columns = TRUE)
+#'
+#' #remove indices
+#' resources <- fhir_rm_indices(resources, brackets = c("[", "]"))
+#'
+#' View(resources)
+#'}
+
+fhir_capability_statement <-function(url = "https://hapi.fhir.org/baseR4",
+									 username = NULL,
+									 password = NULL,
+									 brackets = NULL,
+									 sep = " || ",
+									 log_errors = NULL) {
+
+
+	auth <- if (!is.null(username) && !is.null(password)) {
+		httr::authenticate(username, password)
+	}
+
+	response <- httr::GET(
+		paste_paths(url, "/metadata?"),
+		httr::add_headers(Accept = "application/fhir+xml"),
+		auth
+	)
+
+	#check for http errors
+	check_response(response, log_errors = log_errors)
+
+	#extract payload
+	payload <- httr::content(response, as = "text", encoding = "UTF-8")
+	xml <- xml2::read_xml(payload)
+	xml2::xml_ns_strip(xml)
+
+	xml_meta <- xml2::xml_new_root(xml, .copy = T)
+	xml2::xml_remove(xml2::xml_find_all(xml_meta, "/CapabilityStatement/rest"))
+
+
+	xml_rest <- xml2::xml_new_root(xml, .copy = T)
+	xml_rest <- xml2::xml_find_all(xml_rest, "/CapabilityStatement/rest")
+	xml2::xml_remove(xml2::xml_find_all(xml_rest, "/CapabilityStatement/rest/resource"))
+
+	xml_resource <- xml2::xml_find_all(xml, "/CapabilityStatement/rest/resource")
+
+	suppressWarnings({
+		desc_meta <- fhir_df_description(resource = "/CapabilityStatement")
+		desc_rest <- fhir_df_description(resource = "rest")
+		desc_resource <- fhir_df_description(resource = "resource")
+	})
+
+	META <- fhir_crack(
+		bundles = list(xml_meta),
+		design = fhir_design(desc_meta),
+		sep=sep, brackets = brackets
+	)
+
+	restBrackets <- if(is.null(brackets)){c("[", "]")}else{brackets}
+
+	REST <- fhir_crack(
+		bundles = list(xml_rest),
+		design = fhir_design(desc_rest),
+		sep=sep,brackets = restBrackets
+	)
+
+	rest <- fhir_melt(REST$desc_rest, brackets = restBrackets, sep = " || ",
+					  columns = fhir_common_columns(REST$desc_rest, column_names_prefix = "operation"),
+					  all_columns = T)
+
+	rest$resource_identifier <- NULL
+	if(is.null(brackets)){rest <- fhir_rm_indices(rest, brackets = restBrackets)}
+
+	RESOURCE <- fhir_crack(
+		bundles = list(xml_resource),
+		design = fhir_design(desc_resource),
+		sep=sep, brackets = brackets
+	)
+
+	list(Meta = META$desc_meta,
+		 Rest = unique(rest),
+		 Resources = RESOURCE$desc_resource
+		 )
+
+}
 
 ####Saving Bundles####
 

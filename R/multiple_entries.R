@@ -338,12 +338,14 @@ setMethod(
 	}
 )
 
-#' Remove indices from data frame
+#' Remove indices from data.frame/data.table
 #'
-#' Removes the indices produced by \code{\link{fhir_crack}} when \code{add_indices=TRUE}
-#' @param indexed_data_frame A data frame with indices for multiple entries as produced by \code{\link{fhir_crack}}
-#' @param brackets A string vector of length two defining the brackets that were used in \code{\link{fhir_crack}}
-#' @param columns A string vector of column names, indicating from which columns indices should be removed. Defaults to all columns.
+#' Removes the indices in front of multiple entries as produced by [fhir_crack()] when brackets are provided in
+#' the design.
+#' @param indexed_data_frame A data frame with indices for multiple entries as produced by [fhir_crack()]
+#' @param brackets A character vector of length two defining the brackets that were used in [fhir_crack()]
+#' @param columns A character vector of column names, indicating from which columns indices should be removed.
+#' Defaults to all columns.
 #'
 #' @return A data frame without indices.
 #' @export
@@ -383,12 +385,13 @@ setMethod(
 #' </Bundle>"
 #')
 #'
+#' patients <- fhir_df_description(resource = "Patient")
 #'
 #' dfs <- fhir_crack(bundles = list(bundle),
-#'                   design = list(Patients = list(resource = "/Bundle/Patient")),
-#'                   brackets = c("[", "]"),verbose = 2)
+#'                   design = fhir_design(patients),
+#'                   brackets = c("[", "]"))
 #'
-#' df_indices_removed <- fhir_rm_indices(dfs[[1]], brackets=c("[", "]"))
+#' df_indices_removed <- fhir_rm_indices(dfs$patients, brackets=c("[", "]"))
 
 
 fhir_rm_indices <- function(
@@ -425,21 +428,21 @@ fhir_rm_indices <- function(
 }
 
 
-#' Extract indices from molten data.frame with multiple entries
+#' Extract indices from molten data.frame/data.table with multiple entries
 #'
 #' Extracts a character matrix with indices from a molten indexed data.frame/data.table as created
-#' by \code{\link{fhir_melt_all}} with \code{rm_indices=FALSE}. After extraction, the indices of the data.frame can be removed,
+#' by [fhir_melt_all()] with `rm_indices=FALSE`. After extraction, the indices of the data.frame can be removed,
 #' and the data.frame can be manipulated as desired. As long as dimensions as well as row and column
 #' order are preserved during manipulation, the indices can then be restored again with
-#' \code{\link{fhir_restore_indices}}.
+#' [fhir_restore_indices()].
 #'
-#' @param indexed_data_frame A data frame with indices for multiple entries as produced by \code{\link{fhir_melt_all}}.
+#' @param indexed_data_frame A data frame with indices for multiple entries as produced by [fhir_melt_all()].
 #' Please make sure there is no more than one index present per cell, i.e. all multiple entries have been molten into multiple
-#' rows as achieved by \code{\link{fhir_melt_all}} with the argument \code{rm_indices} set to \code{FALSE}.
+#' rows as achieved by [fhir_melt_all()] with the `rm_indices=FALSE`.
 #' All columns have to be of class character.
-#' @param brackets A string vector of length two defining the brackets that were used in \code{\link{fhir_crack}}.
-#' @return A character matrix with same dimensions as \code{indexed_data_frame} containing the indices. For use with
-#' \code{\link{fhir_restore_indices}}.
+#' @param brackets A string vector of length two defining the brackets that were used in [fhir_crack()].
+#' @return A character matrix with same dimensions as [indexed_data_frame()] containing the indices. For use with
+#' `fhir_restore_indices()`.
 #'
 #' @examples
 #' #generate example bundle
@@ -498,13 +501,15 @@ fhir_rm_indices <- function(
 #')
 #'
 #'#crack fhir resources
+#'patients <- fhir_df_description(resource = "Patient",
+#'                                style = fhir_style(brackets = c("[","]"),
+#'				                                     sep="||")
+#'				                  )
 #'dfs <- fhir_crack(bundles = list(bundle),
-#'                  design = list(Patients = list(resource = ".//Patient",
-#'				                                  style= list(brackets = c("[","]"),
-#'				                                   sep="||"))))
+#'                  design = fhir_design(patients))
 #'
-#'#Melt multiple entries
-#'d <- fhir_melt_all(dfs$Patients, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
+#'#Melt all multiple entries
+#'d <- fhir_melt_all(dfs$patients, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
 #'
 #'#Extract indices
 #'fhir_extract_indices(d, brackets = c("[", "]"))
@@ -544,15 +549,15 @@ fhir_extract_indices <- function(indexed_data_frame, brackets){
 	result
 }
 
-#' Restore indices to molten data.frame with multiple entries
+#' Restore indices to molten data.frame/data.table with multiple entries
 #'
-#' Takes a molten data.frame/data.table containing no indices as produced by \code{\link{fhir_melt_all}} and
-#' restores its indices from a matrix of indices as produces by \code{\link{fhir_extract_indices}}. Dimensions as
+#' Takes a molten data.frame/data.table containing no indices as produced by [fhir_melt_all()] and
+#' restores its indices from a matrix of indices as produces by [fhir_extract_indices()]. Dimensions as
 #' well as row and column ordering of index matrix and data frame have to be identical!
 #'
-#' @param d A data.frame/data.table as produced by \code{\link{fhir_melt_all}} without indices.
-#' @param index_matrix A character matrix with the same dimensions as \code{d}, as produced by \code{\link{fhir_extract_indices}}
-#' @return \code{d} but with the indices from \code{index_matrix}
+#' @param d A data.frame/data.table as produced by [fhir_melt_all()] without indices.
+#' @param index_matrix A character matrix with the same dimensions as `d`, as produced by [fhir_extract_indices()]
+#' @return `d` but with the indices from `index_matrix`.
 #'
 #' @examples
 #' #generate example bundle
@@ -611,12 +616,15 @@ fhir_extract_indices <- function(indexed_data_frame, brackets){
 #')
 #'
 #'#crack fhir resources
+#'patients <- fhir_df_description(resource = "Patient",
+#'                                style = fhir_style(brackets = c("[","]"),
+#'				                                     sep="||")
+#'				                  )
 #'dfs <- fhir_crack(bundles = list(bundle),
-#'                  design = list(Patients = list(resource = ".//Patient",
-#'				                                  style= list(brackets = c("[","]"),
-#'				                                   sep="||"))))
+#'                  design = fhir_design(patients))
+#'
 #'#Melt multiple entries
-#'d <- fhir_melt_all(dfs$Patients, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
+#'d <- fhir_melt_all(dfs$patients, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
 #'
 #'#Extract indices
 #'indices <- fhir_extract_indices(d, brackets = c("[", "]"))
@@ -682,7 +690,7 @@ fhir_restore_indices <- function(d, index_matrix){
 #' It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!
 #' @param brackets A character vector of length 2, defining the brackets used for the indices.
 #' @param sep A string, the separator.
-#' @param all_columns A logical scalar. Return all columns or only the ones specified in \code{columns}?
+#' @param all_columns A logical scalar. Return all columns or only the ones specified in `columns`?
 #' @return A data frame with nrow > 1
 #' @noRd
 

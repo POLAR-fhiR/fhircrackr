@@ -17,7 +17,7 @@ setValidity(
 	"fhir_table_list",
 	function(object){
 		messages <- c()
-		if(length(object) != length(object@indexed)) {
+		if(length(object) != length(object)) {
 			messages <- c(messages, "Slot names has to have the same length as the list.")
 		}
 		if(length(object) != length(object@design)) {
