@@ -1,10 +1,11 @@
 #definition
 
-#'an s4 class to represent a body for a post to a fhir server
+#' An s4 class to represent a body for a POST to a FHIR server
 #'
-#'objects of this class should always be created with a call to the function [fhir_body()]
+#' Objects of this class should always be created with a call to the function [fhir_body()]
 #' @slot content a length 1 character representing the body for the post
 #' @slot type a length 1 character defining the type of the body e.g. `"application/x-www-form-urlencoded"` or `"xml"`
+#' @export
 
 setClass(
 	"fhir_body",
@@ -30,23 +31,22 @@ setValidity(
 #constructor
 #generic method to allow for different input types
 
-#' create [fhir_body-class] object
+#' Create [fhir_body-class] object
 #'
 #' @param content A string representing the body for the post in the format specified in `type`.
 #' If you provide a named list here, it will be taken as key value pairs of FHIR search parameters
 #' and will be concatenated appropriately, in which case the `type` will automatically be set to
 #' `"application/x-www-form-urlencoded"`. See examples.
-#'
 #' @param type A string defining the type of the body e.g. `"application/x-www-form-urlencoded"` or `"xml"`.
 #'
 #' @return An object of type [fhir_body-class]
-#'
+#' @export
+#' @docType methods
+#' @rdname fhir_body-methods
 #' @examples
 #'  #body that could be used in a FHIR seach request POSTed to an URL like baseurl/Patient/_search
 #' fhir_body(content = "gender=female&_summary=count", type="application/x-www-form-urlencoded")
 #' fhir_body(content = list("gender" = "female", "_summary" = "count"))
-
-
 setGeneric(
 	"fhir_body",
 	function(content, type){
@@ -54,6 +54,8 @@ setGeneric(
 	}
 )
 
+#' @rdname fhir_body-methods
+#' @aliases fhir_body,list,missing-methods
 setMethod(
 	"fhir_body",
 	c(content = "list", type="missing"),
@@ -75,7 +77,8 @@ setMethod(
 )
 
 
-
+#' @rdname fhir_body-methods
+#' @aliases fhir_body,list,character-methods
 setMethod(
 	"fhir_body",
 	c(content = "list", type="character"),
@@ -97,7 +100,8 @@ setMethod(
 		new("fhir_body", content = string, type="application/x-www-form-urlencoded")
 	}
 )
-
+#' @rdname fhir_body-methods
+#' @aliases fhir_body,character,character-methods
 setMethod(
 	"fhir_body",
 	c(content = "character", type="character"),

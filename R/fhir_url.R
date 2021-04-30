@@ -1,5 +1,10 @@
-####base class####
-#Class definition
+
+#' An S4 object to represent a URL for a FHIR server
+#'
+#' Objects of this class are basically strings (character vectors of length 1) representing
+#' a URL. They are always url encoded. See `?fhir_url`.
+#' @export
+#'
 setClass(
 	"fhir_url",
 	contains = "character"
@@ -17,7 +22,7 @@ setValidity(
 	}
 )
 
-#' Create URL for FHIR search
+#' Create FHIR URL
 #'
 #' This function creates an object of class [fhir_url-class] which mostly represents a URL-encoded URL for
 #' a FHIR search request. A valid Search URL contains a base URL and a resource type and can contain additional
@@ -37,7 +42,9 @@ setValidity(
 #' `"gender=male&_summary=count"` or a named list or named character vector e.g. `list(gender="male", "_summary"="count")`
 #' or `c(gender="male", "_summary"="count")`. Note that parameter names beginning with `_` have to be put in quotation marks!
 #'
-#'
+#' @return An object of class [fhir_url-class]
+#' @docType methods
+#' @rdname fhir_url-methods
 #' @examples
 #'
 #' #provide full FHIR search request
@@ -69,8 +76,7 @@ setValidity(
 #'    resource = "Patient",
 #'    parameters = list("gender" = "male", "_summary" = "count")
 #'  )
-#'
-
+#' @export
 
 setGeneric(
 	"fhir_url",
@@ -81,17 +87,22 @@ setGeneric(
 	}
 )
 
+#' @aliases fhir_url,character,missing,missing-method
+#' @rdname fhir_url-methods
 setMethod(
 	"fhir_url",
 	signature = c(url="character", resource = "missing", parameters = "missing"),
 	function(url){
 
-		if(length(url)>0){url <- URLencode(url)}
+		if(length(url)>0){url <- utils::URLencode(url)}
 
 		new("fhir_url", url)
 
 	}
 )
+
+#' @aliases fhir_url,character,character,missing-method
+#' @rdname fhir_url-methods
 
 setMethod(
 	"fhir_url",
@@ -102,9 +113,12 @@ setMethod(
 
 		request <- paste(url, resource, sep="/")
 
-	 	new("fhir_url", URLencode(request))
+	 	new("fhir_url", utils::URLencode(request))
 	}
 )
+
+#' @aliases fhir_url,character,character,character-method
+#' @rdname fhir_url-methods
 
 setMethod(
 	"fhir_url",
@@ -117,7 +131,7 @@ setMethod(
 
 		if(length(parameters)==1 && grepl("=", parameters)){
 
-			return(new("fhir_url", URLencode(paste0(request, "?", parameters))))
+			return(new("fhir_url", utils::URLencode(paste0(request, "?", parameters))))
 		}
 
 		if(is.null(names(parameters))){
@@ -128,10 +142,13 @@ setMethod(
 		pairs <- paste(keys, parameters, sep = "=")
 		string <- paste(pairs, collapse = "&")
 
-	 	new("fhir_url",  URLencode(paste0(request, "?", string)))
+	 	new("fhir_url",  utils::URLencode(paste0(request, "?", string)))
 	}
 
 )
+
+#' @aliases fhir_url,character,character,list-method
+#' @rdname fhir_url-methods
 
 setMethod(
 	"fhir_url",
@@ -153,7 +170,7 @@ setMethod(
 		pairs <- paste(keys, values, sep = "=")
 		string <- paste(pairs, collapse = "&")
 
-		new("fhir_url",  URLencode(paste0(request, "?", string)))
+		new("fhir_url",  utils::URLencode(paste0(request, "?", string)))
 	}
 
 )

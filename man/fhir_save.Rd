@@ -2,27 +2,7 @@
 % Please edit documentation in R/download_resources.R
 \name{fhir_save}
 \alias{fhir_save}
-\title{#' Get capability statement
-#' @description Get the capability statement of a FHIR server.
-#'
-#' @param url The base URL of the FHIR server.
-#' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
-#' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
-#' @param sep A string to separate pasted multiple entries
-#' @param remove_empty_columns Logical scalar. Remove empty columns?
-#' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
-#' If \code{NULL}, no indices will be added to multiple entries. \code{NULL} means \code{brackets} is looked up in design, if it is \code{NULL} there too, no indices are added.
-#' @param verbose An integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
-#' downloading/extraction progress will be printed. Defaults to 2.
-#' @param add_indices Deprecated. This argument was used to control adding of indices for multiple entries. This is now
-#' done via the brackets argument. If brackets is \code{NULL}, no indices are added, if brackets is not \code{NULL}, indices are added to multiple entries.
-#'
-#' @return A list of data frames containing the information from the statement
-#' @export
-#'
-#' @examples
-#' \donttest{cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")}
-#'}
+\title{Save FHIR bundles as xml-files}
 \usage{
 fhir_save(bundles, directory = "result")
 }
@@ -33,40 +13,6 @@ fhir_save(bundles, directory = "result")
 }
 \description{
 Writes a list of FHIR bundles as numbered xml files into a directory.
-}
-\details{
-fhir_capability_statement <-function(url = "https://hapi.fhir.org/baseR4",
-username = NULL,
-password = NULL,
-sep = " ",
-remove_empty_columns = TRUE,
-brackets = NULL,
-verbose = 2,
-add_indices) {\preformatted{caps <-
-	fhir_search(request = paste_paths(url, "/metadata?"),
-				username = username,
-				password = password,
-				verbose = verbose)
-
-design <- list(
-	META      = list(resource = "/CapabilityStatement", cols = "./*/@*"),
-	REST.META = list(resource = "/CapabilityStatement/rest", cols = "./*/@*"),
-	REST      = list(resource = "/CapabilityStatement/rest/resource")
-)
-
-fhir_crack(
-	bundles = caps,
-	design = design,
-	sep = sep,
-	remove_empty_columns = remove_empty_columns,
-	brackets = brackets,
-	verbose = verbose,
-	add_indices = add_indices
-)
-}
-
-}
-Save FHIR bundles as xml-files
 }
 \examples{
 #unserialize example bundle

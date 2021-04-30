@@ -2,28 +2,28 @@
 % Please edit documentation in R/multiple_entries.R
 \name{fhir_extract_indices}
 \alias{fhir_extract_indices}
-\title{Extract indices from molten data.frame with multiple entries}
+\title{Extract indices from molten data.frame/data.table with multiple entries}
 \usage{
 fhir_extract_indices(indexed_data_frame, brackets)
 }
 \arguments{
-\item{indexed_data_frame}{A data frame with indices for multiple entries as produced by \code{\link{fhir_melt_all}}.
+\item{indexed_data_frame}{A data frame with indices for multiple entries as produced by \code{\link[=fhir_melt_all]{fhir_melt_all()}}.
 Please make sure there is no more than one index present per cell, i.e. all multiple entries have been molten into multiple
-rows as achieved by \code{\link{fhir_melt_all}} with the argument \code{rm_indices} set to \code{FALSE}.
+rows as achieved by \code{\link[=fhir_melt_all]{fhir_melt_all()}} with the \code{rm_indices=FALSE}.
 All columns have to be of class character.}
 
-\item{brackets}{A string vector of length two defining the brackets that were used in \code{\link{fhir_crack}}.}
+\item{brackets}{A string vector of length two defining the brackets that were used in \code{\link[=fhir_crack]{fhir_crack()}}.}
 }
 \value{
 A character matrix with same dimensions as \code{indexed_data_frame} containing the indices. For use with
-\code{\link{fhir_restore_indices}}.
+\code{fhir_restore_indices()}.
 }
 \description{
 Extracts a character matrix with indices from a molten indexed data.frame/data.table as created
-by \code{\link{fhir_melt_all}} with \code{rm_indices=FALSE}. After extraction, the indices of the data.frame can be removed,
+by \code{\link[=fhir_melt_all]{fhir_melt_all()}} with \code{rm_indices=FALSE}. After extraction, the indices of the data.frame can be removed,
 and the data.frame can be manipulated as desired. As long as dimensions as well as row and column
 order are preserved during manipulation, the indices can then be restored again with
-\code{\link{fhir_restore_indices}}.
+\code{\link[=fhir_restore_indices]{fhir_restore_indices()}}.
 }
 \examples{
 #generate example bundle
@@ -82,13 +82,15 @@ bundle <- xml2::read_xml(
 )
 
 #crack fhir resources
+patients <- fhir_df_description(resource = "Patient",
+                               style = fhir_style(brackets = c("[","]"),
+			                                     sep="||")
+			                  )
 dfs <- fhir_crack(bundles = list(bundle),
-                 design = list(Patients = list(resource = ".//Patient",
-			                                  style= list(brackets = c("[","]"),
-			                                   sep="||"))))
+                 design = fhir_design(patients))
 
-#Melt multiple entries
-d <- fhir_melt_all(dfs$Patients, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
+#Melt all multiple entries
+d <- fhir_melt_all(dfs$patients, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
 
 #Extract indices
 fhir_extract_indices(d, brackets = c("[", "]"))

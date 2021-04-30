@@ -14,7 +14,7 @@ types listed at https://hl7.org/FHIR/resourcelist.html}
 An fhir_resource object
 }
 \description{
-This function creates an object of class \link{fhir_resource_type_class}. It checks the resource type against the list
+This function creates an object of class \linkS4class{fhir_resource_type}. It checks the resource type against the list
 of resource types provided at https://hl7.org/FHIR/resourcelist.html and throws a warning if it cannot be found there.
 }
 \examples{

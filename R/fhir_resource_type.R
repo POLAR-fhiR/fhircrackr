@@ -2,6 +2,12 @@
 #Class definition
 
 #' A representation of a FHIR resource type
+#'
+#' An object of class `fhir_resource_type` is a string containing a FHIR resource type.
+#' It is part of a `fhir_df_description` which in turn is part of a `fhir_design` and used in
+#' [fhir_crack()].
+#' @export
+#'
 setClass(
 	"fhir_resource_type",
 	contains = "character"
@@ -21,7 +27,7 @@ setValidity(
 
 #' Create [fhir_resource_type-class] object
 #'
-#' This function creates an object of class [fhir_resource_type_class]. It checks the resource type against the list
+#' This function creates an object of class [fhir_resource_type-class]. It checks the resource type against the list
 #' of resource types provided at https://hl7.org/FHIR/resourcelist.html and throws a warning if it cannot be found there.
 #'
 #' @param string A length one character vector containing the resource type. Will mostly be one of the official FHIR resource

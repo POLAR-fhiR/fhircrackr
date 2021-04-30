@@ -5,6 +5,6 @@
 \alias{fhir_bundle_list-class}
 \title{S4 class to represent a list of FHIR bundles}
 \description{
-A fhir_bundle_list is a list of fhir_bundle_xml or fhir_bundle_serialized objects. It is
-usually not created by the user but returned by a call to \code{\link[=fhir_search]{fhir_search()}}.
+A fhir_bundle_list is a list of fhir_bundle_xml or fhir_bundle_serialized objects. It should
+not be created by the user but returned by a call to \code{\link[=fhir_search]{fhir_search()}}.
 }

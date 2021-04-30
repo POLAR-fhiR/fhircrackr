@@ -3,9 +3,9 @@
 \docType{class}
 \name{fhir_body-class}
 \alias{fhir_body-class}
-\title{an s4 class to represent a body for a post to a fhir server}
+\title{An s4 class to represent a body for a POST to a FHIR server}
 \description{
-objects of this class should always be created with a call to the function \code{\link[=fhir_body]{fhir_body()}}
+Objects of this class should always be created with a call to the function \code{\link[=fhir_body]{fhir_body()}}
 }
 \section{Slots}{
 

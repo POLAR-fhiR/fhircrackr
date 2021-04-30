@@ -7,7 +7,7 @@ testthat::test_that(
 
 		testthat::skip_on_cran()
 
-		bundles <- fhir_search( request = "https://hapi.fhir.org/baseR4/Patient?_pretty=true", max_bundles = 5 )
+		bundles <- fhir_search( request = "https://server.fire.ly/Patient?", max_bundles = 2 )
 
 		testthat::expect_false( is.null( bundles ) )
 		testthat::expect_true( is.list( bundles ) )
@@ -56,7 +56,7 @@ testthat::test_that(
 
 		testthat::skip_on_cran()
 
-		caps <- fhir_capability_statement("https://hapi.fhir.org/baseR4", sep = " ~ ")
+		caps <- fhir_capability_statement("https://server.fire.ly", sep = " ~ ")
 
 		testthat::expect_false( is.null( caps ) )
 		testthat::expect_true( is.list( caps ) )
@@ -69,40 +69,33 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "fhir_crack()" )
 
-xmlfile <- xml2::read_xml( "specimen.xml" )
+bundles <- fhir_unserialize(patient_bundles)
 
-design <- list(
-
-	Specimen = list(
-		resource = "//extension[@url='https://fhir.bbmri.de/StructureDefinition/StorageTemperature']",
-		cols = list(
-			VCS  = "valueCodeableConcept/coding/system/@value",
-			CODE = "valueCodeableConcept/coding/code/@value"
-		)
-	)
+design <- fhir_design(
+	fhir_df_description(resource = "Patient"),
+	names = "Patient"
 )
 
-df <- fhir_crack(bundles = list(xmlfile), design)
+df <- fhir_crack(bundles = bundles, design)
 
 testthat::test_that(
 	"crack creates a valid data frame", {
 		testthat::expect_false( is.null( df ) )
-		testthat::expect_false( is.null( df$Specimen ) )
-		testthat::expect_true( is.data.frame( df$Specimen ) )
-		testthat::expect_equal( nrow( df$Specimen ), 1 )
-		testthat::expect_equal( df$Specimen$VCS[ 1 ],  "https://fhir.bbmri.de/CodeSystem/StorageTemperature" )
-		testthat::expect_equal( df$Specimen$CODE[ 1 ], "temperature2to10" )
+		testthat::expect_false( is.null( df$Patient ) )
+		testthat::expect_true( is.data.frame( df$Patient ) )
+		testthat::expect_equal( nrow( df$Patient), 20 )
 	}
 )
 
-design <- list(
+design <- fhir_design(
 
-	Pat = list(
-		resource = ".//Patient",
+	fhir_df_description(
+		resource = "Patient",
 		cols = list(
 			name = "name/family/@value"
 		)
-	)
+	),
+	names = "Pat"
 )
 
 dfs <- fhir_crack( bundles = myBundles, design = design, sep = "»" )

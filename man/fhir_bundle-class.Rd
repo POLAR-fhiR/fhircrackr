@@ -3,7 +3,7 @@
 \docType{class}
 \name{fhir_bundle-class}
 \alias{fhir_bundle-class}
-\title{An S4 class ro represent FHIR bundles}
+\title{An S4 class to represent FHIR bundles}
 \description{
-An S4 class ro represent FHIR bundles
+An S4 class to represent FHIR bundles
 }

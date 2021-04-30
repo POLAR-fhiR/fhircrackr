@@ -14,10 +14,10 @@ Return FHIR search request used in last call to \code{\link[=fhir_search]{fhir_s
 }
 \examples{
 \donttest{
-request <- fhir_url(url = "https://hapi.fhir.org/baseR4", resource = "Patient")
+request <- fhir_url(url = "https://server.fire.ly", resource = "Patient")
 fhir_current_request()
 
-fhir_search("https://hapi.fhir.org/baseR4/Medication")
+fhir_search("https://server.fire.ly/Medication", max_bundles = 1)
 fhir_current_request()
 }
 

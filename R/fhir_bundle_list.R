@@ -1,10 +1,11 @@
 
 #' S4 class to represent a list of FHIR bundles
 #'
-#' A fhir_bundle_list is a list of fhir_bundle_xml or fhir_bundle_serialized objects. It is
-#' usually not created by the user but returned by a call to [fhir_search()].
+#' A fhir_bundle_list is a list of fhir_bundle_xml or fhir_bundle_serialized objects. It should
+#'  not be created by the user but returned by a call to [fhir_search()].
 #'
 #' @include fhir_bundle.R
+#' @export
 #'
 setClass(
 	"fhir_bundle_list",
@@ -45,6 +46,7 @@ setValidity(
 #'
 #' fhir_bundle_list(list(r1, r2))
 #' fhir_bundle_list(list(fhir_bundle_serialized(r1), fhir_bundle_serialized(r2)))
+#' @noRd
 
 fhir_bundle_list <- function(bundles){
 	if(!is.list(bundles)){

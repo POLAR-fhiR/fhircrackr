@@ -6,6 +6,7 @@
 #' @slot brackets  A character vector of length two defining the brackets surrounding indices for multiple entries,
 #' e.g. `c( "<", ">")`. If this is empty (i.e. character of length 0, the default), no indices will be added to multiple entries.
 #' @slot rm_empty_cols Logical scalar. Remove empty columns? Defaults to TRUE.
+#' @export
 #'
 setClass(
 	"fhir_style",
@@ -32,8 +33,27 @@ setValidity(
 
 #' Create fhir_style object
 #'
-#' This function creates an object of class `fhir_style`. It contains the three elements `sep`, `brackets` and `rm_empty_cols`
-
+#' This function creates an object of class `fhir_style`.
+#' It contains the three elements `sep`, `brackets` and `rm_empty_cols`. See Details.
+#'
+#' @details
+#' A `fhir_style` object is part of a `fhir_df_description` which in turn is part of a `fhir_design` and
+#' ultimately used in [fhir_crack()]. A `fhir_style` object contains three elements:
+#'
+#' - `sep`: A string defining the separator used to separate multiple entries for the same element in a FHIR resource,
+#' e.g. multiple `address/city` elements in a Patient resource.
+#' - `brackets`: A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`.
+#' If this is empty (i.e. character of length 0, the default), no indices will be added to multiple entries.
+#' - `rm_empty_cols`: A logical scalar defining whether or not to remove empty columns after cracking. Empty columns arise when you
+#' try to extract an element that doesn't appear in any of the resources.
+#' A `fhir_style` object looks for example like this:
+#'
+#' ```
+#' sep: ' '
+#' brackets: '[' ']'
+#' rm_empty_cols: FALSE
+#' ```
+#'
 #' @param sep A character vector of length 1 to separate pasted multiple entries. Defaults to `" "`
 #' @param brackets  A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`.
 #' If this is empty (i.e. character of length 0, the default) or 'NULL', no indices will be added to multiple entries. If it is a character
@@ -41,7 +61,11 @@ setValidity(
 #' @param rm_empty_cols Logical scalar. Remove empty columns? Defaults to `TRUE`.
 #' @return A fhir_style object
 #' @examples
-#' fhir_style(sep = " ", brackets = c("[", "]"), rm_empty_cols = FALSE)
+#' fhir_style(sep = " ",
+#'            brackets = c("[", "]"),
+#'            rm_empty_cols = FALSE)
+#'
+#' @export
 
 
 fhir_style <- function(sep=" ", brackets=character(), rm_empty_cols=TRUE) {

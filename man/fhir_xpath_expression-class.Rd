@@ -3,7 +3,13 @@
 \docType{class}
 \name{fhir_xpath_expression-class}
 \alias{fhir_xpath_expression-class}
-\title{A fhir_xpath_expression object}
+\title{An S4 class for xpath_expressions
+Objects of this class are essentially character vectors, but can only be valid
+XPath (1.0) expressions.
+They are mostly used in the \code{fhir_columns} class.}
 \description{
-A fhir_xpath_expression object
+An S4 class for xpath_expressions
+Objects of this class are essentially character vectors, but can only be valid
+XPath (1.0) expressions.
+They are mostly used in the \code{fhir_columns} class.
 }

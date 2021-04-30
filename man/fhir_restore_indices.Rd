@@ -2,21 +2,21 @@
 % Please edit documentation in R/multiple_entries.R
 \name{fhir_restore_indices}
 \alias{fhir_restore_indices}
-\title{Restore indices to molten data.frame with multiple entries}
+\title{Restore indices to molten data.frame/data.table with multiple entries}
 \usage{
 fhir_restore_indices(d, index_matrix)
 }
 \arguments{
-\item{d}{A data.frame/data.table as produced by \code{\link{fhir_melt_all}} without indices.}
+\item{d}{A data.frame/data.table as produced by \code{\link[=fhir_melt_all]{fhir_melt_all()}} without indices.}
 
-\item{index_matrix}{A character matrix with the same dimensions as \code{d}, as produced by \code{\link{fhir_extract_indices}}}
+\item{index_matrix}{A character matrix with the same dimensions as \code{d}, as produced by \code{\link[=fhir_extract_indices]{fhir_extract_indices()}}}
 }
 \value{
-\code{d} but with the indices from \code{index_matrix}
+\code{d} but with the indices from \code{index_matrix}.
 }
 \description{
-Takes a molten data.frame/data.table containing no indices as produced by \code{\link{fhir_melt_all}} and
-restores its indices from a matrix of indices as produces by \code{\link{fhir_extract_indices}}. Dimensions as
+Takes a molten data.frame/data.table containing no indices as produced by \code{\link[=fhir_melt_all]{fhir_melt_all()}} and
+restores its indices from a matrix of indices as produces by \code{\link[=fhir_extract_indices]{fhir_extract_indices()}}. Dimensions as
 well as row and column ordering of index matrix and data frame have to be identical!
 }
 \examples{
@@ -76,12 +76,15 @@ bundle <- xml2::read_xml(
 )
 
 #crack fhir resources
+patients <- fhir_df_description(resource = "Patient",
+                               style = fhir_style(brackets = c("[","]"),
+			                                     sep="||")
+			                  )
 dfs <- fhir_crack(bundles = list(bundle),
-                 design = list(Patients = list(resource = ".//Patient",
-			                                  style= list(brackets = c("[","]"),
-			                                   sep="||"))))
+                 design = fhir_design(patients))
+
 #Melt multiple entries
-d <- fhir_melt_all(dfs$Patients, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
+d <- fhir_melt_all(dfs$patients, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
 
 #Extract indices
 indices <- fhir_extract_indices(d, brackets = c("[", "]"))

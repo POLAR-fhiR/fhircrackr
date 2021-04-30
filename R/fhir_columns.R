@@ -1,13 +1,14 @@
 
 #' A S4 class to represent columns in a [fhir_df_description-class]
 #'
-#' An object of class [fhir_columns-class] is part of a [fhir_df_description-class]
-#' in a [fhir_design-class] and holds information on the elements
+#' An object of class `fhir_columns` is part of a `fhir_df_description`
+#' in a `fhir_design` and holds information on the elements
 #' that should be extracted from the FHIR resources, as well as the column names of the resulting data.frame.
 #' The elements to be extracted are indicated by XPath expressions.
 #'
 #' @slot names The column names
 #' @include fhir_xpath_expression.R
+#' @export
 #'
 setClass(
 	"fhir_columns",
@@ -29,18 +30,19 @@ setValidity(
 
 #' Create [fhir_columns-class] object
 #'
-#' An object of class [fhir_columns-class] is part of a fhir_design and holds information on the elements
+#' An object of class `fhir_columns` is part of a `fhir_df_description`in a `fhir_design` and holds information on the elements
 #' that should be extracted from the FHIR resources, as well as the column names of the resulting data.frame.
 #' The elements to be extracted are indicated by XPath expressions. If no column names are provided,
 #' they are generated automatically and reflect the elements position in the resource.
 #'
 #' @param expressions A (named) character vector or (named) list containing xpath expressions,
-#' or a [fhir_xpath_expressions-class] object.
+#' or a [fhir_xpath_expression-class] object.
 #' @param colnames The names of the columns to create. If no colnames are provided and the list or vector
 #' in `expressions` has names, those names are taken as the colnames. If no colnames are provided and
 #' `expressions` is unnamed too, the colnames are generated automatically from the xpath expressions. See examples.
 #'
-#'
+#' @docType methods
+#' @rdname fhir_columns-methods
 #' @examples
 #'  #provide colnames explicitly
 #'  fhir_columns(expressions = c("name/given", "code/coding/code"),
@@ -54,10 +56,7 @@ setValidity(
 #'
 #'  #colnames are generated automatically
 #'  fhir_columns(expressions = c("name/given", "code/coding/code"))
-#'
-
-
-
+#' @export
 setGeneric(
 	"fhir_columns",
 	function(expressions, colnames){
@@ -65,6 +64,8 @@ setGeneric(
 	}
 )
 
+#' @rdname fhir_columns-methods
+#' @aliases fhir_columns,missing,missing-method
 setMethod(
 	"fhir_columns",
 	signature = c(expressions = "missing", colnames = "missing"),
@@ -73,6 +74,9 @@ setMethod(
 	}
 )
 
+#' @rdname fhir_columns-methods
+#' @aliases fhir_columns,NULL,missing-method
+#'
 setMethod(
 	"fhir_columns",
 	signature = c(expressions = "NULL", colnames = "missing"),
@@ -81,6 +85,8 @@ setMethod(
 	}
 )
 
+#' @rdname fhir_columns-methods
+#' @aliases fhir_columns,character,character-method
 setMethod(
 	"fhir_columns",
 	signature = c(expressions = "character", colnames = "character"),
@@ -89,6 +95,8 @@ setMethod(
 	}
 )
 
+#' @rdname fhir_columns-methods
+#' @aliases fhir_columns,character,missing-method
 setMethod(
 	"fhir_columns",
 	signature = c(expressions = "character", colnames = "missing"),
@@ -101,6 +109,8 @@ setMethod(
 	}
 )
 
+#' @rdname fhir_columns-methods
+#' @aliases fhir_columns,list,missing-method
 setMethod(
 	"fhir_columns",
 	signature = list(expressions = "list", colnames = "missing"),

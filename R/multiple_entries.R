@@ -118,7 +118,8 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #'
 #' #crack fhir resources
 #' dfs <- fhir_crack(bundles = list(bundle),
-#'                   design = fhir_design(fhir_df_description(resource = "Patient"), names = "Patients"),
+#'                   design = fhir_design(fhir_df_description(resource = "Patient"),
+#'                                                            names = "Patients"),
 #'                   brackets = c("[","]"))
 #'
 #' #find all column names associated with attribute address
@@ -224,7 +225,8 @@ fhir_melt <- function(
 #' the way they are. They can be extracted with [fhir_extract_indices()], removed with [fhir_rm_indices()]
 #' and restored with [fhir_restore_indices()]
 #' @return A data frame where each multiple entry appears in a separate row.
-#'
+#' @docType methods
+#' @rdname fhir_melt_all-methods
 #' @examples
 #' #generate example
 #' bundle <- fhir_bundle_xml(xml2::read_xml(
@@ -304,7 +306,8 @@ fhir_melt <- function(
 #'
 #' dfs <- fhir_crack(bundles = list(bundle), design = design, sep="||", brackets = c("[","]"))
 #'
-#' #use on the list of tables: all tables are molten, brackets and sep are inferred from the attached design
+#' #use on the list of tables:
+#' #all tables are molten, brackets and sep are inferred from the attached design
 #' fhir_melt_all(dfs)
 #'
 #' #use on single df
@@ -319,12 +322,16 @@ setGeneric(
 	signature = "indexed_data_frame"
 )
 
+#' @rdname fhir_melt_all-methods
+#' @aliases fhir_melt_all,data.frame-method
 setMethod(
 	"fhir_melt_all",
 	signature = c(indexed_data_frame = "data.frame"),
 	function(indexed_data_frame, sep, brackets, rm_indices=TRUE){melt_all(indexed_data_frame, sep, brackets, rm_indices)}
 )
 
+#' @rdname fhir_melt_all-methods
+#' @aliases fhir_melt_all,fhir_table_list-method
 setMethod(
 	"fhir_melt_all",
 	signature = c(indexed_data_frame = "fhir_table_list"),
@@ -441,7 +448,7 @@ fhir_rm_indices <- function(
 #' rows as achieved by [fhir_melt_all()] with the `rm_indices=FALSE`.
 #' All columns have to be of class character.
 #' @param brackets A string vector of length two defining the brackets that were used in [fhir_crack()].
-#' @return A character matrix with same dimensions as [indexed_data_frame()] containing the indices. For use with
+#' @return A character matrix with same dimensions as `indexed_data_frame` containing the indices. For use with
 #' `fhir_restore_indices()`.
 #'
 #' @examples

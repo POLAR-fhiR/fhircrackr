@@ -5,7 +5,8 @@
 \alias{fhir_bundle_xml-class}
 \title{An S4 class to represent a FHIR bundle in xml form}
 \description{
-An S4 class to represent a FHIR bundle in xml form
+A \code{fhir_bundle_xml} is an xml representation of a FHIR bundle (https://www.hl7.org/fhir/bundle.html).
+It is usually found inside a \code{fhir_bundle_list} which is returned by a call to \code{\link[=fhir_search]{fhir_search()}}.
 }
 \section{Slots}{
 

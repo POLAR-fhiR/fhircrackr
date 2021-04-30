@@ -38,7 +38,8 @@ Imports:
     utils,
     dplyr,
     plyr,
-    data.table
+    data.table,
+    methods
 Suggests: 
     knitr,
     rmarkdown

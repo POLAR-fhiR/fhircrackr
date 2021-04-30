@@ -1,5 +1,8 @@
-
-#' A fhir_xpath_expression object
+#' An S4 class for xpath_expressions
+#' Objects of this class are essentially character vectors, but can only be valid
+#' XPath (1.0) expressions.
+#' They are mostly used in the `fhir_columns` class.
+#' @export
 
 #definition
 setClass(
@@ -34,14 +37,15 @@ setValidity(
 
 #' Create fhir_xpath_expression
 #'
-#' This function takes a character vector, checks whether it contains valid XPath expressions
-#' and returns it as an fhir_xpath_expression object
+#' This function takes a character vector, checks whether it contains valid XPath (1.0) expressions
+#' and returns it as an fhir_xpath_expression object. These objects are used in `fhir_parameters` objects.
 #'
 #' @param expression A character vector of the XPath expressions
 #' @return A XPath expression object
 #' @examples
 #' fhir_xpath_expression(c("//Patient", "name/given"))
 #'
+#' @export
 #'
 fhir_xpath_expression <- function(expression){
 	new("fhir_xpath_expression", expression)

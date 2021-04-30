@@ -261,10 +261,10 @@ fhir_next_bundle_url <- function(bundle=NULL) {
 #'
 #' @examples
 #' \donttest{
-#' request <- fhir_url(url = "https://hapi.fhir.org/baseR4", resource = "Patient")
+#' request <- fhir_url(url = "https://server.fire.ly", resource = "Patient")
 #' fhir_current_request()
 #'
-#' fhir_search("https://hapi.fhir.org/baseR4/Medication")
+#' fhir_search("https://server.fire.ly/Medication", max_bundles = 1)
 #' fhir_current_request()
 #' }
 #'
@@ -295,18 +295,20 @@ fhir_current_request <- function() {
 #' @param sep A string to separate pasted multiple entries
 #' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`.
 #' If `NULL`, no indices will be added to multiple entries.
+#' @param log_errors Either `NULL` or a string indicating the name of a file in which to save the http errors.
+#' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`
 #' @param verbose An integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
-#' downloading/extraction progress will be printed. Defaults to 2.
+#' extraction progress will be printed. Defaults to 2.
 #' @return A list of data frames containing the information from the statement
 #' @export
 #'
 #' @examples
 #' \donttest{
 #' #without indices
-#' cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")
+#' cap <- fhir_capability_statement("https://server.fire.ly")
 #'
 #' #with indices
-#' cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4", brackets = c("[","]"))
+#' cap <- fhir_capability_statement("https://server.fire.ly", brackets = c("[","]"))
 #'
 #' #melt searchInclude variable
 #' resources <- fhir_melt(cap$Resources,
@@ -317,7 +319,7 @@ fhir_current_request <- function() {
 #' #remove indices
 #' resources <- fhir_rm_indices(resources, brackets = c("[", "]"))
 #'
-#' View(resources)
+#' head(resources)
 #'}
 
 fhir_capability_statement <-function(url = "https://hapi.fhir.org/baseR4",
@@ -325,7 +327,8 @@ fhir_capability_statement <-function(url = "https://hapi.fhir.org/baseR4",
 									 password = NULL,
 									 brackets = NULL,
 									 sep = " || ",
-									 log_errors = NULL) {
+									 log_errors = NULL,
+									 verbose = 2) {
 
 
 	auth <- if (!is.null(username) && !is.null(password)) {
@@ -365,7 +368,8 @@ fhir_capability_statement <-function(url = "https://hapi.fhir.org/baseR4",
 	META <- fhir_crack(
 		bundles = list(xml_meta),
 		design = fhir_design(desc_meta),
-		sep=sep, brackets = brackets
+		sep=sep, brackets = brackets,
+		verbose = verbose
 	)
 
 	restBrackets <- if(is.null(brackets)){c("[", "]")}else{brackets}
@@ -373,7 +377,8 @@ fhir_capability_statement <-function(url = "https://hapi.fhir.org/baseR4",
 	REST <- fhir_crack(
 		bundles = list(xml_rest),
 		design = fhir_design(desc_rest),
-		sep=sep,brackets = restBrackets
+		sep=sep,brackets = restBrackets,
+		verbose = verbose
 	)
 
 	rest <- fhir_melt(REST$desc_rest, brackets = restBrackets, sep = " || ",
@@ -386,7 +391,8 @@ fhir_capability_statement <-function(url = "https://hapi.fhir.org/baseR4",
 	RESOURCE <- fhir_crack(
 		bundles = list(xml_resource),
 		design = fhir_design(desc_resource),
-		sep=sep, brackets = brackets
+		sep=sep, brackets = brackets,
+		verbose = verbose
 	)
 
 	list(Meta = META$desc_meta,
@@ -476,6 +482,8 @@ fhir_load <- function(directory) {
 #' @param bundles A [fhir_bundle-class] or [fhir_bundle_list-class] object.
 #' @return A  [fhir_bundle_xml-class] or [fhir_bundle_list-class] object.
 #' @export
+#' @docType methods
+#' @rdname fhir_serialize-methods
 #' @examples
 #'
 #' #example bundles are serialized, unserialize like this:
@@ -495,6 +503,8 @@ setGeneric(
 	}
 )
 
+#' @rdname fhir_serialize-methods
+#' @aliases fhir_serialize,fhir_bundle_xml-method
 setMethod(
 	"fhir_serialize",
 	signature = c(bundles = "fhir_bundle_xml"),
@@ -503,6 +513,8 @@ setMethod(
 	}
 )
 
+#' @rdname fhir_serialize-methods
+#' @aliases fhir_serialize,fhir_bundle_serialized-method
 setMethod(
 	"fhir_serialize",
 	signature = c(bundles = "fhir_bundle_serialized"),
@@ -511,6 +523,8 @@ setMethod(
 	}
 )
 
+#' @rdname fhir_serialize-methods
+#' @aliases fhir_serialize,fhir_bundle_list-method
 setMethod(
 	"fhir_serialize",
 	signature = c(bundles = "fhir_bundle_list"),
@@ -533,6 +547,8 @@ setMethod(
 #' @param bundles A [fhir_bundle-class] or [fhir_bundle_list-class] object.
 #' @return A  [fhir_bundle_serialized-class] or [fhir_bundle_list-class] object.
 #' @export
+#' @docType methods
+#' @rdname fhir_unserialize-methods
 #' @examples
 #'
 #' #unserialize bundle list
@@ -550,6 +566,8 @@ setGeneric(
 	}
 )
 
+#' @rdname fhir_unserialize-methods
+#' @aliases fhir_unserialize,fhir_bundle_xml-method
 setMethod(
 	"fhir_unserialize",
 	signature = c(bundles = "fhir_bundle_xml"),
@@ -558,6 +576,8 @@ setMethod(
 	}
 )
 
+#' @rdname fhir_unserialize-methods
+#' @aliases fhir_unserialize,fhir_bundle_serialized-method
 setMethod(
 	"fhir_unserialize",
 	signature = c(bundles = "fhir_bundle_serialized"),
@@ -567,6 +587,8 @@ setMethod(
 	}
 )
 
+#' @rdname fhir_unserialize-methods
+#' @aliases fhir_unserialize,fhir_bundle_list-method
 setMethod(
 	"fhir_unserialize",
 	signature = c(bundles = "fhir_bundle_list"),

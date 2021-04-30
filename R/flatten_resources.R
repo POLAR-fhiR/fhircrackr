@@ -30,7 +30,6 @@
 #' @return A list of data.frames, i.e. a [fhir_df_list-class] object, or a list of data.tables, i.e. a [fhir_dt_list-class] object.
 #'
 #' @export
-#' @import data.table
 #' @include fhir_design.R fhir_bundle_list.R fhir_table_list.R
 #' @examples
 #' #unserialize example bundle
@@ -73,7 +72,6 @@
 #' #The design that was used can be extracted from the tables like this:
 #' fhir_design(tables)
 #'
-#' @export
 
 fhir_crack <- function(
 	bundles,

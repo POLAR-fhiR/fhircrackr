@@ -1,13 +1,15 @@
 ## This file contains all functions that didn't fit any category##
 ## Exported functions are on top, internal functions below ##
 
-
-
-
+#environment variables
 fhircrackr_env <- new.env(parent = emptyenv())
 assign(x = "last_next_link", value = new("fhir_url"), envir = fhircrackr_env)
 assign(x = "canonical_design", value = NULL, envir = fhircrackr_env)
 assign(x = "current_request", value = new("fhir_url"), envir = fhircrackr_env)
+
+#imports
+#' @import data.table
+#' @import methods
 
 #to ensure data.table version of d[] is called, even though it is not explicitly stated in
 #import section of NAMESPACE file (https://cran.r-project.org/web/packages/data.table/vignettes/datatable-importing.html)

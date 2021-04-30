@@ -5,5 +5,7 @@
 \alias{fhir_bundle_serialized-class}
 \title{An S4 class to represent a FHIR bundle in serialized form}
 \description{
-An S4 class to represent a FHIR bundle in serialized form
+A \code{fhir_bundle_serialized} is a \code{fhir_bundle_xml} that has been serialized using \code{\link[=fhir_serialize]{fhir_serialize()}}. In this form, the
+bundle cannot be used in any meaningful way, but it can be saved and loaded as an \code{.RData} or \code{.rds} object without breaking the
+external pointers in the xml. See \code{?fhir_serialize} and \code{?fhir_unserialize}.
 }

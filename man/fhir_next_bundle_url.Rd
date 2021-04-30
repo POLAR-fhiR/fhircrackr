@@ -26,19 +26,23 @@ See details in the example.
 \examples{
 \donttest{
 # workflow for small memory environments, downloading small batches of bundles
-# for really small memory environments consider also using the _count option in
+# for really small memory environments consider also using the `_count` option in
 # your FHIR search request.
 # You can iteratively download, crack and save the bundles until all bundles are processed or the
 # desired number of bundles is reached.
-url <- fhir_url("http://hapi.fhir.org/baseR4/Observation")
+url <- fhir_url("https://server.fire.ly/Patient")
 count <- 0
+obs <- fhir_df_description(resource = "Patient")
+design <- fhir_design(obs)
 while(length(url)>0 && count < 5){
-	bundles <- fhir_search(url, verbose = 2, max_bundles = 2)
-	tables <- fhir_crack(bundles, list(Obs=list(resource = "//Observation")))
-	save(tables, file = paste0(tempdir(),"/table_", count, ".RData"))
-	count <- count + 1
-	url <- fhir_next_bundle_url()
+	 bundles <- fhir_search(url, max_bundles = 2)
+	 tables <- fhir_crack(bundles, design)
+  save(tables, file = paste0(tempdir(),"/table_", count, ".RData"))
+  count <- count + 1
+  url <- fhir_next_bundle_url()
 }
+#you can see the saved tables here:
+dir(tempdir())
 }
 
 }

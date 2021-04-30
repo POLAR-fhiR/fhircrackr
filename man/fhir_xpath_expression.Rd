@@ -13,11 +13,10 @@ fhir_xpath_expression(expression)
 A XPath expression object
 }
 \description{
-This function takes a character vector, checks whether it contains valid XPath expressions
-and returns it as an fhir_xpath_expression object
+This function takes a character vector, checks whether it contains valid XPath (1.0) expressions
+and returns it as an fhir_xpath_expression object. These objects are used in \code{fhir_parameters} objects.
 }
 \examples{
 fhir_xpath_expression(c("//Patient", "name/given"))
-
 
 }

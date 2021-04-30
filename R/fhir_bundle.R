@@ -1,5 +1,5 @@
 #Class definition
-#' An S4 class ro represent FHIR bundles
+#' An S4 class to represent FHIR bundles
 #' @include fhir_url.R
 setClass(
 	"fhir_bundle",
@@ -11,8 +11,14 @@ setOldClass("xml_node")
 
 
 #' An S4 class to represent a FHIR bundle in xml form
+#'
+#' A `fhir_bundle_xml` is an xml representation of a FHIR bundle (https://www.hl7.org/fhir/bundle.html).
+#' It is usually found inside a `fhir_bundle_list` which is returned by a call to [fhir_search()].
+#'
 #' @slot next_link A [fhir_url-class] pointing to the next bundle on the server
 #' @slot self_link A [fhir_url-class] pointing to this bundle on the server
+#' @export
+#'
 setClass(
 	"fhir_bundle_xml",
 	contains = c("fhir_bundle", "xml_node"),
@@ -38,10 +44,14 @@ setValidity(
 #constructor
 #' Create [fhir_bundle_xml-class] object
 #'
-#' @param bundle A xml-object representing a FHIR bundle
+#' This should only be used if you want to create small examples. Usually, a `fhir_bundle_xml` will
+#' be returned by [fhir_search()]
 #'
+#' @param bundle A xml-object representing a FHIR bundle
 #' @examples
 #' fhir_bundle_xml(xml2::xml_unserialize(patient_bundles[[1]]))
+#'
+#' @export
 #'
 fhir_bundle_xml <- function(bundle) {
 
@@ -67,6 +77,11 @@ setMethod(
 )
 
 #' An S4 class to represent a FHIR bundle in serialized form
+#'
+#' A `fhir_bundle_serialized` is a `fhir_bundle_xml` that has been serialized using [fhir_serialize()]. In this form, the
+#' bundle cannot be used in any meaningful way, but it can be saved and loaded as an `.RData` or `.rds` object without breaking the
+#' external pointers in the xml. See `?fhir_serialize` and `?fhir_unserialize`.
+#' @export
 
 setClass(
 	"fhir_bundle_serialized",
@@ -75,10 +90,13 @@ setClass(
 
 #' Create [fhir_bundle_serialized-class] object
 #'
+#'Only for internal use
+#'
 #' @param bundle A serialized xml object representing a FHIR bundle
 #'
 #' @examples
 #' fhir_bundle_serialized(patient_bundles[[1]])
+#' @noRd
 
 #constructor
 fhir_bundle_serialized <- function(bundle) {

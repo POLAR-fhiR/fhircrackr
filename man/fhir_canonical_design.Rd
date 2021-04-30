@@ -7,20 +7,15 @@
 fhir_canonical_design()
 }
 \description{
-Returns the \linkS4class{fhir_design} of the last call to \code{\link[=fhir_crack]{fhir_crack()}} with
-automatically amended elements, i.e. the canonical form of the design with elements resource, cols, style
-and respective sub-elements.
+Returns the \linkS4class{fhir_design} of the last call to \code{\link[=fhir_crack]{fhir_crack()}}.
 }
 \examples{
 #load example bundles
 bundles <- fhir_unserialize(patient_bundles)
 
-#incomplete but valid design
-design <- list(
-  Pat = list(
-    resource = "//Patient"
-    )
-)
+#define design
+patients <- fhir_df_description(resource = "Patient")
+design <- fhir_design(patients)
 
 result <- fhir_crack(bundles, design)
 

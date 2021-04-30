@@ -10,7 +10,8 @@ fhir_bundle_xml(bundle)
 \item{bundle}{A xml-object representing a FHIR bundle}
 }
 \description{
-Create \linkS4class{fhir_bundle_xml} object
+This should only be used if you want to create small examples. Usually, a \code{fhir_bundle_xml} will
+be returned by \code{\link[=fhir_search]{fhir_search()}}
 }
 \examples{
 fhir_bundle_xml(xml2::xml_unserialize(patient_bundles[[1]]))

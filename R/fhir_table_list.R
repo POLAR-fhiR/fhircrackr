@@ -4,6 +4,8 @@
 #' @slot names Character vector containing the names of the tables
 #' @slot design An object of class [fhir_design-class] that was used to create the table list
 #' @include fhir_design.R
+#' @noRd
+#'
 setClass(
 	"fhir_table_list",
 	contains = c("VIRTUAL", "list"),
@@ -38,8 +40,9 @@ setValidity(
 #' They behave like an ordinary named list of data.frames but have some additional information
 #' in the slot `design`.
 #'
-#' @slot names Character vector containing the names of the data.frames
-#' @slot design An object of class [fhir_design-class] that was used to create the df_list
+#' @slot names Character vector containing the names of the data.frames.
+#' @slot design An object of class [fhir_design-class] that was used to create the df_list.
+#' @export
 #'
 setClass(
 	"fhir_df_list",
@@ -61,9 +64,9 @@ setValidity(
 #' They behave like an ordinary named list of data.tables but have some additional information
 #' in the slot `design`.
 #'
-#' @slot names Character vector containing the names of the data.tables
-#' @slot design An object of class [fhir_design-class] that was used to create the dt_list
-#'
+#' @slot names Character vector containing the names of the data.tables.
+#' @slot design An object of class [fhir_design-class] that was used to create the dt_list.
+#' @export
 setClass(
 	"fhir_dt_list",
 	contains = "fhir_table_list"
@@ -83,7 +86,7 @@ setValidity(
 #' An object of this class should **only** be created inside of [fhir_crack()]
 #' @param df_list A named list of data.frames
 #' @param design The design that was used to create the list
-#'
+#' @noRd
 #' @examples
 #' df_desc1 <- fhir_df_description(resource = "Patient",
 #'                     cols = c(name = "name/family",
@@ -141,6 +144,8 @@ fhir_dt_list <- function(dt_list, design){
 }
 
 #corresponding generic in fhir_design.R
+#' @rdname fhir_design-methods
+#' @aliases fhir_design,fhir_table_list-method
 setMethod(
 	"fhir_design",
 	signature = c(...="fhir_table_list"),

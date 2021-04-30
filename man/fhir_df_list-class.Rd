@@ -12,8 +12,8 @@ in the slot \code{design}.
 \section{Slots}{
 
 \describe{
-\item{\code{names}}{Character vector containing the names of the data.frames}
+\item{\code{names}}{Character vector containing the names of the data.frames.}
 
-\item{\code{design}}{An object of class \linkS4class{fhir_design} that was used to create the df_list}
+\item{\code{design}}{An object of class \linkS4class{fhir_design} that was used to create the df_list.}
 }}
 
