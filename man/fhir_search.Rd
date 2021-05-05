@@ -6,8 +6,10 @@
 \usage{
 fhir_search(
   request = fhir_current_request(),
+  body = NULL,
   username = NULL,
   password = NULL,
+  token = NULL,
   max_bundles = Inf,
   verbose = 1,
   max_attempts = 5,
@@ -23,9 +25,18 @@ fhir_search(
 recommended to explicitly create the request via \code{\link[=fhir_url]{fhir_url()}} as this will do some validity checks and format the url properly.
 Defaults to \code{\link[=fhir_current_request]{fhir_current_request()}}}
 
-\item{username}{A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.}
+\item{body}{A string or object of class \code{fhir_body} with type \code{"application/x-www-form-urlencoded"}. A body should be provided
+when the FHIR search request is too long and might exceed the maximal allowed length of the URL when send to the server. In this case
+a search via POST (see https://www.hl7.org/fhir/search.html#Introduction) can be used. The body should contain all the parameters that
+follow after the \verb{?} in the FHIR search request. When a body is provided, the required \verb{_search} is automatically added
+to the url in \code{request}. See examples and \code{?fhir_body}.}
 
-\item{password}{A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.}
+\item{username}{A string containing the username for basic authentication.}
+
+\item{password}{A string containing the password for basic authentication.}
+
+\item{token}{A string or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
+for how to create this.}
 
 \item{max_bundles}{Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
 
@@ -52,19 +63,61 @@ too many requests to quickly. Defaults to zero.}
 \item{directory}{Deprecated. Please specify the directory directly in the \code{save_to_disc} argument.}
 }
 \value{
-A \linkS4class{fhir_bundle_list} when\code{save_to_disc = NULL} (the default),  else \code{NULL}.
+A \linkS4class{fhir_bundle_list} when \code{save_to_disc = NULL} (the default),  else \code{NULL}.
 }
 \description{
-Downloads all FHIR bundles of a FHIR search request from a FHIR server.
+Downloads all FHIR bundles of a FHIR search request from a FHIR server by iterating through the bundles. Search via GET
+and POST is possible, see Details.
+}
+\details{
+\subsection{Request type}{
+
+\code{fhir_search} allows for two types of search request:
+\enumerate{
+\item FHIR search via GET:
+This is the more common approach. All information on which resources to download is contained in the URL
+that is send to the server (\code{request} argument). This encompasses the base url of the server, the resource type and possible
+search parameters to further qualify the search (see \code{\link[=fhir_url]{fhir_url()}}). The search via GET is the default and performed whenever
+the argument \code{body} is NULL.
+\item FHIR search via POST:
+This option should only be used when the parameters make the search URL so long the server might deny it
+because it exceeds the allowed length. In this case the search parameters (everything that would usually follow the resource type
+after the \verb{?}) can be transferred to a body of type \code{"application/x-www-form-urlencoded"} and send via POST. If you provide a body in
+\code{fhir_search()}, the url in \code{request} should only contain the base URL and the resource type.
+The function will automatically amend it with \verb{_search} and perform a POST.
+}
+}
+
+\subsection{Authentication}{
+
+There are several ways of authentication implemented in \code{fhir_search()}. If you don't need any authentication,
+just leave the arguments described in the following at their default values of \code{NULL}.
+\enumerate{
+\item Basic Authentication: Provide the \code{username} and the \code{password} for basic authentication in the respective arguments.
+\item Token Authentication: Provide a token in the argument \code{token}, either as a string or as as an object of class
+\link[httr:Token-class]{httr::Token}. You can use the function \code{\link[=fhir_authenticate]{fhir_authenticate()}} to create this object.
+}
+}
 }
 \examples{
 \donttest{
-
+#Search with GET
 #create fhir search url
 request <- fhir_url(url = "https://server.fire.ly",
                     resource = "Patient",
                     parameters = c(gender="female"))
 #download bundles
 bundles <- fhir_search(request, max_bundles = 5)
+
+
+#Search with POST (should actually be used for longer requests)
+request <- fhir_url(url = "https://server.fire.ly",
+                    resource = "Patient")
+
+body <- fhir_body(content = list(gender = "female"))
+
+bundles <- fhir_search(request = request,
+                       body = body,
+                       max_bundles = 5)
 }
 }

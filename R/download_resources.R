@@ -2,13 +2,45 @@
 ## Exported functions are on top, internal functions below ##
 
 #' Download FHIR search result
-#' @description Downloads all FHIR bundles of a FHIR search request from a FHIR server.
+#' @description Downloads all FHIR bundles of a FHIR search request from a FHIR server by iterating through the bundles. Search via GET
+#' and POST is possible, see Details.
+#'
+#' @details
+#' ## Request type
+#' `fhir_search` allows for two types of search request:
+#' 1. FHIR search via GET:
+#' This is the more common approach. All information on which resources to download is contained in the URL
+#' that is send to the server (`request` argument). This encompasses the base url of the server, the resource type and possible
+#' search parameters to further qualify the search (see [fhir_url()]). The search via GET is the default and performed whenever
+#' the argument `body` is NULL.
+#'
+#'  2. FHIR search via POST:
+#'  This option should only be used when the parameters make the search URL so long the server might deny it
+#'  because it exceeds the allowed length. In this case the search parameters (everything that would usually follow the resource type
+#'  after the `?`) can be transferred to a body of type `"application/x-www-form-urlencoded"` and send via POST. If you provide a body in
+#'  `fhir_search()`, the url in `request` should only contain the base URL and the resource type.
+#'  The function will automatically amend it with `_search` and perform a POST.
+#'
+#' ## Authentication
+#' There are several ways of authentication implemented in `fhir_search()`. If you don't need any authentication,
+#' just leave the arguments described in the following at their default values of `NULL`.
+#' 1. Basic Authentication: Provide the `username` and the `password` for basic authentication in the respective arguments.
+#'
+#' 2. Token Authentication: Provide a token in the argument `token`, either as a string or as as an object of class
+#' [httr::Token-class]. You can use the function [fhir_authenticate()] to create this object.
 #'
 #' @param request An object of class [fhir_url-class] or a string containing the full FHIR search request. It is
 #' recommended to explicitly create the request via [fhir_url()] as this will do some validity checks and format the url properly.
 #' Defaults to [fhir_current_request()]
-#' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
-#' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
+#' @param body A string or object of class `fhir_body` with type `"application/x-www-form-urlencoded"`. A body should be provided
+#' when the FHIR search request is too long and might exceed the maximal allowed length of the URL when send to the server. In this case
+#' a search via POST (see https://www.hl7.org/fhir/search.html#Introduction) can be used. The body should contain all the parameters that
+#' follow after the `?` in the FHIR search request. When a body is provided, the required `_search` is automatically added
+#' to the url in `request`. See examples and `?fhir_body`.
+#' @param username A string containing the username for basic authentication.
+#' @param password A string containing the password for basic authentication.
+#' @param token A string or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
+#' for how to create this.
 #' @param max_bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
 #' @param verbose An Integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
 #' downloading progress will be printed. Defaults to 2.
@@ -26,24 +58,37 @@
 #' i.e. between downloading the current bundle and the next bundle. This can be used to avoid choking a weak server with
 #' too many requests to quickly. Defaults to zero.
 #'
-#' @return A [fhir_bundle_list-class] when`save_to_disc = NULL` (the default),  else `NULL`.
+#' @return A [fhir_bundle_list-class] when `save_to_disc = NULL` (the default),  else `NULL`.
 #' @export
 #'
 #' @examples
 #' \donttest{
-#'
+#' #Search with GET
 #' #create fhir search url
 #' request <- fhir_url(url = "https://server.fire.ly",
 #'                     resource = "Patient",
 #'                     parameters = c(gender="female"))
 #' #download bundles
 #' bundles <- fhir_search(request, max_bundles = 5)
+#'
+#'
+#' #Search with POST (should actually be used for longer requests)
+#' request <- fhir_url(url = "https://server.fire.ly",
+#'                     resource = "Patient")
+#'
+#' body <- fhir_body(content = list(gender = "female"))
+#'
+#' bundles <- fhir_search(request = request,
+#'                        body = body,
+#'                        max_bundles = 5)
 #' }
 
 fhir_search <- function(
 	request = fhir_current_request(),
+	body = NULL,
 	username = NULL,
 	password = NULL,
+	token = NULL,
 	max_bundles = Inf,
 	verbose = 1,
 	max_attempts = 5,
@@ -83,6 +128,52 @@ fhir_search <- function(
 			 "for fhir_current_request()")
 	}
 
+	#prepare body
+	if(!is.null(body)){
+		if(verbose > 0){message("Initializing search via POST.\n")}
+		#filter out bad urls
+		if(grepl("\\?", request)){
+			stop("The url in argument request should only consist of base url and resource type. ",
+				 "The one you provided has a `?` which indicates the presence of parameters.\n",
+				 "If you want to perform search via GET, please set body to NULL.")
+		}
+
+		if(!grepl("_search", request)){
+			request <- paste(request, "_search", sep="/")
+		}
+
+		#convert body to appropriate class
+		if(is.character(body)){
+			body <- fhir_body(content = body, type = "application/x-www-form-urlencoded")
+		}else if(is(body, "fhir_body")){
+			if(body@type != "application/x-www-form-urlencoded"){
+				stop("The (content) type of the body for a search via POST must be `application/x-www-form-urlencoded`")
+			}
+		}else{
+			stop("The body must be either of type character or of class fhir_body")
+		}
+	}
+
+	#prepare token authorization
+	if(!is.null(token)){
+		if(!is.null(username)||is.null(password)){
+			warning("You provided username and password as well as a token for authentication.\n",
+					"Ignoring username and password, trying to authorize with token.")
+			username <- NULL
+			password <- NULL
+		}
+
+		if(is(token, "Token")){
+			token <- token$credentials$access_token
+		}
+
+		if(length(token)>1){stop("token must be of length 1.")}
+
+		bearerToken <- paste0("Bearer ", token)
+	}else{
+		bearerToken <- NULL
+	}
+
 	bundles <- list()
 
 	addr <- fhir_url(request)
@@ -110,6 +201,7 @@ fhir_search <- function(
 
 	#download bundles
 	cnt <- 0
+
 	repeat {
 		cnt <- cnt + 1
 
@@ -120,8 +212,10 @@ fhir_search <- function(
 		bundle <-
 			get_bundle(
 				request = addr,
+				body = body,
 				username = username,
 				password = password,
+				token = bearerToken,
 				verbose = verbose,
 				max_attempts = max_attempts,
 				delay_between_attempts = delay_between_attempts,
@@ -601,6 +695,72 @@ setMethod(
 	}
 )
 
+#' Create token for Authentication
+#'
+#' @description
+#' This function is a wrapper to create an [httr::Token] object for authentication with OAuth2/OpenID Connect.
+#' Internally, it calls [httr::oauth_app()], [httr::oauth_endpoint()] and [httr::oauth2.0_token()] to create a token that can
+#' then be used in [fhir_search].
+#'
+#' @param key Consumer key, also called client ID.
+#' For Keycloak this would for instance be the Keycloak client, e.g. "postman".
+#' @param secret The consumer/client secret, belonging to `key`
+#' @param base_url The URL the user will be redirected to after authorization is complete.
+#' This will usually be the base url of you FHIR server
+#' @param authorize The url to send the client for authorization
+#' @param access The url used to exchange unauthenticated for authenticated token.
+#' This can be identical to `authorize`.
+#' @param query_authorize_extra A named list holding query parameters to append to initial auth page query.
+#' could hold info about user identity and scope for keycloak like this:
+#' ```
+#' list(scope = "openid",
+#'      grant_type = "password",
+#'      username = "fhir-user",
+#'      password = "fhirtest")
+#' ```
+
+fhir_authenticate <- function(secret,
+							  key,
+							  base_url,
+							  access,
+							  authorize,
+							  query_authorize_extra = list()
+							  ){
+
+
+
+	#Initialize app
+	app <- httr::oauth_app(
+		appname = key,#could be any name
+		key = key,
+		secret = secret,
+		redirect_uri = base_url
+	)
+
+	#set endpoint
+	endpoint <- httr::oauth_endpoint(
+		access = access,
+		authorize = authorize)
+
+	#Create Token
+	t <- httr::oauth2.0_token(endpoint = endpoint,
+								  app=app,
+								  client_credentials = TRUE,
+								  cache = TRUE,
+								  query_authorize_extra = query_authorize_extra
+	)
+
+	if(names(t$credentials)[1]=="error"){
+		stop("The token could not be created.\n\n",
+			 "Error code: ", t$credentials$error, "\n",
+			 "Error description: ", t$credentials$error_description, "\n")
+	}
+
+	t
+
+}
+
+
 #################################################################################################
 #################################################################################################
 
@@ -610,6 +770,7 @@ setMethod(
 #' @param request An object of class [fhir_search_url-class] or string containing the full FHIR search request.
 #' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
+#' @param token A bearer token as a string or NULL.
 #' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
 #' @param verbose An integer scalar. If > 1,  Downloading progress is printed. Defaults to 2.
 #' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
@@ -627,8 +788,10 @@ setMethod(
 
 get_bundle <- function(
 	request,
+	body = NULL,
 	username = NULL,
 	password = NULL,
+	token = NULL,
 	verbose = 2,
 	max_attempts = 5,
 	delay_between_attempts = 10,
@@ -644,11 +807,26 @@ get_bundle <- function(
 			httr::authenticate(username, password)
 		}
 
-		response <- httr::GET(
-			request,
-			httr::add_headers(Accept = "application/fhir+xml"),
-			auth
-		)
+		#search via POST
+		if(!is.null(body)){
+			response <- httr::POST(
+				request,
+				httr::add_headers(Accept = "application/fhir+xml",
+								  Authorization = token),
+				httr::content_type(body@type),
+				auth,
+				body = body@content
+			)
+		#search via GET
+		}else{
+			response <- httr::GET(
+				request,
+				httr::add_headers(Accept = "application/fhir+xml",
+								  Authorization = token),
+				auth
+			)
+		}
+
 
 		#check for http errors
 		check_response(response, log_errors = log_errors)

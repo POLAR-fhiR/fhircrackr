@@ -9,3 +9,4 @@
 ^doc$
 ^Meta$
 ^fhircrackr\.pdf
+^\.httr-oauth$
