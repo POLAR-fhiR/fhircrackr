@@ -718,6 +718,7 @@ setMethod(
 #'      username = "fhir-user",
 #'      password = "fhirtest")
 #' ```
+#' @export
 
 fhir_authenticate <- function(secret,
 							  key,
