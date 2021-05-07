@@ -4,36 +4,44 @@
 
 #' Flatten list of FHIR bundles
 #' @description Converts a [fhir_bundle_list-class] (the result of [fhir_search()] to a list of data.frames/data.tables,
-#' i.e. a [fhir_df_list-class]/[fhir_dt_list-class]
+#' i.e. a [fhir_df_list-class]/[fhir_dt_list-class] if a [fhir_design-class] is given in the argument `design`.
+#' Creates a single data.frame/data.table, if only a [fhir_df_description-class] is given in the argument `design`.
 #'
 #' @param bundles A FHIR search result as returned by [fhir_search()].
-#' @param design A [fhir_design-class] object. See `?fhir_design` and the corresponding vignette
-#' (`vignette("flattenResources", package ="fhircrackr")`) for a more detailed explanation and
-#' comprehensive examples of a [fhir_design-class].
+#' @param design A [fhir_design-class] or [fhir_df_description-class] object. See `?fhir_design`/`?fhir_df_description`
+#' and the corresponding vignette (`vignette("flattenResources", package ="fhircrackr")`) for a more detailed explanation and
+#' comprehensive examples of both.
 #'
-#' @param sep Optional. A string to separate pasted multiple entries which will overwrite the `sep` defined in the
-#' `design`. If `sep=NULL`, it is looked up in the `design`, where the default is `" "`.
+#' @param sep Optional. A string to separate pasted multiple entries which will overwrite the `sep` defined in
+#' `design`. If `sep=NULL`, it is looked up in `design`, where the default is `" "`.
 #'
-#' @param remove_empty_columns Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in the
-#' `design`. If `remove_empty_columns=NULL`, it is looked up in the `design`, where the default is `TRUE`.
+#' @param remove_empty_columns Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
+#' `design`. If `remove_empty_columns=NULL`, it is looked up in `design`, where the default is `TRUE`.
 #'
 #' @param brackets Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")},
-#' which will overwrite the `brackets` defined in the `design`. If `brackets=NULL`, it is looked up in the `design`, where the default is `character(0)`,
+#' which will overwrite the `brackets` defined in `design`. If `brackets=NULL`, it is looked up in `design`, where the default is `character(0)`,
 #' i.e. no indices are added to multiple entries.
 #'
 #' @param verbose An Integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
 #'
 #' @param data.table Logical scalar. Should tables be returned in data.table format instead of data.frame?
-#' defaults to FALSE.
+#' Defaults to FALSE.
 #'
-#' @return A list of data.frames, i.e. a [fhir_df_list-class] object, or a list of data.tables, i.e. a [fhir_dt_list-class] object.
+#' @return If a [fhir_design-class] was used, the result is a list of data.frames, i.e. a [fhir_df_list-class] object, or a list of data.tables,
+#' i.e. a [fhir_dt_list-class] object. If a [fhir_df_description-class] was used, the result is a single data.frame/data.table.
 #'
 #' @export
+#' @rdname fhir_crack-methods
+#' @docType methods
 #' @include fhir_design.R fhir_bundle_list.R fhir_table_list.R
 #' @examples
 #' #unserialize example bundle
 #' bundles <- fhir_unserialize(medication_bundles)
+#'
+#'
+#' ###Example 1###
+#' #Extract just one resource type
 #'
 #' #define attributes to extract
 #' medications <- fhir_df_description(
@@ -56,90 +64,261 @@
 #'     		)
 #' )
 #'
+#' med_df <- fhir_crack(bundles, design = medications)
+#'
+#' head(med_df) #data.frame
+#'
+#'
+#' ###Example 2###
+#' #extract more resource types
+#'
 #' patients <- fhir_df_description(
 #'    resource = "Patient"
 #' )
 #'
 #' design <- fhir_design(medications, patients)
 #'
-#' #convert bundles to data frames
-#' tables <- fhir_crack(bundles, design)
+#' df_list <- fhir_crack(bundles, design)
 #'
-#' #check results
-#' head(tables$medications)
-#' head(tables$patients)
+#' #list of data.frames/fhir_df_list
+#' head(df_list$medications)
+#' head(df_list$patients)
 #'
-#' #The design that was used can be extracted from the tables like this:
-#' fhir_design(tables)
+#' #The design that was used can be extracted from a fhir_df_list
+#' fhir_design(df_list)
 #'
 
-fhir_crack <- function(
-	bundles,
-	design,
-	sep = NULL,
-	remove_empty_columns = NULL,
-	brackets = NULL,
-	verbose = 2,
-	data.table = FALSE) {
+setGeneric(
+	"fhir_crack",
+	function(
+		bundles,
+		design,
+		sep = NULL,
+		remove_empty_columns = NULL,
+		brackets = NULL,
+		verbose = 2,
+		data.table = FALSE){
 
-
-	if(!is(design, "fhir_design")){
-		warning("The use of an old-style design will be disallowed in the future. ",
-			 "Please consider building the design with the function fhir_design().\n",
-			 "Converting design to fhir_design object.")
-		suppressMessages(design <- fhir_design(design))
-	}
-	#overwrite design with function arguments
-	if (!is.null(sep)) {
-		design <- fhir_design(lapply(
-			design,
-			function(x){
-				x@style@sep <- sep
-				x
-			}
-		))
-	}
-	if (!is.null(brackets)) {
-		brackets <- fix_brackets(brackets)
-		design <-fhir_design(lapply(
-			design,
-			function(x){
-				x@style@brackets <- brackets
-				x
-			}
-		))
-	}
-	if (!is.null(remove_empty_columns)) {
-		design <- fhir_design(lapply(
-			design,
-			function(x){
-				x@style@rm_empty_cols <- remove_empty_columns
-				x
-			}
-		))
+		standardGeneric("fhir_crack")
 	}
 
-	#Check for dangerous XPath expressions ins cols
-	cols <- lapply(design, function(x){c(x@cols)})
-	dangerCols <- sapply(cols, function(x){any(grepl(esc("//"), x))})
-	if(any(dangerCols)){
-		warning("In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
-		"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
-		"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
-		"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
-		"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse=", "))
+)
+
+#' @rdname fhir_crack-methods
+#' @aliases fhir_crack,fhir_design-method
+setMethod(
+	"fhir_crack",
+	signature = c(design = "fhir_design"),
+	function(
+		bundles,
+		design,
+		sep = NULL,
+		remove_empty_columns = NULL,
+		brackets = NULL,
+		verbose = 2,
+		data.table = FALSE){
+
+		#overwrite design with function arguments
+		if (!is.null(sep)) {
+			design <- fhir_design(lapply(
+				design,
+				function(x){
+					x@style@sep <- sep
+					x
+				}
+			))
+		}
+		if (!is.null(brackets)) {
+			brackets <- fix_brackets(brackets)
+			design <-fhir_design(lapply(
+				design,
+				function(x){
+					x@style@brackets <- brackets
+					x
+				}
+			))
+		}
+		if (!is.null(remove_empty_columns)) {
+			design <- fhir_design(lapply(
+				design,
+				function(x){
+					x@style@rm_empty_cols <- remove_empty_columns
+					x
+				}
+			))
+		}
+
+		#Check for dangerous XPath expressions ins cols
+		cols <- lapply(design, function(x){c(x@cols)})
+		dangerCols <- sapply(cols, function(x){any(grepl(esc("//"), x))})
+		if(any(dangerCols)){
+			warning("In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
+					"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
+					"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
+					"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
+					"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse=", "))
+		}
+
+
+		#Add attributes to design
+		design <- add_attribute_to_design(design)
+		#crack
+		dfs <- bundles2dfs(bundles = bundles, design = design, data.table = data.table, verbose = verbose)
+		if (0 < verbose) {message("FHIR-Resources cracked. \n")}
+		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
+		dfs
 	}
+)
 
+#' @rdname fhir_crack-methods
+#' @aliases fhir_crack,fhir_df_description-method
+setMethod(
+	"fhir_crack",
+	signature = c(design = "fhir_df_description"),
+	function(
+		bundles,
+		design,
+		sep = NULL,
+		remove_empty_columns = NULL,
+		brackets = NULL,
+		verbose = 2,
+		data.table = FALSE){
 
-	#Add attributes to design
-	design <- add_attribute_to_design(design)
-	#crack
-	dfs <- bundles2dfs(bundles = bundles, design = design, data.table = data.table, verbose = verbose)
-	if (0 < verbose) {message("FHIR-Resources cracked. \n")}
-	assign(x = "canonical_design", value = design, envir = fhircrackr_env)
-	dfs
-}
+		#overwrite design with function arguments
+		if (!is.null(sep)) {
+			design@style@sep <- sep
+		}
 
+		if (!is.null(brackets)) {
+			brackets <- fix_brackets(brackets)
+			design@style@brackets <- brackets
+		}
+
+		if (!is.null(remove_empty_columns)) {
+			design@style@rm_empty_cols <- remove_empty_columns
+		}
+
+		#Check for dangerous XPath expressions ins cols
+		cols <- design@cols
+		dangerCols <- sapply(cols, function(x){any(grepl(esc("//"), x))})
+		if(any(dangerCols)){
+			warning("In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
+					"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
+					"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
+					"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
+					"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse=", "))
+		}
+
+		#Add attributes to design
+		design <- add_attribute_to_design(design)
+
+		#crack
+		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose)
+		#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
+		remove <- design@style@rm_empty_cols
+
+		if(remove && ncol(df) > 0){
+			df_cleaned <- df[, colSums(!is.na(df))>0, with=F]
+		}else{
+			df_cleaned <- df}
+
+		if (0 < verbose) {message("FHIR-Resources cracked. \n")}
+		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
+
+		if(data.table){
+			df
+		} else {
+			data.frame(df)
+		}
+	}
+)
+
+#' @rdname fhir_crack-methods
+#' @aliases fhir_crack,list-method
+setMethod(
+	"fhir_crack",
+	signature = c(design = "list"),
+	function(
+		bundles,
+		design,
+		sep = NULL,
+		remove_empty_columns = NULL,
+		brackets = NULL,
+		verbose = 2,
+		data.table = FALSE){
+
+			warning("The use of an old-style design will be disallowed in the future. ",
+				 "Please consider building the design with the function fhir_design().\n",
+				 "Converting design to fhir_design object.")
+			suppressMessages(design <- fhir_design(design))
+
+			fhir_crack(bundles = bundles,
+					   design = design,
+					   sep = sep,
+					   remove_empty_columns = remove_empty_columns,
+					   brackets = brackets,
+					   verbose = verbose,
+					   data.table = data.table)
+	}
+)
+
+	# if(!is(design, "fhir_design")){
+	# 	warning("The use of an old-style design will be disallowed in the future. ",
+	# 		 "Please consider building the design with the function fhir_design().\n",
+	# 		 "Converting design to fhir_design object.")
+	# 	suppressMessages(design <- fhir_design(design))
+	# }
+	# #overwrite design with function arguments
+	# if (!is.null(sep)) {
+	# 	design <- fhir_design(lapply(
+	# 		design,
+	# 		function(x){
+	# 			x@style@sep <- sep
+	# 			x
+	# 		}
+	# 	))
+	# }
+	# if (!is.null(brackets)) {
+	# 	brackets <- fix_brackets(brackets)
+	# 	design <-fhir_design(lapply(
+	# 		design,
+	# 		function(x){
+	# 			x@style@brackets <- brackets
+	# 			x
+	# 		}
+	# 	))
+	# }
+	# if (!is.null(remove_empty_columns)) {
+	# 	design <- fhir_design(lapply(
+	# 		design,
+	# 		function(x){
+	# 			x@style@rm_empty_cols <- remove_empty_columns
+	# 			x
+	# 		}
+	# 	))
+	# }
+
+# 	#Check for dangerous XPath expressions ins cols
+# 	cols <- lapply(design, function(x){c(x@cols)})
+# 	dangerCols <- sapply(cols, function(x){any(grepl(esc("//"), x))})
+# 	if(any(dangerCols)){
+# 		warning("In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
+# 		"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
+# 		"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
+# 		"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
+# 		"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse=", "))
+# 	}
+#
+#
+# 	#Add attributes to design
+# 	design <- add_attribute_to_design(design)
+# 	#crack
+# 	dfs <- bundles2dfs(bundles = bundles, design = design, data.table = data.table, verbose = verbose)
+# 	if (0 < verbose) {message("FHIR-Resources cracked. \n")}
+# 	assign(x = "canonical_design", value = design, envir = fhircrackr_env)
+# 	dfs
+# }
+#
 
 ############################################################################################
 ##############################################################################################

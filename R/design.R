@@ -297,20 +297,37 @@ fix_design <- function(design) {
 #' @noRd
 #'
 add_attribute_to_design <- function(design, attrib = "value"){
-	if(!is(design, "fhir_design")){stop("You need to provide an object of class fhir_design here.")}
-	for (n_d in names(design)) { #loop through df_desc
-		if (length(design[[n_d]]@cols)>0) { #Only add attrib if xpath expressions are provided
-			for (n_c in names(design[[n_d]]@cols)) { #loop through cols
-				txt <- design[[n_d]]@cols[[n_c]]
+	if(is(design, "fhir_design")){
+		for (n_d in names(design)) { #loop through df_desc
+			if (length(design[[n_d]]@cols)>0) { #Only add attrib if xpath expressions are provided
+				for (n_c in names(design[[n_d]]@cols)) { #loop through cols
+					txt <- design[[n_d]]@cols[[n_c]]
+					if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
+						txt <- paste_paths(txt, paste0("@", attrib))
+						design[[n_d]]@cols[[n_c]] <- txt
+					}
+				}
+
+			}
+		}
+	}
+
+	if(is(design,"fhir_df_description")){
+
+		if (length(design@cols)>0) { #Only add attrib if xpath expressions are provided
+			for (n_c in names(design@cols)) { #loop through cols
+				txt <- design@cols[[n_c]]
 				if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
 					txt <- paste_paths(txt, paste0("@", attrib))
-					design[[n_d]]@cols[[n_c]] <- txt
+					design@cols[[n_c]] <- txt
 				}
 			}
 
 		}
 	}
+
 	if(validObject(design)){design}else{stop("Something went wrong with the design.")}
+
 }
 
 
