@@ -6,7 +6,7 @@
 #'
 #' @description Returns the [fhir_design-class] of the last call to [fhir_crack()].
 #' @export
-#' @seealso [fhir_design()], [fhir_Df_description()]
+#' @seealso [fhir_design()], [fhir_df_description()]
 #' @examples
 #' #load example bundles
 #' bundles <- fhir_unserialize(patient_bundles)

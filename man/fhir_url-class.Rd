@@ -6,5 +6,5 @@
 \title{An S4 object to represent a URL for a FHIR server}
 \description{
 Objects of this class are basically strings (character vectors of length 1) representing
-a URL. They are always url encoded. See \code{?fhir_url}.
+a URL. They are always url encoded. See \code{\link[=fhir_url]{fhir_url()}} for how to build them..
 }

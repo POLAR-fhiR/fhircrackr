@@ -15,8 +15,10 @@ An fhir_resource object
 }
 \description{
 This function creates an object of class \linkS4class{fhir_resource_type}. It checks the resource type against the list
-of resource types provided at https://hl7.org/FHIR/resourcelist.html and throws a warning if it cannot be found there.
+of resource types provided at https://hl7.org/FHIR/resourcelist.html, corrects wrong cases and throws a warning if the resource
+cannot be found at hl7.org.
 }
 \examples{
-fhir_resource_type("MedicationAdministration")
+fhir_resource_type("Patient")
+fhir_resource_type("medicationadministration")
 }

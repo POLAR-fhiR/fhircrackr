@@ -2,7 +2,7 @@
 #' An S4 object to represent a URL for a FHIR server
 #'
 #' Objects of this class are basically strings (character vectors of length 1) representing
-#' a URL. They are always url encoded. See `?fhir_url`.
+#' a URL. They are always url encoded. See [fhir_url()] for how to build them..
 #' @export
 #'
 setClass(
@@ -111,7 +111,14 @@ setMethod(
 
 		resource <- fhir_resource_type(resource)
 
-		request <- paste(url, resource, sep="/")
+		if(stringr::str_sub(url, -1) =="/"){
+
+			request <- paste0(url, resource)
+
+		}else{
+			request <- paste(url, resource, sep="/")
+		}
+
 
 	 	new("fhir_url", utils::URLencode(request))
 	}
@@ -126,7 +133,14 @@ setMethod(
 	function(url, resource, parameters){
 
 		resource <- fhir_resource_type(resource)
-		request <- paste(url, resource, sep="/")
+
+		if(stringr::str_sub(url, -1) =="/"){
+
+			request <- paste0(url, resource)
+
+		}else{
+			request <- paste(url, resource, sep="/")
+		}
 
 
 		if(length(parameters)==1 && grepl("=", parameters)){
@@ -156,7 +170,14 @@ setMethod(
 	function(url, resource, parameters){
 
 		resource <- fhir_resource_type(resource)
-		request <- paste(url, resource, sep="/")
+
+		if(stringr::str_sub(url, -1) =="/"){
+
+			request <- paste0(url, resource)
+
+		}else{
+			request <- paste(url, resource, sep="/")
+		}
 
 		if(any(!sapply(parameters, function(x) {is.character(x)}))) {
 			stop("The provided list must have elements of type character")

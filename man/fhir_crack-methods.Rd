@@ -140,6 +140,6 @@ fhir_design(df_list)
 \itemize{
 \item Downloading bundles from a FHIR server: \code{\link[=fhir_search]{fhir_search()}}
 \item Creating designs/df_descriptions: \code{\link[=fhir_df_description]{fhir_df_description()}} and \code{\link[=fhir_design]{fhir_design()}}
-\item Dealing with multiple entries: \code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_melt_all]{fhir_melt_all()}}, \code{\link[=fhir_rm_indicdes]{fhir_rm_indicdes()}}
+\item Dealing with multiple entries: \code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_melt_all]{fhir_melt_all()}}, \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
 }
 }

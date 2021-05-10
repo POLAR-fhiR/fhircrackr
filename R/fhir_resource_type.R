@@ -28,23 +28,31 @@ setValidity(
 #' Create [fhir_resource_type-class] object
 #'
 #' This function creates an object of class [fhir_resource_type-class]. It checks the resource type against the list
-#' of resource types provided at https://hl7.org/FHIR/resourcelist.html and throws a warning if it cannot be found there.
+#' of resource types provided at https://hl7.org/FHIR/resourcelist.html, corrects wrong cases and throws a warning if the resource
+#' cannot be found at hl7.org.
 #'
 #' @param string A length one character vector containing the resource type. Will mostly be one of the official FHIR resource
 #' types listed at https://hl7.org/FHIR/resourcelist.html
 #' @return An fhir_resource object
-#' @examples fhir_resource_type("MedicationAdministration")
+#' @examples
+#' fhir_resource_type("Patient")
+#' fhir_resource_type("medicationadministration")
 #' @export
 #'
 fhir_resource_type <- function(string) {
 
-	result <- new("fhir_resource_type", string)
-	if(!string %in% existing_resource_types) {
+	#convert to correct case and check for validity
+	if(tolower(string) %in% tolower(existing_resource_types)){
+		string <- existing_resource_types[tolower(string) == tolower(existing_resource_types)]
+	}else{
 		warning(
 			"You gave \"", string, "\" as the resource type.\n",
 			"This doesn't match any of the resource types defined under https://hl7.org/FHIR/resourcelist.html. ",
-			"Case matters! If you are sure the resource type is correct anyway, you can ignore this warning.")
+			"If you are sure the resource type is correct anyway, you can ignore this warning.\n")
 	}
+
+	result <- new("fhir_resource_type", string)
+
 	result
 }
 
@@ -55,5 +63,6 @@ setMethod(
 	function(object){
 		cat("A fhir_resource_type object: ")
 		cat(object)
+		cat("\n")
 	}
 )

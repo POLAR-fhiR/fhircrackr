@@ -9,7 +9,7 @@
 #' A `fhir_df_description` consists of
 #' the following elements:
 #'
-#' - The resource element: Defines the resource type (e.g. `Patient` or `Observation`). See [fhir_resource()].
+#' - The resource element: Defines the resource type (e.g. `Patient` or `Observation`). See [fhir_resource_type()].
 #' - The cols element: Contains the column names and XPath expressions defining the columns to extract.
 #' If this element is empty, [fhir_crack()] will extract all available elements of the resource and name the
 #' columns automatically. See [fhir_columns()].

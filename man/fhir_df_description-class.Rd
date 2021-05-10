@@ -14,7 +14,7 @@ per resource type. See Details.
 A \code{fhir_df_description} consists of
 the following elements:
 \itemize{
-\item The resource element: Defines the resource type (e.g. \code{Patient} or \code{Observation}). See \code{\link[=fhir_resource]{fhir_resource()}}.
+\item The resource element: Defines the resource type (e.g. \code{Patient} or \code{Observation}). See \code{\link[=fhir_resource_type]{fhir_resource_type()}}.
 \item The cols element: Contains the column names and XPath expressions defining the columns to extract.
 If this element is empty, \code{\link[=fhir_crack]{fhir_crack()}} will extract all available elements of the resource and name the
 columns automatically. See \code{\link[=fhir_columns]{fhir_columns()}}.

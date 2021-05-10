@@ -68,12 +68,11 @@ library(fhircrackr)
 
 ## Downloading resources
 To download resources from a FHIR server, you need to send a FHIR search request using `fhir_search()`.
-This introduction will not go into the details of building a valid FHIR search request. For that, please see the vignette on downloading FHIR resources. Here we will use a simple example of downloading all Patient resources from a public HAPI server:
+This introduction will not go into the details of building a valid FHIR search request. For that, please see the vignette on downloading FHIR resources or have a look at `?fhir_url`. Here we will use a simple example of downloading all Patient resources from a public HAPI server:
 
 ```{r, eval=F}
-patient_bundles <- fhir_search(request="http://fhir.hl7.de:8080/baseDstu3/Patient",
-							   max_bundles=2, verbose = 0)
-
+request <- fhir_url(url = "http://fhir.hl7.de:8080/baseDstu3", resource = "Patient")
+patient_bundles <- fhir_search(request=request,max_bundles=2, verbose = 0)
 ```
 
 
@@ -81,37 +80,35 @@ patient_bundles <- fhir_search(request="http://fhir.hl7.de:8080/baseDstu3/Patien
 patient_bundles <- fhir_unserialize(fhircrackr::patient_bundles)
 ``` 
 
-The minimum information `fhir_search()` requires is a string containing the full FHIR search request in the argument `request` which you can either provide explicitly or by a call to `fhir_build_url()` before.
+The minimum information `fhir_search()` requires is a url containing the full FHIR search request in the argument `request` which you can build by a call to `fhir_url()` or by providing an explicit string.
 In general, a FHIR search request returns a *bundle* of the resources you requested. If there are a lot of resources matching your request, the search result isn't returned in one big bundle but distributed over several of them. If the argument `max_bundles` is set to its default `Inf`, `fhir_search()` will return all available bundles, meaning all resources matching your request. If you set it to `2` as in the example above, the download will stop after the first two bundles. Note that in this case, the result *may not contain all* the resources from the server matching your request.
 
-If you want to connect to a FHIR server that uses basic authentication, you can supply the arguments `username` and `password`.
+If you want to connect to a FHIR server that uses basic authentication, you can supply the arguments `username` and `password`. If your server uses some form of bearer token authorization, you can supply the token in the argument `token`.
 
-As you can see in the next block of code, `fhir_search()` returns a list of xml objects where each list element represents one bundle of resources, so a list of two xml objects in our case:
+As you can see in the next block of code, `fhir_search()` returns a `fhir_bundle_list` object, which is basically a list of xml objects where each list element represents one bundle of resources, so a list of two xml objects in our case:
 
 ```{r}
 length(patient_bundles)
-str(patient_bundles[[1]])
+patient_bundles
 ```
 
 If for some reason you cannot connect to a FHIR server at the moment but want to explore the following functions anyway, the package provides two example lists of bundles containing Patient and MedicationStatement resources. See `?patient_bundles` and `?medication_bundles` for how to use them.
 
 
 ## Flattening resources
-Now we know that inside these xml objects there is the patient data somewhere. To get it out, we will use `fhir_crack()`. The most important argument `fhir_crack()` takes is `bundles`, the list of bundles that is returned by `fhir_search()`. The second important argument is `design`, an object that tells the function which data to extract from the bundle. `fhir_crack()` returns a list of data.frames (the default) or a list of data.tables (if argument `data.tables=TRUE`).
+Now we know that inside these xml objects there is the patient data somewhere. To bring it into a tabular format, we will use `fhir_crack()` which creates one table per resource type in the bundle. The most important argument `fhir_crack()` takes is `bundles`, the list of bundles that is returned by `fhir_search()`. The second important argument is `design`, an object that tells the function which data to extract from the bundle. `fhir_crack()` returns (a list of) data.frames or data.tables (if argument `data.tables=TRUE`).
 
-The proper format of a `design` in `fhir_crack()` is described in detail in the vignette on flattening resources. Please refer to this document for more information, as we will just use one example of a design here.
+The object that is passed to the `design` argument can be of class `fhir_df_description` or `fhir_design`. A `fhir_df_description` is used when you want to extract just one resource type, resulting in a single table. A `fhir_design` is basically a named list of `fhir_df_descriptions` and is used when you want to extract several resource types, resulting in a named list of tables.
 
-In general, `design` is a named list containing one element per data frame that will be created. We call these elements *data.frame descriptions*. The names of the data.frame descriptions in `design` are also going to be the names of the resulting data frames. It usually makes sense to create one data frame per type of resource. Because we have just downloaded resources of the type Patient, the `design` here would be a list of length 1, containing just one data.frame description. A full data.frame description is a list with the elements *resource*, *cols* and *style* and can look as follows:
+The details of what the different elements of a `fhir_df_description` or `fhir_design` mean are described in the vignette on flattening resources. Please refer to this document for more information, as we will just use one simple example here.
+
 
 ```{r}
-#define design
-design <- list(
-
-	Patients = list(
-		
-		resource = "//Patient",
-		
-		cols = list(
+#define df_description
+df_description <- fhir_df_description(
+	resource = "Patient",
+	
+	cols = c(
 			PID           = "id",
 			use_name      = "name/use",
 			given_name    = "name/given",
@@ -119,100 +116,105 @@ design <- list(
 			gender        = "gender",
 			birthday      = "birthDate"
 		),
-		
-		style = list(
+	
+	style = fhir_style(
 			sep = "|",
 			brackets = c("[","]"),
 			rm_empty_cols = FALSE
 		)
-	)
+	
 )
+
+#Have a look
+df_description
 ```
 
-All three elements of `style` can also be controlled directly by the `fhir_crack()` arguments `sep`, `brackets` and `remove_empty_columns`. If the function arguments are `NULL` (their default), the values provided in `style` are used, if they are not NULL, they will overwrite any values in `style`. If both the function arguments and the `style` component of the data.frame description are NULL, default values(`sep=" "`, `brackets = NULL`, `rm_empty_cols=TRUE`) will be assumed. 
+All three elements of `style` can also be controlled directly by the `fhir_crack()` arguments `sep`, `brackets` and `remove_empty_columns`. If the function arguments are `NULL` (their default), the values provided in `style` are used, if they are not NULL, they will overwrite any values in `style`. If both the function arguments and the `style` component of the `fhir_df_description` are NULL, default values(`sep=" "`, `brackets = NULL`, `rm_empty_cols=TRUE`) will be assumed. 
 
-After it is defined, the design can be used in `fhir_crack()` like this:
+After it is defined, the `fhir_df_description` can be used in `fhir_crack()` like this:
 
 ```{r}
 #flatten resources
-list_of_tables <- fhir_crack(bundles = patient_bundles, design = design, verbose = 0)
+patients <- fhir_crack(bundles = patient_bundles, design = df_description, verbose = 0)
 
 #have look at the results
-head(list_of_tables$Patients)
+head(patients)
 ```
 
 ## Extract more than one resource type
-Of course the previous example is using just one resource type. If you are interested in several types of resources, `design` will contain several data.frame descriptions and the result will be a list of several data frames.
+Of course the previous example is using just one resource type. If you are interested in several types of resources, you use a `fhir_design` containing several `fhir_df_descriptions`.
 
 Consider the following example where we want to download MedicationStatements referring to a certain medication we specify with its SNOMED CT code and also the Patient resources these MedicationStatements are linked to.
 
-When the FHIR search request gets longer, it can be helpful to build up the request piece by piece like this:
+We can build the request like this:
 
 ```{r}
-search_request  <- paste0(
-  "https://hapi.fhir.org/baseR4/", #base url
-  "MedicationStatement?", #look for MedicationsStatements
-  "code=http://snomed.info/ct%7C429374003", #only choose resources with this snomed code
-  "&_include=MedicationStatement:subject") #include the corresponding Patient resources
+request  <- fhir_url(
+	url = "https://hapi.fhir.org/baseR4", 
+	resource = "MedicationStatement", 
+	parameters = c("code" = "http://snomed.info/ct|429374003", 
+				   "_include" = "MedicationStatement:subject")
+	
+)
 ```
 
 Then we can download the resources:
 
 ```{r, eval=F}
-medication_bundles <- fhir_search(request = search_request, max_bundles = 3)
+medication_bundles <- fhir_search(request = request, max_bundles = 3)
 ```
 
 ```{r, include=F}
 medication_bundles <- fhir_unserialize(medication_bundles)
 ```
 
-Now our `design` needs two data.frame descriptions (called `MedicationStatement` and `Patients` in our example), one for the MedicationStatement resources and one for the Patient resources:
+Now our `design` needs two `df_descriptions` (called `MedicationStatements` and `Patients` in our example), one for the MedicationStatement resources and one for the Patient resources:
 
 ```{r}
-design <- list(
+MedicationStatements <- fhir_df_description(
 
-	MedicationStatement = list(
+	resource = "MedicationStatement",
 
-		resource = "//MedicationStatement",
-
-		cols = list(
-			MS.ID              = "id",
-			STATUS.TEXT        = "text/status",
-			STATUS             = "status",
-			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-			MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-			MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-			DOSAGE             = "dosage/text",
-			PATIENT            = "subject/reference",
-			LAST.UPDATE        = "meta/lastUpdated"
-		),
-		
-		style = list(
-			sep = "|",
-			brackets = NULL, 
-			rm_empty_cols = FALSE
-		)
+	cols = c(
+		MS.ID              = "id",
+		STATUS.TEXT        = "text/status",
+		STATUS             = "status",
+		MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+		MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+		MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+		DOSAGE             = "dosage/text",
+		PATIENT            = "subject/reference",
+		LAST.UPDATE        = "meta/lastUpdated"
 	),
-
-	Patients = list(
-
-		resource = "//Patient"
+	
+	style = fhir_style(
+		sep = "|",
+		brackets = NULL, 
+		rm_empty_cols = FALSE
 	)
 )
+
+Patients <- fhir_df_description(resource = "Patient")
+
+design <- fhir_design(MedicationStatements, Patients)
+
+```
+In this example, we have spelled out the description MedicationStatement completely, while we have used a short form for Patients. The resulting design looks like this:
+```{r}
+design
 ```
 
-In this example, we have spelled out the data.frame description MedicationStatement completely, while we have used a short form for Patients. We can now use this `design` for `fhir_crack()`:
+We can now use this `design` for `fhir_crack()`:
 
 ```{r}
 list_of_tables <- fhir_crack(bundles = medication_bundles, design = design, verbose = 0)
 
-head(list_of_tables$MedicationStatement)
+list_of_tables$MedicationStatements[1:5,]
 
-head(list_of_tables$Patients)
+list_of_tables$Patients[1:5,]
 ```
 
 As you can see, the result now contains two data frames, one for Patient resources and one for MedicationStatement resources.
-
 
 ## Multiple entries
 A particularly complicated problem in flattening FHIR resources is caused by the fact that there can be multiple entries to an attribute. For a more detailed description of this problem, please see the vignette on flattening resources. 
@@ -220,76 +222,71 @@ A particularly complicated problem in flattening FHIR resources is caused by the
 In general, `fhir_crack()` will paste multiple entries for the same attribute together in the data frame, using the separator provided by the `sep` argument. 
 
 
-Let's have a look at the following simple example, where we have a bundle containing just two Patient resources:
+Let's have a look at the following simple example, where we have a bundle containing just two Patient resources. The example is part of the `fhricrackr` package and you can make it available like this:
 
 ```{r}
-bundle <- xml2::read_xml(
-	"<Bundle>
-
-		<Patient>
-			<id value='id1'/>
-			<address>
-				<use value='home'/>
-				<city value='Amsterdam'/>
-				<type value='physical'/>
-				<country value='Netherlands'/>
-			</address>
-			<name>
-				<given value='Marie'/>
-			</name>
-		</Patient>
-
-		<Patient>
-			<id value='id3'/>
-			<address>
-				<use value='home'/>
-				<city value='Berlin'/>
-			</address>
-			<address>
-				<type value='postal'/>
-				<country value='France'/>
-			</address>
-			<address>
-				<use value='work'/>
-				<city value='London'/>
-				<type value='postal'/>
-				<country value='England'/>
-			</address>
-			<name>
-				<given value='Frank'/>
-			</name>
-			<name>
-				<given value='Max'/>
-			</name>			
-		</Patient>		
-
-	</Bundle>"
-)
-
-bundle_list <- list(bundle)
+bundles <- fhir_unserialize(example_bundles1)
 ```
 
+They represent a very simple bundle of just two Patient resources which looks like this:
+
+```
+<Bundle>
+
+	<Patient>
+		<id value='id1'/>
+		<address>
+			<use value='home'/>
+			<city value='Amsterdam'/>
+			<type value='physical'/>
+			<country value='Netherlands'/>
+		</address>
+		<name>
+			<given value='Marie'/>
+		</name>
+	</Patient>
+
+	<Patient>
+		<id value='id3'/>
+		<address>
+			<use value='home'/>
+			<city value='Berlin'/>
+		</address>
+		<address>
+			<type value='postal'/>
+			<country value='France'/>
+		</address>
+		<address>
+			<use value='work'/>
+			<city value='London'/>
+			<type value='postal'/>
+			<country value='England'/>
+		</address>
+		<name>
+			<given value='Frank'/>
+		</name>
+		<name>
+			<given value='Max'/>
+		</name>			
+	</Patient>		
+
+</Bundle>
+```
 The first resource has just one entry for the address attribute. The second Patient resource has an address attribute with three entries containing different elements and also two entries for the name attribute.
 
-This is where the `style` element of the design comes into play:
+This is where the `style` element of the `df_description` comes into play:
 
 ```{r}
-design <- list(
-	Patients = list(
-		resource = "//Patient",
-		cols = NULL, 
-		style = list(
-			sep = " | ",
-			brackets  = c("[", "]"),
-			rm_empty_cols = TRUE
-		)
-	)
-)
-
-dfs <- fhir_crack(bundles = bundle_list, design = design, verbose = 0)
-dfs$Patients
+df_description <- fhir_df_description(resource = "Patient",
+									  style = fhir_style(
+									  	brackets = c("[","]"),
+									  	sep = " | ",
+									  	rm_empty_cols = FALSE)
+									  )
+df <- fhir_crack(bundles = bundles, design = df_description, verbose = 0)
+df
 ```
-Multiple entries are pasted together with the specified seperator in between and the indices (inside the specified brackets) display the entry the value belongs to. That way you can see that Patient resource 2 had three entries for the attribute `address` and you can also see which attributes belong to which entry.
+Multiple entries are pasted together with the specified separator in between and the indices (inside the specified brackets) display the entry the value belongs to. That way you can see that Patient resource 2 had three entries for the attribute `address` and you can also see which attributes belong to which entry.
 
 ## Process Data Frames with multiple Entries
 
@@ -297,7 +294,7 @@ Multiple entries are pasted together with the specified seperator in between and
 If the data frame produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. This is where `fhir_melt()` comes into play. `fhir_melt()` takes an indexed data frame with multiple entries in one or several `columns` and spreads (aka melts) these entries over several rows:
 
 ```{r}
-fhir_melt(dfs$Patients, columns = "address.city", brackets = c("[","]"), 
+fhir_melt(df, columns = "address.city", brackets = c("[","]"), 
 		  sep=" | ", all_columns = FALSE)
 ```
 
@@ -308,14 +305,14 @@ The new variable `resource_identifier` maps which rows in the created data frame
 cols <- c("address.city", "address.use", "address.type", 
 		  "address.country")
 
-fhir_melt(dfs$Patients, columns = cols, brackets = c("[","]"), 
+fhir_melt(df, columns = cols, brackets = c("[","]"), 
 		  sep=" | ", all_columns = FALSE)
 ```
 
 With the argument `all_columns` you can control whether the resulting data frame contains only the molten columns or all columns of the original data frame:
 
 ```{r}
-molten <- fhir_melt(dfs$Patients, columns = cols, brackets = c("[","]"), 
+molten <- fhir_melt(df, columns = cols, brackets = c("[","]"), 
 					sep=" | ", all_columns = TRUE)
 molten
 ```
@@ -336,7 +333,7 @@ Since `fhir_crack()` discards of all the data not specified in `design`, it make
 There are two ways of saving the FHIR bundles you downloaded: Either you save them as R objects, or you write them to an xml file.
 
 ### Save and load bundles as R objects
-If you want to save the list of downloaded bundles as an `.rda` or `.RData` file, you can't just use R's `save()` or `save_image()` on it, because this will break the external pointers in the xml objects representing your bundles. Instead, you have to serialize the bundles before saving and unserialize them after loading. For single xml objects the package `xml2` provides serialization functions. For convenience, however, `fhircrackr` provides the functions `fhir_serialize()` and `fhir_unserialize()` that can be used directly on the list of bundles returned by `fhir_search()`:
+If you want to save the list of downloaded bundles as an `.rda` or `.RData` file, you can't just use R's `save()` or `save_image()` on it, because this will break the external pointers in the xml objects representing your bundles. Instead, you have to serialize the bundles before saving and unserialize them after loading. For single xml objects the package `xml2` provides serialization functions. For convenience, however, `fhircrackr` provides the functions `fhir_serialize()` and `fhir_unserialize()` that can be used directly on the bundles returned by `fhir_search()`:
 
 ```{r}
 #serialize bundles
@@ -367,7 +364,7 @@ load(paste0(temp_dir, "/bundles.rda"))
 bundles <- fhir_unserialize(serialized_bundles)
 
 #have a look
-head(bundles[[1]])
+bundles
 ```
 
 After unserialization, the pointers are restored and you can continue to work with the bundles. Note that the example bundles `medication_bundles` and `patient_bundles` that are provided with the `fhircrackr` package are also provided in their serialized form and have to be unserialized as described on their help page.
