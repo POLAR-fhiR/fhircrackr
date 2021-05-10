@@ -61,6 +61,12 @@
 #' @return A [fhir_bundle_list-class] when `save_to_disc = NULL` (the default),  else `NULL`.
 #' @export
 #'
+#' @seealso
+#' - Creating a FHIR search request: [fhir_url()] and [fhir_body()] (for POST based search)
+#' - OAuth2 Authentication: [fhir_authenticate()]
+#' - Saving/reading bundles from disc: [fhir_save()] and [fhir_load()]
+#' - Flattening the bundles: [fhir_crack()]
+#'
 #' @examples
 #' \donttest{
 #' #Search with GET

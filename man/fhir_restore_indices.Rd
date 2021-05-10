@@ -98,3 +98,6 @@ d_restored <- fhir_restore_indices(d_removed, indices)
 #compare
 identical(d, d_restored)
 }
+\seealso{
+\code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_melt_all]{fhir_melt_all()}}, \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
+}

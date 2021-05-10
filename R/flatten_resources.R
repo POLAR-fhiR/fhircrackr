@@ -8,7 +8,7 @@
 #' Creates a single data.frame/data.table, if only a [fhir_df_description-class] is given in the argument `design`.
 #'
 #' @param bundles A FHIR search result as returned by [fhir_search()].
-#' @param design A [fhir_design-class] or [fhir_df_description-class] object. See `?fhir_design`/`?fhir_df_description`
+#' @param design A [fhir_design-class] or [fhir_df_description-class] object. See [fhir_design()]/[fhir_df_description()]
 #' and the corresponding vignette (`vignette("flattenResources", package ="fhircrackr")`) for a more detailed explanation and
 #' comprehensive examples of both.
 #'
@@ -35,6 +35,10 @@
 #' @rdname fhir_crack-methods
 #' @docType methods
 #' @include fhir_design.R fhir_bundle_list.R fhir_table_list.R
+#' @seealso
+#' - Downloading bundles from a FHIR server: [fhir_search()]
+#' - Creating designs/df_descriptions: [fhir_df_description()] and [fhir_design()]
+#' - Dealing with multiple entries: [fhir_melt()], [fhir_melt_all()], [fhir_rm_indicdes()]
 #' @examples
 #' #unserialize example bundle
 #' bundles <- fhir_unserialize(medication_bundles)
@@ -262,63 +266,6 @@ setMethod(
 	}
 )
 
-	# if(!is(design, "fhir_design")){
-	# 	warning("The use of an old-style design will be disallowed in the future. ",
-	# 		 "Please consider building the design with the function fhir_design().\n",
-	# 		 "Converting design to fhir_design object.")
-	# 	suppressMessages(design <- fhir_design(design))
-	# }
-	# #overwrite design with function arguments
-	# if (!is.null(sep)) {
-	# 	design <- fhir_design(lapply(
-	# 		design,
-	# 		function(x){
-	# 			x@style@sep <- sep
-	# 			x
-	# 		}
-	# 	))
-	# }
-	# if (!is.null(brackets)) {
-	# 	brackets <- fix_brackets(brackets)
-	# 	design <-fhir_design(lapply(
-	# 		design,
-	# 		function(x){
-	# 			x@style@brackets <- brackets
-	# 			x
-	# 		}
-	# 	))
-	# }
-	# if (!is.null(remove_empty_columns)) {
-	# 	design <- fhir_design(lapply(
-	# 		design,
-	# 		function(x){
-	# 			x@style@rm_empty_cols <- remove_empty_columns
-	# 			x
-	# 		}
-	# 	))
-	# }
-
-# 	#Check for dangerous XPath expressions ins cols
-# 	cols <- lapply(design, function(x){c(x@cols)})
-# 	dangerCols <- sapply(cols, function(x){any(grepl(esc("//"), x))})
-# 	if(any(dangerCols)){
-# 		warning("In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
-# 		"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
-# 		"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
-# 		"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
-# 		"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse=", "))
-# 	}
-#
-#
-# 	#Add attributes to design
-# 	design <- add_attribute_to_design(design)
-# 	#crack
-# 	dfs <- bundles2dfs(bundles = bundles, design = design, data.table = data.table, verbose = verbose)
-# 	if (0 < verbose) {message("FHIR-Resources cracked. \n")}
-# 	assign(x = "canonical_design", value = design, envir = fhircrackr_env)
-# 	dfs
-# }
-#
 
 ############################################################################################
 ##############################################################################################

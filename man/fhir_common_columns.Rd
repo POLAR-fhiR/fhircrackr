@@ -44,3 +44,6 @@ names(dfs$Patients)
 #extract all column names beginning with the string "name"
 fhir_common_columns(data_frame = dfs$Patients, column_names_prefix = "name")
 }
+\seealso{
+\code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_melt_all]{fhir_melt_all()}}, \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
+}

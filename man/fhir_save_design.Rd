@@ -7,7 +7,7 @@
 fhir_save_design(design, file = "design.xml")
 }
 \arguments{
-\item{design}{A \linkS4class{fhir_design} object. See \code{?fhir_design}.}
+\item{design}{A \linkS4class{fhir_design} object. See \code{\link[=fhir_design]{fhir_design()}}.}
 
 \item{file}{A string specifying the file to write to, defaults to writing "design.xml"
 into the current working directory}
@@ -34,4 +34,7 @@ df_desc2 <- fhir_df_description(resource = "Observation",
 design <- fhir_design(df_desc1, df_desc2, names = c("Patients", "Observations"))
 
 fhir_save_design(design, file = tempfile())
+}
+\seealso{
+\code{\link[=fhir_design]{fhir_design()}}, \code{\link[=fhir_df_description]{fhir_df_description()}}, \code{\link[=fhir_load_design]{fhir_load_design()}}
 }

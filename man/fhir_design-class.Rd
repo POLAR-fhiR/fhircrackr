@@ -19,3 +19,6 @@ list of bundles containing FHIR resources.
 resulting data.frames.}
 }}
 
+\seealso{
+\code{\link[=fhir_df_description]{fhir_df_description()}}, \code{\link[=fhir_crack]{fhir_crack()}}
+}

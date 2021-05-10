@@ -133,3 +133,6 @@ fhir_melt_all(dfs)
 #use on single df
 fhir_melt_all(dfs$patients, brackets = c("[","]"), sep="||")
 }
+\seealso{
+\code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
+}

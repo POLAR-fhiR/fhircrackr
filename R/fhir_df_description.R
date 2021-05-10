@@ -9,12 +9,12 @@
 #' A `fhir_df_description` consists of
 #' the following elements:
 #'
-#' - The resource element: Defines the resource type (e.g. `Patient` or `Observation`). See `?fhir_resource`.
+#' - The resource element: Defines the resource type (e.g. `Patient` or `Observation`). See [fhir_resource()].
 #' - The cols element: Contains the column names and XPath expressions defining the columns to extract.
 #' If this element is empty, [fhir_crack()] will extract all available elements of the resource and name the
-#' columns automatically. See `?fhir_columns`.
+#' columns automatically. See [fhir_columns()].
 #' - The style element: Defines how to deal with multiple entries to the same element and whether empty columns are
-#' removed. See `?fhir_style`
+#' removed. See [fhir_style()].
 #'
 #' A full `fhir_df_description` looks for example like this:
 #' ```
@@ -40,6 +40,7 @@
 #' elements and put them in automatically named columns.
 #' @slot style An object of class [fhir_style-class] describing how to deal with multiple entries and emtpy columns.
 #' @include fhir_resource_type.R fhir_style.R fhir_columns.R
+#' @seealso [fhir_resource_type()],[fhir_columns()],[fhir_style()], [fhir_design()], [fhir_crack()]
 #' @export
 setClass(
 	"fhir_df_description",

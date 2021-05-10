@@ -54,7 +54,7 @@ fhir_crack(
 \arguments{
 \item{bundles}{A FHIR search result as returned by \code{\link[=fhir_search]{fhir_search()}}.}
 
-\item{design}{A \linkS4class{fhir_design} or \linkS4class{fhir_df_description} object. See \code{?fhir_design}/\code{?fhir_df_description}
+\item{design}{A \linkS4class{fhir_design} or \linkS4class{fhir_df_description} object. See \code{\link[=fhir_design]{fhir_design()}}/\code{\link[=fhir_df_description]{fhir_df_description()}}
 and the corresponding vignette (\code{vignette("flattenResources", package ="fhircrackr")}) for a more detailed explanation and
 comprehensive examples of both.}
 
@@ -135,4 +135,11 @@ head(df_list$patients)
 #The design that was used can be extracted from a fhir_df_list
 fhir_design(df_list)
 
+}
+\seealso{
+\itemize{
+\item Downloading bundles from a FHIR server: \code{\link[=fhir_search]{fhir_search()}}
+\item Creating designs/df_descriptions: \code{\link[=fhir_df_description]{fhir_df_description()}} and \code{\link[=fhir_design]{fhir_design()}}
+\item Dealing with multiple entries: \code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_melt_all]{fhir_melt_all()}}, \code{\link[=fhir_rm_indicdes]{fhir_rm_indicdes()}}
+}
 }

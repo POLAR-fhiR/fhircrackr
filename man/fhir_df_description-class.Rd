@@ -14,12 +14,12 @@ per resource type. See Details.
 A \code{fhir_df_description} consists of
 the following elements:
 \itemize{
-\item The resource element: Defines the resource type (e.g. \code{Patient} or \code{Observation}). See \code{?fhir_resource}.
+\item The resource element: Defines the resource type (e.g. \code{Patient} or \code{Observation}). See \code{\link[=fhir_resource]{fhir_resource()}}.
 \item The cols element: Contains the column names and XPath expressions defining the columns to extract.
 If this element is empty, \code{\link[=fhir_crack]{fhir_crack()}} will extract all available elements of the resource and name the
-columns automatically. See \code{?fhir_columns}.
+columns automatically. See \code{\link[=fhir_columns]{fhir_columns()}}.
 \item The style element: Defines how to deal with multiple entries to the same element and whether empty columns are
-removed. See \code{?fhir_style}
+removed. See \code{\link[=fhir_style]{fhir_style()}}.
 }
 
 A full \code{fhir_df_description} looks for example like this:\preformatted{fhir_resource_type: Patient
@@ -50,3 +50,6 @@ elements and put them in automatically named columns.}
 \item{\code{style}}{An object of class \linkS4class{fhir_style} describing how to deal with multiple entries and emtpy columns.}
 }}
 
+\seealso{
+\code{\link[=fhir_resource_type]{fhir_resource_type()}},\code{\link[=fhir_columns]{fhir_columns()}},\code{\link[=fhir_style]{fhir_style()}}, \code{\link[=fhir_design]{fhir_design()}}, \code{\link[=fhir_crack]{fhir_crack()}}
+}

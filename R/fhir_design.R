@@ -9,6 +9,7 @@
 #' @slot names The names of the df_descriptions. Those will also be the names of the
 #' resulting data.frames.
 #' @include fhir_df_description.R
+#' @seealso [fhir_df_description()], [fhir_crack()]
 #' @export
 #'
 setClass(
@@ -39,7 +40,7 @@ setValidity(
 
 #' Create a [fhir_design-class] object
 #'
-#' A `fhir_design` is a named list of `fhir_df_description` objects (See `?fhir_df_description`)
+#' A `fhir_design` is a named list of `fhir_df_description` objects (See [fhir_df_description()])
 #' and should be created using the function described here. The design is used in [fhir_crack()] to tell
 #' the function how to flatten each resource type.
 #'
@@ -48,7 +49,7 @@ setValidity(
 #' For backwards compatibility it is for the moment also possible to build it from an
 #' old-style design as used in `fhircrackr (< 1.0.0)`. See examples.
 #'
-#' If this function is given an object of class `fhir_df_list` or `fhir_dt_list`, it will
+#' If this function is given an object of class [fhir_df_list-class] or [fhir_dt_list-class], it will
 #' extract the design that was used to create the respective list.
 #'
 #' A `fhir_design` looks for example like this:
@@ -87,11 +88,12 @@ setValidity(
 #' See the examples for how to create this design.
 #'
 #' @param ... One ore more `fhir_df_description` objects or a named list containing
-#' `fhir_df_description` objects, or an object of class `fhir_df_list`/`fhir_dt_list-class`.
-#' See `?fhir_df_description`.
+#' `fhir_df_description` objects, or an object of class [fhir_df_list-class]/[fhir_dt_list-class].
+#' See [fhir_df_description()].
 #' @param names Optional. The names of the df_descriptions. If no names are provided, the names of the object(s) that
 #' were used in creating the design are taken as the names.
 #' @docType methods
+#' @seealso [fhir_df_description()], [fhir_crack()]
 #' @rdname fhir_design-methods
 #' @examples
 #'

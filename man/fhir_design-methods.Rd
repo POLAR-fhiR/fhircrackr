@@ -18,14 +18,14 @@ fhir_design(..., names)
 }
 \arguments{
 \item{...}{One ore more \code{fhir_df_description} objects or a named list containing
-\code{fhir_df_description} objects, or an object of class \code{fhir_df_list}/\code{fhir_dt_list-class}.
-See \code{?fhir_df_description}.}
+\code{fhir_df_description} objects, or an object of class \linkS4class{fhir_df_list}/\linkS4class{fhir_dt_list}.
+See \code{\link[=fhir_df_description]{fhir_df_description()}}.}
 
 \item{names}{Optional. The names of the df_descriptions. If no names are provided, the names of the object(s) that
 were used in creating the design are taken as the names.}
 }
 \description{
-A \code{fhir_design} is a named list of \code{fhir_df_description} objects (See \code{?fhir_df_description})
+A \code{fhir_design} is a named list of \code{fhir_df_description} objects (See \code{\link[=fhir_df_description]{fhir_df_description()}})
 and should be created using the function described here. The design is used in \code{\link[=fhir_crack]{fhir_crack()}} to tell
 the function how to flatten each resource type.
 }
@@ -33,7 +33,7 @@ the function how to flatten each resource type.
 For backwards compatibility it is for the moment also possible to build it from an
 old-style design as used in \verb{fhircrackr (< 1.0.0)}. See examples.
 
-If this function is given an object of class \code{fhir_df_list} or \code{fhir_dt_list}, it will
+If this function is given an object of class \linkS4class{fhir_df_list} or \linkS4class{fhir_dt_list}, it will
 extract the design that was used to create the respective list.
 
 A \code{fhir_design} looks for example like this:\preformatted{A fhir_design with 2 df_descriptions:
@@ -145,4 +145,7 @@ dfs <- fhir_crack(med_bundles, design = design1)
 #extract design
 fhir_design(dfs)
 
+}
+\seealso{
+\code{\link[=fhir_df_description]{fhir_df_description()}}, \code{\link[=fhir_crack]{fhir_crack()}}
 }

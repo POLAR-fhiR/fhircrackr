@@ -22,3 +22,6 @@ result <- fhir_crack(bundles, design)
 fhir_canonical_design()
 
 }
+\seealso{
+\code{\link[=fhir_design]{fhir_design()}}, \code{\link[=fhir_Df_description]{fhir_Df_description()}}
+}

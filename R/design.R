@@ -6,6 +6,7 @@
 #'
 #' @description Returns the [fhir_design-class] of the last call to [fhir_crack()].
 #' @export
+#' @seealso [fhir_design()], [fhir_Df_description()]
 #' @examples
 #' #load example bundles
 #' bundles <- fhir_unserialize(patient_bundles)
@@ -27,10 +28,11 @@ fhir_canonical_design <- function() {
 
 #' Write design to xml
 #' @description Writes a [fhir_design-class] for use with [fhir_crack()] to an xml file
-#' @param design A [fhir_design-class] object. See `?fhir_design`.
+#' @param design A [fhir_design-class] object. See [fhir_design()].
 #' @param file A string specifying the file to write to, defaults to writing "design.xml"
 #' into the current working directory
 #' @export
+#' @seealso [fhir_design()], [fhir_df_description()], [fhir_load_design()]
 #'
 #' @examples
 #' #create design
@@ -69,7 +71,7 @@ fhir_save_design <- function (design, file = "design.xml") {
 #'
 #' @return A [fhir_design-class] object. See `?fhir_design`.
 #' @export
-#'
+#' @seealso [fhir_design()], [fhir_df_description()], [fhir_save_design()]
 #' @examples
 #'
 #' #create and save design

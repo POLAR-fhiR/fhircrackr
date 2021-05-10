@@ -121,3 +121,11 @@ bundles <- fhir_search(request = request,
                        max_bundles = 5)
 }
 }
+\seealso{
+\itemize{
+\item Creating a FHIR search request: \code{\link[=fhir_url]{fhir_url()}} and \code{\link[=fhir_body]{fhir_body()}} (for POST based search)
+\item OAuth2 Authentication: \code{\link[=fhir_authenticate]{fhir_authenticate()}}
+\item Saving/reading bundles from disc: \code{\link[=fhir_save]{fhir_save()}} and \code{\link[=fhir_load]{fhir_load()}}
+\item Flattening the bundles: \code{\link[=fhir_crack]{fhir_crack()}}
+}
+}

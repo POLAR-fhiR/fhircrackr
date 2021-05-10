@@ -67,4 +67,8 @@ dfs <- fhir_crack(bundles = list(bundle),
                   brackets = c("[", "]"))
 
 df_indices_removed <- fhir_rm_indices(dfs$patients, brackets=c("[", "]"))
+
+}
+\seealso{
+\code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_melt_all]{fhir_melt_all()}}
 }

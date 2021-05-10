@@ -95,3 +95,6 @@ d <- fhir_melt_all(dfs$patients, brackets = c("[", "]"), sep="||", rm_indices = 
 #Extract indices
 fhir_extract_indices(d, brackets = c("[", "]"))
 }
+\seealso{
+\code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_melt_all]{fhir_melt_all()}}, \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
+}

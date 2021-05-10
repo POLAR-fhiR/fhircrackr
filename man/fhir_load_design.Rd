@@ -41,3 +41,6 @@ fhir_save_design(design, file = temp)
 
 design <- fhir_load_design(temp)
 }
+\seealso{
+\code{\link[=fhir_design]{fhir_design()}}, \code{\link[=fhir_df_description]{fhir_df_description()}}, \code{\link[=fhir_save_design]{fhir_save_design()}}
+}

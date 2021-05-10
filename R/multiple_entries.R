@@ -36,6 +36,7 @@
 #' #extract all column names beginning with the string "name"
 #' fhir_common_columns(data_frame = dfs$Patients, column_names_prefix = "name")
 #' @export
+#' @seealso [fhir_melt()], [fhir_melt_all()], [fhir_rm_indices()]
 #'
 fhir_common_columns <- function(data_frame, column_names_prefix) {
 
@@ -136,6 +137,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #' fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,
 #'           brackets = c("[","]"), sep = " ", all_columns = TRUE)
 #' @export
+#' @seealso [fhir_common_columns()], [fhir_melt_all()], [fhir_rm_indices()]
 
 fhir_melt <- function(
 	indexed_data_frame,
@@ -313,6 +315,7 @@ fhir_melt <- function(
 #' #use on single df
 #' fhir_melt_all(dfs$patients, brackets = c("[","]"), sep="||")
 #' @export
+#' @seealso [fhir_melt()], [fhir_rm_indices()]
 
 setGeneric(
 	"fhir_melt_all",
@@ -399,6 +402,8 @@ setMethod(
 #'                   brackets = c("[", "]"))
 #'
 #' df_indices_removed <- fhir_rm_indices(dfs$patients, brackets=c("[", "]"))
+#'
+#' @seealso [fhir_melt()], [fhir_melt_all()]
 
 
 fhir_rm_indices <- function(
@@ -520,7 +525,9 @@ fhir_rm_indices <- function(
 #'
 #'#Extract indices
 #'fhir_extract_indices(d, brackets = c("[", "]"))
-#'@export
+#' @export
+#' @seealso [fhir_melt()], [fhir_melt_all()], [fhir_rm_indices()]
+
 
 fhir_extract_indices <- function(indexed_data_frame, brackets){
 
@@ -645,6 +652,9 @@ fhir_extract_indices <- function(indexed_data_frame, brackets){
 #'#compare
 #'identical(d, d_restored)
 #'@export
+#'
+#' @seealso [fhir_melt()], [fhir_melt_all()], [fhir_rm_indices()]
+
 
 fhir_restore_indices <- function(d, index_matrix){
 
