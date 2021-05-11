@@ -814,8 +814,10 @@ get_bundle <- function(
 			httr::authenticate(username, password)
 		}
 
+		#paging is implemented differently for Hapi/Vonk When initial request is POST
+		#VonK: Next-Links have to be POSTed, Hapi: Next-Links have to be GETed
 		#search via POST
-		if(!is.null(body)){
+		if(grepl("_search", request)){
 			response <- httr::POST(
 				request,
 				httr::add_headers(Accept = "application/fhir+xml",
