@@ -2,7 +2,7 @@
 title: "fhircrackr: Download FHIR resources"
 
 date: "`r Sys.Date()`"
-output:	rmarkdown::pdf_document
+output:	rmarkdown::html_vignette
 
 
 
@@ -18,6 +18,31 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#"
 )
+
+
+hook_output = knitr::knit_hooks$get('output')
+knitr::knit_hooks$set(output = function(x, options) {
+	 if (!is.null(n <- options$out.lines)){
+		    if (any(nchar(x) > n)){
+		    	index <- seq(1,nchar(x),n)
+		    	x = substring(x, index, c(index[2:length(index)]-1, nchar(x)))
+		    } 
+		    x = paste(x, collapse = '\n# ')
+	 }
+		  hook_output(x, options)
+
+})
+
+# hook_warning = knitr::knit_hooks$get('warning')
+# knitr::knit_hooks$set(warning = function(x, options) {
+#     n <- 90
+#     x = knitr:::split_lines(x)
+#     # any lines wider than n should be wrapped
+#     if (any(nchar(x) > n)) x = strwrap(x, width = n)
+#     x = paste(x, collapse = '\n ')
+#   hook_warning(x, options)
+# })
+
 ```
 
 This vignette covers the following topics:
@@ -32,9 +57,12 @@ This vignette covers the following topics:
 
 - Dealing with HTTP errors
 
+- Saving the downloaded bundles
+
 - Dealing with large data sets
 
 - Downloading the capability statement
+
 
 Before running any of the following code, you need to load the `fhircrackr` package:
 
@@ -59,7 +87,6 @@ Internally, `fhir_resource_type` is called to check the type you provided agains
 ```{r}
 fhir_resource_type("Patient") #Correct
 fhir_resource_type("medicationstatement") #corrected
-fhir_resource_type("nonExistentResource") #warning
 ```
 Beside telling the server which resource type to give back, the resource type also determines the kinds of search parameters that are allowed. Search parameters are use to further qualify the resources you want to get back, e.g by restricting the search result to Patient resources of female patients only. 
 
@@ -69,33 +96,22 @@ Apart from the resource independent parameters, there are also resource dependen
 
 You can add search parameters to you request in a named list or named character vector this:
 
-```{r}
-request1 <- fhir_url(url = "http://hapi.fhir.org/baseR4",
-					resource = "Patient",
-					parameters = list("code" = "http://loinc.org|1751-1")
+```{r, out.lines=110}
+request <- fhir_url(url = "http://hapi.fhir.org/baseR4",
+		resource = "Patient",
+		parameters = list("birthdate" = "lt2000-01-01",
+						  "code" = "http://loinc.org|1751-1")
 		 			)
 
-request1
-
-request2 <- fhir_url(url = "http://hapi.fhir.org/baseR4",
-					resource = "Patient",
-					parameters = list("birthdate" = "lt2000-01-01",
-								      "code" = "http://loinc.org|1751-1")
-		 			)
-
-#request2 is to long to print here
-
+request
 ```
 
-As you can see, `fhir_url()` performs automatic url encoding and the `|` is transformed to `%7C`.
+`
+As you can see, `fhir_url()` performs automatic url encoding and the  `|`  is transformed to  `%7C`.
 
 
 ### Accessing the current request
-Whenever you call `fhir_url()` or `fhir_search()`, the corresponding FHIR search request will be saved implicitly and can be accessed like this:
-
-```{r}
-fhir_current_request()
-```
+Whenever you call `fhir_url()` or `fhir_search()`, the corresponding FHIR search request will be saved implicitly and can be accessed with `fhir_current_request()`
 
 If you call `fhir_search()` without providing an explicit request, the function will automatically call `fhir_current_request()`.
 
@@ -205,8 +221,67 @@ bundles <- fhir_search(request = url, body = body)
 To get more detailed information on the error response, you can pass a string with a file name to the argument `log_errors` . This will write a log with error information to the specified file.
 
 ```{r, eval=F}
-medication_bundles <- fhir_search(request = request, max_bundles = 3, log_errors = "myErrorFile")
+medication_bundles <- fhir_search(request = request, 
+								  max_bundles = 3, 
+								  log_errors = "myErrorFile")
 ```
+
+## Saving the downloaded bundles
+There are two ways of saving the FHIR bundles you downloaded: Either you save them as R objects, or you write them to an xml file.
+
+### Save bundles as R objects
+If you want to save the list of downloaded bundles as an `.rda` or `.RData` file, you can't just use R's `save()` or `save_image()` on it, because this will break the external pointers in the xml objects representing your bundles. Instead, you have to serialize the bundles before saving and unserialize them after loading. For single xml objects the package `xml2` provides serialization functions. For convenience, however, `fhircrackr` provides the functions `fhir_serialize()` and `fhir_unserialize()` that can be used directly on the bundles returned by `fhir_search()`:
+
+```{r}
+#serialize bundles
+serialized_bundles <- fhir_serialize(patient_bundles)
+
+#have a look at them
+head(serialized_bundles[[1]])
+```
+
+```{r}
+#create temporary directory for saving
+temp_dir <- tempdir()
+
+#save
+save(serialized_bundles, file=paste0(temp_dir, "/bundles.rda"))
+
+```
+
+If you load this bundle again, you have to unserialize it before you can work with it:
+
+```{r}
+#load bundles
+load(paste0(temp_dir, "/bundles.rda"))
+```
+
+```{r}
+#unserialize
+bundles <- fhir_unserialize(serialized_bundles)
+
+#have a look
+bundles
+```
+
+After unserialization, the pointers are restored and you can continue to work with the bundles. Note that the example bundles `medication_bundles` and `patient_bundles` that are provided with the `fhircrackr` package are also provided in their serialized form and have to be unserialized as described on their help page.
+
+### Save and load bundles as xml files
+If you want to store the bundles in xml files instead of R objects, you can use the functions `fhir_save()` and `fhir_load()`.
+`fhir_save()` takes a list of bundles in form of xml objects (as returned by `fhir_search()`) and writes them into the directory specified in the argument `directory`. Each bundle is saved as a separate xml-file. If the folder defined in `directory` doesn't exist, it is created in the current working directory.
+
+```{r}
+#save bundles as xml files
+fhir_save(patient_bundles, directory=temp_dir)
+```
+
+To read bundles saved with `fhir_save()` back into R, you can use `fhir_load()`:
+
+```{r}
+bundles <- fhir_load(temp_dir)
+```  
+
+`fhir_load()` takes the name of the directory (or path to it) as its only argument. All xml-files in this directory will be read into R and returned as a list of bundles in xml format just as returned by `fhir_search()`.
 
 ## Dealing with large data sets
 If you want to download a lot of resources from a server, you might run into several problems. 
@@ -237,9 +312,6 @@ assign(x = "last_next_link", value = fhir_url( "http://hapi.fhir.org/baseR4?_get
 
 ```
 
-```{r}
-fhir_next_bundle_url()
-```
 To get a better overview, we can split this very long link along the `&`:
 
 ```{r}

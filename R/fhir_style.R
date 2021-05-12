@@ -84,7 +84,7 @@ setMethod(
 	function(object) {
 		sep <- if(length(object@sep)==0){
 			"character(0)"
-		} else if(object@sep==" ") {paste0("'", object@sep, "'")}else {object@sep}
+		} else {paste0("'", object@sep, "'")}
 
 		brackets <- if(length(object@brackets)==0) {
 			"character(0)"

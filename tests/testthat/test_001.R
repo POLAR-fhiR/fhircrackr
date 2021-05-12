@@ -83,7 +83,7 @@ testthat::test_that(
 		testthat::expect_false( is.null( df ) )
 		testthat::expect_false( is.null( df$Patient ) )
 		testthat::expect_true( is.data.frame( df$Patient ) )
-		testthat::expect_equal( nrow( df$Patient), 20 )
+		testthat::expect_equal( nrow( df$Patient), 40 )
 	}
 )
 

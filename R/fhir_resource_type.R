@@ -41,6 +41,8 @@ setValidity(
 #'
 fhir_resource_type <- function(string) {
 
+	if(length(string)>1){stop("Please provide only a single string to define the FHIR resource.")}
+
 	#convert to correct case and check for validity
 	if(tolower(string) %in% tolower(existing_resource_types)){
 		string <- existing_resource_types[tolower(string) == tolower(existing_resource_types)]
