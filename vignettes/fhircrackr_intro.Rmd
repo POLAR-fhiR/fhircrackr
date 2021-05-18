@@ -53,7 +53,7 @@ The complexity of the problem requires a couple of prerequisites both regarding 
 
 2. To download resources from the server, you should be familiar with [FHIR search requests](https://www.hl7.org/fhir/search.html). FHIR search allows you to download sets of resources that match very specific requirements. The `fhircrackr` package offers some help building FHIR search requests, for this please see the vignette on downloading FHIR resources.
 
-3. In the first step, `fhircrackr` downloads the resources in xml format into R. To specify which elements from the FHIR resources you want in your data frame, you should have at least some familiarity with XPath expressions. A good tutorial on XPath expressions can be found [here](https://www.w3schools.com/xml/xpath_intro.asp).
+3. In the first step, `fhircrackr` downloads the resources in xml format into R. To specify which elements from the FHIR resources you want in your data frame, you should have at least some familiarity with XPath expressions. A good tutorial on XPath expressions can be found here: [https://www.w3schools.com/xml/xpath_intro.asp](https://www.w3schools.com/xml/xpath_intro.asp).
 
 In the following we'll go through a typical workflow with `fhircrackr` step by step. The first and foremost step is of course, to install and load the package:
 
