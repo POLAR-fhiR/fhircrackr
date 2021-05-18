@@ -2,7 +2,7 @@
 title: "fhircrackr: Flatten FHIR resources"
 
 date: "`r Sys.Date()`"
-output:	rmarkdown::pdf_document
+output:	rmarkdown::html_vignette
 
 
 
@@ -390,44 +390,44 @@ Of course the above example is a very specific case that only occurs if your res
 ### Melt data frames with multiple entries
 If the data frame produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. This is where `fhir_melt()` comes into play. `fhir_melt()` takes an indexed data frame with multiple entries in one or several `columns` and spreads (aka melts) these entries over several rows:
 
-```{r}
-fhir_melt(df2, columns = "address.city", brackets = c("[","]"), 
-		  sep=" | ", all_columns = FALSE)
-```
-
-The new variable `resource_identifier` maps which rows in the created data frame belong to which row (usually equivalent to one resource) in the original data frame.
-`brackets` and `sep` should be given the same character vectors that have been used to build the indices in `fhir_melt()`. `columns` is a character vector with the names of the variables you want to melt. You can provide more than one column here but it makes sense to only have variables from the same repeating attribute together in one call to `fhir_melt()`:
-
-```{r}
-cols <- c("address.city", "address.use", "address.type", 
-		  "address.country")
-
-fhir_melt(df2, columns = cols, brackets = c("[","]"), 
-		  sep=" | ", all_columns = FALSE)
-```
-If the names of the variables in your data frame have been generated automatically with `fhir_crack()` you can find all variable names belonging to the same attribute with `fhir_common_columns()`:
-
-```{r}
-cols <- fhir_common_columns(df2, column_names_prefix = "address")
-cols
-```
-With the argument `all_columns` you can control whether the resulting data frame contains only the molten columns or all columns of the original data frame:
-
-```{r}
-fhir_melt(df2, columns = cols, brackets = c("[","]"), 
-		  sep=" | ", all_columns = TRUE)
-```
-Values on the other variables will just repeat in the newly created rows.
-
-If you try to melt several variables that don't belong to the same attribute in one call to `fhir_melt()`, this will cause problems, because the different attributes won't be combined correctly:
-
-```{r}
-cols <- c(cols, "id")
-fhir_melt(df2, columns = cols, brackets = c("[","]"), 
-		  sep=" | ", all_columns = TRUE)
-
-```
-
+# ```{r}
+# fhir_melt(df2, columns = "address.city", brackets = c("[","]"), 
+# 		  sep=" | ", all_columns = FALSE)
+# ```
+# 
+# The new variable `resource_identifier` maps which rows in the created data frame belong to which row (usually equivalent to one resource) in the original data frame.
+# `brackets` and `sep` should be given the same character vectors that have been used to build the indices in `fhir_melt()`. `columns` is a character vector with the names of the variables you want to melt. You can provide more than one column here but it makes sense to only have variables from the same repeating attribute together in one call to `fhir_melt()`:
+# 
+# ```{r}
+# cols <- c("address.city", "address.use", "address.type", 
+# 		  "address.country")
+# 
+# fhir_melt(df2, columns = cols, brackets = c("[","]"), 
+# 		  sep=" | ", all_columns = FALSE)
+# ```
+# If the names of the variables in your data frame have been generated automatically with `fhir_crack()` you can find all variable names belonging to the same attribute with `fhir_common_columns()`:
+# 
+# ```{r}
+# cols <- fhir_common_columns(df2, column_names_prefix = "address")
+# cols
+# ```
+# With the argument `all_columns` you can control whether the resulting data frame contains only the molten columns or all columns of the original data frame:
+# 
+# ```{r}
+# fhir_melt(df2, columns = cols, brackets = c("[","]"), 
+# 		  sep=" | ", all_columns = TRUE)
+# ```
+# Values on the other variables will just repeat in the newly created rows.
+# 
+# If you try to melt several variables that don't belong to the same attribute in one call to `fhir_melt()`, this will cause problems, because the different attributes won't be combined correctly:
+# 
+# ```{r}
+# cols <- c(cols, "id")
+# fhir_melt(df2, columns = cols, brackets = c("[","]"), 
+# 		  sep=" | ", all_columns = TRUE)
+# 
+# ```
+# 
 Instead, melt the attributes one after another:
 
 ```{r}
