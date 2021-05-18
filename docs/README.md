@@ -532,12 +532,14 @@ This is where the `style` element of the `df_description` comes into
 play:
 
 ``` r
-df_description <- fhir_df_description(resource = "Patient",
-                                      style = fhir_style(
-                                        brackets = c("[","]"),
-                                        sep = " | ",
-                                        rm_empty_cols = FALSE)
-                                      )
+df_description <- fhir_df_description(
+    resource = "Patient",
+    style = fhir_style(
+        brackets = c("[","]"),
+        sep = " | ",
+        rm_empty_cols = FALSE
+    )
+)
 df <- fhir_crack(bundles = bundles, design = df_description, verbose = 0)
 df
 #>       id           address.use              address.city

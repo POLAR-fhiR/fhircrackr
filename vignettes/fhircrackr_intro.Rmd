@@ -277,12 +277,14 @@ The first resource has just one entry for the address attribute. The second Pati
 This is where the `style` element of the `df_description` comes into play:
 
 ```{r}
-df_description <- fhir_df_description(resource = "Patient",
-									  style = fhir_style(
-									  	brackets = c("[","]"),
-									  	sep = " | ",
-									  	rm_empty_cols = FALSE)
-									  )
+df_description <- fhir_df_description(
+	resource = "Patient",
+	style = fhir_style(
+		brackets = c("[","]"),
+		sep = " | ",
+		rm_empty_cols = FALSE
+	)
+)
 df <- fhir_crack(bundles = bundles, design = df_description, verbose = 0)
 df
 ```
@@ -294,19 +296,18 @@ Multiple entries are pasted together with the specified separator in between and
 If the data frame produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. This is where `fhir_melt()` comes into play. `fhir_melt()` takes an indexed data frame with multiple entries in one or several `columns` and spreads (aka melts) these entries over several rows:
 
 ```{r}
-fhir_melt(df, columns = "address.city", brackets = c("[","]"), 
-		  sep=" | ", all_columns = FALSE)
+fhir_melt(df, columns = "address.city", 
+		  brackets = c("[","]"), sep=" | ", all_columns = FALSE)
 ```
 
 The new variable `resource_identifier` maps which rows in the created data frame belong to which row (usually equivalent to one resource) in the original data frame.
 `brackets` and `sep` should be given the same character vectors that have been used to build the indices in `fhir_melt()`. `columns` is a character vector with the names of the variables you want to melt. You can provide more than one column here but it makes sense to only have variables from the same repeating attribute together in one call to `fhir_melt()`:
 
 ```{r}
-cols <- c("address.city", "address.use", "address.type", 
-		  "address.country")
+cols <- c("address.city", "address.use", "address.type", "address.country")
 
 fhir_melt(df, columns = cols, brackets = c("[","]"), 
-		  sep=" | ", all_columns = FALSE)
+		  sep = " | ", all_columns = FALSE)
 ```
 
 With the argument `all_columns` you can control whether the resulting data frame contains only the molten columns or all columns of the original data frame:
