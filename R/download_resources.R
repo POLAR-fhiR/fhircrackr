@@ -102,8 +102,7 @@ fhir_search <- function(
 	log_errors = NULL,
 	save_to_disc = NULL,
 	delay_between_pages = 0,
-	directory = paste0("FHIR_bundles_", gsub("-| |:","", Sys.time()))) {
-
+	directory = paste0("FHIR_bundles_", gsub("-| |:", "", Sys.time()))) {
 
 
 	####remove at some point####

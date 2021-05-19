@@ -106,8 +106,7 @@ request <- fhir_url(url = "http://hapi.fhir.org/baseR4",
 request
 ```
 
-`
-As you can see, `fhir_url()` performs automatic url encoding and the  `|`  is transformed to  `%7C`.
+As you can see, `fhir_url()` performs automatic url encoding and the `|` is transformed to `%7C`.
 
 
 ### Accessing the current request
@@ -154,8 +153,8 @@ In many cases, you will want to download different types of FHIR resources belon
 ```{r}
 request <- fhir_url(url = "https://hapi.fhir.org/baseR4/",
 				    resource = "MedicationStatement",
-				    parameters = list("code"="http://snomed.info/ct|429374003",
-				                      "_include"="MedicationStatement:subject")
+				    parameters = list("code" = "http://snomed.info/ct|429374003",
+				                      "_include" = "MedicationStatement:subject")
 )
 ```
 
@@ -194,7 +193,7 @@ ids <- c("72622884-0a09-4ea9-9a91-685bce3b0fe3",
 You can use them comma separated in the value of the `identifier` search parameter like this:
 
 ```{r}
-id_string <- paste(ids, collapse =",")
+id_string <- paste(ids, collapse = ",")
 ``` 
 
 But this string would make the FHIR search request URL very long, especially if it is combined with additional other search parameters. 
@@ -202,15 +201,14 @@ But this string would make the FHIR search request URL very long, especially if 
 In a search via POST, the search parameters (everything that would usually follow the resource type after the ?) can be transferred to a body of type `application/x-www-form-urlencoded` and sent via POST. A body of this kind can be created the same way the parameters are usually given to the `parameters` argument of `fhir_url()`, i.e. as a named list or character:
 
 ```{r}
-body <- fhir_body(content = list("identifier" = id_string,
-						         "_revinclude" = "Observation:patient")
-)
+body <- fhir_body(content = list(
+	"identifier" = id_string,
+	"_revinclude" = "Observation:patient"))
 ```
 The body will then automatically be assigned the content type `application/x-www-form-urlencoded`. If you provide a body like this in `fhir_search()`, the url in request should **only** contain the base URL and the resource type. The function will automatically amend it with the suffix `_search` and perform a POST:
 
 ```{r, eval = F}
-url <- fhir_url(url = "https://hapi.fhir.org/baseR4/",
-				    resource = "Patient")
+url <- fhir_url(url = "https://hapi.fhir.org/baseR4/", resource = "Patient")
 
 bundles <- fhir_search(request = url, body = body)
 ```
@@ -272,7 +270,7 @@ If you want to store the bundles in xml files instead of R objects, you can use 
 
 ```{r}
 #save bundles as xml files
-fhir_save(patient_bundles, directory=temp_dir)
+fhir_save(patient_bundles, directory = temp_dir)
 ```
 
 To read bundles saved with `fhir_save()` back into R, you can use `fhir_load()`:
@@ -330,7 +328,7 @@ You can also use this function to avoid memory issues. Th following block of cod
 #Starting fhir search request
 url <- fhir_url(url = "http://hapi.fhir.org/baseR4",
 				resource = "Observation",
-				parameters = list("_count"="500"))
+				parameters = list("_count" = "500"))
 
 #count <- 0
 
@@ -345,7 +343,7 @@ while(!is.null(url)){
 	dfs <- fhir_crack(bundles, df_description)
 	
 	#save cracked bundle to RData-file (can be exchanged by other data type)
-	save(tables, file = paste0(tempdir(),"/table_", count, ".RData"))
+	save(tables, file = paste0(tempdir(), "/table_", count, ".RData"))
 	
 	#retrieve starting point for next 10 bundles
 	url <- fhir_next_bundle_url()

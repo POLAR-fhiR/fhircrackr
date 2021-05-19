@@ -58,7 +58,7 @@ setGeneric(
 #' @aliases fhir_body,list,missing-methods
 setMethod(
 	"fhir_body",
-	c(content = "list", type="missing"),
+	c(content = "list", type = "missing"),
 	function(content){
 		if(any(!sapply(content, function(x) {is.character(x)}))) {
 			stop("The provided list must have elements of type character")
@@ -72,7 +72,7 @@ setMethod(
 		pairs <- paste(keys, values, sep = "=")
 		string <- paste(pairs, collapse = "&")
 
-		new("fhir_body", content = string, type="application/x-www-form-urlencoded")
+		new("fhir_body", content = string, type = "application/x-www-form-urlencoded")
 	}
 )
 
@@ -81,7 +81,7 @@ setMethod(
 #' @aliases fhir_body,list,character-methods
 setMethod(
 	"fhir_body",
-	c(content = "list", type="character"),
+	c(content = "list", type = "character"),
 	function(content, type){
 		message("When content is a list, the type you provided will be overwritten with 'application/x-www-form-urlencoded'")
 
@@ -97,17 +97,17 @@ setMethod(
 		pairs <- paste(keys, values, sep = "=")
 		string <- paste(pairs, collapse = "&")
 
-		new("fhir_body", content = string, type="application/x-www-form-urlencoded")
+		new("fhir_body", content = string, type = "application/x-www-form-urlencoded")
 	}
 )
 #' @rdname fhir_body-methods
 #' @aliases fhir_body,character,character-methods
 setMethod(
 	"fhir_body",
-	c(content = "character", type="character"),
+	c(content = "character", type = "character"),
 	function(content, type){
 
-		new("fhir_body", content=content, type=type)
+		new("fhir_body", content = content, type = type)
 	}
 )
 
@@ -118,7 +118,7 @@ setMethod(
 	function(object){
 		cat(
 			paste0(
-				"content:\n", object@content,"\n\n",
+				"content:\n", object@content, "\n\n",
 				"type: ", object@type
 			)
 		)

@@ -72,7 +72,7 @@ This introduction will not go into the details of building a valid FHIR search r
 
 ```{r, eval=F}
 request <- fhir_url(url = "http://fhir.hl7.de:8080/baseDstu3", resource = "Patient")
-patient_bundles <- fhir_search(request=request,max_bundles=2, verbose = 0)
+patient_bundles <- fhir_search(request = request,max_bundles = 2, verbose = 0)
 ```
 
 
@@ -297,7 +297,7 @@ If the data frame produced by `fhir_crack()` contains multiple entries, you'll p
 
 ```{r}
 fhir_melt(df, columns = "address.city", 
-		  brackets = c("[","]"), sep=" | ", all_columns = FALSE)
+		  brackets = c("[","]"), sep = " | ", all_columns = FALSE)
 ```
 
 The new variable `resource_identifier` maps which rows in the created data frame belong to which row (usually equivalent to one resource) in the original data frame.
@@ -324,7 +324,7 @@ Values on the other variables will just repeat in the newly created rows. For mo
 Once you have sorted out the multiple entries, you might want to get rid of the indices in your data.frame. This can be achieved using `fhir_rm_indices()`:
 
 ```{r}
-fhir_rm_indices(molten, brackets=c("[","]"))
+fhir_rm_indices(molten, brackets = c("[","]"))
 ```
 Again, `brackets` and `sep` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()`respectively.
 
