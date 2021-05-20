@@ -72,7 +72,7 @@ testthat::context( "fhir_crack()" )
 bundles <- fhir_unserialize(patient_bundles)
 
 design <- fhir_design(
-	fhir_df_description(resource = "Patient"),
+	fhir_table_description(resource = "Patient"),
 	names = "Patient"
 )
 
@@ -89,7 +89,7 @@ testthat::test_that(
 
 design <- fhir_design(
 
-	fhir_df_description(
+	fhir_table_description(
 		resource = "Patient",
 		cols = list(
 			name = "name/family/@value"

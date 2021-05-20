@@ -98,14 +98,14 @@ If for some reason you cannot connect to a FHIR server at the moment but want to
 ## Flattening resources
 Now we know that inside these xml objects there is the patient data somewhere. To bring it into a tabular format, we will use `fhir_crack()` which creates one table per resource type in the bundle. The most important argument `fhir_crack()` takes is `bundles`, the list of bundles that is returned by `fhir_search()`. The second important argument is `design`, an object that tells the function which data to extract from the bundle. `fhir_crack()` returns (a list of) data.frames or data.tables (if argument `data.tables=TRUE`).
 
-The object that is passed to the `design` argument can be of class `fhir_df_description` or `fhir_design`. A `fhir_df_description` is used when you want to extract just one resource type, resulting in a single table. A `fhir_design` is basically a named list of `fhir_df_descriptions` and is used when you want to extract several resource types, resulting in a named list of tables.
+The object that is passed to the `design` argument can be of class `fhir_table_description` or `fhir_design`. A `fhir_table_description` is used when you want to extract just one resource type, resulting in a single table. A `fhir_design` is basically a named list of `fhir_table_descriptions` and is used when you want to extract several resource types, resulting in a named list of tables.
 
-The details of what the different elements of a `fhir_df_description` or `fhir_design` mean are described in the vignette on flattening resources. Please refer to this document for more information, as we will just use one simple example here.
+The details of what the different elements of a `fhir_table_description` or `fhir_design` mean are described in the vignette on flattening resources. Please refer to this document for more information, as we will just use one simple example here.
 
 
 ```{r}
-#define df_description
-df_description <- fhir_df_description(
+#define table_description
+table_description <- fhir_table_description(
 	resource = "Patient",
 	
 	cols = c(
@@ -126,23 +126,23 @@ df_description <- fhir_df_description(
 )
 
 #Have a look
-df_description
+table_description
 ```
 
-All three elements of `style` can also be controlled directly by the `fhir_crack()` arguments `sep`, `brackets` and `remove_empty_columns`. If the function arguments are `NULL` (their default), the values provided in `style` are used, if they are not NULL, they will overwrite any values in `style`. If both the function arguments and the `style` component of the `fhir_df_description` are NULL, default values(`sep=" "`, `brackets = NULL`, `rm_empty_cols=TRUE`) will be assumed. 
+All three elements of `style` can also be controlled directly by the `fhir_crack()` arguments `sep`, `brackets` and `remove_empty_columns`. If the function arguments are `NULL` (their default), the values provided in `style` are used, if they are not NULL, they will overwrite any values in `style`. If both the function arguments and the `style` component of the `fhir_table_description` are NULL, default values(`sep=" "`, `brackets = NULL`, `rm_empty_cols=TRUE`) will be assumed. 
 
-After it is defined, the `fhir_df_description` can be used in `fhir_crack()` like this:
+After it is defined, the `fhir_table_description` can be used in `fhir_crack()` like this:
 
 ```{r}
 #flatten resources
-patients <- fhir_crack(bundles = patient_bundles, design = df_description, verbose = 0)
+patients <- fhir_crack(bundles = patient_bundles, design = table_description, verbose = 0)
 
 #have look at the results
 head(patients)
 ```
 
 ## Extract more than one resource type
-Of course the previous example is using just one resource type. If you are interested in several types of resources, you use a `fhir_design` containing several `fhir_df_descriptions`.
+Of course the previous example is using just one resource type. If you are interested in several types of resources, you use a `fhir_design` containing several `fhir_table_descriptions`.
 
 Consider the following example where we want to download MedicationStatements referring to a certain medication we specify with its SNOMED CT code and also the Patient resources these MedicationStatements are linked to.
 
@@ -168,10 +168,10 @@ medication_bundles <- fhir_search(request = request, max_bundles = 3)
 medication_bundles <- fhir_unserialize(medication_bundles)
 ```
 
-Now our `design` needs two `df_descriptions` (called `MedicationStatements` and `Patients` in our example), one for the MedicationStatement resources and one for the Patient resources:
+Now our `design` needs two `table_descriptions` (called `MedicationStatements` and `Patients` in our example), one for the MedicationStatement resources and one for the Patient resources:
 
 ```{r}
-MedicationStatements <- fhir_df_description(
+MedicationStatements <- fhir_table_description(
 
 	resource = "MedicationStatement",
 
@@ -194,7 +194,7 @@ MedicationStatements <- fhir_df_description(
 	)
 )
 
-Patients <- fhir_df_description(resource = "Patient")
+Patients <- fhir_table_description(resource = "Patient")
 
 design <- fhir_design(MedicationStatements, Patients)
 
@@ -274,10 +274,10 @@ They represent a very simple bundle of just two Patient resources which looks li
 ```
 The first resource has just one entry for the address attribute. The second Patient resource has an address attribute with three entries containing different elements and also two entries for the name attribute.
 
-This is where the `style` element of the `df_description` comes into play:
+This is where the `style` element of the `table_description` comes into play:
 
 ```{r}
-df_description <- fhir_df_description(
+table_description <- fhir_table_description(
 	resource = "Patient",
 	style = fhir_style(
 		brackets = c("[","]"),
@@ -285,7 +285,7 @@ df_description <- fhir_df_description(
 		rm_empty_cols = FALSE
 	)
 )
-df <- fhir_crack(bundles = bundles, design = df_description, verbose = 0)
+df <- fhir_crack(bundles = bundles, design = table_description, verbose = 0)
 df
 ```
 Multiple entries are pasted together with the specified separator in between and the indices (inside the specified brackets) display the entry the value belongs to. That way you can see that Patient resource 2 had three entries for the attribute `address` and you can also see which attributes belong to which entry.

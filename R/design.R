@@ -6,13 +6,13 @@
 #'
 #' @description Returns the [fhir_design-class] of the last call to [fhir_crack()].
 #' @export
-#' @seealso [fhir_design()], [fhir_df_description()]
+#' @seealso [fhir_design()], [fhir_table_description()]
 #' @examples
 #' #load example bundles
 #' bundles <- fhir_unserialize(patient_bundles)
 #'
 #' #define design
-#' patients <- fhir_df_description(resource = "Patient")
+#' patients <- fhir_table_description(resource = "Patient")
 #' design <- fhir_design(patients)
 #'
 #' result <- fhir_crack(bundles, design)
@@ -32,11 +32,11 @@ fhir_canonical_design <- function() {
 #' @param file A string specifying the file to write to, defaults to writing "design.xml"
 #' into the current working directory
 #' @export
-#' @seealso [fhir_design()], [fhir_df_description()], [fhir_load_design()]
+#' @seealso [fhir_design()], [fhir_table_description()], [fhir_load_design()]
 #'
 #' @examples
 #' #create design
-#' df_desc1 <- fhir_df_description(resource = "Patient",
+#' df_desc1 <- fhir_table_description(resource = "Patient",
 #'                     cols = c(name = "name/family",
 #'                              gender = "gender",
 #'                              id = "id"),
@@ -46,7 +46,7 @@ fhir_canonical_design <- function() {
 #'                             )
 #'              )
 #'
-#' df_desc2 <- fhir_df_description(resource = "Observation",
+#' df_desc2 <- fhir_table_description(resource = "Observation",
 #'                     cols = c("code/coding/system", "code/coding/code")
 #'             )
 #'
@@ -71,11 +71,11 @@ fhir_save_design <- function (design, file = "design.xml") {
 #'
 #' @return A [fhir_design-class] object. See `?fhir_design`.
 #' @export
-#' @seealso [fhir_design()], [fhir_df_description()], [fhir_save_design()]
+#' @seealso [fhir_design()], [fhir_table_description()], [fhir_save_design()]
 #' @examples
 #'
 #' #create and save design
-#' df_desc1 <- fhir_df_description(resource = "Patient",
+#' df_desc1 <- fhir_table_description(resource = "Patient",
 #'                     cols = c(name = "name/family",
 #'                              gender = "gender",
 #'                              id = "id"),
@@ -85,7 +85,7 @@ fhir_save_design <- function (design, file = "design.xml") {
 #'                             )
 #'              )
 #'
-#' df_desc2 <- fhir_df_description(resource = "Observation",
+#' df_desc2 <- fhir_table_description(resource = "Observation",
 #'                     cols = c("code/coding/system", "code/coding/code")
 #'             )
 #'
@@ -314,7 +314,7 @@ add_attribute_to_design <- function(design, attrib = "value"){
 		}
 	}
 
-	if(is(design,"fhir_df_description")){
+	if(is(design,"fhir_table_description")){
 
 		if (length(design@cols)>0) { #Only add attrib if xpath expressions are provided
 			for (n_c in names(design@cols)) { #loop through cols
@@ -397,7 +397,7 @@ design2xml <- function (design) {
 #' @return An object of class [fhir_design-class]
 #' @noRd
 #' @examples
-#' df_desc1 <- fhir_df_description(resource = "Patient",
+#' df_desc1 <- fhir_table_description(resource = "Patient",
 #'                     cols = c(name = "name/family",
 #'                              gender = "gender",
 #'                              id = "id"),
@@ -407,11 +407,11 @@ design2xml <- function (design) {
 #'                             )
 #'              )
 #'
-#' df_desc2 <- fhir_df_description(resource = "Observation",
+#' df_desc2 <- fhir_table_description(resource = "Observation",
 #'                     cols = c("code/coding/system", "code/coding/code")
 #'             )
 #'
-#' df_desc3 <- fhir_df_description(resource = "Medication")
+#' df_desc3 <- fhir_table_description(resource = "Medication")
 #'
 #' design <- fhir_design(df_desc1, df_desc2, df_desc3, names = c("Patients", "Observations", "Medications"))
 #'
@@ -435,14 +435,14 @@ xml2design <- function(xml) {
 	}
 
 	xml_design <- xml_design[[1]]
-	xml_df_descriptions <- xml2::xml_find_all(xml_design, "*")
+	xml_table_descriptions <- xml2::xml_find_all(xml_design, "*")
 
-	if (length(xml_df_descriptions) < 1) {
+	if (length(xml_table_descriptions) < 1) {
 		warning("Design does not contain any entries like resource, cols and style. Returning NULL. \n")
 		return(NULL)
 	}
 
-	resources_names <- sapply(xml_df_descriptions, xml2::xml_name)
+	resources_names <- sapply(xml_table_descriptions, xml2::xml_name)
 
 	if (length(unique(resources_names)) < length(resources_names)) {
 
@@ -450,9 +450,9 @@ xml2design <- function(xml) {
 		return(NULL)
 	}
 
-	l <- lapply(seq_along(xml_df_descriptions), function (i) {
+	l <- lapply(seq_along(xml_table_descriptions), function (i) {
 
-		xml_df_desc <- xml_df_descriptions[[i]]
+		xml_df_desc <- xml_table_descriptions[[i]]
 
 		resource <- xml2::xml_attr(xml2::xml_find_all(xml_df_desc, "resource"), "value")
 
@@ -493,7 +493,7 @@ xml2design <- function(xml) {
 			style <- fhir_style(sep, c(bra_open, bra_close), rm_empty_cols)
 		}
 
-		fhir_df_description(resource, columns, style)
+		fhir_table_description(resource, columns, style)
 	})
 	names(l) <- resources_names
 	fhir_design(l)

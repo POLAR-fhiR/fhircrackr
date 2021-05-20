@@ -60,7 +60,7 @@ bundle <- xml2::read_xml(
 </Bundle>"
 )
 
-patients <- fhir_df_description(resource = "Patient")
+patients <- fhir_table_description(resource = "Patient")
 
 dfs <- fhir_crack(bundles = list(bundle),
                   design = fhir_design(patients),

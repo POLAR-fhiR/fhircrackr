@@ -3,29 +3,29 @@
 \docType{methods}
 \name{fhir_design}
 \alias{fhir_design}
-\alias{fhir_design,fhir_df_description-method}
+\alias{fhir_design,fhir_table_description-method}
 \alias{fhir_design,list-method}
 \alias{fhir_design,fhir_table_list-method}
 \title{Create a \linkS4class{fhir_design} object}
 \usage{
 fhir_design(..., names)
 
-\S4method{fhir_design}{fhir_df_description}(..., names)
+\S4method{fhir_design}{fhir_table_description}(..., names)
 
 \S4method{fhir_design}{list}(..., names)
 
 \S4method{fhir_design}{fhir_table_list}(..., names)
 }
 \arguments{
-\item{...}{One ore more \code{fhir_df_description} objects or a named list containing
-\code{fhir_df_description} objects, or an object of class \linkS4class{fhir_df_list}/\linkS4class{fhir_dt_list}.
-See \code{\link[=fhir_df_description]{fhir_df_description()}}.}
+\item{...}{One ore more \code{fhir_table_description} objects or a named list containing
+\code{fhir_table_description} objects, or an object of class \linkS4class{fhir_df_list}/\linkS4class{fhir_dt_list}.
+See \code{\link[=fhir_table_description]{fhir_table_description()}}.}
 
-\item{names}{Optional. The names of the df_descriptions. If no names are provided, the names of the object(s) that
+\item{names}{Optional. The names of the table_descriptions. If no names are provided, the names of the object(s) that
 were used in creating the design are taken as the names.}
 }
 \description{
-A \code{fhir_design} is a named list of \code{fhir_df_description} objects (See \code{\link[=fhir_df_description]{fhir_df_description()}})
+A \code{fhir_design} is a named list of \code{fhir_table_description} objects (See \code{\link[=fhir_table_description]{fhir_table_description()}})
 and should be created using the function described here. The design is used in \code{\link[=fhir_crack]{fhir_crack()}} to tell
 the function how to flatten each resource type.
 }
@@ -36,7 +36,7 @@ old-style design as used in \verb{fhircrackr (< 1.0.0)}. See examples.
 If this function is given an object of class \linkS4class{fhir_df_list} or \linkS4class{fhir_dt_list}, it will
 extract the design that was used to create the respective list.
 
-A \code{fhir_design} looks for example like this:\preformatted{A fhir_design with 2 df_descriptions:
+A \code{fhir_design} looks for example like this:\preformatted{A fhir_design with 2 table_descriptions:
 =====================================================
 Name: Patients
 
@@ -73,10 +73,10 @@ See the examples for how to create this design.
 
 ####Example 1####
 
-###create fhir_df_descriptions
+###create fhir_table_descriptions
 
 #most explicit, long form
-pat <- fhir_df_description(resource = "Patient",
+pat <- fhir_table_description(resource = "Patient",
                     cols = c(name = "name/family",
                              gender = "gender",
                              id = "id"),
@@ -89,7 +89,7 @@ pat <- fhir_df_description(resource = "Patient",
 
 #most reduced form:
 #All columns are extracted, default style is assumed
-meds <- fhir_df_description(resource = "MedicationAdministration")
+meds <- fhir_table_description(resource = "MedicationAdministration")
 print(meds)
 
 #create design
@@ -97,12 +97,12 @@ print(meds)
 design1 <- fhir_design(pat, meds, names = c("Patients", "Medications"))
 print(design1)
 
-#Second option: Names are taken from the df_descriptions
+#Second option: Names are taken from the table_descriptions
 design2 <- fhir_design(pat, meds)
 print(design2)
 
 #don't do this, because names will be weird:
-design2a <- fhir_design(fhir_df_description(resource = "MedicationAdministration"))
+design2a <- fhir_design(fhir_table_description(resource = "MedicationAdministration"))
 print(design2a)
 
 #Third option: named list
@@ -147,5 +147,5 @@ fhir_design(dfs)
 
 }
 \seealso{
-\code{\link[=fhir_df_description]{fhir_df_description()}}, \code{\link[=fhir_crack]{fhir_crack()}}
+\code{\link[=fhir_table_description]{fhir_table_description()}}, \code{\link[=fhir_crack]{fhir_crack()}}
 }

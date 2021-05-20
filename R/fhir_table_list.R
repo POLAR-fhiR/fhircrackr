@@ -24,7 +24,7 @@ setValidity(
 		}
 		if(length(object) != length(object@design)) {
 			messages <- c(messages,
-						  "The number of df_descriptions in the design doesn't correspond to the number of data.frames")
+						  "The number of table_descriptions in the design doesn't correspond to the number of data.frames")
 		}
 		if(any(!names(object@design) %in% object@names)){
 			messages <- c(messages,
@@ -88,7 +88,7 @@ setValidity(
 #' @param design The design that was used to create the list
 #' @noRd
 #' @examples
-#' df_desc1 <- fhir_df_description(resource = "Patient",
+#' df_desc1 <- fhir_table_description(resource = "Patient",
 #'                     cols = c(name = "name/family",
 #'                              gender = "gender",
 #'                              id = "id"),
@@ -98,7 +98,7 @@ setValidity(
 #'                             )
 #'              )
 #'
-#' df_desc2 <- fhir_df_description(resource = "Observation",
+#' df_desc2 <- fhir_table_description(resource = "Observation",
 #'                     cols = c("code/coding/system", "code/coding/code")
 #'             )
 #'
@@ -119,7 +119,7 @@ fhir_df_list <- function(df_list, design){
 #' @param design The design that was used to create the list
 #'
 #' @examples
-#' df_desc1 <- fhir_df_description(resource = "Patient",
+#' df_desc1 <- fhir_table_description(resource = "Patient",
 #'                     cols = c(name = "name/family",
 #'                              gender = "gender",
 #'                              id = "id"),
@@ -129,7 +129,7 @@ fhir_df_list <- function(df_list, design){
 #'                             )
 #'              )
 #'
-#' df_desc2 <- fhir_df_description(resource = "Observation",
+#' df_desc2 <- fhir_table_description(resource = "Observation",
 #'                     cols = c("code/coding/system", "code/coding/code")
 #'             )
 #'

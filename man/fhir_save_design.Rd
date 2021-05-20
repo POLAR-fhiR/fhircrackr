@@ -17,7 +17,7 @@ Writes a \linkS4class{fhir_design} for use with \code{\link[=fhir_crack]{fhir_cr
 }
 \examples{
 #create design
-df_desc1 <- fhir_df_description(resource = "Patient",
+df_desc1 <- fhir_table_description(resource = "Patient",
                     cols = c(name = "name/family",
                              gender = "gender",
                              id = "id"),
@@ -27,7 +27,7 @@ df_desc1 <- fhir_df_description(resource = "Patient",
                             )
              )
 
-df_desc2 <- fhir_df_description(resource = "Observation",
+df_desc2 <- fhir_table_description(resource = "Observation",
                     cols = c("code/coding/system", "code/coding/code")
             )
 
@@ -36,5 +36,5 @@ design <- fhir_design(df_desc1, df_desc2, names = c("Patients", "Observations"))
 fhir_save_design(design, file = tempfile())
 }
 \seealso{
-\code{\link[=fhir_design]{fhir_design()}}, \code{\link[=fhir_df_description]{fhir_df_description()}}, \code{\link[=fhir_load_design]{fhir_load_design()}}
+\code{\link[=fhir_design]{fhir_design()}}, \code{\link[=fhir_table_description]{fhir_table_description()}}, \code{\link[=fhir_load_design]{fhir_load_design()}}
 }

@@ -1,7 +1,7 @@
 
 testthat::test_that(
 	"fhir_design is built correctly", {
-		d1 <- fhir_df_description(resource = "Patient",
+		d1 <- fhir_table_description(resource = "Patient",
 								  cols = c(name = "name/family",
 								  		 gender = "gender",
 								  		 id = "id"),
@@ -10,12 +10,12 @@ testthat::test_that(
 								  				   rm_empty_cols = FALSE
 								  )
 		)
-		d2 <- fhir_df_description(resource = "Patient",
+		d2 <- fhir_table_description(resource = "Patient",
 								  cols = c("name/family",
 								  		 "gender",
 								  		 "id")
 		)
-		d3 <- fhir_df_description(resource = "Patient",
+		d3 <- fhir_table_description(resource = "Patient",
 								  cols = fhir_columns(c("name/family",
 								  					  "gender",
 								  					  "id"))
@@ -55,12 +55,12 @@ testthat::test_that(
 
 testthat::test_that(
 	"methods for fhir_design() create identical results", {
-		d1 <- fhir_df_description(resource = "Patient",
+		d1 <- fhir_table_description(resource = "Patient",
 								  cols = c(name = "name/family",
 								  		 gender = "gender",
 								  		 id = "id")
 		)
-		d2 <- fhir_df_description(resource = "Patient",
+		d2 <- fhir_table_description(resource = "Patient",
 								  cols = list(name = "name/family",
 								  			gender = "gender",
 								  			id = "id")

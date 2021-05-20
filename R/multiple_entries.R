@@ -24,7 +24,7 @@
 #'
 #' #crack Patient Resources
 #' design <- fhir_design(
-#'   fhir_df_description(resource = "Patient"),
+#'   fhir_table_description(resource = "Patient"),
 #'   names = "Patients"
 #' )
 #'
@@ -119,7 +119,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #'
 #' #crack fhir resources
 #' dfs <- fhir_crack(bundles = list(bundle),
-#'                   design = fhir_design(fhir_df_description(resource = "Patient"),
+#'                   design = fhir_design(fhir_table_description(resource = "Patient"),
 #'                                                            names = "Patients"),
 #'                   brackets = c("[","]"))
 #'
@@ -300,9 +300,9 @@ fhir_melt <- function(
 #' ))
 #'
 #' #crack fhir resources
-#' patients <- fhir_df_description(resource = "Patient")
+#' patients <- fhir_table_description(resource = "Patient")
 #'
-#' observations <- fhir_df_description(resource = "Observation")
+#' observations <- fhir_table_description(resource = "Observation")
 #'
 #' design <- fhir_design(patients, observations)
 #'
@@ -395,7 +395,7 @@ setMethod(
 #' </Bundle>"
 #')
 #'
-#' patients <- fhir_df_description(resource = "Patient")
+#' patients <- fhir_table_description(resource = "Patient")
 #'
 #' dfs <- fhir_crack(bundles = list(bundle),
 #'                   design = fhir_design(patients),
@@ -513,7 +513,7 @@ fhir_rm_indices <- function(
 #')
 #'
 #'#crack fhir resources
-#'patients <- fhir_df_description(resource = "Patient",
+#'patients <- fhir_table_description(resource = "Patient",
 #'                                style = fhir_style(brackets = c("[","]"),
 #'				                                     sep="||")
 #'				                  )
@@ -630,7 +630,7 @@ fhir_extract_indices <- function(indexed_data_frame, brackets){
 #')
 #'
 #'#crack fhir resources
-#'patients <- fhir_df_description(resource = "Patient",
+#'patients <- fhir_table_description(resource = "Patient",
 #'                                style = fhir_style(brackets = c("[","]"),
 #'				                                     sep="||")
 #'				                  )

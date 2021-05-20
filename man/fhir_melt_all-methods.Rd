@@ -118,9 +118,9 @@ bundle <- fhir_bundle_xml(xml2::read_xml(
 ))
 
 #crack fhir resources
-patients <- fhir_df_description(resource = "Patient")
+patients <- fhir_table_description(resource = "Patient")
 
-observations <- fhir_df_description(resource = "Observation")
+observations <- fhir_table_description(resource = "Observation")
 
 design <- fhir_design(patients, observations)
 

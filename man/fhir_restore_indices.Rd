@@ -76,7 +76,7 @@ bundle <- xml2::read_xml(
 )
 
 #crack fhir resources
-patients <- fhir_df_description(resource = "Patient",
+patients <- fhir_table_description(resource = "Patient",
                                style = fhir_style(brackets = c("[","]"),
 			                                     sep="||")
 			                  )

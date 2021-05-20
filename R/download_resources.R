@@ -139,7 +139,8 @@ fhir_search <- function(
 		#filter out bad urls
 		if(grepl("\\?", request)){
 			stop("The url in argument request should only consist of base url and resource type. ",
-				 "The one you provided has a `?` which indicates the presence of parameters.\n",
+				 "The one you provided has a `?` which indicates the presence of parameters. ",
+				 "If your request just ends with a `?`, please remove it to remove this error.\n",
 				 "If you want to perform search via GET, please set body to NULL.")
 		}
 
@@ -323,7 +324,7 @@ fhir_search <- function(
 #' # desired number of bundles is reached.
 #' url <- fhir_url("https://server.fire.ly/Patient")
 #' count <- 0
-#' obs <- fhir_df_description(resource = "Patient")
+#' obs <- fhir_table_description(resource = "Patient")
 #' design <- fhir_design(obs)
 #' while(length(url)>0 && count < 5){
 #' 	 bundles <- fhir_search(url, max_bundles = 2)
@@ -391,6 +392,8 @@ fhir_current_request <- function() {
 #' @param url The base URL of the FHIR server.
 #' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
+#' @param token A string or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
+#' for how to create this.
 #' @param sep A string to separate pasted multiple entries
 #' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`.
 #' If `NULL`, no indices will be added to multiple entries.
@@ -424,6 +427,7 @@ fhir_current_request <- function() {
 fhir_capability_statement <-function(url = "https://hapi.fhir.org/baseR4",
 									 username = NULL,
 									 password = NULL,
+									 token=NULL,
 									 brackets = NULL,
 									 sep = " || ",
 									 log_errors = NULL,
@@ -436,7 +440,8 @@ fhir_capability_statement <-function(url = "https://hapi.fhir.org/baseR4",
 
 	response <- httr::GET(
 		paste_paths(url, "/metadata?"),
-		httr::add_headers(Accept = "application/fhir+xml"),
+		httr::add_headers(Accept = "application/fhir+xml",
+						  Authorization = token),
 		auth
 	)
 
@@ -459,9 +464,9 @@ fhir_capability_statement <-function(url = "https://hapi.fhir.org/baseR4",
 	xml_resource <- xml2::xml_find_all(xml, "/CapabilityStatement/rest/resource")
 
 	suppressWarnings({
-		desc_meta <- fhir_df_description(resource = "/CapabilityStatement")
-		desc_rest <- fhir_df_description(resource = "rest")
-		desc_resource <- fhir_df_description(resource = "resource")
+		desc_meta <- fhir_table_description(resource = "/CapabilityStatement")
+		desc_rest <- fhir_table_description(resource = "rest")
+		desc_resource <- fhir_table_description(resource = "resource")
 	})
 
 	META <- fhir_crack(

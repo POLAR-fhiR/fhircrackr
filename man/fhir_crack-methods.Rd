@@ -5,8 +5,8 @@
 \alias{fhir_crack}
 \alias{fhir_crack,ANY,fhir_design-method}
 \alias{fhir_crack,fhir_design-method}
-\alias{fhir_crack,ANY,fhir_df_description-method}
-\alias{fhir_crack,fhir_df_description-method}
+\alias{fhir_crack,ANY,fhir_table_description-method}
+\alias{fhir_crack,fhir_table_description-method}
 \alias{fhir_crack,ANY,list-method}
 \alias{fhir_crack,list-method}
 \title{Flatten list of FHIR bundles}
@@ -31,7 +31,7 @@ fhir_crack(
   data.table = FALSE
 )
 
-\S4method{fhir_crack}{ANY,fhir_df_description}(
+\S4method{fhir_crack}{ANY,fhir_table_description}(
   bundles,
   design,
   sep = NULL,
@@ -54,7 +54,7 @@ fhir_crack(
 \arguments{
 \item{bundles}{A FHIR search result as returned by \code{\link[=fhir_search]{fhir_search()}}.}
 
-\item{design}{A \linkS4class{fhir_design} or \linkS4class{fhir_df_description} object. See \code{\link[=fhir_design]{fhir_design()}}/\code{\link[=fhir_df_description]{fhir_df_description()}}
+\item{design}{A \linkS4class{fhir_design} or \linkS4class{fhir_table_description} object. See \code{\link[=fhir_design]{fhir_design()}}/\code{\link[=fhir_table_description]{fhir_table_description()}}
 and the corresponding vignette (\code{vignette("flattenResources", package ="fhircrackr")}) for a more detailed explanation and
 comprehensive examples of both.}
 
@@ -66,7 +66,7 @@ comprehensive examples of both.}
 
 \item{brackets}{Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")},
 which will overwrite the \code{brackets} defined in \code{design}. If \code{brackets=NULL}, it is looked up in \code{design}, where the default is \code{character(0)},
-i.e. no indices are added to multiple entries.}
+i.e. no indices are added to multiple entries. Empty strings (\code{""}) are not allowed.}
 
 \item{verbose}{An Integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 extraction progress will be printed. Defaults to 2.}
@@ -76,12 +76,12 @@ Defaults to FALSE.}
 }
 \value{
 If a \linkS4class{fhir_design} was used, the result is a list of data.frames, i.e. a \linkS4class{fhir_df_list} object, or a list of data.tables,
-i.e. a \linkS4class{fhir_dt_list} object. If a \linkS4class{fhir_df_description} was used, the result is a single data.frame/data.table.
+i.e. a \linkS4class{fhir_dt_list} object. If a \linkS4class{fhir_table_description} was used, the result is a single data.frame/data.table.
 }
 \description{
 Converts a \linkS4class{fhir_bundle_list} (the result of \code{\link[=fhir_search]{fhir_search()}} to a list of data.frames/data.tables,
 i.e. a \linkS4class{fhir_df_list}/\linkS4class{fhir_dt_list} if a \linkS4class{fhir_design} is given in the argument \code{design}.
-Creates a single data.frame/data.table, if only a \linkS4class{fhir_df_description} is given in the argument \code{design}.
+Creates a single data.frame/data.table, if only a \linkS4class{fhir_table_description} is given in the argument \code{design}.
 }
 \examples{
 #unserialize example bundle
@@ -92,7 +92,7 @@ bundles <- fhir_unserialize(medication_bundles)
 #Extract just one resource type
 
 #define attributes to extract
-medications <- fhir_df_description(
+medications <- fhir_table_description(
    resource = "MedicationStatement",
    cols = c(
 			    	MS.ID              = "id",
@@ -120,7 +120,7 @@ head(med_df) #data.frame
 ###Example 2###
 #extract more resource types
 
-patients <- fhir_df_description(
+patients <- fhir_table_description(
    resource = "Patient"
 )
 
@@ -139,7 +139,7 @@ fhir_design(df_list)
 \seealso{
 \itemize{
 \item Downloading bundles from a FHIR server: \code{\link[=fhir_search]{fhir_search()}}
-\item Creating designs/df_descriptions: \code{\link[=fhir_df_description]{fhir_df_description()}} and \code{\link[=fhir_design]{fhir_design()}}
+\item Creating designs/table_descriptions: \code{\link[=fhir_table_description]{fhir_table_description()}} and \code{\link[=fhir_design]{fhir_design()}}
 \item Dealing with multiple entries: \code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_melt_all]{fhir_melt_all()}}, \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
 }
 }

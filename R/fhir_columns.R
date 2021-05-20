@@ -1,8 +1,8 @@
 
-#' A S4 class to represent columns in a [fhir_df_description-class]
+#' A S4 class to represent columns in a [fhir_table_description-class]
 #'
-#' An object of class `fhir_columns` is part of a `fhir_df_description`
-#' in a `fhir_design` and holds information on the elements
+#' An object of class `fhir_columns` is part of a [fhir_table_description-class]
+#' in a [fhir_design-class] and holds information on the elements
 #' that should be extracted from the FHIR resources, as well as the column names of the resulting data.frame.
 #' The elements to be extracted are indicated by XPath expressions.
 #'
@@ -30,7 +30,7 @@ setValidity(
 
 #' Create [fhir_columns-class] object
 #'
-#' An object of class `fhir_columns` is part of a `fhir_df_description`in a `fhir_design` and holds information on the elements
+#' An object of class `fhir_columns` is part of a `fhir_table_description`in a `fhir_design` and holds information on the elements
 #' that should be extracted from the FHIR resources, as well as the column names of the resulting data.frame.
 #' The elements to be extracted are indicated by XPath expressions. If no column names are provided,
 #' they are generated automatically and reflect the elements position in the resource.

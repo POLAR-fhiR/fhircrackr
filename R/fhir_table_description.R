@@ -1,12 +1,12 @@
 #' A S4 class describing the form of data.frame produced by [fhir_crack()]
 #'
-#' A `fhir_df_description` is part of a `fhir_design` and holds the information [fhir_crack()] needs to flatten (aka crack)
-#' FHIR resources from a FHIR bundle and is created with [fhir_df_description()].
-#' There should be one `fhir_df_description` per resource type as [fhir_crack()] will create one data.frame/data.table
+#' A `fhir_table_description` is part of a `fhir_design` and holds the information [fhir_crack()] needs to flatten (aka crack)
+#' FHIR resources from a FHIR bundle and is created with [fhir_table_description()].
+#' There should be one `fhir_table_description` per resource type as [fhir_crack()] will create one data.frame/data.table
 #' per resource type. See Details.
 #'
 #' @details
-#' A `fhir_df_description` consists of
+#' A `fhir_table_description` consists of
 #' the following elements:
 #'
 #' - The resource element: Defines the resource type (e.g. `Patient` or `Observation`). See [fhir_resource_type()].
@@ -16,7 +16,7 @@
 #' - The style element: Defines how to deal with multiple entries to the same element and whether empty columns are
 #' removed. See [fhir_style()].
 #'
-#' A full `fhir_df_description` looks for example like this:
+#' A full `fhir_table_description` looks for example like this:
 #' ```
 #' fhir_resource_type: Patient
 #'
@@ -43,21 +43,21 @@
 #' @seealso [fhir_resource_type()],[fhir_columns()],[fhir_style()], [fhir_design()], [fhir_crack()]
 #' @export
 setClass(
-	"fhir_df_description",
+	"fhir_table_description",
 	slots = c(resource = "fhir_resource_type",
 			  cols = "fhir_columns",
 			  style = "fhir_style"
 			  )
 )
 
-#' Create [fhir_df_description-class] object
+#' Create [fhir_table_description-class] object
 #'
-#' A `fhir_df_description` is part of a `fhir_design` and holds the information [fhir_crack()] needs to flatten (aka crack)
-#' FHIR resources from a FHIR bundle. There should be one `fhir_df_description` per resource type as
+#' A `fhir_table_description` is part of a `fhir_design` and holds the information [fhir_crack()] needs to flatten (aka crack)
+#' FHIR resources from a FHIR bundle. There should be one `fhir_table_description` per resource type as
 #' [fhir_crack()] will create one data.frame/data.table per resource type. See Details.
 #'
 #' @details
-#' A `fhir_df_description` consists of
+#' A `fhir_table_description` consists of
 #' the following elements:
 #'
 #' - The resource element: Defines the resource type (e.g. `Patient` or `Observation`). See `?fhir_resource`.
@@ -67,7 +67,7 @@ setClass(
 #' - The style element: Defines how to deal with multiple entries to the same element and whether empty columns are
 #' removed. See `?fhir_style`
 #'
-#' A full `fhir_df_description` looks for example like this:
+#' A full `fhir_table_description` looks for example like this:
 #' ```
 #' fhir_resource_type: Patient
 #'
@@ -94,11 +94,11 @@ setClass(
 #' @param style Optional. A [fhir_style-class] object, as created by [fhir_style()].
 #' If this argument is omitted, default values will be assumed, see [fhir_style()].
 #'
-#' @return An object of class [fhir_df_description-class].
+#' @return An object of class [fhir_table_description-class].
 #'
 #' @examples
 #' #named character for cols
-#' fhir_df_description(resource = "Patient",
+#' fhir_table_description(resource = "Patient",
 #'                     cols = c(name = "name/family",
 #'                              gender = "gender",
 #'                              id = "id"),
@@ -108,43 +108,43 @@ setClass(
 #' )
 #'
 #' #' #If style is ommitted, default values are assumed
-#' fhir_df_description(resource = "Patient",
+#' fhir_table_description(resource = "Patient",
 #'                     cols = c(name = "name/family",
 #'                              gender = "gender",
 #'                              id = "id")
 #' )
 #'
 #' #named list for cols
-#' fhir_df_description(resource = "Patient",
+#' fhir_table_description(resource = "Patient",
 #'                     cols = list(name = "name/family",
 #'                              gender = "gender",
 #'                              id = "id")
 #' )
 #'
 #' #unnamed character for cols, colnames are generated automatically
-#' fhir_df_description(resource = "Patient",
+#' fhir_table_description(resource = "Patient",
 #'                     cols = c("name/family",
 #'                                 "gender",
 #'                                 "id")
 #' )
 #' @export
-fhir_df_description <- function(resource,
+fhir_table_description <- function(resource,
 								cols = fhir_columns(),
 								style = fhir_style()){
 
 	resource <- fhir_resource_type(resource)
 	if(class(cols)!="fhir_columns"){cols <- fhir_columns(cols)}
 
-	new("fhir_df_description", resource = resource, cols = cols, style = style)
+	new("fhir_table_description", resource = resource, cols = cols, style = style)
 
 }
 
 
 setMethod(
 	"show",
-	"fhir_df_description",
+	"fhir_table_description",
 	function(object){
-		cat("A fhir_df_description with the following elements: \n\n")
+		cat("A fhir_table_description with the following elements: \n\n")
 		cat(paste0("fhir_resource_type: ", as.character(object@resource), "\n\n"))
 		cat("fhir_columns: \n"); show(object@cols)
 		cat("\n\nfhir_style: \n");	show(object@style)

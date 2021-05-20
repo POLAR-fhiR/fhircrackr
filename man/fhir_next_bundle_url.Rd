@@ -32,7 +32,7 @@ See details in the example.
 # desired number of bundles is reached.
 url <- fhir_url("https://server.fire.ly/Patient")
 count <- 0
-obs <- fhir_df_description(resource = "Patient")
+obs <- fhir_table_description(resource = "Patient")
 design <- fhir_design(obs)
 while(length(url)>0 && count < 5){
 	 bundles <- fhir_search(url, max_bundles = 2)

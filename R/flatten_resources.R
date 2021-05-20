@@ -5,10 +5,10 @@
 #' Flatten list of FHIR bundles
 #' @description Converts a [fhir_bundle_list-class] (the result of [fhir_search()] to a list of data.frames/data.tables,
 #' i.e. a [fhir_df_list-class]/[fhir_dt_list-class] if a [fhir_design-class] is given in the argument `design`.
-#' Creates a single data.frame/data.table, if only a [fhir_df_description-class] is given in the argument `design`.
+#' Creates a single data.frame/data.table, if only a [fhir_table_description-class] is given in the argument `design`.
 #'
 #' @param bundles A FHIR search result as returned by [fhir_search()].
-#' @param design A [fhir_design-class] or [fhir_df_description-class] object. See [fhir_design()]/[fhir_df_description()]
+#' @param design A [fhir_design-class] or [fhir_table_description-class] object. See [fhir_design()]/[fhir_table_description()]
 #' and the corresponding vignette (`vignette("flattenResources", package ="fhircrackr")`) for a more detailed explanation and
 #' comprehensive examples of both.
 #'
@@ -20,7 +20,7 @@
 #'
 #' @param brackets Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")},
 #' which will overwrite the `brackets` defined in `design`. If `brackets=NULL`, it is looked up in `design`, where the default is `character(0)`,
-#' i.e. no indices are added to multiple entries.
+#' i.e. no indices are added to multiple entries. Empty strings (`""`) are not allowed.
 #'
 #' @param verbose An Integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
@@ -29,7 +29,7 @@
 #' Defaults to FALSE.
 #'
 #' @return If a [fhir_design-class] was used, the result is a list of data.frames, i.e. a [fhir_df_list-class] object, or a list of data.tables,
-#' i.e. a [fhir_dt_list-class] object. If a [fhir_df_description-class] was used, the result is a single data.frame/data.table.
+#' i.e. a [fhir_dt_list-class] object. If a [fhir_table_description-class] was used, the result is a single data.frame/data.table.
 #'
 #' @export
 #' @rdname fhir_crack-methods
@@ -37,7 +37,7 @@
 #' @include fhir_design.R fhir_bundle_list.R fhir_table_list.R
 #' @seealso
 #' - Downloading bundles from a FHIR server: [fhir_search()]
-#' - Creating designs/df_descriptions: [fhir_df_description()] and [fhir_design()]
+#' - Creating designs/table_descriptions: [fhir_table_description()] and [fhir_design()]
 #' - Dealing with multiple entries: [fhir_melt()], [fhir_melt_all()], [fhir_rm_indices()]
 #' @examples
 #' #unserialize example bundle
@@ -48,7 +48,7 @@
 #' #Extract just one resource type
 #'
 #' #define attributes to extract
-#' medications <- fhir_df_description(
+#' medications <- fhir_table_description(
 #'    resource = "MedicationStatement",
 #'    cols = c(
 #' 			    	MS.ID              = "id",
@@ -76,7 +76,7 @@
 #' ###Example 2###
 #' #extract more resource types
 #'
-#' patients <- fhir_df_description(
+#' patients <- fhir_table_description(
 #'    resource = "Patient"
 #' )
 #'
@@ -152,6 +152,8 @@ setMethod(
 			))
 		}
 
+		validObject(design, complete = T)
+
 		#Check for dangerous XPath expressions ins cols
 		cols <- lapply(design, function(x){c(x@cols)})
 		dangerCols <- sapply(cols, function(x){any(grepl(esc("//"), x))})
@@ -175,10 +177,10 @@ setMethod(
 )
 
 #' @rdname fhir_crack-methods
-#' @aliases fhir_crack,fhir_df_description-method
+#' @aliases fhir_crack,fhir_table_description-method
 setMethod(
 	"fhir_crack",
-	signature = c(design = "fhir_df_description"),
+	signature = c(design = "fhir_table_description"),
 	function(
 		bundles,
 		design,
@@ -201,6 +203,8 @@ setMethod(
 		if (!is.null(remove_empty_columns)) {
 			design@style@rm_empty_cols <- remove_empty_columns
 		}
+
+		validObject(design, complete = T)
 
 		#Check for dangerous XPath expressions ins cols
 		cols <- design@cols
@@ -412,7 +416,7 @@ xtrct_columns <- function(
 
 #' Extracts one data frame out of one bundle
 #' @param bundle A xml object containing one FHIR bundle
-#' @param df_desc An object of class [fhir_df_description-class].
+#' @param df_desc An object of class [fhir_table_description-class].
 #' @param verbose An integer scalar.  If > 1, extraction progress will be printed. Defaults to 2.
 #' @noRd
 #' @examples
@@ -422,8 +426,8 @@ xtrct_columns <- function(
 #' #extract first bundle
 #' bundle <- bundles[[1]]
 #'
-#' #define df_description
-#' df_desc <- fhir_df_description(
+#' #define table_description
+#' df_desc <- fhir_table_description(
 #'      resource = "MedicationStatement",
 #'      cols = list(
 #' 	           SYSTEM  = "medicationCodeableConcept/coding/system/@value",
@@ -486,7 +490,7 @@ bundle2df <- function(
 #' #unserialize example bundle
 #' bundles <- fhir_unserialize(medication_bundles)
 #'
-#' df_desc <- fhir_df_description(
+#' df_desc <- fhir_table_description(
 #'      resource = "MedicationStatement",
 #'      cols = list(
 #' 	           SYSTEM  = "medicationCodeableConcept/coding/system/@value",
@@ -544,7 +548,7 @@ bundles2df <- function(
 #' #define attributes to extract
 #' design <- fhir_design(
 #'
-#' 	 fhir_df_description(
+#' 	 fhir_table_description(
 #'
 #' 		resource = "MedicationStatement",
 #'
@@ -560,7 +564,7 @@ bundles2df <- function(
 #' 			LAST.UPDATE        = "meta/lastUpdated/@value"
 #' 		)
 #' 	),
-#'  fhir_df_description(
+#'  fhir_table_description(
 #'
 #' 		resource = "Patient"
 #' 	),

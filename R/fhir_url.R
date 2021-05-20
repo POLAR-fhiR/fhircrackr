@@ -152,6 +152,12 @@ setMethod(
 			stop("A character vector has to be named to create parameters from it.")
 		}
 
+		if("" %in% names(parameters)){
+			stop("All elements in the parameter vector must have names. \n",
+				 "Please provide a name for the following parameters: \"",
+				 paste(parameters[names(parameters)==""], collapse = "\", \""), "\".")
+		}
+
 		keys <- names(parameters)
 		pairs <- paste(keys, parameters, sep = "=")
 		string <- paste(pairs, collapse = "&")

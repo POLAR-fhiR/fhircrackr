@@ -53,44 +53,44 @@ See `?patient_bundles` and `?medication_bundles` for the FHIR search request tha
 There are two extraction scenarios when you want to flatten FHIR bundles: Either you want to extract just one resource type, or you want to extract several resource types. Because the structure of different resource types is quite dissimilar, it makes sense to create one table per resource type. Therefore the result of the flattening process in `fhircrackr` can be either a single table (when extracting just one resource type) or a list of tables (when extracting more than one resource type). Both scenarios are realized with a call to `fhir_crack()`. We will now explain the two scenarios individually.  
 
 ## Extracting one resource type
-We'll start with `pat_bundles`, which only contains Patient resources. To transform them into a table, we will use `fhir_crack()`. The most important argument `fhir_crack()` takes is `bundles`, an object of class `fhir_bundle_list` that is returned by `fhir_search()`. The second important argument is `design`, which tells the function which data to extract from the bundle. When we want to extract just one resource type, we can use a `fhir_df_description` in the argument `design`.`fhir_crack()` then returns a single data.frame or data.table (if argument `data.tables=TRUE`). 
+We'll start with `pat_bundles`, which only contains Patient resources. To transform them into a table, we will use `fhir_crack()`. The most important argument `fhir_crack()` takes is `bundles`, an object of class `fhir_bundle_list` that is returned by `fhir_search()`. The second important argument is `design`, which tells the function which data to extract from the bundle. When we want to extract just one resource type, we can use a `fhir_table_description` in the argument `design`.`fhir_crack()` then returns a single data.frame or data.table (if argument `data.tables=TRUE`). 
 
-We'll show you an example of how it works first and then go on to explain the `fhir_df_description` in more detail.
+We'll show you an example of how it works first and then go on to explain the `fhir_table_description` in more detail.
 
 ```{r}
-pat_df_description <- fhir_df_description(resource = "Patient",
+pat_table_description <- fhir_table_description(resource = "Patient",
 										  cols = list(id = "id",
 									  				  gender = "gender", 
 												      name = "name/family",
 												      city = "address/city"))
 
 table <- fhir_crack(bundles = pat_bundles, 
-					design = pat_df_description, 
+					design = pat_table_description, 
 					verbose = 0)
 
 head(table)
 ```
 
-### The df_description
+### The table_description
 
-A `fhir_df_description` holds all the information `fhir_crack()` needs to create a table from resources of a certain type. It is created with `fhir_df_description()` and generally consists of the three elements that can be provided in the three following arguments:
+A `fhir_table_description` holds all the information `fhir_crack()` needs to create a table from resources of a certain type. It is created with `fhir_table_description()` and generally consists of the three elements that can be provided in the three following arguments:
 
 #### The `resource` argument 
 This is basically a string that defines the resource type (e.g. Patient or Observation) to extract. You set it like this:
 
 ```{r}
-fhir_df_description(resource = "Patient")
+fhir_table_description(resource = "Patient")
 ```
 
-Internally, `fhir_df_description()` calls `fhir_resource_type()` which checks the type you provided against list of all currently available resource types can be found at https://hl7.org/FHIR/resourcelist.html. Case errors are corrected automatically and the function throws a warning, if the resource type doesn't match the list under hl7.org.
+Internally, `fhir_table_description()` calls `fhir_resource_type()` which checks the type you provided against list of all currently available resource types can be found at https://hl7.org/FHIR/resourcelist.html. Case errors are corrected automatically and the function throws a warning, if the resource type doesn't match the list under hl7.org.
 
-As you can see in the above output, there are two more elements in a `fhir_df_description` which are filled automatically by `fhir_df_description()`.
+As you can see in the above output, there are two more elements in a `fhir_table_description` which are filled automatically by `fhir_table_description()`.
 
 #### The cols argument
 The `cols` argument takes the column names and XPath (1.0) expressions defining the columns to create from the FHIR resources. If this element is empty, `fhir_crack()` will extract all available elements of the resource and name the columns automatically. To explicitly define columns, you can provide a (named) character or a (named) list with XPath expressions like this:
 
 ```{r}
-fhir_df_description(resource = "Patient",
+fhir_table_description(resource = "Patient",
 					cols = list(gender = "gender",
 								name = "name/family",
 								city = "address/city"))
@@ -98,7 +98,7 @@ fhir_df_description(resource = "Patient",
 
 In this case a table with three columns called gender, name and city will be created. They will be filled with the value attribute that can be found under the respective xpath expressions in the resource. In the rare cases where you want to extract another attribute (besides *value* FHIR currently only allows *id* and *url* attributes), you have to add the attribute to the xpath expression like this: `"node/node/@id"`. Note that this happens extremely rarely. 
 
-Internally, `fhir_df_description()` calls `fhir_columns()` to check the validity of the XPath expressions and assign column names. You can provide the XPath expressions in a named or unnamed character vector or a named or unnamed list. If you choose the unnamed version, the names will be set automatically and reflect the respective XPath expression:
+Internally, `fhir_table_description()` calls `fhir_columns()` to check the validity of the XPath expressions and assign column names. You can provide the XPath expressions in a named or unnamed character vector or a named or unnamed list. If you choose the unnamed version, the names will be set automatically and reflect the respective XPath expression:
 
 ```{r}
 #custom column names
@@ -113,10 +113,10 @@ fhir_columns(c("gender", "name/family", "address/city"))
 We strongly advise to only use fully specified relative XPath expressions here, e.g. `"ingredient/strength/numerator/code"` and not search paths like `"//code"`, as those can generate unexpected results especially if the searched element appears on different levels of the resource.
 
 #### The style argument
-The final element of a `fhir_df_description` is a `fhir_style` object. This element controls how `fhir_crack()` deals with multiple entries to the same element and with columns that are completely empty, i.e. have only `NA` values. In the outputs above you can see, that the style takes some default values if you skip it in `fhir_df_description()`. You can change the defaults like this:
+The final element of a `fhir_table_description` is a `fhir_style` object. This element controls how `fhir_crack()` deals with multiple entries to the same element and with columns that are completely empty, i.e. have only `NA` values. In the outputs above you can see, that the style takes some default values if you skip it in `fhir_table_description()`. You can change the defaults like this:
 
 ```{r}
-fhir_df_description(resource = "Patient",
+fhir_table_description(resource = "Patient",
 					
 					cols = list(gender = "gender",
 								name = "name/family",
@@ -127,7 +127,7 @@ fhir_df_description(resource = "Patient",
 									   rm_empty_cols = FALSE))
 ```
 
-As you can see, the style is created by a call to `fhir_style()` which can be used outside of `fhir_df_description()`, too:
+As you can see, the style is created by a call to `fhir_style()` which can be used outside of `fhir_table_description()`, too:
 
 ```{r}
 fhir_style(sep = "||",
@@ -143,19 +143,19 @@ The `rm_empty_cols`: Can be `TRUE` or `FALSE`. If `TRUE`, columns containing onl
 
 All three elements of `style` can also be controlled directly by the `fhir_crack()` arguments `sep`, `brackets` and `remove_empty_columns`. If the function arguments are `NULL` (their default), the values provided in `style` are used, if they are not NULL, they will overwrite any values in `style`. 
 
-We will now work through examples using `fhir_df_descriptions` of different complexity.
+We will now work through examples using `fhir_table_descriptions` of different complexity.
 
 ### Examples
 
 #### Extract all available attributes
-Lets start with an example where we only provide the (mandatory) `resource` component of the df_description.  In this case, `fhir_crack()` will extract all available attributes and use default values for the `style` component:
+Lets start with an example where we only provide the (mandatory) `resource` component of the table_description.  In this case, `fhir_crack()` will extract all available attributes and use default values for the `style` component:
 
 ```{r}
 #define design
-df_description1 <- fhir_df_description(resource = "Patient")
+table_description1 <- fhir_table_description(resource = "Patient")
 
 #Convert resources
-table<- fhir_crack(bundles = pat_bundles, design = df_description1, verbose = 0)
+table<- fhir_crack(bundles = pat_bundles, design = table_description1, verbose = 0)
 
 #have look at part of the results
 table[1:5,1:5]
@@ -168,7 +168,7 @@ If we know which attributes we want to extract, we can specify them in a named l
 
 ```{r}
 #define design
-df_description2 <- fhir_df_description(
+table_description2 <- fhir_table_description(
 
 		resource = "Patient",
 		
@@ -183,7 +183,7 @@ df_description2 <- fhir_df_description(
 )
 
 #Convert resources
-table <- fhir_crack(bundles = pat_bundles, design = df_description2, verbose = 0)
+table <- fhir_crack(bundles = pat_bundles, design = table_description2, verbose = 0)
 
 #have look at the results
 head(table)
@@ -202,12 +202,12 @@ As you can see the value attributes have been amended by `fhir_crack()`. This wi
 
 
 ## Extracting more than one resource type
-Of course the previous example is using just one resource type. If you are interested in several types of resources, you need one `fhir_df_description` per resource type. You can bundle a bunch of `fhir_df_descriptions` in a `fhir_design`. This is basically a named list of `fhir_df_descriptions`, and when you pass it to `fhir_crack()`, the result will be a named list of tables with the same names as the design. Consider an example where we have downloaded MedicationStatements referring to a certain medication as well as the Patient resources these MedicationStatements are linked to.
+Of course the previous example is using just one resource type. If you are interested in several types of resources, you need one `fhir_table_description` per resource type. You can bundle a bunch of `fhir_table_descriptions` in a `fhir_design`. This is basically a named list of `fhir_table_descriptions`, and when you pass it to `fhir_crack()`, the result will be a named list of tables with the same names as the design. Consider an example where we have downloaded MedicationStatements referring to a certain medication as well as the Patient resources these MedicationStatements are linked to.
 
 The design to extract both resource types could look like this:
 
 ```{r}
-meds <- fhir_df_description(resource = "MedicationStatement",
+meds <- fhir_table_description(resource = "MedicationStatement",
 
 							cols = list(
 								ms_id              = "id",
@@ -227,18 +227,18 @@ meds <- fhir_df_description(resource = "MedicationStatement",
 								rm_empty_cols = FALSE)
 		)
 
-pat <- fhir_df_description(resource = "Patient")
+pat <- fhir_table_description(resource = "Patient")
 
 design <- fhir_design(meds, pat)
 ```
 
-In this example, we have spelled out the df_description MedicationStatement completely, while we have used a short form for Patients. It looks like this:
+In this example, we have spelled out the table_description MedicationStatement completely, while we have used a short form for Patients. It looks like this:
 
 ```{r}
 design
 ```
 
-As you can see, each df_description is identified by a name, which will also be the name of the corresponding table in the result of `fhir_crack()`.
+As you can see, each table_description is identified by a name, which will also be the name of the corresponding table in the result of `fhir_crack()`.
 
 You can assign the names explicitly, if you prefer:
 
@@ -247,7 +247,7 @@ design <- fhir_design(meds, pat, names = c("Medications", "Patients"))
 design
 ```
 
-And you can also extract single df_descriptions by their name:
+And you can also extract single table_descriptions by their name:
 
 ```{r}
 design$Patients
@@ -262,13 +262,13 @@ head(list_of_tables$Medications)
 head(list_of_tables$Patients)
 ```
 
-As you can see, the result is a list of two data frames, one for Patient resources and one for MedicationStatement resources. When you use `fhir_crack()` with a `fhir_desgn()` instead of a `fhir_df_description`, the result is an object of class `fhir_df_list` or `fhir_dt_list` that also has the design attached. You can extract the design from a list like this using `fhir_design()`:
+As you can see, the result is a list of two data frames, one for Patient resources and one for MedicationStatement resources. When you use `fhir_crack()` with a `fhir_desgn()` instead of a `fhir_table_description`, the result is an object of class `fhir_df_list` or `fhir_dt_list` that also has the design attached. You can extract the design from a list like this using `fhir_design()`:
 
 ```{r}
 fhir_design(list_of_tables)
 ``` 
 
-Note that this doesn't work on single tables created with a `fhir_df_description`. 
+Note that this doesn't work on single tables created with a `fhir_table_description`. 
 
 
 ### Saving and reading designs
@@ -360,7 +360,7 @@ This bundle contains three Patient resources. The first resource has just one en
 
 Let's see what happens if we extract all attributes:
 ```{r}
-desc1 <- fhir_df_description(resource = "Patient",
+desc1 <- fhir_table_description(resource = "Patient",
 							style = fhir_style(sep = " | "))
 
 
@@ -372,7 +372,7 @@ As you can see, multiple entries for the same attribute (address and name) are p
 You can counter this problem by setting `brackets`:
 
 ```{r}
-desc2 <- fhir_df_description(resource = "Patient",
+desc2 <- fhir_table_description(resource = "Patient",
 							style = fhir_style(sep = " | ",
 											   brackets = c("[", "]"))
 							)
@@ -443,7 +443,7 @@ molten_2
 ```
 This will give you the appropriate product of all multiple entries.
 
-If you just want all multiple entries molten correctly, you can use `fhir_melt_all()`. This function will find all columns containing multiple entries and melt them appropriately. Note that this will only work if the column names reflect the path to the corresponding resource element with . as a separator, e.g. `name.given`. These names are produced automatically by `fhir_df_description()` when the cols element is unnamed or omitted.
+If you just want all multiple entries molten correctly, you can use `fhir_melt_all()`. This function will find all columns containing multiple entries and melt them appropriately. Note that this will only work if the column names reflect the path to the corresponding resource element with . as a separator, e.g. `name.given`. These names are produced automatically by `fhir_table_description()` when the cols element is unnamed or omitted.
 
 ```{r}
 fhir_melt_all(df2, brackets = c("[","]"), sep=" | ")

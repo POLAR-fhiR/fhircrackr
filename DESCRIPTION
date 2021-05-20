@@ -46,7 +46,7 @@ Suggests:
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 Depends: 
-    R (>= 3.5.0)
+    R (>= 4.0.0)
 Collate: 
     'design.R'
     'fhir_url.R'
@@ -58,7 +58,7 @@ Collate:
     'fhir_columns.R'
     'fhir_style.R'
     'fhir_resource_type.R'
-    'fhir_df_description.R'
+    'fhir_table_description.R'
     'fhir_design.R'
     'fhir_table_list.R'
     'flatten_resources.R'

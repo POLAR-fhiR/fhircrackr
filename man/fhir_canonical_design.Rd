@@ -14,7 +14,7 @@ Returns the \linkS4class{fhir_design} of the last call to \code{\link[=fhir_crac
 bundles <- fhir_unserialize(patient_bundles)
 
 #define design
-patients <- fhir_df_description(resource = "Patient")
+patients <- fhir_table_description(resource = "Patient")
 design <- fhir_design(patients)
 
 result <- fhir_crack(bundles, design)
@@ -23,5 +23,5 @@ fhir_canonical_design()
 
 }
 \seealso{
-\code{\link[=fhir_design]{fhir_design()}}, \code{\link[=fhir_df_description]{fhir_df_description()}}
+\code{\link[=fhir_design]{fhir_design()}}, \code{\link[=fhir_table_description]{fhir_table_description()}}
 }

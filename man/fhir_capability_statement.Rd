@@ -8,6 +8,7 @@ fhir_capability_statement(
   url = "https://hapi.fhir.org/baseR4",
   username = NULL,
   password = NULL,
+  token = NULL,
   brackets = NULL,
   sep = " || ",
   log_errors = NULL,
@@ -20,6 +21,9 @@ fhir_capability_statement(
 \item{username}{A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.}
 
 \item{password}{A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.}
+
+\item{token}{A string or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
+for how to create this.}
 
 \item{brackets}{A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
 If \code{NULL}, no indices will be added to multiple entries.}

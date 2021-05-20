@@ -1,7 +1,7 @@
 
 testthat::test_that(
 	"fhir_dt_list is built correctly", {
-		df_desc1 <- fhir_df_description(resource = "Patient",
+		df_desc1 <- fhir_table_description(resource = "Patient",
 		                    cols = c(name = "name/family",
 		                             gender = "gender",
 		                             id = "id"),
@@ -11,7 +11,7 @@ testthat::test_that(
 		                            )
 		             )
 
-		df_desc2 <- fhir_df_description(resource = "Observation",
+		df_desc2 <- fhir_table_description(resource = "Observation",
 		                    cols = c("code/coding/system", "code/coding/code")
 		            )
 
@@ -28,7 +28,7 @@ testthat::test_that(
 
 testthat::test_that(
 	"fhir_df_list is built correctly", {
-		df_desc1 <- fhir_df_description(resource = "Patient",
+		df_desc1 <- fhir_table_description(resource = "Patient",
 										cols = c(name = "name/family",
 												 gender = "gender",
 												 id = "id"),
@@ -38,7 +38,7 @@ testthat::test_that(
 										)
 		)
 
-		df_desc2 <- fhir_df_description(resource = "Observation",
+		df_desc2 <- fhir_table_description(resource = "Observation",
 										cols = c("code/coding/system", "code/coding/code")
 		)
 

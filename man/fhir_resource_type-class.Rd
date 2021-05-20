@@ -6,6 +6,6 @@
 \title{A representation of a FHIR resource type}
 \description{
 An object of class \code{fhir_resource_type} is a string containing a FHIR resource type.
-It is part of a \code{fhir_df_description} which in turn is part of a \code{fhir_design} and used in
+It is part of a \code{fhir_table_description} which in turn is part of a \code{fhir_design} and used in
 \code{\link[=fhir_crack]{fhir_crack()}}.
 }

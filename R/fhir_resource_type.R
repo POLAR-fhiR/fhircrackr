@@ -4,7 +4,7 @@
 #' A representation of a FHIR resource type
 #'
 #' An object of class `fhir_resource_type` is a string containing a FHIR resource type.
-#' It is part of a `fhir_df_description` which in turn is part of a `fhir_design` and used in
+#' It is part of a `fhir_table_description` which in turn is part of a `fhir_design` and used in
 #' [fhir_crack()].
 #' @export
 #'
@@ -45,7 +45,11 @@ fhir_resource_type <- function(string) {
 
 	#convert to correct case and check for validity
 	if(tolower(string) %in% tolower(existing_resource_types)){
-		string <- existing_resource_types[tolower(string) == tolower(existing_resource_types)]
+		if(!string %in% existing_resource_types){
+			corrected <- existing_resource_types[tolower(string) == tolower(existing_resource_types)]
+			message("Changing resource type \"", string, "\" into \"", corrected, "\".")
+			string <- existing_resource_types[tolower(string) == tolower(existing_resource_types)]
+		}
 	}else{
 		warning(
 			"You gave \"", string, "\" as the resource type.\n",

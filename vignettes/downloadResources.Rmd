@@ -332,7 +332,7 @@ url <- fhir_url(url = "http://hapi.fhir.org/baseR4",
 
 #count <- 0
 
-df_description <- fhir_df_description(resource = "Observation")
+table_description <- fhir_table_description(resource = "Observation")
 
 while(!is.null(url)){
 	
@@ -340,7 +340,7 @@ while(!is.null(url)){
 	bundles <- fhir_search(url, max_bundles = 10) 
 	
 	#crack bundles
-	dfs <- fhir_crack(bundles, df_description)
+	dfs <- fhir_crack(bundles, table_description)
 	
 	#save cracked bundle to RData-file (can be exchanged by other data type)
 	save(tables, file = paste0(tempdir(), "/table_", count, ".RData"))
