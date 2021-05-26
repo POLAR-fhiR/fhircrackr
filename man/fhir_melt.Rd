@@ -81,8 +81,7 @@ bundle <- fhir_bundle_xml(xml2::read_xml(
 
 #crack fhir resources
 dfs <- fhir_crack(bundles = list(bundle),
-                  design = fhir_design(fhir_table_description(resource = "Patient"),
-                                                           names = "Patients"),
+                  design = fhir_design(Patients = fhir_table_description(resource = "Patient")),
                   brackets = c("[","]"))
 
 #find all column names associated with attribute address

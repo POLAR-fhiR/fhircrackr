@@ -46,11 +46,6 @@ setValidity(
 #'
 #'
 #' @details
-#' For backwards compatibility it is for the moment also possible to build it from an
-#' old-style design as used in `fhircrackr (< 1.0.0)`. See examples.
-#'
-#' If this function is given an object of class [fhir_df_list-class] or [fhir_dt_list-class], it will
-#' extract the design that was used to create the respective list.
 #'
 #' A `fhir_design` looks for example like this:
 #'
@@ -73,7 +68,7 @@ setValidity(
 #' brackets: '[' ']'
 #' rm_empty_cols: FALSE
 #' =====================================================
-#' Name: Observations
+#' Name: MedicationAdministrations
 #'
 #' Resource type: MedicationAdministration
 #'
@@ -85,13 +80,19 @@ setValidity(
 #' brackets: character(0)
 #' rm_empty_cols: TRUE
 #' ```
-#' See the examples for how to create this design.
+#' The names of the table_descriptions are taken from the names of the arguments. If the table_descriptions are
+#' created within the call to `fhir_design` and therefore have no names, the names will be created from the respective
+#' resource type. See examples.
+#'
+#' For backwards compatibility it is for the moment also possible to build it from an
+#' old-style design as used in `fhircrackr (< 1.0.0)`. See examples.
+#'
+#' If this function is given an object of class [fhir_df_list-class] or [fhir_dt_list-class], it will
+#' extract the design that was used to create the respective list.
 #'
 #' @param ... One ore more `fhir_table_description` objects or a named list containing
 #' `fhir_table_description` objects, or an object of class [fhir_df_list-class]/[fhir_dt_list-class].
 #' See [fhir_table_description()].
-#' @param names Optional. The names of the table_descriptions. If no names are provided, the names of the object(s) that
-#' were used in creating the design are taken as the names.
 #' @docType methods
 #' @seealso [fhir_table_description()], [fhir_crack()]
 #' @rdname fhir_design-methods
@@ -99,9 +100,9 @@ setValidity(
 #'
 #' ####Example 1####
 #'
-#' ###create fhir_table_descriptions
+#' ###create fhir_table_descriptions first
+#' #see ?fhir_table_description for explanation
 #'
-#' #most explicit, long form
 #' pat <- fhir_table_description(resource = "Patient",
 #'                     cols = c(name = "name/family",
 #'                              gender = "gender",
@@ -111,27 +112,30 @@ setValidity(
 #'                                        rm_empty_cols = FALSE
 #'                             )
 #'              )
-#'  print(pat)
 #'
-#' #most reduced form:
-#' #All columns are extracted, default style is assumed
 #' meds <- fhir_table_description(resource = "MedicationAdministration")
-#' print(meds)
 #'
-#' #create design
-#' #First option: explicitly define names
-#' design1 <- fhir_design(pat, meds, names = c("Patients", "Medications"))
+#' ###create design
+#' #First option: Explicitly define names
+#'
+#' design1 <- fhir_design(Pats = pat, Medics = meds)
 #' print(design1)
 #'
-#' #Second option: Names are taken from the table_descriptions
+#'
+#' #Second option: Names are taken from the object names
+#'
 #' design2 <- fhir_design(pat, meds)
 #' print(design2)
 #'
-#' #don't do this, because names will be weird:
-#' design2a <- fhir_design(fhir_table_description(resource = "MedicationAdministration"))
-#' print(design2a)
 #'
-#' #Third option: named list
+#' #Third option: Create table_description within fhir_design
+#'
+#' design3 <- fhir_design(fhir_table_description(resource = "MedicationAdministration"))
+#' print(design3)
+#'
+#'
+#' #Fourth option: Names are taken from named list
+#'
 #' design3 <- fhir_design(list(Patients = pat, Medications = meds))
 #' print(design3)
 #'
@@ -169,13 +173,14 @@ setValidity(
 #' dfs <- fhir_crack(med_bundles, design = design1)
 #'
 #' #extract design
+#'
 #' fhir_design(dfs)
 #'
 #' @export
 #'
 setGeneric(
 	"fhir_design",
-	function(..., names){
+	function(...){
 		standardGeneric("fhir_design")
 	},
 	signature = "..."
@@ -187,10 +192,17 @@ setGeneric(
 setMethod(
 	"fhir_design",
 	signature = c(...="fhir_table_description"),
-	function(..., names){
-		argnames <- sapply(substitute(list(...))[-1], deparse)
-		if(missing(names)){names <-argnames}
+	function(...){
 		args <- list(...)
+
+		names <- paste0(sapply(args, function(x){x@resource}), "s")
+
+		name_index <- sapply(substitute(list(...))[-1], function(x)class(x)=="name")
+
+		names[name_index] <- sapply(substitute(list(...))[-1], deparse)[name_index]
+
+		names[names(args) != ""] <- names(args)[names(args) != ""]
+
 		new("fhir_design", args, names = names)
 	}
 )

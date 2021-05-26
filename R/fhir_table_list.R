@@ -149,7 +149,7 @@ fhir_dt_list <- function(dt_list, design){
 setMethod(
 	"fhir_design",
 	signature = c(...="fhir_table_list"),
-	function(..., names){
+	function(...){
 		args <- list(...)
 		tab <- args[[1]]
 		tab@design

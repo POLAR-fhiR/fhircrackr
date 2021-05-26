@@ -21,7 +21,7 @@ testthat::test_that(
 								  					  "id"))
 		)
 
-		design <- fhir_design(d1, d2, d3, names=c("d1", "d2", "d3"))
+		design <- fhir_design(d1, d2, d3)
 
 		old_design <- list(
 		                 Patients = list(
@@ -66,7 +66,7 @@ testthat::test_that(
 								  			id = "id")
 		)
 
-		design1 <-  fhir_design(d1, d2, names=c("d1", "d2"))
+		design1 <-  fhir_design(d1, d2)
 		design2 <-  fhir_design(list(d1=d1, d2=d2))
 
 		testthat::expect_identical(design1, design2)

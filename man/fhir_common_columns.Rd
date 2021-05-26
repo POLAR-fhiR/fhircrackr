@@ -32,8 +32,7 @@ bundles <- fhir_unserialize(medication_bundles)
 
 #crack Patient Resources
 design <- fhir_design(
-  fhir_table_description(resource = "Patient"),
-  names = "Patients"
+  Patients = fhir_table_description(resource = "Patient")
 )
 
 dfs <- fhir_crack(bundles, design)

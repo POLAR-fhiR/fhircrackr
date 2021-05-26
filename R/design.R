@@ -50,7 +50,7 @@ fhir_canonical_design <- function() {
 #'                     cols = c("code/coding/system", "code/coding/code")
 #'             )
 #'
-#' design <- fhir_design(df_desc1, df_desc2, names = c("Patients", "Observations"))
+#' design <- fhir_design(Patients = df_desc1, Observations = df_desc2)
 #'
 #' fhir_save_design(design, file = tempfile())
 
@@ -90,7 +90,7 @@ fhir_save_design <- function (design, file = "design.xml") {
 #'             )
 #'
 #' #create design
-#' design <- fhir_design(df_desc1, df_desc2, names = c("Patients", "Observations"))
+#' design <- fhir_design(Patients = df_desc1, Observations = df_desc2)
 #'
 #' temp <- tempfile()
 #'
@@ -413,7 +413,7 @@ design2xml <- function (design) {
 #'
 #' df_desc3 <- fhir_table_description(resource = "Medication")
 #'
-#' design <- fhir_design(df_desc1, df_desc2, df_desc3, names = c("Patients", "Observations", "Medications"))
+#' design <- fhir_design(df_desc1, df_desc2, df_desc3)
 #'
 #' xml <- design2xml(design)
 #'

@@ -8,21 +8,18 @@
 \alias{fhir_design,fhir_table_list-method}
 \title{Create a \linkS4class{fhir_design} object}
 \usage{
-fhir_design(..., names)
+fhir_design(...)
 
-\S4method{fhir_design}{fhir_table_description}(..., names)
+\S4method{fhir_design}{fhir_table_description}(...)
 
-\S4method{fhir_design}{list}(..., names)
+\S4method{fhir_design}{list}(...)
 
-\S4method{fhir_design}{fhir_table_list}(..., names)
+\S4method{fhir_design}{fhir_table_list}(...)
 }
 \arguments{
 \item{...}{One ore more \code{fhir_table_description} objects or a named list containing
 \code{fhir_table_description} objects, or an object of class \linkS4class{fhir_df_list}/\linkS4class{fhir_dt_list}.
 See \code{\link[=fhir_table_description]{fhir_table_description()}}.}
-
-\item{names}{Optional. The names of the table_descriptions. If no names are provided, the names of the object(s) that
-were used in creating the design are taken as the names.}
 }
 \description{
 A \code{fhir_design} is a named list of \code{fhir_table_description} objects (See \code{\link[=fhir_table_description]{fhir_table_description()}})
@@ -30,12 +27,6 @@ and should be created using the function described here. The design is used in \
 the function how to flatten each resource type.
 }
 \details{
-For backwards compatibility it is for the moment also possible to build it from an
-old-style design as used in \verb{fhircrackr (< 1.0.0)}. See examples.
-
-If this function is given an object of class \linkS4class{fhir_df_list} or \linkS4class{fhir_dt_list}, it will
-extract the design that was used to create the respective list.
-
 A \code{fhir_design} looks for example like this:\preformatted{A fhir_design with 2 table_descriptions:
 =====================================================
 Name: Patients
@@ -54,7 +45,7 @@ sep: ||
 brackets: '[' ']'
 rm_empty_cols: FALSE
 =====================================================
-Name: Observations
+Name: MedicationAdministrations
 
 Resource type: MedicationAdministration
 
@@ -67,15 +58,23 @@ brackets: character(0)
 rm_empty_cols: TRUE
 }
 
-See the examples for how to create this design.
+The names of the table_descriptions are taken from the names of the arguments. If the table_descriptions are
+created within the call to \code{fhir_design} and therefore have no names, the names will be created from the respective
+resource type. See examples.
+
+For backwards compatibility it is for the moment also possible to build it from an
+old-style design as used in \verb{fhircrackr (< 1.0.0)}. See examples.
+
+If this function is given an object of class \linkS4class{fhir_df_list} or \linkS4class{fhir_dt_list}, it will
+extract the design that was used to create the respective list.
 }
 \examples{
 
 ####Example 1####
 
-###create fhir_table_descriptions
+###create fhir_table_descriptions first
+#see ?fhir_table_description for explanation
 
-#most explicit, long form
 pat <- fhir_table_description(resource = "Patient",
                     cols = c(name = "name/family",
                              gender = "gender",
@@ -85,27 +84,30 @@ pat <- fhir_table_description(resource = "Patient",
                                        rm_empty_cols = FALSE
                             )
              )
- print(pat)
 
-#most reduced form:
-#All columns are extracted, default style is assumed
 meds <- fhir_table_description(resource = "MedicationAdministration")
-print(meds)
 
-#create design
-#First option: explicitly define names
-design1 <- fhir_design(pat, meds, names = c("Patients", "Medications"))
+###create design
+#First option: Explicitly define names
+
+design1 <- fhir_design(Pats = pat, Medics = meds)
 print(design1)
 
-#Second option: Names are taken from the table_descriptions
+
+#Second option: Names are taken from the object names
+
 design2 <- fhir_design(pat, meds)
 print(design2)
 
-#don't do this, because names will be weird:
-design2a <- fhir_design(fhir_table_description(resource = "MedicationAdministration"))
-print(design2a)
 
-#Third option: named list
+#Third option: Create table_description within fhir_design
+
+design3 <- fhir_design(fhir_table_description(resource = "MedicationAdministration"))
+print(design3)
+
+
+#Fourth option: Names are taken from named list
+
 design3 <- fhir_design(list(Patients = pat, Medications = meds))
 print(design3)
 
@@ -143,6 +145,7 @@ med_bundles <- fhir_unserialize(medication_bundles)
 dfs <- fhir_crack(med_bundles, design = design1)
 
 #extract design
+
 fhir_design(dfs)
 
 }

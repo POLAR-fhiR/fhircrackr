@@ -33,7 +33,7 @@ df_desc2 <- fhir_table_description(resource = "Observation",
             )
 
 #create design
-design <- fhir_design(df_desc1, df_desc2, names = c("Patients", "Observations"))
+design <- fhir_design(Patients = df_desc1, Observations = df_desc2)
 
 temp <- tempfile()
 
