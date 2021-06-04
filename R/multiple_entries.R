@@ -368,7 +368,7 @@ fhir_extract_indices <- function(indexed_data_frame, brackets){
 	if(!any(grepl(pattern.ids, indexed_data_frame))){stop("There don't seem to be any indices ",
 														  "with the specified brackets.")}
 
-	result <- apply(indexed_data_frame, 2, stringr::str_extract_all, pattern=pattern.ids, simplify = T)
+	result <- apply(indexed_data_frame, 2, function(x){stringr::str_extract_all(x, pattern=pattern.ids, simplify = T)})
 
 	if(is.list(result)){
 		warning("There seems to be more than one index per cell in indexed_data_frame.",

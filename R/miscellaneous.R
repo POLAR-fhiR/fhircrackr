@@ -75,7 +75,7 @@ paste_paths <- function(path1 = "w",
 #'
 #' **medication_bundles** (*Downloaded 10-05-21*)
 #'
-#' \code{
+#' ```
 #' search_request  <- fhir_url("https://hapi.fhir.org/baseR4",
 #' 							resource = "MedicationStatement",
 #' 							parameters = c("code" = "http://snomed.info/ct|429374003",
@@ -84,7 +84,7 @@ paste_paths <- function(path1 = "w",
 #' bundles <- fhir_search(search_request, max_bundles = 3)
 #'
 #' medication_bundles <- fhir_serialize(bundles)
-#' }
+#' ```
 #'
 #'
 #'
@@ -105,11 +105,13 @@ paste_paths <- function(path1 = "w",
 #' @source
 #' **patient_bundles** (*Downloaded 10-05-21*)
 #'
-#' \code{
-#' bundles <- fhir_search(request="https://hapi.fhir.org/baseR4/Patient", max_bundles=2, verbose = 0)
+#' ```
+#' bundles <- fhir_search(request="https://hapi.fhir.org/baseR4/Patient",
+#'                        max_bundles=2,
+#'                        verbose = 0)
 #'
 #' patient_bundles <- fhir_serialize(bundles)
-#' }
+#' ```
 #'
 #'
 #'
