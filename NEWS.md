@@ -1,26 +1,41 @@
+# fhircrackr 1.0.0
+The package is now rewritten using S4 classes. Almost all of the code written with fhircrackr < 1.0.0 will still work, though in a few cases the user will be prompted to change their code to the new syntax.
 
+The most prominent change is ho to create a `design` that tells `fhir_crack()` how to flatten the resources. It should now be created using the functions `fhir_table_description()` and `fhir_design()`. `fhir_crack()` is now also able to create a single data.frame/data.table instead of a list of tables when just one resource type is extracted. Please see the documentation under `?fhir_table_description` and `?fhir_design`! 
+
+To get an overview about how the general workflow has changed, please have a look at the intro vignette (`vignette("fhircrackr_intro", package="fhircrackr")`).
+
+There are a couple of new constructor functions for the newly defined classes which will not be listed here. Please have look at the package vignettes which go through them in detail. 
+
+Other new functions or behavior are listed in the following:
 
 ## New functions
+- `fhir_authenticate()`: Set up authentication using OAuth2/OpenID Connect
+- `fhir_current_request()`: Get search request used in most recent call to `fhir_search()`or `fhir_url()`
+- `fhir_extract_indices()`: Extract indices from a table with multiple entries
+- `fhir_restore_indices()`: Restore indices from a table with multiple entries
+- `fhir_melt_all()`: Melt all multiple entries in a table.
 
-fhir_extract_indices
-fhir_melt_all
-fhir_restore_indices
 
-## News
-- The deprecated argument `add_indices` in `fhir_crack()` is now fully removed.
+## New behavior
+- `fhir_search()` no allows for a search via POST via the argument `body`
+
+- `fhir_search()` can no handle bearer token authentication via the argument `token`
 
 - Argument `save_to_file` in `fhir_search()` now takes `NULL` or a string with a directory name and saves the bundles only if there is a specified directory. For backwards compatibility `TRUE`/`FALSE` in combination with `directory` are still allowed but discouraged with a warning.
 
-- Argument log_errors in `fhir_search()` now takes a string with a filename and writes an xml (no tables anymore) to the specified file. For backwards compatibility numbers are still allowed but discouraged with a warning. 
+- Argument `log_errors` in `fhir_search()` now takes a string with a filename and writes an xml (no tables anymore) to the specified file. For backwards compatibility numbers are still allowed but discouraged with a warning. 
 
-- New argument `delay_between_pages` for `fhir_search()` allowing to put a delay between the download of bundles 
-(i.e. pages) in a bigger search request to prevent weak servers from choking.
+- New argument `delay_between_bundles` for `fhir_search()` allows to put a delay between the download of bundles (i.e. pages) in a bigger search request to prevent weak servers from choking.
+
+- The output of `fhir_capability_statement()` is slightly restructured
+
+- The deprecated argument `add_indices` in `fhir_crack()` is now fully removed.
 
 - The most recently used FHIR search request is now implicitly saved whenever `fhir_search()` or `fhir_url()` is called. It can be accessed with the new function `fhir_current_request()`.
 
 
 
-See documentation for more information on all new functions.
 
 
 # fhircrackr 0.2.1
