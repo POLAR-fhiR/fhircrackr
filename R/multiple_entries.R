@@ -82,57 +82,27 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #' @return A data.frame/data.table where each entry from the variables in `columns` appears in a separate row.
 #'
 #' @examples
-#' #generate example
-#' bundle <- fhir_bundle_xml(xml2::read_xml(
-#' "<Bundle>
-#'
-#'     <Patient>
-#'         <id value='id1'/>
-#'         <address>
-#'             <use value='home'/>
-#'             <city value='Amsterdam'/>
-#'             <type value='physical'/>
-#'            <country value='Netherlands'/>
-#'         </address>
-#'         <birthDate value='1992-02-06'/>
-#'     </Patient>
-#'
-#'     <Patient>
-#'         <id value='id2'/>
-#'         <address>
-#'             <use value='home'/>
-#'             <city value='Rome'/>
-#'             <type value='physical'/>
-#'             <country value='Italy'/>
-#'         </address>
-#'         <address>
-#'             <use value='work'/>
-#'             <city value='Stockholm'/>
-#'             <type value='postal'/>
-#'             <country value='Sweden'/>
-#'         </address>
-#'         <birthDate value='1980-05-23'/>
-#'     </Patient>
-#' </Bundle>"
-#'))
+#' #unserialize example
+#' bundles <- fhir_unserialize(example_bundles1)
 #'
 #' #crack fhir resources
-#' dfs <- fhir_crack(bundles = list(bundle),
-#'                   design = fhir_design(Patients = fhir_table_description(resource = "Patient")),
-#'                   brackets = c("[","]"))
+#' table_desc <- fhir_table_description(resource = "Patient",
+#'                                      style = fhir_style(brackets = c("[","]"),
+#'                                                         sep = " "))
+#' df <- fhir_crack(bundles = bundles, design = table_desc)
 #'
 #' #find all column names associated with attribute address
-#' col_names <- fhir_common_columns(dfs$Patients, "address")
+#' col_names <- fhir_common_columns(df, "address")
 #'
 #' #original data frame
-#' dfs$Patients
+#' df
 #'
 #' #only keep address columns
-#' fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,
+#' fhir_melt(indexed_data_frame = df, columns = col_names,
 #'           brackets = c("[","]"), sep = " ")
 #'
 #' #keep all columns
-#' fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,
+#' fhir_melt(indexed_data_frame = df, columns = col_names,
 #'           brackets = c("[","]"), sep = " ", all_columns = TRUE)
 #' @export
 #' @seealso [fhir_common_columns()], [fhir_melt_all()], [fhir_rm_indices()]
@@ -200,13 +170,13 @@ fhir_melt <- function(
 
 #' Melt all multiple entries
 #'
-#' This function divides all multiple entries in a (list of)indexed data frame as produced by [fhir_crack()]
+#' This function divides all multiple entries in a (list of) indexed data frame as produced by [fhir_crack()]
 #' into separate observations.
 #'
 #' Every row containing values that consist of multiple entries will be turned into multiple rows, one for each entry.
 #' Values on other variables will be repeated in all the new rows. This function will only work if the column names
 #' reflect the path to the corresponding resource element with `.` as a separator, e.g. `name.given`.
-#' These names are produced automatically by [fhir_design()] when the cols element of the
+#' These names are produced automatically by [fhir_table_description()] when the cols element of the
 #' design is unnamed or omitted.
 #'
 #' If `rm_indices=FALSE` the original indices are kept for every entry. These are useful if you need to keep in mind the
@@ -215,7 +185,7 @@ fhir_melt <- function(
 #' For a more detailed description on how to use this function please see the package vignette.
 #'
 #' @param indexed_data_frame A data.frame/data.table with indexed multiple entries or an object of class
-#' [fhir_df_list-class]/[fhir_dt_list-class]. Column names mustreflect the path to the corresponding resource
+#' [fhir_df_list-class]/[fhir_dt_list-class]. Column names must reflect the path to the corresponding resource
 #' element with `.` as a separator, e.g. `name.given`.
 #' @param brackets A character vector of length 2, defining the brackets used for the indices. If a
 #' [fhir_df_list-class]/[fhir_dt_list-class] is provided for `indexed_data_frame`, this argument is ignored.
@@ -228,74 +198,8 @@ fhir_melt <- function(
 #' @docType methods
 #' @rdname fhir_melt_all-methods
 #' @examples
-#' #generate example
-#' bundle <- fhir_bundle_xml(xml2::read_xml(
-#' 	"<Bundle>
-#'
-#' 		<Patient>
-#' 			<id value='id1'/>
-#' 			<address>
-#' 				<use value='home'/>
-#' 				<city value='Amsterdam'/>
-#' 				<type value='physical'/>
-#' 				<country value='Netherlands'/>
-#' 			</address>
-#' 			<birthDate value='1992-02-06'/>
-#' 		</Patient>
-#'
-#' 		<Patient>
-#' 			<id value='id2'/>
-#' 			<address>
-#' 				<use value='home'/>
-#' 				<city value='Rome'/>
-#' 				<type value='physical'/>
-#' 				<country value='Italy'/>
-#' 			</address>
-#' 			<address>
-#' 				<use value='work'/>
-#' 				<city value='Stockholm'/>
-#' 				<type value='postal'/>
-#' 				<country value='Sweden'/>
-#' 			</address>
-#' 			<birthDate value='1980-05-23'/>
-#' 		</Patient>
-#'
-#' 		<Patient>
-#' 			<id value='id3.1'/>
-#' 			<id value='id3.2'/>
-#' 			<address>
-#' 				<use value='home'/>
-#' 				<city value='Berlin'/>
-#' 			</address>
-#' 			<address>
-#' 				<type value='postal'/>
-#' 				<country value='France'/>
-#' 			</address>
-#' 			<address>
-#' 				<use value='work'/>
-#' 				<city value='London'/>
-#' 				<type value='postal'/>
-#' 				<country value='England'/>
-#' 			</address>
-#' 			<birthDate value='1974-12-25'/>
-#' 		</Patient>
-#' 		<Observation>
-#' 		<id value = '1'/>
-#'		<code>
-#'			<coding>
-#'			   <system value='http://loinc.org'/>
-#'			   <code value='29463-7'/>
-#'			   <display value='Body Weight'/>
-#'			</coding>
-#'			<coding>
-#'			   <system value='http://snomed.info/sct'/>
-#'		 	   <code value='27113001'/>
-#'			   <display value='Body weight'/>
-#'			</coding>
-#'		</code>
-#' 		</Observation>
-#' 	</Bundle>"
-#' ))
+#' #unserialize example
+#' bundles <- fhir_unserialize(example_bundles3)
 #'
 #' #crack fhir resources
 #' patients <- fhir_table_description(resource = "Patient")
@@ -304,7 +208,7 @@ fhir_melt <- function(
 #'
 #' design <- fhir_design(patients, observations)
 #'
-#' dfs <- fhir_crack(bundles = list(bundle), design = design, sep="||", brackets = c("[","]"))
+#' dfs <- fhir_crack(bundles = bundles, design = design, sep="||", brackets = c("[","]"))
 #'
 #' #use on the list of tables:
 #' #all tables are molten, brackets and sep are inferred from the attached design
@@ -360,46 +264,16 @@ setMethod(
 #'
 #' @examples
 #'
-#' bundle <- xml2::read_xml(
-#'"<Bundle>
-#'
-#'         <Patient>
-#'             <id value='id1'/>
-#'             <address>
-#'                 <use value='home'/>
-#'                 <city value='Amsterdam'/>
-#'                 <type value='physical'/>
-#'                <country value='Netherlands'/>
-#'             </address>
-#'             <birthDate value='1992-02-06'/>
-#'         </Patient>
-#'
-#'         <Patient>
-#'             <id value='id2'/>
-#'             <address>
-#'                 <use value='home'/>
-#'                 <city value='Rome'/>
-#'                 <type value='physical'/>
-#'                 <country value='Italy'/>
-#'             </address>
-#'             <address>
-#'                 <use value='work'/>
-#'                 <city value='Stockholm'/>
-#'                 <type value='postal'/>
-#'                 <country value='Sweden'/>
-#'             </address>
-#'             <birthDate value='1980-05-23'/>
-#'         </Patient>
-#' </Bundle>"
-#')
+#' #unserialize example
+#' bundles <- fhir_unserialize(example_bundles1)
 #'
 #' patients <- fhir_table_description(resource = "Patient")
 #'
-#' dfs <- fhir_crack(bundles = list(bundle),
-#'                   design = fhir_design(patients),
+#' df <- fhir_crack(bundles = bundles,
+#'                   design = patients,
 #'                   brackets = c("[", "]"))
 #'
-#' df_indices_removed <- fhir_rm_indices(dfs$patients, brackets=c("[", "]"))
+#' df_indices_removed <- fhir_rm_indices(df, brackets=c("[", "]"))
 #'
 #' @seealso [fhir_melt()], [fhir_melt_all()]
 
@@ -455,71 +329,19 @@ fhir_rm_indices <- function(
 #' `fhir_restore_indices()`.
 #'
 #' @examples
-#' #generate example bundle
-#'bundle <- xml2::read_xml(
-#'	"<Bundle>
-#'
-#'		<Patient>
-#'			<id value='id1'/>
-#'			<address>
-#'				<use value='home'/>
-#'				<city value='Amsterdam'/>
-#'				<type value='physical'/>
-#'				<country value='Netherlands'/>
-#'			</address>
-#'			<birthDate value='1992-02-06'/>
-#'		</Patient>
-#'
-#'		<Patient>
-#'			<id value='id2'/>
-#'			<address>
-#'				<use value='home'/>
-#'				<city value='Rome'/>
-#'				<type value='physical'/>
-#'				<country value='Italy'/>
-#'			</address>
-#'			<address>
-#'				<use value='work'/>
-#'				<city value='Stockholm'/>
-#'				<type value='postal'/>
-#'				<country value='Sweden'/>
-#'			</address>
-#'			<birthDate value='1980-05-23'/>
-#'		</Patient>
-#'
-#'		<Patient>
-#'			<id value='id3'/>
-#'			<address>
-#'				<use value='home'/>
-#'				<city value='Berlin'/>
-#'			</address>
-#'			<address>
-#'				<type value='postal'/>
-#'				<country value='France'/>
-#'			</address>
-#'			<address>
-#'				<use value='work'/>
-#'				<city value='London'/>
-#'				<type value='postal'/>
-#'				<country value='England'/>
-#'			</address>
-#'			<birthDate value='1974-12-25'/>
-#'			<birthDate value='1978-11-13'/>
-#'		</Patient>
-#'
-#'	</Bundle>"
-#')
+#' #unserialize example bundle
+#' bundles <- fhir_unserialize(example_bundles2)
 #'
 #'#crack fhir resources
 #'patients <- fhir_table_description(resource = "Patient",
 #'                                style = fhir_style(brackets = c("[","]"),
 #'				                                     sep="||")
 #'				                  )
-#'dfs <- fhir_crack(bundles = list(bundle),
-#'                  design = fhir_design(patients))
+#' df <- fhir_crack(bundles = bundles,
+#'                  design = patients)
 #'
 #'#Melt all multiple entries
-#'d <- fhir_melt_all(dfs$patients, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
+#'d <- fhir_melt_all(df, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
 #'
 #'#Extract indices
 #'fhir_extract_indices(d, brackets = c("[", "]"))

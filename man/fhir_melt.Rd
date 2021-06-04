@@ -45,57 +45,27 @@ from the same origin. The name of this column can be changed in the argument \co
 For a more detailed description on how to use this function please see the corresponding package vignette.
 }
 \examples{
-#generate example
-bundle <- fhir_bundle_xml(xml2::read_xml(
-"<Bundle>
-
-    <Patient>
-        <id value='id1'/>
-        <address>
-            <use value='home'/>
-            <city value='Amsterdam'/>
-            <type value='physical'/>
-           <country value='Netherlands'/>
-        </address>
-        <birthDate value='1992-02-06'/>
-    </Patient>
-
-    <Patient>
-        <id value='id2'/>
-        <address>
-            <use value='home'/>
-            <city value='Rome'/>
-            <type value='physical'/>
-            <country value='Italy'/>
-        </address>
-        <address>
-            <use value='work'/>
-            <city value='Stockholm'/>
-            <type value='postal'/>
-            <country value='Sweden'/>
-        </address>
-        <birthDate value='1980-05-23'/>
-    </Patient>
-</Bundle>"
-))
+#unserialize example
+bundles <- fhir_unserialize(example_bundles1)
 
 #crack fhir resources
-dfs <- fhir_crack(bundles = list(bundle),
-                  design = fhir_design(Patients = fhir_table_description(resource = "Patient")),
-                  brackets = c("[","]"))
+table_desc <- fhir_table_description(resource = "Patient",
+                                     style = fhir_style(brackets = c("[","]"),
+                                                        sep = " "))
+df <- fhir_crack(bundles = bundles, design = table_desc)
 
 #find all column names associated with attribute address
-col_names <- fhir_common_columns(dfs$Patients, "address")
+col_names <- fhir_common_columns(df, "address")
 
 #original data frame
-dfs$Patients
+df
 
 #only keep address columns
-fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,
+fhir_melt(indexed_data_frame = df, columns = col_names,
           brackets = c("[","]"), sep = " ")
 
 #keep all columns
-fhir_melt(indexed_data_frame = dfs$Patients, columns = col_names,
+fhir_melt(indexed_data_frame = df, columns = col_names,
           brackets = c("[","]"), sep = " ", all_columns = TRUE)
 }
 \seealso{

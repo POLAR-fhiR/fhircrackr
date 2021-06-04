@@ -4,8 +4,11 @@
 \name{example_bundles1}
 \alias{example_bundles1}
 \alias{example_bundles2}
+\alias{example_bundles3}
 \title{Toy example bundles for mulitple entries}
 \format{
+An object of class \code{fhir_bundle_list} of length 1.
+
 An object of class \code{fhir_bundle_list} of length 1.
 
 An object of class \code{fhir_bundle_list} of length 1.
@@ -109,11 +112,91 @@ An object of class \code{fhir_bundle_list} of length 1.
 
 </Bundle>
 }
+
+\strong{example_bundles3}\preformatted{<Bundle>
+
+	<Patient>
+		<id value='id1'/>
+		<address>
+			<use value='home'/>
+			<city value='Amsterdam'/>
+			<type value='physical'/>
+			<country value='Netherlands'/>
+		</address>
+		<name>
+		<given value='Marie'/>
+		</name>
+	</Patient>
+
+	<Patient>
+		<id value='id2'/>
+		<address>
+			<use value='home'/>
+			<city value='Rome'/>
+			<type value='physical'/>
+			<country value='Italy'/>
+		</address>
+		<address>
+			<use value='work'/>
+			<city value='Stockholm'/>
+			<type value='postal'/>
+			<country value='Sweden'/>
+		</address>
+		<name>
+			<given value='Susie'/>
+		</name>
+	</Patient>
+
+	<Patient>
+		<id value='id3'/>
+		<address>
+			<use value='home'/>
+			<city value='Berlin'/>
+		</address>
+		<address>
+			<type value='postal'/>
+			<country value='France'/>
+		</address>
+		<address>
+			<use value='work'/>
+			<city value='London'/>
+			<type value='postal'/>
+			<country value='England'/>
+		</address>
+		<name>
+			<given value='Frank'/>
+		</name>
+		<name>
+			<given value='Max'/>
+		</name>
+	</Patient>
+
+	<Observation>
+	   <id value = '1'/>
+   <code>
+       <coding>
+	     <system value='http://loinc.org'/>
+	     <code value='29463-7'/>
+	     <display value='Body Weight'/>
+	  </coding>
+      <coding>
+	     <system value='http://snomed.info/sct'/>
+	     <code value='27113001'/>
+	     <display value='Body weight'/>
+      </coding>
+   </code>
+	 </Observation>
+
+	</Bundle>"
+
+}
 }
 \usage{
 example_bundles1
 
 example_bundles2
+
+example_bundles3
 }
 \description{
 These data examples are bundles that contain very few very simple Patient resources
@@ -124,10 +207,14 @@ xml versions look.
 \code{example_bundles1} contains 1 bundle with 2 Patient resources.
 
 \code{example_bundles2} contains 1 bundle with 3 Patient resources.
+
+\code{example_bundles3} contains 1 bundle with 3 Patient resources and 1 Observation resource.
 }
 \examples{
 #unserialize xml objects before doing anything else with them!
 fhir_unserialize(example_bundles1)
+#unserialize xml objects before doing anything else with them!
+fhir_unserialize(example_bundles2)
 #unserialize xml objects before doing anything else with them!
 fhir_unserialize(example_bundles2)
 }

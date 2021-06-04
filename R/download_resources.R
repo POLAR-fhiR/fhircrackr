@@ -54,7 +54,7 @@
 #' in one R session might overburden working memory. When the download is complete, the bundles can be loaded into R using [fhir_load()].
 #' Defaults to `NULL`, i.e. bundles are returned as a list within the R session.
 #' @param directory Deprecated. Please specify the directory directly in the `save_to_disc` argument.
-#' @param delay_between_pages A numeric scalar specifying a time in seconds to wait between pages of the search result,
+#' @param delay_between_bundles A numeric scalar specifying a time in seconds to wait between pages of the search result,
 #' i.e. between downloading the current bundle and the next bundle. This can be used to avoid choking a weak server with
 #' too many requests to quickly. Defaults to zero.
 #'
@@ -101,7 +101,7 @@ fhir_search <- function(
 	delay_between_attempts = 10,
 	log_errors = NULL,
 	save_to_disc = NULL,
-	delay_between_pages = 0,
+	delay_between_bundles = 0,
 	directory = paste0("FHIR_bundles_", gsub("-| |:", "", Sys.time()))) {
 
 
@@ -282,7 +282,7 @@ fhir_search <- function(
 
 		addr <- bundle@next_link
 
-		Sys.sleep(delay_between_pages)
+		Sys.sleep(delay_between_bundles)
 	}
 
 	fhircrackr_env$current_request <- request

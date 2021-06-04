@@ -26,71 +26,19 @@ order are preserved during manipulation, the indices can then be restored again 
 \code{\link[=fhir_restore_indices]{fhir_restore_indices()}}.
 }
 \examples{
-#generate example bundle
-bundle <- xml2::read_xml(
-"<Bundle>
-
-	<Patient>
-		<id value='id1'/>
-		<address>
-			<use value='home'/>
-			<city value='Amsterdam'/>
-			<type value='physical'/>
-			<country value='Netherlands'/>
-		</address>
-		<birthDate value='1992-02-06'/>
-	</Patient>
-
-	<Patient>
-		<id value='id2'/>
-		<address>
-			<use value='home'/>
-			<city value='Rome'/>
-			<type value='physical'/>
-			<country value='Italy'/>
-		</address>
-		<address>
-			<use value='work'/>
-			<city value='Stockholm'/>
-			<type value='postal'/>
-			<country value='Sweden'/>
-		</address>
-		<birthDate value='1980-05-23'/>
-	</Patient>
-
-	<Patient>
-		<id value='id3'/>
-		<address>
-			<use value='home'/>
-			<city value='Berlin'/>
-		</address>
-		<address>
-			<type value='postal'/>
-			<country value='France'/>
-		</address>
-		<address>
-			<use value='work'/>
-			<city value='London'/>
-			<type value='postal'/>
-			<country value='England'/>
-		</address>
-		<birthDate value='1974-12-25'/>
-		<birthDate value='1978-11-13'/>
-	</Patient>
-
-</Bundle>"
-)
+#unserialize example bundle
+bundles <- fhir_unserialize(example_bundles2)
 
 #crack fhir resources
 patients <- fhir_table_description(resource = "Patient",
                                style = fhir_style(brackets = c("[","]"),
 			                                     sep="||")
 			                  )
-dfs <- fhir_crack(bundles = list(bundle),
-                 design = fhir_design(patients))
+df <- fhir_crack(bundles = bundles,
+                 design = patients)
 
 #Melt all multiple entries
-d <- fhir_melt_all(dfs$patients, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
+d <- fhir_melt_all(df, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
 
 #Extract indices
 fhir_extract_indices(d, brackets = c("[", "]"))

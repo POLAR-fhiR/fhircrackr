@@ -27,46 +27,16 @@ the design.
 }
 \examples{
 
-bundle <- xml2::read_xml(
-"<Bundle>
-
-        <Patient>
-            <id value='id1'/>
-            <address>
-                <use value='home'/>
-                <city value='Amsterdam'/>
-                <type value='physical'/>
-               <country value='Netherlands'/>
-            </address>
-            <birthDate value='1992-02-06'/>
-        </Patient>
-
-        <Patient>
-            <id value='id2'/>
-            <address>
-                <use value='home'/>
-                <city value='Rome'/>
-                <type value='physical'/>
-                <country value='Italy'/>
-            </address>
-            <address>
-                <use value='work'/>
-                <city value='Stockholm'/>
-                <type value='postal'/>
-                <country value='Sweden'/>
-            </address>
-            <birthDate value='1980-05-23'/>
-        </Patient>
-</Bundle>"
-)
+#unserialize example
+bundles <- fhir_unserialize(example_bundles1)
 
 patients <- fhir_table_description(resource = "Patient")
 
-dfs <- fhir_crack(bundles = list(bundle),
-                  design = fhir_design(patients),
+df <- fhir_crack(bundles = bundles,
+                  design = patients,
                   brackets = c("[", "]"))
 
-df_indices_removed <- fhir_rm_indices(dfs$patients, brackets=c("[", "]"))
+df_indices_removed <- fhir_rm_indices(df, brackets=c("[", "]"))
 
 }
 \seealso{

@@ -1,8 +1,8 @@
 Package: fhircrackr
 Type: Package
 Title: Handling HL7 FHIR Resources in R
-Version: 0.2.1.9000
-Date: 2020-11-24
+Version: 1.0.0
+Date: 2021-06-07
 Authors@R: c(
     person( given = "Thomas", 
             family = "Peschel", 
