@@ -72,7 +72,7 @@ This introduction will not go into the details of building a valid FHIR search r
 
 ```{r, eval=F}
 request <- fhir_url(url = "http://fhir.hl7.de:8080/baseDstu3", resource = "Patient")
-patient_bundles <- fhir_search(request = request,max_bundles = 2, verbose = 0)
+patient_bundles <- fhir_search(request = request, max_bundles = 2, verbose = 0)
 ```
 
 
@@ -96,9 +96,9 @@ If for some reason you cannot connect to a FHIR server at the moment but want to
 
 
 ## Flattening resources
-Now we know that inside these xml objects there is the patient data somewhere. To bring it into a tabular format, we will use `fhir_crack()` which creates one table per resource type in the bundle. The most important argument `fhir_crack()` takes is `bundles`, the list of bundles that is returned by `fhir_search()`. The second important argument is `design`, an object that tells the function which data to extract from the bundle. `fhir_crack()` returns (a list of) data.frames or data.tables (if argument `data.tables=TRUE`).
+Now we know that inside these xml objects there is the patient data somewhere. To bring it into a tabular format, we will use `fhir_crack()` which creates one table per resource type in the bundle. The most important argument `fhir_crack()` takes is `bundles`, the list of bundles that is returned by `fhir_search()`. The second important argument is `design`, an object that tells the function which data how to extract from the bundle. `fhir_crack()` returns (a list of) data.frames or data.tables (if argument `data.tables = TRUE`).
 
-The object that is passed to the `design` argument can be of class `fhir_table_description` or `fhir_design`. A `fhir_table_description` is used when you want to extract just one resource type, resulting in a single table. A `fhir_design` is basically a named list of `fhir_table_descriptions` and is used when you want to extract several resource types, resulting in a named list of tables.
+The object that is passed to the `design` argument can be of class `fhir_table_description` or `fhir_design`. A `fhir_table_description` is used when you want to extract just one resource type, resulting in a single table. A `fhir_design` is basically a named list of `fhir_table_descriptions` and is used when you want to extract several resource types at once, resulting in a named list of tables.
 
 The details of what the different elements of a `fhir_table_description` or `fhir_design` mean are described in the vignette on flattening resources. Please refer to this document for more information, as we will just use one simple example here.
 
@@ -129,7 +129,7 @@ table_description <- fhir_table_description(
 table_description
 ```
 
-All three elements of `style` can also be controlled directly by the `fhir_crack()` arguments `sep`, `brackets` and `remove_empty_columns`. If the function arguments are `NULL` (their default), the values provided in `style` are used, if they are not NULL, they will overwrite any values in `style`. If both the function arguments and the `style` component of the `fhir_table_description` are NULL, default values(`sep=" "`, `brackets = NULL`, `rm_empty_cols=TRUE`) will be assumed. 
+All three elements of `style` can also be controlled directly by the `fhir_crack()` arguments `sep`, `brackets` and `remove_empty_columns`. If the function arguments are `NULL` (their default), the values provided in `style` are used, if they are not NULL, they will overwrite any values in `style`. If both the function arguments and the `style` component of the `fhir_table_description` are NULL, default values(`sep = " "`, `brackets = NULL`, `rm_empty_cols = TRUE`) will be assumed. 
 
 After it is defined, the `fhir_table_description` can be used in `fhir_crack()` like this:
 
@@ -317,7 +317,7 @@ molten <- fhir_melt(df, columns = cols, brackets = c("[","]"),
 					sep=" | ", all_columns = TRUE)
 molten
 ```
-Values on the other variables will just repeat in the newly created rows. For more information, e.g. on how to melt all multiple entries in a data.rame at once, please see the vignette on flattening resources.
+Values on the other variables will just repeat in the newly created rows. For more information, e.g. on how to melt all multiple entries in a data.frame at once, please see the vignette on flattening resources.
 
 
 ### Remove indices
@@ -329,7 +329,7 @@ fhir_rm_indices(molten, brackets = c("[","]"))
 Again, `brackets` and `sep` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()`respectively.
 
 ## Save and load downloaded bundles
-Since `fhir_crack()` discards of all the data not specified in `design`, it makes sense to store the original search result for reproducibility and in case you realize later on that you need elements from the resources that you haven't extracted at first.
+Since `fhir_crack()` ingorizes all data not specified in `design`, it makes sense to store the original search result for reproducibility and in case you realize later on that you need elements from the resources that you haven't extracted at first.
 
 There are two ways of saving the FHIR bundles you downloaded: Either you save them as R objects, or you write them to an xml file.
 
@@ -349,11 +349,11 @@ head(serialized_bundles[[1]])
 temp_dir <- tempdir()
 
 #save
-save(serialized_bundles, file=paste0(temp_dir, "/bundles.rda"))
+save(serialized_bundles, file = paste0(temp_dir, "/bundles.rda"))
 
 ```
 
-If you load this bundle again, you have to unserialize it before you can work with it:
+If you reload this bundle again, you have to unserialize it before you can work with it:
 
 ```{r}
 #load bundles
@@ -376,7 +376,7 @@ If you want to store the bundles in xml files instead of R objects, you can use 
 
 ```{r}
 #save bundles as xml files
-fhir_save(patient_bundles, directory=temp_dir)
+fhir_save(patient_bundles, directory = temp_dir)
 ```
 
 To read bundles saved with `fhir_save()` back into R, you can use `fhir_load()`:
@@ -385,7 +385,7 @@ To read bundles saved with `fhir_save()` back into R, you can use `fhir_load()`:
 bundles <- fhir_load(temp_dir)
 ```  
 
-`fhir_load()` takes the name of the directory (or path to it) as its only argument. All xml-files in this directory will be read into R and returned as a list of bundles in xml format just as returned by `fhir_search()`.
+`fhir_load()` takes the name of the directory (or path to it) as its only argument. All xml-files in this directory are read into R and returned as a list of bundles in xml format just as returned by `fhir_search()`.
 
 ## Acknowledgements
 This work was carried out by the SMITH consortium and the cross-consortium use case POLAR_MI; both are part of the German Initiative for Medical Informatics and funded by the German Federal Ministry of Education and Research (BMBF), grant no. 01ZZ1803A , 01ZZ1803C and 01ZZ1910A.

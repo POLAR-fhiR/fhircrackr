@@ -87,6 +87,7 @@ Internally, `fhir_resource_type` is called to check the type you provided agains
 ```{r}
 fhir_resource_type("Patient") #Correct
 fhir_resource_type("medicationstatement") #corrected
+fhir_resource_type("Hospital") #a currently unknown resource type, therefore a warning is issued
 ```
 Beside telling the server which resource type to give back, the resource type also determines the kinds of search parameters that are allowed. Search parameters are use to further qualify the resources you want to get back, e.g by restricting the search result to Patient resources of female patients only. 
 
