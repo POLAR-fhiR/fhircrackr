@@ -96,7 +96,7 @@ If for some reason you cannot connect to a FHIR server at the moment but want to
 
 
 ## Flattening resources
-Now we know that inside these xml objects there is the patient data somewhere. To bring it into a tabular format, we will use `fhir_crack()` which creates one table per resource type in the bundle. The most important argument `fhir_crack()` takes is `bundles`, the list of bundles that is returned by `fhir_search()`. The second important argument is `design`, an object that tells the function which data how to extract from the bundle. `fhir_crack()` returns (a list of) data.frames or data.tables (if argument `data.tables = TRUE`).
+Now we know that inside these xml objects there is the patient data somewhere. To bring it into a tabular format, we will use `fhir_crack()` which creates one table per resource type requested in the `design` argument. The most important argument `fhir_crack()` takes is `bundles`, the list of bundles that is returned by `fhir_search()`. The second important argument is `design`, an object that tells the function which data to extract from the bundle and how. `fhir_crack()` returns (a list of) data.frames or data.tables (if argument `data.tables = TRUE`).
 
 The object that is passed to the `design` argument can be of class `fhir_table_description` or `fhir_design`. A `fhir_table_description` is used when you want to extract just one resource type, resulting in a single table. A `fhir_design` is basically a named list of `fhir_table_descriptions` and is used when you want to extract several resource types at once, resulting in a named list of tables.
 
@@ -329,7 +329,7 @@ fhir_rm_indices(molten, brackets = c("[","]"))
 Again, `brackets` and `sep` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()`respectively.
 
 ## Save and load downloaded bundles
-Since `fhir_crack()` ingorizes all data not specified in `design`, it makes sense to store the original search result for reproducibility and in case you realize later on that you need elements from the resources that you haven't extracted at first.
+Since `fhir_crack()` ignores all data not specified in `design`, it makes sense to store the original search result for reproducibility and in case you realize later on that you need elements from the resources that you haven't extracted at first.
 
 There are two ways of saving the FHIR bundles you downloaded: Either you save them as R objects, or you write them to an xml file.
 
@@ -353,7 +353,7 @@ save(serialized_bundles, file = paste0(temp_dir, "/bundles.rda"))
 
 ```
 
-If you reload this bundle again, you have to unserialize it before you can work with it:
+If you reload this bundle, you have to unserialize it before you can work with it:
 
 ```{r}
 #load bundles
