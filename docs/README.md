@@ -216,8 +216,8 @@ resources. Please refer to this document for more information, as we
 will just use one simple example here.
 
 ``` r
-#define df_description
-df_description <- fhir_table_description(
+#define table_description
+table_description <- fhir_table_description(
     resource = "Patient",
     
     cols = c(
@@ -238,7 +238,7 @@ df_description <- fhir_table_description(
 )
 
 #Have a look
-df_description
+table_description
 #> A fhir_table_description with the following elements: 
 #> 
 #> fhir_resource_type: Patient
@@ -264,16 +264,16 @@ All three elements of `style` can also be controlled directly by the
 If the function arguments are `NULL` (their default), the values
 provided in `style` are used, if they are not NULL, they will overwrite
 any values in `style`. If both the function arguments and the `style`
-component of the `fhir_df_description` are NULL, default
+component of the `fhir_table_description` are NULL, default
 values(`sep=" "`, `brackets = NULL`, `rm_empty_cols=TRUE`) will be
 assumed.
 
-After it is defined, the `fhir_df_description` can be used in
+After it is defined, the `fhir_table_description` can be used in
 `fhir_crack()` like this:
 
 ``` r
 #flatten resources
-patients <- fhir_crack(bundles = patient_bundles, design = df_description, verbose = 0)
+patients <- fhir_crack(bundles = patient_bundles, design = table_description, verbose = 0)
 
 #have look at the results
 head(patients)
@@ -304,7 +304,7 @@ head(patients)
 
 Of course the previous example is using just one resource type. If you
 are interested in several types of resources, you use a `fhir_design`
-containing several `fhir_df_descriptions`.
+containing several `fhir_table_descriptions`.
 
 Consider the following example where we want to download
 MedicationStatements referring to a certain medication we specify with
@@ -329,7 +329,7 @@ Then we can download the resources:
 medication_bundles <- fhir_search(request = request, max_bundles = 3)
 ```
 
-Now our `design` needs two `df_descriptions` (called
+Now our `design` needs two `fhir_table_description`s (called
 `MedicationStatements` and `Patients` in our example), one for the
 MedicationStatement resources and one for the Patient resources:
 
@@ -533,11 +533,12 @@ into play:
 
 ``` r
 table_description <- fhir_table_description(resource = "Patient",
-                                      style = fhir_style(
-                                        brackets = c("[","]"),
-                                        sep = " | ",
-                                        rm_empty_cols = FALSE)
-                                      )
+                                            style = fhir_style(
+                                                brackets = c("[","]"),
+                                                sep = " | ",
+                                                rm_empty_cols = FALSE
+                                            ))
+
 df <- fhir_crack(bundles = bundles, design = table_description, verbose = 0)
 df
 #>       id           address.use              address.city
