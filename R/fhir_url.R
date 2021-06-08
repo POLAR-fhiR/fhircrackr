@@ -2,7 +2,7 @@
 #' An S4 object to represent a URL for a FHIR server
 #'
 #' Objects of this class are basically strings (character vectors of length 1) representing
-#' a URL. They are always url encoded. See [fhir_url()] for how to build them..
+#' a URL. They are usually url encoded. See [fhir_url()] for how to build them..
 #' @export
 #'
 setClass(

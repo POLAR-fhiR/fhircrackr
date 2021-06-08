@@ -28,23 +28,25 @@ setValidity(
 #' Create [fhir_resource_type-class] object
 #'
 #' This function creates an object of class [fhir_resource_type-class]. It checks the resource type against the list
-#' of resource types provided at https://hl7.org/FHIR/resourcelist.html, corrects wrong cases and throws a warning if the resource
-#' cannot be found at hl7.org.
+#' of resource types provided at https://hl7.org/FHIR/resourcelist.html, corrects wrong cases (which can be disabled with `fix_cases = FALSE`)
+#' and throws a warning if the resource cannot be found at hl7.org.
 #'
-#' @param string A length one character vector containing the resource type. Will mostly be one of the official FHIR resource
+#' @param string A length one character vector containing the resource type. Will usually be one of the official FHIR resource
 #' types listed at https://hl7.org/FHIR/resourcelist.html
-#' @return An fhir_resource object
+#' @param fix_cases Correct wrong cases for known resource types? E.g. `patients -> Patients` or
+#' `medicationstatement -> MedicationStatement`. Defaults to TRUE.
+#' @return An [fhir_resource_type-class] object
 #' @examples
 #' fhir_resource_type("Patient")
 #' fhir_resource_type("medicationadministration")
 #' @export
 #'
-fhir_resource_type <- function(string) {
+fhir_resource_type <- function(string, fix_cases=TRUE) {
 
 	if(length(string)>1){stop("Please provide only a single string to define the FHIR resource.")}
 
 	#convert to correct case and check for validity
-	if(tolower(string) %in% tolower(existing_resource_types)){
+	if(tolower(string) %in% tolower(existing_resource_types)&& fix_cases){
 		if(!string %in% existing_resource_types){
 			corrected <- existing_resource_types[tolower(string) == tolower(existing_resource_types)]
 			message("Changing resource type \"", string, "\" into \"", corrected, "\".")
