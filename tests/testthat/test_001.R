@@ -20,7 +20,7 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "fhir_save" )
 
-directory <- tempdir()
+directory <- paste0(tempdir(), "/bundles")
 
 fhir_save( fhir_unserialize(patient_bundles), directory)
 
