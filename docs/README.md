@@ -11,7 +11,8 @@ standard describing data formats and elements (known as “resources”) as
 well as an application programming interface (API) for exchanging
 electronic health records. The standard was created by the Health Level
 Seven International (HL7) health-care standards organization. For more
-information on the FHIR standard, visit <https://www.hl7.org/fhir/>.
+information on the FHIR standard, visit
+<a href="https://www.hl7.org/fhir/" target="_blank" rel="noopener">https://www.hl7.org/fhir/</a>.
 
 While FHIR is a very useful standard to describe and exchange medical
 data in an interoperable way, it is not at all useful for statistical
@@ -62,17 +63,18 @@ preconditions for using the `fhircrackr` package here:
     server is often referred to as \[base\].
 
 2.  To download resources from the server, you should be familiar with
-    [FHIR search requests](https://www.hl7.org/fhir/search.html). FHIR
-    search allows you to download sets of resources that match very
-    specific requirements. The `fhircrackr` package offers some help
-    building FHIR search requests, for this please see the vignette on
-    downloading FHIR resources.
+    <a href='https://www.hl7.org/fhir/search.html' target='_blank'>FHIR
+    search requests</a>. FHIR search allows you to download sets of
+    resources that match very specific requirements. The `fhircrackr`
+    package offers some help building FHIR search requests, for this
+    please see the vignette on downloading FHIR resources.
 
 3.  In the first step, `fhircrackr` downloads the resources in xml
     format into R. To specify which elements from the FHIR resources you
     want in your data frame, you should have at least some familiarity
     with XPath expressions. A good tutorial on XPath expressions can be
-    found here: <https://www.w3schools.com/xml/xpath_intro.asp>.
+    found here:
+    <a href=https://www.w3schools.com/xml/xpath_intro.asp target="_blank">“<https://www.w3schools.com/xml/xpath_intro.asp>”</a>.
 
 In the following we’ll go through a typical workflow with `fhircrackr`
 step by step. The first and foremost step is of course, to install and
@@ -122,6 +124,7 @@ two xml objects in our case:
 
 ``` r
 length(patient_bundles)
+#> [1] 2
 #> [1] 2
 patient_bundles
 #> An object of class "fhir_bundle_list"
@@ -184,6 +187,66 @@ patient_bundles
 #> [19] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837793"/ ...
 #> [20] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837794"/ ...
 #> ...
+#> An object of class "fhir_bundle_list"
+#> [[1]]
+#> A fhir_bundle_xml object
+#> No. of entries : 20
+#> Self Link: http://hapi.fhir.org/baseR4/Patient
+#> Next Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1 ...
+#> 
+#> {xml_node}
+#> <Bundle>
+#>  [1] <id value="ce958386-53d0-4042-888c-cad53bf5d5a1"/>
+#>  [2] <meta>\n  <lastUpdated value="2021-05-10T12:12:43.317+00:00"/>\n</meta>
+#>  [3] <type value="searchset"/>
+#>  [4] <link>\n  <relation value="self"/>\n  <url value="http://hapi.fhir.org/b ...
+#>  [5] <link>\n  <relation value="next"/>\n  <url value="http://hapi.fhir.org/b ...
+#>  [6] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837602"/ ...
+#>  [7] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/example-r ...
+#>  [8] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837624"/ ...
+#>  [9] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837626"/ ...
+#> [10] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837631"/ ...
+#> [11] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837716"/ ...
+#> [12] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837720"/ ...
+#> [13] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837714"/ ...
+#> [14] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837721"/ ...
+#> [15] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837722"/ ...
+#> [16] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837723"/ ...
+#> [17] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837724"/ ...
+#> [18] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/cfsb16116 ...
+#> [19] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837736"/ ...
+#> [20] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837737"/ ...
+#> ...
+#> 
+#> [[2]]
+#> A fhir_bundle_xml object
+#> No. of entries : 20
+#> Self Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1 ...
+#> Next Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1 ...
+#> 
+#> {xml_node}
+#> <Bundle>
+#>  [1] <id value="ce958386-53d0-4042-888c-cad53bf5d5a1"/>
+#>  [2] <meta>\n  <lastUpdated value="2021-05-10T12:12:43.317+00:00"/>\n</meta>
+#>  [3] <type value="searchset"/>
+#>  [4] <link>\n  <relation value="self"/>\n  <url value="http://hapi.fhir.org/b ...
+#>  [5] <link>\n  <relation value="next"/>\n  <url value="http://hapi.fhir.org/b ...
+#>  [6] <link>\n  <relation value="previous"/>\n  <url value="http://hapi.fhir.o ...
+#>  [7] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837760"/ ...
+#>  [8] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837766"/ ...
+#>  [9] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837768"/ ...
+#> [10] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837781"/ ...
+#> [11] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837783"/ ...
+#> [12] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837784"/ ...
+#> [13] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837787"/ ...
+#> [14] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837788"/ ...
+#> [15] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837789"/ ...
+#> [16] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837790"/ ...
+#> [17] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837791"/ ...
+#> [18] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837792"/ ...
+#> [19] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837793"/ ...
+#> [20] <entry>\n  <fullUrl value="http://hapi.fhir.org/baseR4/Patient/1837794"/ ...
+#> ...
 ```
 
 If for some reason you cannot connect to a FHIR server at the moment but
@@ -204,20 +267,20 @@ extract from the bundle. `fhir_crack()` returns (a list of) data.frames
 or data.tables (if argument `data.tables=TRUE`).
 
 The object that is passed to the `design` argument can be of class
-`fhir_df_description` or `fhir_design`. A `fhir_df_description` is used
-when you want to extract just one resource type, resulting in a single
-table. A `fhir_design` is basically a named list of
-`fhir_df_descriptions` and is used when you want to extract several
+`fhir_table_description` or `fhir_design`. A `fhir_table_description` is
+used when you want to extract just one resource type, resulting in a
+single table. A `fhir_design` is basically a named list of
+`fhir_table_description`s and is used when you want to extract several
 resource types, resulting in a named list of tables.
 
-The details of what the different elements of a `fhir_df_description` or
-`fhir_design` mean are described in the vignette on flattening
+The details of what the different elements of a `fhir_table_description`
+or `fhir_design` mean are described in the vignette on flattening
 resources. Please refer to this document for more information, as we
 will just use one simple example here.
 
 ``` r
 #define df_description
-df_description <- fhir_df_description(
+df_description <- fhir_table_description(
     resource = "Patient",
     
     cols = c(
@@ -239,7 +302,7 @@ df_description <- fhir_df_description(
 
 #Have a look
 df_description
-#> A fhir_df_description with the following elements: 
+#> A fhir_table_description with the following elements: 
 #> 
 #> fhir_resource_type: Patient
 #> 
@@ -334,7 +397,7 @@ Now our `design` needs two `df_descriptions` (called
 MedicationStatement resources and one for the Patient resources:
 
 ``` r
-MedicationStatements <- fhir_df_description(
+MedicationStatements <- fhir_table_description(
 
     resource = "MedicationStatement",
 
@@ -357,7 +420,7 @@ MedicationStatements <- fhir_df_description(
     )
 )
 
-Patients <- fhir_df_description(resource = "Patient")
+Patients <- fhir_table_description(resource = "Patient")
 
 design <- fhir_design(MedicationStatements, Patients)
 ```
@@ -368,7 +431,7 @@ design looks like this:
 
 ``` r
 design
-#> A fhir_design with 2 df_descriptions:
+#> A fhir_design with 2 table_descriptions:
 #> =====================================================
 #> Name: MedicationStatements
 #> 
@@ -528,19 +591,17 @@ second Patient resource has an address attribute with three entries
 containing different elements and also two entries for the name
 attribute.
 
-This is where the `style` element of the `df_description` comes into
-play:
+This is where the `style` element of the `fhir_table_description` comes
+into play:
 
 ``` r
-df_description <- fhir_df_description(
-    resource = "Patient",
-    style = fhir_style(
-        brackets = c("[","]"),
-        sep = " | ",
-        rm_empty_cols = FALSE
-    )
-)
-df <- fhir_crack(bundles = bundles, design = df_description, verbose = 0)
+table_description <- fhir_table_description(resource = "Patient",
+                                      style = fhir_style(
+                                        brackets = c("[","]"),
+                                        sep = " | ",
+                                        rm_empty_cols = FALSE)
+                                      )
+df <- fhir_crack(bundles = bundles, design = table_description, verbose = 0)
 df
 #>       id           address.use              address.city
 #> 1 [1]id1             [1.1]home            [1.1]Amsterdam
@@ -704,7 +765,7 @@ bundles
 #> A fhir_bundle_xml object
 #> No. of entries : 20
 #> Self Link: http://hapi.fhir.org/baseR4/Patient
-#> Next Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1&_getpagesoffset=20&_count=20&_pretty=true&_bundletype=searchset 
+#> Next Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1 ...
 #> 
 #> {xml_node}
 #> <Bundle>
@@ -733,8 +794,8 @@ bundles
 #> [[2]]
 #> A fhir_bundle_xml object
 #> No. of entries : 20
-#> Self Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1&_getpagesoffset=20&_count=20&_pretty=true&_bundletype=searchset
-#> Next Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1&_getpagesoffset=40&_count=20&_pretty=true&_bundletype=searchset 
+#> Self Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1 ...
+#> Next Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1 ...
 #> 
 #> {xml_node}
 #> <Bundle>
