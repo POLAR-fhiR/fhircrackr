@@ -90,7 +90,7 @@ Internally, `fhir_table_description()` calls `fhir_resource_type()` which checks
 As you can see in the above output, there are two more elements in a `fhir_table_description` which are filled automatically by `fhir_table_description()`.
 
 #### The cols argument
-The `cols` argument takes the column names and XPath (1.0) expressions defining the columns to create from the FHIR resources. The XPath expression refers here relatively to the root of the resource tree. If the `cols` element is empty, `fhir_crack()` will extract all available elements of the resource and name the columns automatically. To explicitly define columns, you can provide a (named) character or a (named) list with XPath expressions like this:
+The `cols` argument takes the column names and XPath (1.0) expressions defining the columns to create from the FHIR resources. The XPath expression has to be built relatively to the root of the resource tree. If the `cols` element is empty, `fhir_crack()` will extract all available elements of the resource and name the columns automatically. To explicitly define columns, you can provide a (named) character or a (named) list with XPath expressions like this:
 
 ```{r}
 fhir_table_description(
@@ -116,6 +116,7 @@ fhir_columns(c(
 fhir_columns(c("gender", "name/family", "address/city"))
 ```
 
+A `fhir_columns` object that is created explicitly like this can of course also be used in the `columns` argument of `fhir_table_description`. 
 We strongly advise to only use fully specified relative XPath expressions here, e.g. `"ingredient/strength/numerator/code"` and not search paths like `"//code"`, as those can generate unexpected results especially if the searched element appears on different levels of the resource.
 
 #### The style argument
