@@ -11,7 +11,8 @@ standard describing data formats and elements (known as “resources”) as
 well as an application programming interface (API) for exchanging
 electronic health records. The standard was created by the Health Level
 Seven International (HL7) health-care standards organization. For more
-information on the FHIR standard, visit <https://www.hl7.org/fhir/>.
+information on the FHIR standard, visit
+<a href="https://www.hl7.org/fhir/" target="_blank">https://www.hl7.org/fhir/</a>.
 
 While FHIR is a very useful standard to describe and exchange medical
 data in an interoperable way, it is not at all useful for statistical
@@ -62,17 +63,18 @@ preconditions for using the `fhircrackr` package here:
     server is often referred to as \[base\].
 
 2.  To download resources from the server, you should be familiar with
-    [FHIR search requests](https://www.hl7.org/fhir/search.html). FHIR
-    search allows you to download sets of resources that match very
-    specific requirements. The `fhircrackr` package offers some help
-    building FHIR search requests, for this please see the vignette on
-    downloading FHIR resources.
+    <a href="https://www.hl7.org/fhir/search.html" target="_blank">FHIR
+    search requests</a>. FHIR search allows you to download sets of
+    resources that match very specific requirements. The `fhircrackr`
+    package offers some help building FHIR search requests, for this
+    please see the vignette on downloading FHIR resources.
 
 3.  In the first step, `fhircrackr` downloads the resources in xml
     format into R. To specify which elements from the FHIR resources you
     want in your data frame, you should have at least some familiarity
     with XPath expressions. A good tutorial on XPath expressions can be
-    found here: <https://www.w3schools.com/xml/xpath_intro.asp>.
+    found here:
+    <a href="https://www.w3schools.com/xml/xpath_intro.asp" target="_blank">https://www.w3schools.com/xml/xpath\_intro.asp</a>.
 
 In the following we’ll go through a typical workflow with `fhircrackr`
 step by step. The first and foremost step is of course, to install and
@@ -94,7 +96,7 @@ Patient resources from a public HAPI server:
 
 ``` r
 request <- fhir_url(url = "http://fhir.hl7.de:8080/baseDstu3", resource = "Patient")
-patient_bundles <- fhir_search(request=request,max_bundles=2, verbose = 0)
+patient_bundles <- fhir_search(request = request, max_bundles = 2, verbose = 0)
 ```
 
 The minimum information `fhir_search()` requires is a url containing the
@@ -129,7 +131,7 @@ patient_bundles
 #> A fhir_bundle_xml object
 #> No. of entries : 20
 #> Self Link: http://hapi.fhir.org/baseR4/Patient
-#> Next Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1&_getpagesoffset=20&_count=20&_pretty=true&_bundletype=searchset 
+#> Next Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1 ...
 #> 
 #> {xml_node}
 #> <Bundle>
@@ -158,8 +160,8 @@ patient_bundles
 #> [[2]]
 #> A fhir_bundle_xml object
 #> No. of entries : 20
-#> Self Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1&_getpagesoffset=20&_count=20&_pretty=true&_bundletype=searchset
-#> Next Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1&_getpagesoffset=40&_count=20&_pretty=true&_bundletype=searchset 
+#> Self Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1 ...
+#> Next Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1 ...
 #> 
 #> {xml_node}
 #> <Bundle>
@@ -196,19 +198,19 @@ use them.
 
 Now we know that inside these xml objects there is the patient data
 somewhere. To bring it into a tabular format, we will use `fhir_crack()`
-which creates one table per resource type in the bundle. The most
-important argument `fhir_crack()` takes is `bundles`, the list of
-bundles that is returned by `fhir_search()`. The second important
-argument is `design`, an object that tells the function which data to
-extract from the bundle. `fhir_crack()` returns (a list of) data.frames
-or data.tables (if argument `data.tables=TRUE`).
+which creates one table per resource type requested in the `design`
+argument. The most important argument `fhir_crack()` takes is `bundles`,
+the list of bundles that is returned by `fhir_search()`. The second
+important argument is `design`, an object that tells the function which
+data to extract from the bundle and how. `fhir_crack()` returns (a list
+of) data.frames or data.tables (if argument `data.tables = TRUE`).
 
 The object that is passed to the `design` argument can be of class
 `fhir_table_description` or `fhir_design`. A `fhir_table_description` is
 used when you want to extract just one resource type, resulting in a
 single table. A `fhir_design` is basically a named list of
-`fhir_table_description`s and is used when you want to extract several
-resource types, resulting in a named list of tables.
+`fhir_table_descriptions` and is used when you want to extract several
+resource types at once, resulting in a named list of tables.
 
 The details of what the different elements of a `fhir_table_description`
 or `fhir_design` mean are described in the vignette on flattening
@@ -265,7 +267,7 @@ If the function arguments are `NULL` (their default), the values
 provided in `style` are used, if they are not NULL, they will overwrite
 any values in `style`. If both the function arguments and the `style`
 component of the `fhir_table_description` are NULL, default
-values(`sep=" "`, `brackets = NULL`, `rm_empty_cols=TRUE`) will be
+values(`sep = " "`, `brackets = NULL`, `rm_empty_cols = TRUE`) will be
 assumed.
 
 After it is defined, the `fhir_table_description` can be used in
@@ -329,7 +331,7 @@ Then we can download the resources:
 medication_bundles <- fhir_search(request = request, max_bundles = 3)
 ```
 
-Now our `design` needs two `fhir_table_description`s (called
+Now our `design` needs two `table_descriptions` (called
 `MedicationStatements` and `Patients` in our example), one for the
 MedicationStatement resources and one for the Patient resources:
 
@@ -528,17 +530,18 @@ second Patient resource has an address attribute with three entries
 containing different elements and also two entries for the name
 attribute.
 
-This is where the `style` element of the `fhir_table_description` comes
-into play:
+This is where the `style` element of the `table_description` comes into
+play:
 
 ``` r
-table_description <- fhir_table_description(resource = "Patient",
-                                            style = fhir_style(
-                                                brackets = c("[","]"),
-                                                sep = " | ",
-                                                rm_empty_cols = FALSE
-                                            ))
-
+table_description <- fhir_table_description(
+    resource = "Patient",
+    style = fhir_style(
+        brackets = c("[","]"),
+        sep = " | ",
+        rm_empty_cols = FALSE
+    )
+)
 df <- fhir_crack(bundles = bundles, design = table_description, verbose = 0)
 df
 #>       id           address.use              address.city
@@ -567,8 +570,8 @@ or several `columns` and spreads (aka melts) these entries over several
 rows:
 
 ``` r
-fhir_melt(df, columns = "address.city", brackets = c("[","]"), 
-          sep=" | ", all_columns = FALSE)
+fhir_melt(df, columns = "address.city", 
+          brackets = c("[","]"), sep = " | ", all_columns = FALSE)
 #>   address.city resource_identifier
 #> 1 [1]Amsterdam                   1
 #> 2    [1]Berlin                   2
@@ -586,11 +589,10 @@ but it makes sense to only have variables from the same repeating
 attribute together in one call to `fhir_melt()`:
 
 ``` r
-cols <- c("address.city", "address.use", "address.type", 
-          "address.country")
+cols <- c("address.city", "address.use", "address.type", "address.country")
 
 fhir_melt(df, columns = cols, brackets = c("[","]"), 
-          sep=" | ", all_columns = FALSE)
+          sep = " | ", all_columns = FALSE)
 #>   address.city address.use address.type address.country resource_identifier
 #> 1 [1]Amsterdam     [1]home  [1]physical  [1]Netherlands                   1
 #> 2    [1]Berlin     [1]home         <NA>            <NA>                   2
@@ -620,7 +622,7 @@ molten
 
 Values on the other variables will just repeat in the newly created
 rows. For more information, e.g. on how to melt all multiple entries in
-a data.rame at once, please see the vignette on flattening resources.
+a data.frame at once, please see the vignette on flattening resources.
 
 ### Remove indices
 
@@ -629,7 +631,7 @@ of the indices in your data.frame. This can be achieved using
 `fhir_rm_indices()`:
 
 ``` r
-fhir_rm_indices(molten, brackets=c("[","]"))
+fhir_rm_indices(molten, brackets = c("[","]"))
 #>    id address.use address.city address.type address.country  name.given
 #> 1 id1        home    Amsterdam     physical     Netherlands       Marie
 #> 2 id3        home       Berlin         <NA>            <NA> Frank | Max
@@ -647,10 +649,10 @@ that was used for `fhir_crack()` and `fhir_melt()`respectively.
 
 ## Save and load downloaded bundles
 
-Since `fhir_crack()` discards of all the data not specified in `design`,
-it makes sense to store the original search result for reproducibility
-and in case you realize later on that you need elements from the
-resources that you haven’t extracted at first.
+Since `fhir_crack()` ignores all data not specified in `design`, it
+makes sense to store the original search result for reproducibility and
+in case you realize later on that you need elements from the resources
+that you haven’t extracted at first.
 
 There are two ways of saving the FHIR bundles you downloaded: Either you
 save them as R objects, or you write them to an xml file.
@@ -681,10 +683,10 @@ head(serialized_bundles[[1]])
 temp_dir <- tempdir()
 
 #save
-save(serialized_bundles, file=paste0(temp_dir, "/bundles.rda"))
+save(serialized_bundles, file = paste0(temp_dir, "/bundles.rda"))
 ```
 
-If you load this bundle again, you have to unserialize it before you can
+If you reload this bundle, you have to unserialize it before you can
 work with it:
 
 ``` r
@@ -703,7 +705,7 @@ bundles
 #> A fhir_bundle_xml object
 #> No. of entries : 20
 #> Self Link: http://hapi.fhir.org/baseR4/Patient
-#> Next Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1&_getpagesoffset=20&_count=20&_pretty=true&_bundletype=searchset 
+#> Next Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1 ...
 #> 
 #> {xml_node}
 #> <Bundle>
@@ -732,8 +734,8 @@ bundles
 #> [[2]]
 #> A fhir_bundle_xml object
 #> No. of entries : 20
-#> Self Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1&_getpagesoffset=20&_count=20&_pretty=true&_bundletype=searchset
-#> Next Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1&_getpagesoffset=40&_count=20&_pretty=true&_bundletype=searchset 
+#> Self Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1 ...
+#> Next Link: http://hapi.fhir.org/baseR4?_getpages=ce958386-53d0-4042-888c-cad53bf5d5a1 ...
 #> 
 #> {xml_node}
 #> <Bundle>
@@ -778,7 +780,7 @@ current working directory.
 
 ``` r
 #save bundles as xml files
-fhir_save(patient_bundles, directory=temp_dir)
+fhir_save(patient_bundles, directory = temp_dir)
 ```
 
 To read bundles saved with `fhir_save()` back into R, you can use
@@ -789,7 +791,7 @@ bundles <- fhir_load(temp_dir)
 ```
 
 `fhir_load()` takes the name of the directory (or path to it) as its
-only argument. All xml-files in this directory will be read into R and
+only argument. All xml-files in this directory are read into R and
 returned as a list of bundles in xml format just as returned by
 `fhir_search()`.
 
