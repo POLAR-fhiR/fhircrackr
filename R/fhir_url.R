@@ -34,6 +34,8 @@ setValidity(
 #'
 #' Note that only the latter approach does a validity check on the resource type!
 #'
+#' You can disable URL-encoding by setting `url_enc=FALSE`.
+#'
 #' @param url A character of length 1 specifying either the full search request,
 #' e.g. `"http://hapi.fhir.org/baseR4/Patient?gender=male&_summary=count"`, or
 #' the base URL to the FHIR server, e.g. `"http://hapi.fhir.org/baseR4"`.
@@ -41,6 +43,7 @@ setValidity(
 #' @param parameters Optional. Either a length 1 character containing properly formatted FHIR search parameters, e.g.
 #' `"gender=male&_summary=count"` or a named list or named character vector e.g. `list(gender="male", "_summary"="count")`
 #' or `c(gender="male", "_summary"="count")`. Note that parameter names beginning with `_` have to be put in quotation marks!
+#' @param url_enc Should the url be URL-encoded? Defaults to `TRUE`.
 #'
 #' @return An object of class [fhir_url-class]
 #' @docType methods
@@ -80,7 +83,7 @@ setValidity(
 
 setGeneric(
 	"fhir_url",
-	function(url, resource, parameters){
+	function(url, resource, parameters, url_enc=TRUE){
 		request <- standardGeneric("fhir_url")
 		fhircrackr_env$current_request <- request
 		request
@@ -92,9 +95,9 @@ setGeneric(
 setMethod(
 	"fhir_url",
 	signature = c(url="character", resource = "missing", parameters = "missing"),
-	function(url){
+	function(url, url_enc=TRUE){
 
-		if(length(url)>0){url <- utils::URLencode(url)}
+		if(length(url)>0&&url_enc){url <- utils::URLencode(url)}
 
 		new("fhir_url", url)
 
@@ -107,7 +110,7 @@ setMethod(
 setMethod(
 	"fhir_url",
 	signature = c(url = "character", resource = "character", parameters = "missing"),
-	function(url, resource){
+	function(url, resource, url_enc=TRUE){
 
 		resource <- fhir_resource_type(resource)
 
@@ -119,8 +122,8 @@ setMethod(
 			request <- paste(url, resource, sep="/")
 		}
 
-
-	 	new("fhir_url", utils::URLencode(request))
+		if(url_enc){request <- utils::URLencode(request)}
+	 	new("fhir_url", request)
 	}
 )
 
@@ -130,7 +133,7 @@ setMethod(
 setMethod(
 	"fhir_url",
 	signature = c(url = "character", resource = "character", parameters = "character"),
-	function(url, resource, parameters){
+	function(url, resource, parameters, url_enc=TRUE){
 
 		resource <- fhir_resource_type(resource)
 
@@ -144,8 +147,9 @@ setMethod(
 
 
 		if(length(parameters)==1 && grepl("=", parameters)){
-
-			return(new("fhir_url", utils::URLencode(paste0(request, "?", parameters))))
+			request <- paste0(request, "?", parameters)
+			if(url_enc){utils::URLencode(request)}
+			return(new("fhir_url", request))
 		}
 
 		if(is.null(names(parameters))){
@@ -162,7 +166,9 @@ setMethod(
 		pairs <- paste(keys, parameters, sep = "=")
 		string <- paste(pairs, collapse = "&")
 
-	 	new("fhir_url",  utils::URLencode(paste0(request, "?", string)))
+		request <- paste0(request, "?", string)
+		if(url_enc){request <- utils::URLencode(request)}
+	 	new("fhir_url", request)
 	}
 
 )
@@ -173,7 +179,7 @@ setMethod(
 setMethod(
 	"fhir_url",
 	signature = c(url = "character", resource = "character", parameters = "list"),
-	function(url, resource, parameters){
+	function(url, resource, parameters, url_enc=TRUE){
 
 		resource <- fhir_resource_type(resource)
 
@@ -197,7 +203,10 @@ setMethod(
 		pairs <- paste(keys, values, sep = "=")
 		string <- paste(pairs, collapse = "&")
 
-		new("fhir_url",  utils::URLencode(paste0(request, "?", string)))
+		request <- paste0(request, "?", string)
+		if(url_enc){request <- utils::URLencode(request)}
+
+		new("fhir_url", request)
 	}
 
 )
