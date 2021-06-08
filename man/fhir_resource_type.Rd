@@ -4,21 +4,21 @@
 \alias{fhir_resource_type}
 \title{Create \linkS4class{fhir_resource_type} object}
 \usage{
-fhir_resource_type(string)
+fhir_resource_type(string, fix_capitalization = TRUE)
 }
 \arguments{
 \item{string}{A length one character vector containing the resource type. Will usually be one of the official FHIR resource
 types listed at https://hl7.org/FHIR/resourcelist.html}
 
-\item{fix_cases}{Correct wrong cases for known resource types? E.g. \code{patients -> Patients} or
+\item{fix_capitalization}{Correct wrong capitalization for known resource types? E.g. \code{patients -> Patients} or
 \code{medicationstatement -> MedicationStatement}. Defaults to TRUE.}
 }
 \value{
-An fhir_resource object
+An \linkS4class{fhir_resource_type} object
 }
 \description{
 This function creates an object of class \linkS4class{fhir_resource_type}. It checks the resource type against the list
-of resource types provided at https://hl7.org/FHIR/resourcelist.html, corrects wrong cases (which can be disabled with \code{fix_cases = FALSE})
+of resource types provided at https://hl7.org/FHIR/resourcelist.html, corrects wrong cases (which can be disabled with \code{fix_capitalization = FALSE})
 and throws a warning if the resource cannot be found at hl7.org.
 }
 \examples{
