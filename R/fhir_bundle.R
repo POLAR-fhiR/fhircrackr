@@ -22,14 +22,13 @@ setOldClass("xml_node")
 setClass(
 	"fhir_bundle_xml",
 	contains = c("fhir_bundle", "xml_node"),
-	slots = c(next_link = "fhir_url",
-			  self_link = "fhir_url"),
-	prototype = prototype(xml2::read_xml("<Bundle></Bundle>"))
+	slots = c(next_link = "fhir_url", self_link = "fhir_url"),
+	prototype = prototype(xml2::read_xml(x = "<Bundle></Bundle>"))
 )
 
 setValidity(
 	"fhir_bundle_xml",
-	function(object){
+	function(object) {
 		messages <- c()
 		if(xml2::xml_name(x = object) != "Bundle") {
 			messages <- c(
@@ -54,24 +53,26 @@ setValidity(
 #' @export
 #'
 fhir_bundle_xml <- function(bundle) {
-
 	xml2::xml_ns_strip(x = bundle)
 	links <- xml2::xml_find_all(x = bundle, xpath = "link")
 	rels.nxt <-	xml2::xml_text(x = xml2::xml_find_first(x = links, xpath = "./relation/@value")) == "next"
 	rels.self <- xml2::xml_text(x = xml2::xml_find_first(x = links,xpath = "./relation/@value")) == "self"
 	urls <- xml2::xml_attr(x = xml2::xml_find_all(x = links, xpath = "url"), attr = "value")
-
-	new("fhir_bundle_xml", bundle, next_link = fhir_url(urls[rels.nxt]), self_link = fhir_url(urls[rels.self]))
+	new(Class = "fhir_bundle_xml", bundle, next_link = fhir_url(url = urls[rels.nxt]), self_link = fhir_url(url = urls[rels.self]))
 }
 
 setMethod(
 	"show",
 	"fhir_bundle_xml",
 	function(object) {
-		cat(paste0("A fhir_bundle_xml object\n",
-				   "No. of entries : ", length(xml2::xml_find_all(object, "entry")), "\n",
-				   "Self Link: ", object@self_link, "\n",
-				   "Next Link: ", object@next_link), "\n\n")
+		cat(
+			paste0(
+				"A fhir_bundle_xml object\n",
+				"No. of entries : ", length(xml2::xml_find_all(object, "entry")), "\n",
+				"Self Link: ", object@self_link, "\n",
+				"Next Link: ", object@next_link
+			), "\n\n"
+		)
 		print(object)
     }
 )
@@ -100,5 +101,5 @@ setClass(
 
 #constructor
 fhir_bundle_serialized <- function(bundle) {
-	new("fhir_bundle_serialized", bundle)
+	new(Class = "fhir_bundle_serialized", bundle)
 }
