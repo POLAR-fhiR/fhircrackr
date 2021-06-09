@@ -1,4 +1,3 @@
-
 #Class definition
 
 #' A representation of a FHIR resource type
@@ -9,13 +8,13 @@
 #' @export
 #'
 setClass(
-	"fhir_resource_type",
+	Class = "fhir_resource_type",
 	contains = "character"
 )
 
 #Validity check
 setValidity(
-	"fhir_resource_type",
+	Class = "fhir_resource_type",
 	method = function(object) {
 		messages <- c()
 		if(1 < length(object)) {
@@ -42,35 +41,31 @@ setValidity(
 #' @export
 #'
 fhir_resource_type <- function(string, fix_capitalization = TRUE) {
-
 	if(length(string)>1){stop("Please provide only a single string to define the FHIR resource.")}
-
 	#convert to correct case and check for validity
-	if(tolower(string) %in% tolower(existing_resource_types)&& fix_capitalization){
-		if(!string %in% existing_resource_types){
+	if(tolower(string) %in% tolower(existing_resource_types) && fix_capitalization) {
+		if(!string %in% existing_resource_types) {
 			corrected <- existing_resource_types[tolower(string) == tolower(existing_resource_types)]
 			message("Changing resource type \"", string, "\" into \"", corrected, "\".")
 			string <- existing_resource_types[tolower(string) == tolower(existing_resource_types)]
 		}
-	}else{
+	} else {
 		warning(
 			"You gave \"", string, "\" as the resource type.\n",
 			"This doesn't match any of the resource types defined under https://hl7.org/FHIR/resourcelist.html. ",
-			"If you are sure the resource type is correct anyway, you can ignore this warning.\n")
+			"If you are sure the resource type is correct anyway, you can ignore this warning.\n"
+		)
 	}
-
-	result <- new("fhir_resource_type", string)
-
-	result
+	# result <- new(Class = "fhir_resource_type", string)
+	# result
+	new(Class = "fhir_resource_type", string)
 }
 
 
 setMethod(
-	"show",
-	"fhir_resource_type",
-	function(object){
-		cat("A fhir_resource_type object: ")
-		cat(object)
-		cat("\n")
+	f = "show",
+	signature = "fhir_resource_type",
+	function(object) {
+		cat("A fhir_resource_type object: ", object, "\n")
 	}
 )
