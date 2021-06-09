@@ -46,7 +46,7 @@ testthat::test_that(
 
 		df_list <- list(Patients = data.frame(), Observations = data.frame())
 
-		fdfl <- fhir_df_list(df_list, design)
+		fdfl <- fhir_df_list(df_list = df_list, design = design)
 
 		testthat::expect_s4_class(fdfl, "fhir_df_list")
 	}

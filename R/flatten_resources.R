@@ -68,7 +68,7 @@
 #'     		)
 #' )
 #'
-#' med_df <- fhir_crack(bundles, design = medications)
+#' med_df <- fhir_crack(bundles = bundles, design = medications)
 #'
 #' head(med_df) #data.frame
 #'
@@ -82,7 +82,7 @@
 #'
 #' design <- fhir_design(medications, patients)
 #'
-#' df_list <- fhir_crack(bundles, design)
+#' df_list <- fhir_crack(bundles = bundles, design = design)
 #'
 #' #list of data.frames/fhir_df_list
 #' head(df_list$medications)
@@ -133,7 +133,7 @@ setMethod(
 			))
 		}
 		if (!is.null(brackets)) {
-			brackets <- fix_brackets(brackets)
+			brackets <- fix_brackets(brackets = brackets)
 			design <-fhir_design(lapply(
 				design,
 				function(x){
@@ -152,7 +152,7 @@ setMethod(
 			))
 		}
 
-		validObject(design, complete = T)
+		validObject(object = design, complete = T)
 
 		#Check for dangerous XPath expressions ins cols
 		cols <- lapply(design, function(x){c(x@cols)})
@@ -167,7 +167,7 @@ setMethod(
 
 
 		#Add attributes to design
-		design <- add_attribute_to_design(design)
+		design <- add_attribute_to_design(design = design)
 		#crack
 		dfs <- bundles2dfs(bundles = bundles, design = design, data.table = data.table, verbose = verbose)
 		if (0 < verbose) {message("FHIR-Resources cracked. \n")}
@@ -196,7 +196,7 @@ setMethod(
 		}
 
 		if (!is.null(brackets)) {
-			brackets <- fix_brackets(brackets)
+			brackets <- fix_brackets(brackets = brackets)
 			design@style@brackets <- brackets
 		}
 
@@ -204,7 +204,7 @@ setMethod(
 			design@style@rm_empty_cols <- remove_empty_columns
 		}
 
-		validObject(design, complete = T)
+		validObject(object = design, complete = T)
 
 		#Check for dangerous XPath expressions ins cols
 		cols <- design@cols
@@ -218,7 +218,7 @@ setMethod(
 		}
 
 		#Add attributes to design
-		design <- add_attribute_to_design(design)
+		design <- add_attribute_to_design(design = design)
 
 		#crack
 		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose)
@@ -288,13 +288,13 @@ setMethod(
 #'
 #' @examples
 #' #unserialize example bundle
-#' bundles <- fhir_unserialize(medication_bundles)
+#' bundles <- fhir_unserialize(bundles = medication_bundles)
 #'
 #' #extract child
-#' child <- xml2::xml_find_first(bundles[[1]], ".//MedicationStatement")
+#' child <- xml2::xml_find_first(x = bundles[[1]], xpath = ".//MedicationStatement")
 #'
 #' #Extract all columns
-#' result <- fhircrackr:::xtrct_all_columns(child)
+#' result <- fhircrackr:::xtrct_all_columns(child = child)
 #'
 xtrct_all_columns <- function(
 	child,
@@ -304,16 +304,22 @@ xtrct_all_columns <- function(
 
 	if(length(brackets)==0){brackets <- NULL}
 
-	tree <- xml2::xml_find_all(child, xpath)
+	tree <- xml2::xml_find_all(x = child, xpath = xpath)
 	if (length(tree) < 1) {return(data.table::data.table())}
-	xp.child  <- xml2::xml_path(child)
-	xp.remain <- xml2::xml_path(tree)
-	xp.rel    <- substr(xp.remain, nchar(xp.child) + 2, nchar(xp.remain))
-	xp.cols   <- gsub("/", ".", gsub("@", "", unique(gsub("\\[[0-9]+\\]", "", xp.rel))))
+	xp.child  <- xml2::xml_path(x = child)
+	xp.remain <- xml2::xml_path(x = tree)
+	xp.rel    <- substr(x = xp.remain, start = nchar(xp.child) + 2, stop = nchar(xp.remain))
+	xp.cols   <- gsub(pattern = "/", replacement = ".",
+					  x = gsub(pattern = "@", replacement = "",
+					  		 x = unique(gsub(pattern = "\\[[0-9]+\\]", replacement = "",
+					  		 				x = xp.rel)
+					  		 				)
+					  		 )
+					  )
 	d <- lapply(1:length(xp.cols), function(dummy)character(0))
 	names(d) <- xp.cols
-	val  <- xml2::xml_text(tree)
-	s <- stringr::str_split(xp.rel, "/")
+	val  <- xml2::xml_text(x = tree)
+	s <- stringr::str_split(string = xp.rel, pattern = "/")
 	o <- sapply(
 		seq_along(s),
 		function(i) {
@@ -321,8 +327,14 @@ xtrct_all_columns <- function(
 			i.f <- !grepl("\\[[0-9]+\\]", s.)
 			if (any(i.f)) {s.[i.f] <- paste0(s.[i.f], "[1]")}
 			c(
-				paste0(gsub("]$","",gsub(".*\\[","",s.[-length(s.)])), collapse = "."),
-				gsub("@", "", gsub("\\[[0-9]+\\]", "", paste0(s., collapse = ".")))
+				paste0(gsub(pattern = "]$",replacement = "",
+							x = gsub(pattern = ".*\\[",replacement = "",
+									 x = s.[-length(s.)])), collapse = "."),
+				gsub(pattern = "@", replacement = "",
+					 x = gsub(pattern = "\\[[0-9]+\\]", replacement = "",
+					 		 x = paste0(s., collapse = ".")
+					 		 )
+					 )
 			)
 		}
 	)
@@ -336,8 +348,8 @@ xtrct_all_columns <- function(
 		#col <- xp.cols[1]
 		d[[col]] <- paste0(val[col == o[2, ]], collapse = sep)
 	}
-	result <- data.table::as.data.table(d)
-	names(result) <- gsub("(\\.\\w+)$", "", names(result))
+	result <- data.table::as.data.table(x = d)
+	names(result) <- gsub(pattern = "(\\.\\w+)$", replacement = "", x = names(result))
 	result
 }
 
@@ -369,7 +381,7 @@ xtrct_all_columns <- function(
 #' )
 #'
 #' #Extract columns
-#' result <- fhircrackr:::xtrct_columns(child, cols)
+#' result <- fhircrackr:::xtrct_columns(child = child, cols = cols)
 
 xtrct_columns <- function(
 	child,
@@ -379,24 +391,24 @@ xtrct_columns <- function(
 
 	if(length(brackets)==0){brackets <- NULL}
 
-	xp <- xml2::xml_path(child)
+	xp <- xml2::xml_path(x = child)
 	l <- lapply(
 		lst(names(cols)),
 		function(column.name)  {
 			i.srch <- cols[[column.name]]
 			loc <- xml2::xml_find_all(x = child, xpath = i.srch)
-			val <- xml2::xml_text(loc)
+			val <- xml2::xml_text(x = loc)
 			if (!is.null(brackets)) {
-				loc.xp <- xml2::xml_path(loc)
+				loc.xp <- xml2::xml_path(x = loc)
 				loc.xp.rel <- substr(loc.xp, nchar(xp) + 2, nchar(loc.xp))
-				s <- stringr::str_split(loc.xp.rel, "/")
+				s <- stringr::str_split(string = loc.xp.rel, pattern = "/")
 				o <- sapply(
 					seq_along(s),
 					function(i) {
 						s. <- s[[i]]
 						i.f <- !grepl("\\[[0-9]+\\]", s.)
 						if (any(i.f)) {s.[i.f] <- paste0(s.[i.f], "[1]")}
-						gsub(".1$", "", paste0(gsub("[^0-9]", "", s.), collapse = "."))
+						gsub(".1$", "", paste0(gsub(pattern = "[^0-9]", replacement = "", x = s.), collapse = "."))
 					}
 				)
 
@@ -411,7 +423,7 @@ xtrct_columns <- function(
 			}
 		}
 	)
-	data.table::as.data.table(l)
+	data.table::as.data.table(x = l)
 }
 
 #' Extracts one data frame out of one bundle
@@ -421,7 +433,7 @@ xtrct_columns <- function(
 #' @noRd
 #' @examples
 #' #unserialize example bundle
-#' bundles <- fhir_unserialize(medication_bundles)
+#' bundles <- fhir_unserialize(bundles = medication_bundles)
 #'
 #' #extract first bundle
 #' bundle <- bundles[[1]]
@@ -442,14 +454,14 @@ xtrct_columns <- function(
 #' 	 )
 #'
 #' #convert bundle to data frame
-#' result <- fhircrackr:::bundle2df(bundle, df_desc)
+#' result <- fhircrackr:::bundle2df(bundle = bundle, df_desc = df_desc)
 bundle2df <- function(
 	bundle,
 	df_desc,
 	verbose = 2) {
 
 	xpath <- paste0("//", df_desc@resource)
-	children <- xml2::xml_find_all(bundle, xpath)
+	children <- xml2::xml_find_all(x = bundle, xpath = xpath)
 	df.list <- if (length(children) == 0) {
 		list()
 	} else {
@@ -462,7 +474,7 @@ bundle2df <- function(
 
 			   	if (length(df_desc@cols)>0) {#if cols is not empty
 			   		cols <- df_desc@cols
-			   		res <- xtrct_columns(child, cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets)
+			   		res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets)
 			   		if (1 < verbose) {
 			   			if (all(sapply(res, is.na))) {cat("x")} else {cat(".")}
 			   		}
@@ -505,7 +517,7 @@ bundle2df <- function(
 #' 	 )
 #'
 #' #convert bundles to data frame
-#' result <- fhircrackr:::bundles2df(bundles, df_desc)
+#' result <- fhircrackr:::bundles2df(bundles = bundles, df_desc = df_desc)
 
 bundles2df <- function(
 	bundles,
@@ -520,7 +532,7 @@ bundles2df <- function(
 				#i<-1
 				if (1 < verbose) {cat("\n", i)}
 				bundle <- bundles[[i]]
-				bundle2df(bundle, df_desc, verbose = verbose)
+				bundle2df(bundle = bundle, df_desc = df_desc, verbose = verbose)
 			}
 		),
 		fill = TRUE
@@ -543,12 +555,12 @@ bundles2df <- function(
 #'
 #' @examples
 #' #unserialize example bundle
-#' bundles <- fhir_unserialize(medication_bundles)
+#' bundles <- fhir_unserialize(bundles = medication_bundles)
 #'
 #' #define attributes to extract
 #' design <- fhir_design(
 #'
-#' 	 fhir_table_description(
+#' 	 Medications = fhir_table_description(
 #'
 #' 		resource = "MedicationStatement",
 #'
@@ -564,15 +576,14 @@ bundles2df <- function(
 #' 			LAST.UPDATE        = "meta/lastUpdated/@value"
 #' 		)
 #' 	),
-#'  fhir_table_description(
+#'  Patients = fhir_table_description(
 #'
 #' 		resource = "Patient"
-#' 	),
-#' 	names = c("Medications", "Patients")
+#' 	)
 #' )
 #'
 #' #convert fhir to data frames
-#' list_of_tables <- fhircrackr:::bundles2dfs(bundles, design)
+#' list_of_tables <- fhircrackr:::bundles2dfs(bundles = bundles, design = design)
 
 bundles2dfs <- function(
 	bundles,

@@ -30,12 +30,12 @@ globalVariables(".")
 #' @export
 #'
 #' @examples
-#' paste_paths("data", "patients")
-#' paste_paths("/data", "patients")
-#' paste_paths("/data/", "patients")
-#' paste_paths("/data", "/patients")
-#' paste_paths("/data/", "/patients/")
-#' paste_paths("data", "patients", "windows")
+#' paste_paths(path1 = "data", path2 = "patients")
+#' paste_paths(path1 = "/data", path2 = "patients")
+#' paste_paths(path1 = "/data/", path2 = "patients")
+#' paste_paths(path1 = "/data", path2 = "/patients")
+#' paste_paths(path1 = "/data/", path2 = "/patients/")
+#' paste_paths(path1 = "data", path2 = "patients", os = "windows")
 
 paste_paths <- function(path1 = "w",
 						path2 = "d",
@@ -43,10 +43,14 @@ paste_paths <- function(path1 = "w",
 	os <- tolower(substr(os, 1, 1))
 
 	if (os == "w") {
-		return(paste0(sub("\\\\$" , "", path1), "\\", sub("^\\\\", "", path2)))
+		return(paste0(sub(pattern = "\\\\$" , replacement = "", x = path1),
+					  "\\",
+					  sub(pattern = "^\\\\", replacement = "", x = path2)))
 	}
 
-	paste0(sub("/$" , "", path1), "/", sub("^/", "", path2))
+	paste0(sub(pattern = "/$" , replacement = "", x = path1),
+		   "/", sub(pattern = "^/",
+		   		 replacement = "", x = path2))
 }
 
 ##### Documentation for medication_bundles data set ######
@@ -67,7 +71,7 @@ paste_paths <- function(path1 = "w",
 #'
 #' @examples
 #' #unserialize xml objects before doing anything else with them!
-#' fhir_unserialize(medication_bundles)
+#' fhir_unserialize(bundles = medication_bundles)
 #'
 #' @rdname datasets_real
 #'
@@ -76,14 +80,14 @@ paste_paths <- function(path1 = "w",
 #' **medication_bundles** (*Downloaded 10-05-21*)
 #'
 #' ```
-#' search_request  <- fhir_url("https://hapi.fhir.org/baseR4",
+#' search_request  <- fhir_url(url = "https://hapi.fhir.org/baseR4",
 #' 							resource = "MedicationStatement",
 #' 							parameters = c("code" = "http://snomed.info/ct|429374003",
 #' 										   "_include" = "MedicationStatement:subject"))
 #'
-#' bundles <- fhir_search(search_request, max_bundles = 3)
+#' bundles <- fhir_search(request = search_request, max_bundles = 3)
 #'
-#' medication_bundles <- fhir_serialize(bundles)
+#' medication_bundles <- fhir_serialize(bundles = bundles)
 #' ```
 #'
 #'
@@ -98,7 +102,7 @@ paste_paths <- function(path1 = "w",
 #'
 #' @examples
 #' #unserialize xml objects before doing anything else with them!
-#' fhir_unserialize(patient_bundles)
+#' fhir_unserialize(bundles = patient_bundles)
 #' @aliases patient_bundles
 #' @rdname datasets_real
 #'
@@ -110,7 +114,7 @@ paste_paths <- function(path1 = "w",
 #'                        max_bundles=2,
 #'                        verbose = 0)
 #'
-#' patient_bundles <- fhir_serialize(bundles)
+#' patient_bundles <- fhir_serialize(bundles = bundles)
 #' ```
 #'
 #'
@@ -130,7 +134,7 @@ paste_paths <- function(path1 = "w",
 #'
 #' @examples
 #' #unserialize xml objects before doing anything else with them!
-#' fhir_unserialize(example_bundles1)
+#' fhir_unserialize(bundles = example_bundles1)
 
 #' @rdname datasets_selfmade
 #'
@@ -263,7 +267,7 @@ paste_paths <- function(path1 = "w",
 #'
 #' @examples
 #' #unserialize xml objects before doing anything else with them!
-#' fhir_unserialize(example_bundles2)
+#' fhir_unserialize(bundles = example_bundles2)
 #' @rdname datasets_selfmade
 #'
 #' @source
@@ -379,7 +383,7 @@ lst <- function(...,
 #' Escape special characters
 #' @param s A string in which the characters should be escaped
 #' @return A string with all special characters escaped
-#' @example esc(c("(",")"))
+#' @example esc(s = c("(",")"))
 #' @noRd
 #'
 esc <- function(s) {

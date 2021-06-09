@@ -33,7 +33,7 @@ df_desc2 <- fhir_table_description(resource = "Observation",
 
 design <- fhir_design(Patients = df_desc1, Observations = df_desc2)
 
-fhir_save_design(design, file = tempfile())
+fhir_save_design(design = design, file = tempfile())
 }
 \seealso{
 \code{\link[=fhir_design]{fhir_design()}}, \code{\link[=fhir_table_description]{fhir_table_description()}}, \code{\link[=fhir_load_design]{fhir_load_design()}}

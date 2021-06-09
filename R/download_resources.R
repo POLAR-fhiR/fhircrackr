@@ -815,7 +815,7 @@ get_bundle <- function(
 			cat(paste0("(", n, "): ", request, "\n"))
 
 		auth <- if (!is.null(username) && !is.null(password)) {
-			httr::authenticate(username, password)
+			httr::authenticate(user = username, password = password)
 		}
 
 		#paging is implemented differently for Hapi/Vonk When initial request is POST
@@ -823,7 +823,7 @@ get_bundle <- function(
 		#search via POST
 		if(grepl("_search", request)){
 			response <- httr::POST(
-				request,
+				url = request,
 				httr::add_headers(Accept = "application/fhir+xml",
 								  Authorization = token),
 				httr::content_type(body@type),
@@ -833,7 +833,7 @@ get_bundle <- function(
 		#search via GET
 		}else{
 			response <- httr::GET(
-				request,
+				url = request,
 				httr::add_headers(Accept = "application/fhir+xml",
 								  Authorization = token),
 				auth
@@ -842,18 +842,18 @@ get_bundle <- function(
 
 
 		#check for http errors
-		check_response(response, log_errors = log_errors)
+		check_response(response = response, log_errors = log_errors)
 
 		#extract payload
 		payload <-
-			try(httr::content(response, as = "text", encoding = "UTF-8"),
+			try(httr::content(x = response, as = "text", encoding = "UTF-8"),
 				silent = TRUE)
 
 		if (class(payload)[1] != "try-error") {
-			xml <- try(xml2::read_xml(payload), silent = TRUE)
+			xml <- try(xml2::read_xml(x = payload), silent = TRUE)
 
 			if (class(xml)[1] != "try-error") {
-				return(fhir_bundle_xml(xml))
+				return(fhir_bundle_xml(bundle = xml))
 			}
 		}
 
@@ -870,11 +870,11 @@ get_bundle <- function(
 #' @noRd
 #'
 error_to_file <- function(response,log_errors) {
-	payload <- httr::content(response, as = "text", encoding = "UTF-8")
+	payload <- httr::content(x = response, as = "text", encoding = "UTF-8")
 
-	xml <- xml2::read_xml(payload)
+	xml <- xml2::read_xml(x = payload)
 
-	xml2::write_xml(xml, file = log_errors)
+	xml2::write_xml(x = xml, file = log_errors)
 
 }
 #' Check http response
@@ -891,7 +891,7 @@ check_response <- function(response, log_errors) {
 	code <- response$status_code
 
 	if (code != 200 && !is.null(log_errors)) {
-		error_to_file(response, log_errors)
+		error_to_file(response = response, log_errors = log_errors)
 	}
 
 	if (code == 400) {

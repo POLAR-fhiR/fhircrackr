@@ -9,13 +9,13 @@
 #' @seealso [fhir_design()], [fhir_table_description()]
 #' @examples
 #' #load example bundles
-#' bundles <- fhir_unserialize(patient_bundles)
+#' bundles <- fhir_unserialize(bundles = patient_bundles)
 #'
 #' #define design
 #' patients <- fhir_table_description(resource = "Patient")
 #' design <- fhir_design(patients)
 #'
-#' result <- fhir_crack(bundles, design)
+#' result <- fhir_crack(bundles = bundles, design = design)
 #'
 #' fhir_canonical_design()
 #'
@@ -52,7 +52,7 @@ fhir_canonical_design <- function() {
 #'
 #' design <- fhir_design(Patients = df_desc1, Observations = df_desc2)
 #'
-#' fhir_save_design(design, file = tempfile())
+#' fhir_save_design(design = design, file = tempfile())
 
 fhir_save_design <- function (design, file = "design.xml") {
 
@@ -61,7 +61,7 @@ fhir_save_design <- function (design, file = "design.xml") {
 
 	xml <- design2xml(design = design)
 
-	invisible(xml2::write_xml(xml, file))
+	invisible(x = xml2::write_xml(x = xml, file = file))
 }
 
 #' Load design from xml
@@ -94,13 +94,13 @@ fhir_save_design <- function (design, file = "design.xml") {
 #'
 #' temp <- tempfile()
 #'
-#' fhir_save_design(design, file = temp)
+#' fhir_save_design(design = design, file = temp)
 #'
-#' design <- fhir_load_design(temp)
+#' design <- fhir_load_design(file = temp)
 
 fhir_load_design <- function (file) {
-	xml <- xml2::read_xml(file)
-	xml2design(xml)
+	xml <- xml2::read_xml(x = file)
+	xml2design(xml = xml)
 }
 
 ##################################################################################################
@@ -140,7 +140,7 @@ fix <- function (list, names, defaults = NULL) {
 
 	#append missing elements with values NULL
 	if (length(list) < length(names)) {
-		list <- append(list, lapply(seq_len(length(names) - length(list)), function(x) {NULL}))
+		list <- append(x = list, values = lapply(seq_len(length(names) - length(list)), function(x) {NULL}))
 	}
 
 	lnames <- names(list)
@@ -184,7 +184,7 @@ fix <- function (list, names, defaults = NULL) {
 #'
 #' @return a character of length two or NULL
 #'
-#' @example fix_brackets("|")
+#' @example fix_brackets(brackets = "|")
 #' @noRd
 #'
 
@@ -209,7 +209,7 @@ fix_brackets <- function(brackets){
 #' This function is only here to allow for old style designs to be fixed before being turned into S4
 #' @param df_desc A data.frame description from an old-style design for fhir_crack()
 #' @return a fixed data.frame description with resource, cols, style, sep, brackets and rm_empty_cols
-#' @example fix_df_desc(list(resource="//Patient"))
+#' @example fix_df_desc(df_desc = list(resource="//Patient"))
 #' @noRd
 #'
 fix_df_desc <- function (df_desc) {
@@ -241,7 +241,7 @@ fix_df_desc <- function (df_desc) {
 
 	}else{
 
-		fix_res <- fix(df_desc$style,c("sep", "brackets", "rm_empty_cols"), defaults = list(" ", NULL, TRUE))
+		fix_res <- fix(list = df_desc$style,c("sep", "brackets", "rm_empty_cols"), defaults = list(" ", NULL, TRUE))
 
 		if(is.null(fix_res$value)){
 
@@ -266,14 +266,14 @@ fix_df_desc <- function (df_desc) {
 #' This function is only here to allow for old style designs to be fixed before being turned into S4
 #' @param design  An old style design (list, not S4)
 #' @return a fixed design, where all df description have resource, cols, style, sep, brackets and rm_empty_cols
-#' @example fix_design(listpat=(list(resource="//Patient")))
+#' @example fix_design(design=(list(resource="//Patient")))
 #' @noRd
 #'
 fix_design <- function(design) {
 
 	fixed_design <-lapply(seq_along(design), function(i){
 
-		fixed <- fix_df_desc(design[[i]])
+		fixed <- fix_df_desc(df_desc = design[[i]])
 
 		if(is.null(fixed$value)){
 			#warning("Something is wrong with the data.frame description named", names(design)[i], ":\n", fixed$msg , "\n Returning NULL for this data.frame description. \n")
@@ -305,7 +305,7 @@ add_attribute_to_design <- function(design, attrib = "value"){
 				for (n_c in names(design[[n_d]]@cols)) { #loop through cols
 					txt <- design[[n_d]]@cols[[n_c]]
 					if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
-						txt <- paste_paths(txt, paste0("@", attrib))
+						txt <- paste_paths(path1 = txt, path2 = paste0("@", attrib))
 						design[[n_d]]@cols[[n_c]] <- txt
 					}
 				}
@@ -320,7 +320,7 @@ add_attribute_to_design <- function(design, attrib = "value"){
 			for (n_c in names(design@cols)) { #loop through cols
 				txt <- design@cols[[n_c]]
 				if (length(grep("/@(\\w|\\*)+$", txt)) < 1) {
-					txt <- paste_paths(txt, paste0("@", attrib))
+					txt <- paste_paths(path1 = txt, path2 = paste0("@", attrib))
 					design@cols[[n_c]] <- txt
 				}
 			}
@@ -347,45 +347,45 @@ design2xml <- function (design) {
 	}
 
 	xml  <- xml2::xml_new_document()
-	root <- xml2::xml_add_child(xml, "Design")
+	root <- xml2::xml_add_child(.x = xml, .value = "Design")
 
 	for (nms in names(design)) {
 
 		df_desc <- design[[nms]]
 
-		child <- xml2::xml_add_child(root, nms)
+		child <- xml2::xml_add_child(.x = root, .value = nms)
 
-		res <- xml2::xml_add_child(child, "resource")
-		xml2::xml_set_attr(res, "value", df_desc@resource)
+		res <- xml2::xml_add_child(.x = child, .value = "resource")
+		xml2::xml_set_attr(x = res, attr = "value", value = df_desc@resource)
 
-		cols <- xml2::xml_add_child(child, "cols")
+		cols <- xml2::xml_add_child(.x = child, .value = "cols")
 
 		if (0 < length(df_desc@cols)) {
 
 			for (nms_col in names(df_desc@cols)) {
-				col <- xml2::xml_add_child(cols, nms_col)
-				xml2::xml_set_attr(col, "value", df_desc@cols[[nms_col]])
+				col <- xml2::xml_add_child(.x = cols, .value = nms_col)
+				xml2::xml_set_attr(x = col, attr = "value", value = df_desc@cols[[nms_col]])
 			}
 
 		}
 
-		stl <- xml2::xml_add_child(child, "style")
-		sep <- xml2::xml_add_child(stl, "sep")
-		bra <- xml2::xml_add_child(stl, "brackets")
-		opn <- xml2::xml_add_child(bra, "open")
-		cls <- xml2::xml_add_child(bra, "close")
-		rme <- xml2::xml_add_child(stl, "rm_empty_cols")
+		stl <- xml2::xml_add_child(.x = child, .value = "style")
+		sep <- xml2::xml_add_child(.x = stl, .value = "sep")
+		bra <- xml2::xml_add_child(.x = stl, .value = "brackets")
+		opn <- xml2::xml_add_child(.x = bra, .value = "open")
+		cls <- xml2::xml_add_child(.x = bra, .value = "close")
+		rme <- xml2::xml_add_child(.x = stl, .value = "rm_empty_cols")
 
-		xml2::xml_set_attr(sep, "value", df_desc@style@sep)
+		xml2::xml_set_attr(x = sep, attr = "value", value = df_desc@style@sep)
 		if(length(df_desc@style@brackets)>0){
-			xml2::xml_set_attr(opn, "value", df_desc@style@brackets[1])
-			xml2::xml_set_attr(cls, "value", df_desc@style@brackets[2])
+			xml2::xml_set_attr(x = opn, attr = "value", value = df_desc@style@brackets[1])
+			xml2::xml_set_attr(x = cls, attr = "value", value = df_desc@style@brackets[2])
 		}
-		xml2::xml_set_attr(rme, "value", df_desc@style@rm_empty_cols)
+		xml2::xml_set_attr(x = rme, attr = "value", value = df_desc@style@rm_empty_cols)
 
 	}
-	xml2::xml_ns_strip(xml2::xml_root(xml))
-	xml2::xml_root(xml)
+	xml2::xml_ns_strip(x = xml2::xml_root(x = xml))
+	xml2::xml_root(x = xml)
 }
 
 
@@ -415,15 +415,15 @@ design2xml <- function (design) {
 #'
 #' design <- fhir_design(df_desc1, df_desc2, df_desc3)
 #'
-#' xml <- design2xml(design)
+#' xml <- design2xml(design = design)
 #'
-#' design2 <- xml2design(xml)
+#' design2 <- xml2design(xml = xml)
 #'
 #' identical(design, design2)
 #'
 xml2design <- function(xml) {
 
-	xml_design <- xml2::xml_find_all(xml, "//Design")
+	xml_design <- xml2::xml_find_all(x = xml, xpath = "//Design")
 
 	if (length(xml_design) < 1) {
 		warning("The Argument xml does not contain a Design. \n")
@@ -435,7 +435,7 @@ xml2design <- function(xml) {
 	}
 
 	xml_design <- xml_design[[1]]
-	xml_table_descriptions <- xml2::xml_find_all(xml_design, "*")
+	xml_table_descriptions <- xml2::xml_find_all(x = xml_design, xpath = "*")
 
 	if (length(xml_table_descriptions) < 1) {
 		warning("Design does not contain any entries like resource, cols and style. Returning NULL. \n")
@@ -454,46 +454,49 @@ xml2design <- function(xml) {
 
 		xml_df_desc <- xml_table_descriptions[[i]]
 
-		resource <- xml2::xml_attr(xml2::xml_find_all(xml_df_desc, "resource"), "value")
+		resource <- xml2::xml_attr(x = xml2::xml_find_all(x = xml_df_desc, xpath = "resource"), attr = "value")
 
 		if (length(resource) < 1) {
 			stop(paste0("data.frame description of resource ", resources_names[i], " needs at least a <Resource value=XPath_To_Resource> entry. Returning empty data.frame description. \n"))
 		}
 
-		columns <- xml2::xml_find_all(xml_df_desc, "cols")
+		columns <- xml2::xml_find_all(x = xml_df_desc, xpath = "cols")
 
 		if (length(columns) < 1) { #no cols element
 			columns <- fhir_columns()
 		} else {
-			columns_list <- xml2::xml_find_all(columns, "*") #extract cols
+			columns_list <- xml2::xml_find_all(x = columns, xpath = "*") #extract cols
 		}
 
 		if (length(columns_list) < 1) {#cols is empty
 			columns <- fhir_columns()
 		}else{
-			col_names <- xml2::xml_name(columns_list)
-			col_values <- xml2::xml_attr(columns_list, "value")
+			col_names <- xml2::xml_name(x = columns_list)
+			col_values <- xml2::xml_attr(x = columns_list, attr = "value")
 			columns <- fhir_columns(expressions = col_values, colnames = col_names)
 		}
 
-		style <- xml2::xml_find_all(xml_df_desc, "style")
+		style <- xml2::xml_find_all(x = xml_df_desc, xpath = "style")
 
 		if (length(style) < 1) {#no style info
 			style <- fhir_style()
 		} else {
-			sep <- xml2::xml_attr(xml2::xml_find_all(style, "sep"), "value")
-			if (length(sep) < 1 || all(is.na(sep))){sep <- " "}
-			bra_open <- xml2::xml_attr(xml2::xml_find_all(style, "brackets/open"), "value")
-			if (length(bra_open) < 1 || all(is.na(bra_open))){bra_open <- NULL}
-			bra_close <- xml2::xml_attr(xml2::xml_find_all(style, "brackets/close"), "value")
-			if (length(bra_close) < 1 || all(is.na(bra_close))){bra_close <- NULL}
-			rm_empty_cols <- as.logical(xml2::xml_attr(xml2::xml_find_all(style, "rm_empty_cols"), "value"))
-			if (length(rm_empty_cols) < 1 || all(is.na(rm_empty_cols))){rm_empty_cols <- TRUE}
+			sep <- xml2::xml_attr(x = xml2::xml_find_all(x = style, xpath = "sep"), attr = "value")
 
-			style <- fhir_style(sep, c(bra_open, bra_close), rm_empty_cols)
+			if (length(sep) < 1 || all(is.na(sep))){sep <- " "}
+			bra_open <- xml2::xml_attr(x = xml2::xml_find_all(x = style, xpath = "brackets/open"), attr = "value")
+
+			if (length(bra_open) < 1 || all(is.na(bra_open))){bra_open <- NULL}
+			bra_close <- xml2::xml_attr(x = xml2::xml_find_all(x = style, xpath = "brackets/close"), attr = "value")
+
+			if (length(bra_close) < 1 || all(is.na(bra_close))){bra_close <- NULL}
+			rm_empty_cols <- as.logical(xml2::xml_attr(x = xml2::xml_find_all(x = style, xpath = "rm_empty_cols"), attr = "value"))
+
+			if (length(rm_empty_cols) < 1 || all(is.na(rm_empty_cols))){rm_empty_cols <- TRUE}
+			style <- fhir_style(sep = sep, brackets = c(bra_open, bra_close), rm_empty_cols = rm_empty_cols)
 		}
 
-		fhir_table_description(resource, columns, style)
+		fhir_table_description(resource = resource, cols = columns, style = style)
 	})
 	names(l) <- resources_names
 	fhir_design(l)

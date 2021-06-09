@@ -11,13 +11,13 @@ Returns the \linkS4class{fhir_design} of the last call to \code{\link[=fhir_crac
 }
 \examples{
 #load example bundles
-bundles <- fhir_unserialize(patient_bundles)
+bundles <- fhir_unserialize(bundles = patient_bundles)
 
 #define design
 patients <- fhir_table_description(resource = "Patient")
 design <- fhir_design(patients)
 
-result <- fhir_crack(bundles, design)
+result <- fhir_crack(bundles = bundles, design = design)
 
 fhir_canonical_design()
 

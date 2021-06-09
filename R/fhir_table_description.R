@@ -131,8 +131,8 @@ fhir_table_description <- function(resource,
 								   cols = fhir_columns(),
 								   style = fhir_style()){
 
-	resource <- fhir_resource_type(resource)
-	if(class(cols)!="fhir_columns"){cols <- fhir_columns(cols)}
+	resource <- fhir_resource_type(string = resource)
+	if(class(cols)!="fhir_columns"){cols <- fhir_columns(expressions = cols)}
 
 	new("fhir_table_description", resource = resource, cols = cols, style = style)
 }

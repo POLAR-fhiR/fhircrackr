@@ -37,8 +37,8 @@ setValidity(
 #' `medicationstatement -> MedicationStatement`. Defaults to TRUE.
 #' @return An [fhir_resource_type-class] object
 #' @examples
-#' fhir_resource_type("Patient")
-#' fhir_resource_type("medicationadministration")
+#' fhir_resource_type(string = "Patient")
+#' fhir_resource_type(string = "medicationadministration")
 #' @export
 #'
 fhir_resource_type <- function(string, fix_capitalization = TRUE) {

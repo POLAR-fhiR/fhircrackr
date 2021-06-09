@@ -31,7 +31,7 @@ in \code{expressions} has names, those names are taken as the colnames. If no co
 \code{expressions} is unnamed too, the colnames are generated automatically from the xpath expressions. See examples.}
 }
 \description{
-An object of class \code{fhir_columns} is part of a \code{fhir_table_description}in a \code{fhir_design} and holds information on the elements
+An object of class \code{fhir_columns} is part of a \code{fhir_table_description} in a \code{fhir_design} and holds information on the elements
 that should be extracted from the FHIR resources, as well as the column names of the resulting data.frame.
 The elements to be extracted are indicated by XPath expressions. If no column names are provided,
 they are generated automatically and reflect the elements position in the resource.

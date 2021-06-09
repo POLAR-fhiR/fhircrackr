@@ -141,8 +141,8 @@ print(new_design)
 ###Extract design from fhir_df_list/fhir_dt_list
 
 #unserialize and crack example bundles
-med_bundles <- fhir_unserialize(medication_bundles)
-dfs <- fhir_crack(med_bundles, design = design1)
+med_bundles <- fhir_unserialize(bundles = medication_bundles)
+dfs <- fhir_crack(bundles = med_bundles, design = design1)
 
 #extract design
 

@@ -76,7 +76,7 @@ fhir_style <- function(sep=" ", brackets=character(), rm_empty_cols=TRUE) {
 
 	if(is.null(brackets)) {brackets <- character()}
 	if(any(is.na(brackets))) {stop("You cannot use NA in brackets.")}
-	brackets <- fix_brackets(brackets)
+	brackets <- fix_brackets(brackets = brackets)
 	new("fhir_style", sep=sep, brackets=brackets, rm_empty_cols=rm_empty_cols)
 }
 

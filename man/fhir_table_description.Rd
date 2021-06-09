@@ -58,31 +58,31 @@ rm_empty_cols: FALSE
 \examples{
 #named character for cols
 fhir_table_description(resource = "Patient",
-                    cols = c(name = "name/family",
-                             gender = "gender",
-                             id = "id"),
-                    style = fhir_style(sep = "||",
-                                       brackets = c("[", "]"),
-                                       rm_empty_cols = FALSE)
+                       cols = c(name = "name/family",
+                                gender = "gender",
+                                id = "id"),
+                       style = fhir_style(sep = "||",
+                                          brackets = c("[", "]"),
+                                          rm_empty_cols = FALSE)
 )
 
 #' #If style is ommitted, default values are assumed
 fhir_table_description(resource = "Patient",
-                    cols = c(name = "name/family",
-                             gender = "gender",
-                             id = "id")
+                       cols = c(name = "name/family",
+                                gender = "gender",
+                                id = "id")
 )
 
 #named list for cols
 fhir_table_description(resource = "Patient",
-                    cols = list(name = "name/family",
-                             gender = "gender",
-                             id = "id")
+                       cols = list(name = "name/family",
+                                   gender = "gender",
+                                   id = "id")
 )
 
 #unnamed character for cols, colnames are generated automatically
 fhir_table_description(resource = "Patient",
-                    cols = c("name/family",
+                       cols = c("name/family",
                                 "gender",
                                 "id")
 )

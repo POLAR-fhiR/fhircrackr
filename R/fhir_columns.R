@@ -91,7 +91,7 @@ setMethod(
 	"fhir_columns",
 	signature = c(expressions = "character", colnames = "character"),
 	function(expressions, colnames){
-		new("fhir_columns", fhir_xpath_expression(expressions), names = colnames)
+		new("fhir_columns", fhir_xpath_expression(expression = expressions), names = colnames)
 	}
 )
 
@@ -102,9 +102,9 @@ setMethod(
 	signature = c(expressions = "character", colnames = "missing"),
 	function(expressions){
 		if(is.null(names(expressions))){
-			new("fhir_columns", fhir_xpath_expression(expressions), names = as.character(gsub("/", ".", expressions)))
+			new("fhir_columns", fhir_xpath_expression(expression = expressions), names = as.character(gsub("/", ".", expressions)))
 		}else{
-			new("fhir_columns", fhir_xpath_expression(expressions), names = names(expressions))
+			new("fhir_columns", fhir_xpath_expression(expression = expressions), names = names(expressions))
 		}
 	}
 )
@@ -122,9 +122,9 @@ setMethod(
 			stop("expressions can only contain character vectors of length 1.")
 		}
 		if(is.null(names(expressions))){
-			new("fhir_columns", fhir_xpath_expression(unlist(expressions)), names = gsub("/", ".", unlist(expressions)))
+			new("fhir_columns", fhir_xpath_expression(expression = unlist(expressions)), names = gsub("/", ".", unlist(expressions)))
 		}else{
-			new("fhir_columns", fhir_xpath_expression(unlist(expressions)), names = names(expressions))
+			new("fhir_columns", fhir_xpath_expression(expression = unlist(expressions)), names = names(expressions))
 		}
 	}
 )
@@ -136,10 +136,10 @@ setMethod(
 		if(length(object)==0){cat("An empty fhir_columns object"); return()}
 
 		pairs <- paste(names(object), object, sep = "=")
-		colwidth1 <- max(c(stringr::str_length(names(object)),11)) + 1
-		colwidth2 <- max(stringr::str_length(object)) + 1
+		colwidth1 <- max(c(stringr::str_length(string = names(object)),11)) + 1
+		colwidth2 <- max(stringr::str_length(string = object)) + 1
 		header <- paste(
-			stringr::str_pad("column name", colwidth1 - 1, side="right"),
+			stringr::str_pad(string = "column name", width = colwidth1 - 1, side="right"),
 			"| xpath expression", "\n",
 			paste(rep("-", colwidth1 + colwidth2), collapse=""),
 			"\n",
@@ -150,7 +150,7 @@ setMethod(
 			#	"A fhir_columns object:\n\n",
 				header,
 				paste(
-					paste0(stringr::str_pad(names(object), colwidth1, side="right"), "| ", object),
+					paste0(stringr::str_pad(string = names(object), width = colwidth1, side="right"), "| ", object),
 					collapse = "\n"
 				)
 			)

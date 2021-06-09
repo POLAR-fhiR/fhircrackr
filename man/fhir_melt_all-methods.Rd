@@ -49,7 +49,7 @@ For a more detailed description on how to use this function please see the packa
 }
 \examples{
 #unserialize example
-bundles <- fhir_unserialize(example_bundles3)
+bundles <- fhir_unserialize(bundles = example_bundles3)
 
 #crack fhir resources
 patients <- fhir_table_description(resource = "Patient")
@@ -62,10 +62,10 @@ dfs <- fhir_crack(bundles = bundles, design = design, sep="||", brackets = c("["
 
 #use on the list of tables:
 #all tables are molten, brackets and sep are inferred from the attached design
-fhir_melt_all(dfs)
+fhir_melt_all(indexed_data_frame = dfs)
 
 #use on single df
-fhir_melt_all(dfs$patients, brackets = c("[","]"), sep="||")
+fhir_melt_all(indexed_data_frame = dfs$patients, brackets = c("[","]"), sep="||")
 }
 \seealso{
 \code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
