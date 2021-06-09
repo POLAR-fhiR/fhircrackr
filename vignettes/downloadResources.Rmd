@@ -77,16 +77,19 @@ A FHIR search request will mostly have the form `[base]/[type]?parameter(s)`, wh
 In the simplest case, `fhir_url()` takes only the base url and the resource type you are looking for like this:
 
 ```{r}
-fhir_url(url = "http://hapi.fhir.org/baseR4",
-		 resource = "Patient")
+fhir_url(url = "http://hapi.fhir.org/baseR4", resource = "Patient")
 ```
 
 Internally, `fhir_resource_type` is called to check the type you provided against list of all currently available resource types can be found at <a href="https://hl7.org/FHIR/resourcelist.html" target="_blank">https://hl7.org/FHIR/resourcelist.html</a>. Case errors are corrected automatically and the function throws a warning, if the resource type doesn't match the list under hl7.org:
 
 ```{r,warning=FALSE}
-fhir_resource_type("Patient") #Correct
-fhir_resource_type("medicationstatement") #corrected
-fhir_resource_type("Hospital") #a unknown resource type, therefore a warning is issued
+fhir_resource_type(string = "Patient") #correct
+
+fhir_resource_type(string = "medicationstatement") #fixed
+
+fhir_resource_type(string = "medicationstatement", fix_capitalization = FALSE) #not fixed
+
+fhir_resource_type(string = "Hospital") #a unknown resource type, a warning is issued
 # Warnmeldung:
 # In fhir_resource_type("Hospital") :
 #   You gave "Hospital" as the resource type.
@@ -104,11 +107,12 @@ Apart from the resource independent parameters, there are also resource dependen
 You can add search parameters to your request via a named list or a named character vector:
 
 ```{r, out.lines=110}
-request <- fhir_url(url = "http://hapi.fhir.org/baseR4",
-		resource = "Patient",
-		parameters = list("birthdate" = "lt2000-01-01",
-						  "code" = "http://loinc.org|1751-1")
-		 			)
+request <- fhir_url(
+	url        = "http://hapi.fhir.org/baseR4",
+	resource   = "Patient",
+	parameters = list(
+		"birthdate" = "lt2000-01-01",
+		"code"      = "http://loinc.org|1751-1"))
 
 request
 ```
@@ -127,16 +131,13 @@ To download resources from a server, you use the function `fhir_search()` and pr
 ### Basic request
 We will start with a very simple example and use `fhir_search()` to download Patient resources from a public HAPI server:
 ```{r, eval=F}
-request <- fhir_url(url = "https://hapi.fhir.org/baseR4",
-					resource = "Patient")
+request <- fhir_url(url = "https://hapi.fhir.org/baseR4", resource = "Patient")
 
-patient_bundles <- fhir_search(request=request,
-							   max_bundles=2, verbose = 0)
-
+patient_bundles <- fhir_search(request = request, max_bundles = 2, verbose = 0)
 ```
 
 ```{r, include=F}
-patient_bundles <- fhir_unserialize(fhircrackr::patient_bundles)
+patient_bundles <- fhir_unserialize(bundles = patient_bundles)
 ``` 
 
 In general, a FHIR search request returns a *bundle* of the resources you requested. If there are a lot of resources matching your request, the search result isn't returned in one big bundle but distributed over several of them, sometimes called *pages*, the size of which is determined by the FHIR server. 
@@ -218,11 +219,12 @@ If for some reason you cannot connect to a FHIR server at the moment but want to
 In many cases, you will want to download different types of FHIR resources belonging together. For example you might want to download all MedicationStatement resources with the snomed code `429374003` and also download the Patient resources these MedicationStatements refer to. The FHIR search request to do this can be built like this:
 
 ```{r}
-request <- fhir_url(url = "https://hapi.fhir.org/baseR4/",
-				    resource = "MedicationStatement",
-				    parameters = list("code" = "http://snomed.info/ct|429374003",
-				                      "_include" = "MedicationStatement:subject")
-)
+request <- fhir_url(
+	url        = "https://hapi.fhir.org/baseR4/",
+	resource   = "MedicationStatement",
+	parameters = list(
+		"code"     = "http://snomed.info/ct|429374003",
+		"_include" = "MedicationStatement:subject"))
 ```
 
 Then you provide the request to `fhir_search()`:
@@ -232,13 +234,13 @@ medication_bundles <- fhir_search(request = request, max_bundles = 3)
 ```
 
 ```{r, include=F}
-medication_bundles <- fhir_unserialize(medication_bundles)
+medication_bundles <- fhir_unserialize(bundles = medication_bundles)
 ```
 
 These bundles now contain two types of resources, MedicationStatement resources as well as Patient resources. If you want to have a look at the bundles, it is not very useful to print them to the console. Instead just save them as xml-files to a directory of you choice and look at the resources there:
 
 ```{r, eval=F}
-fhir_save(medication_bundles, directory = "MyProject/medicationBundles")
+fhir_save(bundles = medication_bundles, directory = "MyProject/medicationBundles")
 ```
 
 If you want to have a look at a bundle like this but don't have access to a FHIR server at the moment, check out `?medication_bundles`.
@@ -260,7 +262,7 @@ ids <- c("72622884-0a09-4ea9-9a91-685bce3b0fe3",
 You can use them comma separated in the value of the `identifier` search parameter like this:
 
 ```{r}
-id_string <- paste(ids, collapse = ",")
+id_strings <- paste(ids, collapse = ",")
 ``` 
 
 But this string would make the FHIR search request URL very long, especially if it is combined with additional other search parameters. 
@@ -268,8 +270,9 @@ But this string would make the FHIR search request URL very long, especially if 
 In a search via POST, the search parameters (everything that would usually follow the resource type after the ?) can be transferred to a body of type `application/x-www-form-urlencoded` and sent via POST. A body of this kind can be created the same way the parameters are usually given to the `parameters` argument of `fhir_url()`, i.e. as a named list or character:
 
 ```{r}
+#note the list()-expression
 body <- fhir_body(content = list(
-	"identifier" = id_string,
+	"identifier"  = id_strings,
 	"_revinclude" = "Observation:patient"))
 ```
 The body will then automatically be assigned the content type `application/x-www-form-urlencoded`. If you provide a body like this in `fhir_search()`, the url in request should **only** contain the base URL and the resource type. The function will automatically amend it with the suffix `_search` and perform a POST:
@@ -286,9 +289,10 @@ bundles <- fhir_search(request = url, body = body)
 To get more detailed information on the error response, you can pass a string with a file name to the argument `log_errors` . This will write a log with error information to the specified file.
 
 ```{r, eval=F}
-medication_bundles <- fhir_search(request = request, 
-								  max_bundles = 3, 
-								  log_errors = "myErrorFile")
+medication_bundles <- fhir_search(
+	request     = request,
+	max_bundles = 3,
+	log_errors  = "myErrorFile")
 ```
 
 ## Saving the downloaded bundles
@@ -299,7 +303,7 @@ If you want to save the list of downloaded bundles as an `.rda` or `.RData` file
 
 ```{r}
 #serialize bundles
-serialized_bundles <- fhir_serialize(patient_bundles)
+serialized_bundles <- fhir_serialize(bundles = patient_bundles)
 
 #have a look at them
 head(serialized_bundles[[1]])
@@ -323,7 +327,7 @@ load(paste0(temp_dir, "/bundles.rda"))
 
 ```{r,results='hide'}
 #unserialize
-bundles <- fhir_unserialize(serialized_bundles)
+bundles <- fhir_unserialize(bundles = serialized_bundles)
 
 #have a look
 bundles
@@ -397,13 +401,13 @@ If you want to store the bundles in xml files instead of R objects, you can use 
 
 ```{r}
 #save bundles as xml files
-fhir_save(patient_bundles, directory = temp_dir)
+fhir_save(bundles = patient_bundles, directory = temp_dir)
 ```
 
 To read bundles saved with `fhir_save()` back into R, you can use `fhir_load()`:
 
 ```{r}
-bundles <- fhir_load(temp_dir)
+bundles <- fhir_load(directory = temp_dir)
 ```  
 
 `fhir_load()` takes the name of the directory (or path to it) as its only argument. All xml-files in this directory will be read into R and returned as a list of bundles in xml format just as returned by `fhir_search()`.
@@ -420,13 +424,14 @@ The third problem is that large amounts of resources can at some point exceed th
 If you pass the name of a directory to the argument `save_to_disc` in your call to `fhir_search()`, the bundles will not be combined in a bundle list that is returned when the downloading is done, but will instead be saved as xml-files to the directory specified in the argument `directory` one by one. If the directory you specified doesn't exist yet, `fhir_search()` will create it for you. This way, the R session will only have to keep one bundle at a time in the working memory and if the server crashes halfway trough, all bundles up to the crash are safely saved in your directory. You can later load them using `fhir_load()`:
 
 ```{r, eval=F}
-request <- fhir_url(url = "http://hapi.fhir.org/baseR4",
-					resource = "Patient")
+request <- fhir_url(url = "http://hapi.fhir.org/baseR4", resource = "Patient")
 
-fhir_search(request, max_bundles = 10, 
-			save_to_disc= "MyProject/downloadedBundles")
+fhir_search(
+	request      = request,
+	max_bundles  = 10,
+	save_to_disc = "MyProject/downloadedBundles")
 
-bundles<- fhir_load("MyProject/downloadedBundles")
+bundles<- fhir_load(directory = "MyProject/downloadedBundles")
 ```
 
 ### 2. Use fhir_next_bundle_url() 
@@ -453,9 +458,10 @@ You can also use this function to avoid memory issues. Th following block of cod
 
 ```{r, eval=F}
 #Starting fhir search request
-url <- fhir_url(url = "http://hapi.fhir.org/baseR4",
-				resource = "Observation",
-				parameters = list("_count" = "500"))
+url <- fhir_url(
+	url        = "http://hapi.fhir.org/baseR4",
+	resource   = "Observation",
+	parameters = list("_count" = "500"))
 
 #count <- 0
 
@@ -464,10 +470,10 @@ table_description <- fhir_table_description(resource = "Observation")
 while(!is.null(url)){
 	
 	#load 10 bundles
-	bundles <- fhir_search(url, max_bundles = 10) 
+	bundles <- fhir_search(request = url, max_bundles = 10) 
 	
 	#crack bundles
-	dfs <- fhir_crack(bundles, table_description)
+	dfs <- fhir_crack(bundles = bundles, design = table_description)
 	
 	#save cracked bundle to RData-file (can be exchanged by other data type)
 	save(tables, file = paste0(tempdir(), "/table_", count, ".RData"))
@@ -485,16 +491,10 @@ while(!is.null(url)){
 The <a href="https://www.hl7.org/fhir/capabilitystatement.html" target="_blank">capability statement</a> documents a set of capabilities (behaviors) of a FHIR Server for a particular version of FHIR. You can download this statement using the function `fhir_capability_statement()`:
 
 ```{r, eval=F}
-cap <- fhir_capability_statement("http://hapi.fhir.org/baseR4", verbose = 0)
+cap <- fhir_capability_statement(url = "http://hapi.fhir.org/baseR4", verbose = 0)
 ```
 
 `fhir_capability_statement()` takes the base URL of a FHIR server and returns a list of three data frames containing all information from the capability statement of this server. The first one is called `Meta` and contains some general server information. The second is called `Rest` and contains information on the operations the server implements. The third is called `resources` and gives information on the resource types and associated parameters the server supports. This information can be useful to determine, for example, which FHIR search parameters are implemented in you FHIR server.
 
 ## Next steps
 To learn about how `fhircrackr` allows you to convert the downloaded FHIR resources into data.frames/data.tables, see the vignette on flattening FHIR resources.
-
-
-
-
-
-

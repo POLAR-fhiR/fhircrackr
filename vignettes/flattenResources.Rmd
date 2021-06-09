@@ -44,8 +44,8 @@ In the vignette `fhircrackr: Download FHIR resources` you saw how to download FH
 Now we'll have a look at how to flatten them into data.frames/data.tables. For the rest of the vignette, we'll work with the two example data sets from `fhircrackr`, which can be made accessible like this:
 
 ```{r}
-pat_bundles <- fhir_unserialize(patient_bundles)
-med_bundles <- fhir_unserialize(medication_bundles)
+pat_bundles <- fhir_unserialize(bundles = patient_bundles)
+med_bundles <- fhir_unserialize(bundles = medication_bundles)
 ```
 
 See `?patient_bundles` and `?medication_bundles` for the FHIR search requests that generated them.
@@ -107,13 +107,14 @@ Internally, `fhir_table_description()` calls `fhir_columns()` to check the valid
 
 ```{r}
 #custom column names
-fhir_columns(c(
+#note the c()-expression!
+fhir_columns(expressions = c(
 	gender = "gender",
 	name   = "name/family",
 	city   = "address/city"))
 
 #automatic column names
-fhir_columns(c("gender", "name/family", "address/city"))
+fhir_columns(expressions = c("gender", "name/family", "address/city"))
 ```
 
 A `fhir_columns` object that is created explicitly like this can of course also be used in the `columns` argument of `fhir_table_description`. 
@@ -157,10 +158,11 @@ We will now work through examples using `fhir_table_descriptions` of different c
 Lets start with an example where we only provide the (mandatory) `resource` component of the table_description.  In this case, `fhir_crack()` will extract all available attributes and use default values for the `style` component:
 
 ```{r}
-#define design
+#define a table_description
 table_description1 <- fhir_table_description(resource = "Patient")
 
-#Convert resources
+#convert resources
+#pass table_description1 to the design argument
 table <- fhir_crack(bundles = pat_bundles, design = table_description1, verbose = 0)
 
 #have look at part of the results
@@ -173,7 +175,7 @@ As you can see, this can easily become a rather wide and sparse data frame. This
 If we know which attributes we want to extract, we can specify them in a named list and provide it in the `cols` component of the data.frame description:
 
 ```{r}
-#define design
+#define a table_description
 table_description2 <- fhir_table_description(
 	resource = "Patient",
 	cols     = list(
@@ -184,7 +186,8 @@ table_description2 <- fhir_table_description(
 		gender      = "gender",
 		birthday    = "birthDate"))
 
-#Convert resources
+#convert resources
+#again pass table_description2 to the design argument
 table <- fhir_crack(bundles = pat_bundles, design = table_description2, verbose = 0)
 
 #have look at the results
@@ -378,6 +381,7 @@ desc2 <- fhir_table_description(
 		brackets = c("[", "]")))
 
 df2 <- fhir_crack(bundles = bundle, design = desc2, verbose = 0)
+
 df2
 ```
 Now the indices display the entry the value belongs to. That way you can see that Patient resource 3 had three entries for the attribute `address` and you can also see which attributes belong to which entry.
