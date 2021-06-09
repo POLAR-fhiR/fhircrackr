@@ -175,7 +175,6 @@ fix <- function (list, names, defaults = NULL) {
 #'
 
 fix_brackets <- function(brackets) {
-
 	if(1 == length(brackets)) {
 		c(brackets[1], brackets[1])
 	} else if(2 < length(brackets)) {
@@ -439,5 +438,3 @@ xml2design <- function(xml) {
 	names(l) <- resources_names
 	fhir_design(l)
 }
-
-

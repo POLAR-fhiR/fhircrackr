@@ -2,12 +2,11 @@
 #' An S4 class to represent FHIR bundles
 #' @include fhir_url.R
 setClass(
-	"fhir_bundle",
+	Class = "fhir_bundle",
 	contains = "VIRTUAL"
 )
 
-
-setOldClass("xml_node")
+setOldClass(Classes = "xml_node")
 
 
 #' An S4 class to represent a FHIR bundle in xml form
@@ -20,15 +19,15 @@ setOldClass("xml_node")
 #' @export
 #'
 setClass(
-	"fhir_bundle_xml",
+	Class = "fhir_bundle_xml",
 	contains = c("fhir_bundle", "xml_node"),
 	slots = c(next_link = "fhir_url", self_link = "fhir_url"),
 	prototype = prototype(xml2::read_xml(x = "<Bundle></Bundle>"))
 )
 
 setValidity(
-	"fhir_bundle_xml",
-	function(object) {
+	Class = "fhir_bundle_xml",
+	method = function(object) {
 		messages <- c()
 		if(xml2::xml_name(x = object) != "Bundle") {
 			messages <- c(
@@ -62,9 +61,9 @@ fhir_bundle_xml <- function(bundle) {
 }
 
 setMethod(
-	"show",
-	"fhir_bundle_xml",
-	function(object) {
+	f = "show",
+	signature = "fhir_bundle_xml",
+	definition = function(object) {
 		cat(
 			paste0(
 				"A fhir_bundle_xml object\n",
@@ -85,7 +84,7 @@ setMethod(
 #' @export
 
 setClass(
-	"fhir_bundle_serialized",
+	Class = "fhir_bundle_serialized",
 	contains = c("fhir_bundle", "raw")
 )
 

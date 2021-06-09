@@ -10,14 +10,14 @@
 #' @export
 #'
 setClass(
-	"fhir_columns",
-	 contains = "fhir_xpath_expression",
-	 slots = c(names = "character")
+	Class = "fhir_columns",
+	contains = "fhir_xpath_expression",
+	slots = c(names = "character")
 )
 
 setValidity(
-	"fhir_columns",
-	function(object) {
+	Class = "fhir_columns",
+	method = function(object) {
 		messages <- c()
 		if(length(object) == 0) {return(TRUE)}
 		if(length(names(object)) == 0) {
@@ -57,8 +57,8 @@ setValidity(
 #'  fhir_columns(expressions = c("name/given", "code/coding/code"))
 #' @export
 setGeneric(
-	"fhir_columns",
-	function(expressions, colnames){
+	name = "fhir_columns",
+	def = function(expressions, colnames){
 		standardGeneric(f = "fhir_columns")
 	}
 )
@@ -66,9 +66,9 @@ setGeneric(
 #' @rdname fhir_columns-methods
 #' @aliases fhir_columns,missing,missing-method
 setMethod(
-	"fhir_columns",
+	f = "fhir_columns",
 	signature = c(expressions = "missing", colnames = "missing"),
-	function() {
+	definition = function() {
 		new(Class = "fhir_columns")
 	}
 )
@@ -77,9 +77,9 @@ setMethod(
 #' @aliases fhir_columns,NULL,missing-method
 #'
 setMethod(
-	"fhir_columns",
+	f = "fhir_columns",
 	signature = c(expressions = "NULL", colnames = "missing"),
-	function(expressions) {
+	definition = function(expressions) {
 		new(Class = "fhir_columns")
 	}
 )
@@ -87,9 +87,9 @@ setMethod(
 #' @rdname fhir_columns-methods
 #' @aliases fhir_columns,character,character-method
 setMethod(
-	"fhir_columns",
+	f = "fhir_columns",
 	signature = c(expressions = "character", colnames = "character"),
-	function(expressions, colnames){
+	definition = function(expressions, colnames){
 		new(Class = "fhir_columns", fhir_xpath_expression(expression = expressions), names = colnames)
 	}
 )
@@ -97,12 +97,12 @@ setMethod(
 #' @rdname fhir_columns-methods
 #' @aliases fhir_columns,character,missing-method
 setMethod(
-	"fhir_columns",
+	f = "fhir_columns",
 	signature = c(expressions = "character", colnames = "missing"),
-	function(expressions) {
+	definition = function(expressions) {
 		if(is.null(names(expressions))) {
 			new(Class = "fhir_columns", fhir_xpath_expression(expression = expressions), names = as.character(gsub("/", ".", expressions)))
-		}else{
+		} else {
 			new(Class = "fhir_columns", fhir_xpath_expression(expression = expressions), names = names(expressions))
 		}
 	}
@@ -111,9 +111,9 @@ setMethod(
 #' @rdname fhir_columns-methods
 #' @aliases fhir_columns,list,missing-method
 setMethod(
-	"fhir_columns",
+	f = "fhir_columns",
 	signature = list(expressions = "list", colnames = "missing"),
-	function(expressions){
+	definition = function(expressions){
 		if(any(!sapply(expressions, is.character))){
 			stop("expressions can only contain elements of type character")
 		}
@@ -129,9 +129,9 @@ setMethod(
 )
 
 setMethod(
-	"show",
-	"fhir_columns",
-	function(object) {
+	f = "show",
+	signature = "fhir_columns",
+	definition = function(object) {
 		if(length(object) == 0) {
 			cat("An empty fhir_columns object");
 			return()

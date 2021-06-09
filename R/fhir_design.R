@@ -13,14 +13,14 @@
 #' @export
 #'
 setClass(
-	"fhir_design",
+	Class = "fhir_design",
 	contains = "list",
 	slots = c(names="character")
 )
 
 setValidity(
-	"fhir_design",
-	function(object) {
+	Class = "fhir_design",
+	method = function(object) {
 		messages <- c()
 		if(length(object) != length(object@names)) {
 			messages <- c(messages, "You need exactly one name for every table_description in a design.")
@@ -186,9 +186,9 @@ setValidity(
 #' @export
 #'
 setGeneric(
-	"fhir_design",
-	function(...) {
-		standardGeneric("fhir_design")
+	name = "fhir_design",
+	def = function(...) {
+		standardGeneric(f = "fhir_design")
 	},
 	signature = "..."
 )
@@ -197,9 +197,9 @@ setGeneric(
 #' @rdname fhir_design-methods
 #' @aliases fhir_design,fhir_table_description-method
 setMethod(
-	"fhir_design",
+	f = "fhir_design",
 	signature = c(... = "fhir_table_description"),
-	function(...) {
+	definition = function(...) {
 		args <- list(...)
 		names <- paste0(sapply(args, function(x) {x@resource}), "s")
 		name_index <- sapply(substitute(list(...))[-1], function(x) {class(x) == "name"})
@@ -212,9 +212,9 @@ setMethod(
 #' @rdname fhir_design-methods
 #' @aliases fhir_design,list-method
 setMethod(
-	"fhir_design",
+	f = "fhir_design",
 	signature = c(... = "list"),
-	function(...) {
+	definition = function(...) {
 		args <- list(...)
 		if(length(args) == 1) {
 			args <- unlist(args, recursive = FALSE)
@@ -244,9 +244,9 @@ setMethod(
 )
 
 setMethod(
-	"show",
-	"fhir_design",
-	function(object){
+	f = "show",
+	signature = "fhir_design",
+	definition = function(object){
 		if(length(object) == 0) {
 			cat("An empty fhir_design_object")
 		} else {

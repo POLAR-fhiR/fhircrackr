@@ -549,18 +549,18 @@ fhir_load <- function(directory) {
 #'
 
 setGeneric(
-	"fhir_serialize",
-	function(bundles) {
-		standardGeneric("fhir_serialize")
+	name = "fhir_serialize",
+	def = function(bundles) {
+		standardGeneric(f = "fhir_serialize")
 	}
 )
 
 #' @rdname fhir_serialize-methods
 #' @aliases fhir_serialize,fhir_bundle_xml-method
 setMethod(
-	"fhir_serialize",
+	f = "fhir_serialize",
 	signature = c(bundles = "fhir_bundle_xml"),
-	function(bundles) {
+	definition = function(bundles) {
 		fhir_bundle_serialized(bundle = xml2::xml_serialize(object = bundles, connection = NULL))
 	}
 )
@@ -568,9 +568,9 @@ setMethod(
 #' @rdname fhir_serialize-methods
 #' @aliases fhir_serialize,fhir_bundle_serialized-method
 setMethod(
-	"fhir_serialize",
+	f = "fhir_serialize",
 	signature = c(bundles = "fhir_bundle_serialized"),
-	function(bundles) {
+	definition = function(bundles) {
 		bundles
 	}
 )
@@ -578,9 +578,9 @@ setMethod(
 #' @rdname fhir_serialize-methods
 #' @aliases fhir_serialize,fhir_bundle_list-method
 setMethod(
-	"fhir_serialize",
+	f = "fhir_serialize",
 	signature = c(bundles = "fhir_bundle_list"),
-	function(bundles) {
+	definition = function(bundles) {
 		if(is(bundles[[1]], "fhir_bundle_xml")) {
 			fhir_bundle_list(
 				lapply(
@@ -616,8 +616,8 @@ setMethod(
 #' @include fhir_bundle.R fhir_bundle_list.R
 
 setGeneric(
-	"fhir_unserialize",
-	function(bundles) {
+	name = "fhir_unserialize",
+	def = function(bundles) {
 		standardGeneric("fhir_unserialize")
 	}
 )
@@ -625,9 +625,9 @@ setGeneric(
 #' @rdname fhir_unserialize-methods
 #' @aliases fhir_unserialize,fhir_bundle_xml-method
 setMethod(
-	"fhir_unserialize",
+	f = "fhir_unserialize",
 	signature = c(bundles = "fhir_bundle_xml"),
-	function(bundles) {
+	definition = function(bundles) {
 		bundles
 	}
 )
@@ -646,9 +646,9 @@ setMethod(
 #' @rdname fhir_unserialize-methods
 #' @aliases fhir_unserialize,fhir_bundle_list-method
 setMethod(
-	"fhir_unserialize",
+	f = "fhir_unserialize",
 	signature = c(bundles = "fhir_bundle_list"),
-	function(bundles) {
+	definition = function(bundles) {
 		if(is(bundles[[1]], "fhir_bundle_xml")){
 			bundles
 		} else {
@@ -688,8 +688,7 @@ fhir_authenticate <- function(
 	base_url,
 	access,
 	authorize,
-	query_authorize_extra = list()
-	) {
+	query_authorize_extra = list()) {
 
 	#Initialize app
 	app <- httr::oauth_app(
@@ -906,4 +905,3 @@ check_response <- function(response, log_errors) {
 		}
 	}
 }
-

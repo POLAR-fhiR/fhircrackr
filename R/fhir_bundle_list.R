@@ -8,13 +8,13 @@
 #' @export
 #'
 setClass(
-	"fhir_bundle_list",
+	Class = "fhir_bundle_list",
 	contains = "list"
 )
 
 setValidity(
-	"fhir_bundle_list",
-	function(object) {
+	Class = "fhir_bundle_list",
+	method = function(object) {
 		messages <- c()
 		if(any(!sapply(object, is, "fhir_bundle"))) {
 			messages <- c(messages, "All elements of a fhir_bundle_list must be fhir bundles." )

@@ -8,14 +8,14 @@
 #' @export
 
 setClass(
-	"fhir_body",
+	Class = "fhir_body",
 	slots = c(content = "character", type="character")
 )
 
 #validity
 setValidity(
-	"fhir_body",
-	function(object) {
+	Class = "fhir_body",
+	method = function(object) {
 		messages <- c()
 		if(1 < length(object@type)) {
 			messages <- c(messages, "the type of a fhir_body must have length 1")
@@ -47,8 +47,8 @@ setValidity(
 #' fhir_body(content = "gender=female&_summary=count", type="application/x-www-form-urlencoded")
 #' fhir_body(content = list("gender" = "female", "_summary" = "count"))
 setGeneric(
-	"fhir_body",
-	function(content, type){
+	name = "fhir_body",
+	def = function(content, type){
 		standardGeneric("fhir_body")
 	}
 )
@@ -56,9 +56,9 @@ setGeneric(
 #' @rdname fhir_body-methods
 #' @aliases fhir_body,list,missing-methods
 setMethod(
-	"fhir_body",
-	c(content = "list", type = "missing"),
-	function(content){
+	f = "fhir_body",
+	signature = c(content = "list", type = "missing"),
+	definition = function(content){
 		if(any(!sapply(content, function(x) {is.character(x)}))) {
 			stop("The provided list must have elements of type character")
 		}
@@ -78,9 +78,9 @@ setMethod(
 #' @rdname fhir_body-methods
 #' @aliases fhir_body,list,character-methods
 setMethod(
-	"fhir_body",
-	c(content = "list", type = "character"),
-	function(content, type) {
+	f = "fhir_body",
+	signature = c(content = "list", type = "character"),
+	definition = function(content, type) {
 		message("When content is a list, the type you provided will be overwritten with 'application/x-www-form-urlencoded'")
 		if(any(!sapply(content, function(x) {is.character(x)}))) {
 			stop("The provided list must have elements of type character")
@@ -99,18 +99,18 @@ setMethod(
 #' @rdname fhir_body-methods
 #' @aliases fhir_body,character,character-methods
 setMethod(
-	"fhir_body",
-	c(content = "character", type = "character"),
-	function(content, type){
+	f = "fhir_body",
+	signature = c(content = "character", type = "character"),
+	definition = function(content, type){
 		new(Class = "fhir_body", content = content, type = type)
 	}
 )
 
 #show
 setMethod(
-	"show",
-	"fhir_body",
-	function(object) {
+	f = "show",
+	signature = "fhir_body",
+	definition = function(object) {
 		cat(paste0("content:\n", object@content, "\n\ntype: ", object@type))
 	}
 )
