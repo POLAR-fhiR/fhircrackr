@@ -1,4 +1,3 @@
-
 #' A S4 class to represent columns in a [fhir_table_description-class]
 #'
 #' An object of class `fhir_columns` is part of a [fhir_table_description-class]
@@ -20,8 +19,8 @@ setValidity(
 	"fhir_columns",
 	function(object) {
 		messages <- c()
-		if(length(object)==0){return(TRUE)}
-		if(length(names(object))==0) {
+		if(length(object) == 0) {return(TRUE)}
+		if(length(names(object)) == 0) {
 			messages <- c(messages, "fhir_columns has to be a *named* character.")
 		}
 		if(0 < length(messages)) {messages} else {TRUE}
@@ -60,7 +59,7 @@ setValidity(
 setGeneric(
 	"fhir_columns",
 	function(expressions, colnames){
-		standardGeneric("fhir_columns")
+		standardGeneric(f = "fhir_columns")
 	}
 )
 
@@ -69,8 +68,8 @@ setGeneric(
 setMethod(
 	"fhir_columns",
 	signature = c(expressions = "missing", colnames = "missing"),
-	function(){
-		new("fhir_columns")
+	function() {
+		new(Class = "fhir_columns")
 	}
 )
 
@@ -80,8 +79,8 @@ setMethod(
 setMethod(
 	"fhir_columns",
 	signature = c(expressions = "NULL", colnames = "missing"),
-	function(expressions){
-		new("fhir_columns")
+	function(expressions) {
+		new(Class = "fhir_columns")
 	}
 )
 
@@ -91,7 +90,7 @@ setMethod(
 	"fhir_columns",
 	signature = c(expressions = "character", colnames = "character"),
 	function(expressions, colnames){
-		new("fhir_columns", fhir_xpath_expression(expression = expressions), names = colnames)
+		new(Class = "fhir_columns", fhir_xpath_expression(expression = expressions), names = colnames)
 	}
 )
 
@@ -100,11 +99,11 @@ setMethod(
 setMethod(
 	"fhir_columns",
 	signature = c(expressions = "character", colnames = "missing"),
-	function(expressions){
-		if(is.null(names(expressions))){
-			new("fhir_columns", fhir_xpath_expression(expression = expressions), names = as.character(gsub("/", ".", expressions)))
+	function(expressions) {
+		if(is.null(names(expressions))) {
+			new(Class = "fhir_columns", fhir_xpath_expression(expression = expressions), names = as.character(gsub("/", ".", expressions)))
 		}else{
-			new("fhir_columns", fhir_xpath_expression(expression = expressions), names = names(expressions))
+			new(Class = "fhir_columns", fhir_xpath_expression(expression = expressions), names = names(expressions))
 		}
 	}
 )
@@ -122,9 +121,9 @@ setMethod(
 			stop("expressions can only contain character vectors of length 1.")
 		}
 		if(is.null(names(expressions))){
-			new("fhir_columns", fhir_xpath_expression(expression = unlist(expressions)), names = gsub("/", ".", unlist(expressions)))
-		}else{
-			new("fhir_columns", fhir_xpath_expression(expression = unlist(expressions)), names = names(expressions))
+			new(Class = "fhir_columns", fhir_xpath_expression(expression = unlist(expressions)), names = gsub("/", ".", unlist(expressions)))
+		} else {
+			new(Class = "fhir_columns", fhir_xpath_expression(expression = unlist(expressions)), names = names(expressions))
 		}
 	}
 )
@@ -132,16 +131,18 @@ setMethod(
 setMethod(
 	"show",
 	"fhir_columns",
-	function(object){
-		if(length(object)==0){cat("An empty fhir_columns object"); return()}
-
+	function(object) {
+		if(length(object) == 0) {
+			cat("An empty fhir_columns object");
+			return()
+		}
 		pairs <- paste(names(object), object, sep = "=")
 		colwidth1 <- max(c(stringr::str_length(string = names(object)),11)) + 1
 		colwidth2 <- max(stringr::str_length(string = object)) + 1
 		header <- paste(
-			stringr::str_pad(string = "column name", width = colwidth1 - 1, side="right"),
+			stringr::str_pad(string = "column name", width = colwidth1 - 1, side = "right"),
 			"| xpath expression", "\n",
-			paste(rep("-", colwidth1 + colwidth2), collapse=""),
+			paste(rep("-", colwidth1 + colwidth2), collapse = ""),
 			"\n",
 			collapse = ""
 		)
@@ -150,12 +151,10 @@ setMethod(
 			#	"A fhir_columns object:\n\n",
 				header,
 				paste(
-					paste0(stringr::str_pad(string = names(object), width = colwidth1, side="right"), "| ", object),
+					paste0(stringr::str_pad(string = names(object), width = colwidth1, side = "right"), "| ", object),
 					collapse = "\n"
 				)
 			)
 		)
-
 	}
 )
-
