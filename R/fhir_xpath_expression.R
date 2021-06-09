@@ -6,22 +6,20 @@
 
 #definition
 setClass(
-	"fhir_xpath_expression",
+	Class = "fhir_xpath_expression",
 	contains = "character"
 )
 
 #validity check
 setValidity(
-	"fhir_xpath_expression",
+	Class = "fhir_xpath_expression",
 	method = function(object) {
-		if(length(object)==0){return(TRUE)}
-
+		if(length(object) == 0) {return(TRUE)}
 		messages <- c()
-
 		#slightly hacky solution: use xml2 function and catch warning message
 		#this will validate xpath expression with libxml2 (accessed by xml2)
 		testbundle <- xml2::read_xml(x = "<Bundle><Resource><item value='1'/></Resource></Bundle>")
-		for(i in 1:length(object)){
+		for(i in 1:length(object)) {
 			tryCatch(
 				xml2::xml_find_all(x = testbundle, xpath = object[i]),
 				warning = function(x) {
@@ -47,6 +45,6 @@ setValidity(
 #'
 #' @export
 #'
-fhir_xpath_expression <- function(expression){
-	new("fhir_xpath_expression", expression)
+fhir_xpath_expression <- function(expression) {
+	new(Class = "fhir_xpath_expression", expression)
 }
