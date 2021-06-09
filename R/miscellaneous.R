@@ -3,9 +3,9 @@
 
 #environment variables
 fhircrackr_env <- new.env(parent = emptyenv())
-assign(x = "last_next_link", value = new("fhir_url"), envir = fhircrackr_env)
+assign(x = "last_next_link", value = new(Class = "fhir_url"), envir = fhircrackr_env)
 assign(x = "canonical_design", value = NULL, envir = fhircrackr_env)
-assign(x = "current_request", value = new("fhir_url"), envir = fhircrackr_env)
+assign(x = "current_request", value = new(Class = "fhir_url"), envir = fhircrackr_env)
 
 #imports
 #' @import data.table
@@ -37,20 +37,18 @@ globalVariables(".")
 #' paste_paths(path1 = "/data/", path2 = "/patients/")
 #' paste_paths(path1 = "data", path2 = "patients", os = "windows")
 
-paste_paths <- function(path1 = "w",
-						path2 = "d",
-						os = "LiNuX") {
+paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 	os <- tolower(substr(os, 1, 1))
-
-	if (os == "w") {
-		return(paste0(sub(pattern = "\\\\$" , replacement = "", x = path1),
-					  "\\",
-					  sub(pattern = "^\\\\", replacement = "", x = path2)))
+	if(os == "w") {
+		return(
+			paste0(
+				sub(pattern = "\\\\$" , replacement = "", x = path1),
+				"\\",
+				sub(pattern = "^\\\\", replacement = "", x = path2)
+			)
+		)
 	}
-
-	paste0(sub(pattern = "/$" , replacement = "", x = path1),
-		   "/", sub(pattern = "^/",
-		   		 replacement = "", x = path2))
+	paste0(sub(pattern = "/$" , replacement = "", x = path1), "/", sub(pattern = "^/", replacement = "", x = path2))
 }
 
 ##### Documentation for medication_bundles data set ######
@@ -368,16 +366,11 @@ paste_paths <- function(path1 = "w",
 #' @noRd
 #' @examples
 #' fhircrackr:::lst(letters[1:5], prefix="--", suffix="+")
-lst <- function(...,
-				prefix = NULL,
-				suffix = NULL) {
+lst <- function(..., prefix = NULL, suffix = NULL) {
 	v <- as.list(c(...))
-
 	names(v) <- paste0(prefix, v, suffix)
-
 	v
 }
-
 
 
 #' Escape special characters
@@ -387,7 +380,5 @@ lst <- function(...,
 #' @noRd
 #'
 esc <- function(s) {
-	gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])",
-		 "\\\\\\1",
-		 s)
+	gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s)
 }
