@@ -1,4 +1,3 @@
-
 #' An S4 object to represent a URL for a FHIR server
 #'
 #' Objects of this class are basically strings (character vectors of length 1) representing
@@ -6,14 +5,14 @@
 #' @export
 #'
 setClass(
-	"fhir_url",
+	Class = "fhir_url",
 	contains = "character"
 )
 
 #Validity check
 setValidity(
-	"fhir_url",
-	method = function(object){
+	Class = "fhir_url",
+	method = function(object) {
 		messages <- c()
 		if(1 < length(object)) {
 			messages <- c(messages, paste0("A fhir_url has to be a character of length 1."))
@@ -82,9 +81,9 @@ setValidity(
 #' @export
 
 setGeneric(
-	"fhir_url",
-	function(url, resource, parameters, url_enc=TRUE){
-		request <- standardGeneric("fhir_url")
+	name = "fhir_url",
+	def = function(url, resource, parameters, url_enc = TRUE) {
+		request <- standardGeneric(f = "fhir_url")
 		fhircrackr_env$current_request <- request
 		request
 	}
@@ -93,14 +92,11 @@ setGeneric(
 #' @aliases fhir_url,character,missing,missing-method
 #' @rdname fhir_url-methods
 setMethod(
-	"fhir_url",
-	signature = c(url="character", resource = "missing", parameters = "missing"),
-	function(url, url_enc=TRUE){
-
-		if(length(url)>0&&url_enc){url <- utils::URLencode(URL = url)}
-
-		new("fhir_url", url)
-
+	f = "fhir_url",
+	signature = c(url = "character", resource = "missing", parameters = "missing"),
+	definition = function(url, url_enc = TRUE) {
+		if(0 < length(url) && url_enc) {url <- utils::URLencode(URL = url)}
+		new(Class = "fhir_url", url)
 	}
 )
 
@@ -108,22 +104,17 @@ setMethod(
 #' @rdname fhir_url-methods
 
 setMethod(
-	"fhir_url",
+	f = "fhir_url",
 	signature = c(url = "character", resource = "character", parameters = "missing"),
-	function(url, resource, url_enc=TRUE){
-
+	function(url, resource, url_enc = TRUE) {
 		resource <- fhir_resource_type(string = resource)
-
-		if(stringr::str_sub(string = url, start = -1) =="/"){
-
+		if(stringr::str_sub(string = url, start = -1) == "/") {
 			request <- paste0(url, resource)
-
-		}else{
-			request <- paste(url, resource, sep="/")
+		} else {
+			request <- paste(url, resource, sep = "/")
 		}
-
-		if(url_enc){request <- utils::URLencode(URL = request)}
-	 	new("fhir_url", request)
+		if(url_enc) {request <- utils::URLencode(URL = request)}
+	 	new(Class = "fhir_url", request)
 	}
 )
 
@@ -131,84 +122,64 @@ setMethod(
 #' @rdname fhir_url-methods
 
 setMethod(
-	"fhir_url",
+	f = "fhir_url",
 	signature = c(url = "character", resource = "character", parameters = "character"),
-	function(url, resource, parameters, url_enc=TRUE){
-
+	definition = function(url, resource, parameters, url_enc = TRUE) {
 		resource <- fhir_resource_type(string = resource)
-
-		if(stringr::str_sub(string = url, start = -1) =="/"){
-
+		if(stringr::str_sub(string = url, start = -1) == "/") {
 			request <- paste0(url, resource)
-
-		}else{
+		} else {
 			request <- paste(url, resource, sep="/")
 		}
-
-
-		if(length(parameters)==1 && grepl("=", parameters)){
+		if(length(parameters) == 1 && grepl("=", parameters)) {
 			request <- paste0(request, "?", parameters)
-			if(url_enc){utils::URLencode(URL = request)}
-			return(new("fhir_url", request))
+			if(url_enc) {utils::URLencode(URL = request)}
+			return(new(Class = "fhir_url", request))
 		}
-
-		if(is.null(names(parameters))){
+		if(is.null(names(parameters))) {
 			stop("A character vector has to be named to create parameters from it.")
 		}
-
-		if("" %in% names(parameters)){
-			stop("All elements in the parameter vector must have names. \n",
-				 "Please provide a name for the following parameters: \"",
-				 paste(parameters[names(parameters)==""], collapse = "\", \""), "\".")
+		if("" %in% names(parameters)) {
+			stop(
+				"All elements in the parameter vector must have names. \n",
+				"Please provide a name for the following parameters: \"",
+				paste(parameters[names(parameters)==""], collapse = "\", \""), "\"."
+			)
 		}
-
 		keys <- names(parameters)
 		pairs <- paste(keys, parameters, sep = "=")
 		string <- paste(pairs, collapse = "&")
-
 		request <- paste0(request, "?", string)
-		if(url_enc){request <- utils::URLencode(URL = request)}
-	 	new("fhir_url", request)
+		if(url_enc) {request <- utils::URLencode(URL = request)}
+	 	new(Class = "fhir_url", request)
 	}
-
 )
 
 #' @aliases fhir_url,character,character,list-method
 #' @rdname fhir_url-methods
 
 setMethod(
-	"fhir_url",
+	f = "fhir_url",
 	signature = c(url = "character", resource = "character", parameters = "list"),
-	function(url, resource, parameters, url_enc=TRUE){
-
+	function(url, resource, parameters, url_enc = TRUE) {
 		resource <- fhir_resource_type(string = resource)
-
-		if(stringr::str_sub(string = url, start = -1) =="/"){
-
+		if(stringr::str_sub(string = url, start = -1) == "/") {
 			request <- paste0(url, resource)
-
-		}else{
-			request <- paste(url, resource, sep="/")
+		} else {
+			request <- paste(url, resource, sep = "/")
 		}
-
 		if(any(!sapply(parameters, function(x) {is.character(x)}))) {
 			stop("The provided list must have elements of type character")
 		}
 		if(is.null(names(parameters))) {
 			stop("Please provide a named list.")
 		}
-
 		keys <- names(parameters)
 		values <- unlist(parameters)
 		pairs <- paste(keys, values, sep = "=")
 		string <- paste(pairs, collapse = "&")
-
 		request <- paste0(request, "?", string)
-		if(url_enc){request <- utils::URLencode(URL = request)}
-
-		new("fhir_url", request)
+		if(url_enc) {request <- utils::URLencode(URL = request)}
+		new(Class = "fhir_url", request)
 	}
-
 )
-
-
