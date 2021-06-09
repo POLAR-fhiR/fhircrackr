@@ -93,50 +93,49 @@
 #'
 
 setGeneric(
-	"fhir_crack",
-	function(
+	name = "fhir_crack",
+	def = function(
 		bundles,
 		design,
 		sep = NULL,
 		remove_empty_columns = NULL,
 		brackets = NULL,
 		verbose = 2,
-		data.table = FALSE){
+		data.table = FALSE) {
 
-		standardGeneric("fhir_crack")
+		standardGeneric(f = "fhir_crack")
 	}
-
 )
 
 #' @rdname fhir_crack-methods
 #' @aliases fhir_crack,fhir_design-method
 setMethod(
-	"fhir_crack",
+	f = "fhir_crack",
 	signature = c(design = "fhir_design"),
-	function(
+	definition = function(
 		bundles,
 		design,
 		sep = NULL,
 		remove_empty_columns = NULL,
 		brackets = NULL,
 		verbose = 2,
-		data.table = FALSE){
+		data.table = FALSE) {
 
 		#overwrite design with function arguments
-		if (!is.null(sep)) {
+		if(!is.null(sep)) {
 			design <- fhir_design(lapply(
 				design,
-				function(x){
+				function(x) {
 					x@style@sep <- sep
 					x
-				}
-			))
+				})
+			)
 		}
-		if (!is.null(brackets)) {
+		if(!is.null(brackets)) {
 			brackets <- fix_brackets(brackets = brackets)
 			design <-fhir_design(lapply(
 				design,
-				function(x){
+				function(x) {
 					x@style@brackets <- brackets
 					x
 				}
@@ -145,27 +144,25 @@ setMethod(
 		if (!is.null(remove_empty_columns)) {
 			design <- fhir_design(lapply(
 				design,
-				function(x){
+				function(x) {
 					x@style@rm_empty_cols <- remove_empty_columns
 					x
 				}
 			))
 		}
-
-		validObject(object = design, complete = T)
-
+		validObject(object = design, complete = TRUE)
 		#Check for dangerous XPath expressions ins cols
-		cols <- lapply(design, function(x){c(x@cols)})
-		dangerCols <- sapply(cols, function(x){any(grepl(esc("//"), x))})
-		if(any(dangerCols)){
-			warning("In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
-					"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
-					"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
-					"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
-					"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse=", "))
+		cols <- lapply(design, function(x) {c(x@cols)})
+		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
+		if(any(dangerCols)) {
+			warning(
+				"In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
+				"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
+				"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
+				"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
+				"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse=", ")
+			)
 		}
-
-
 		#Add attributes to design
 		design <- add_attribute_to_design(design = design)
 		#crack
@@ -179,97 +176,87 @@ setMethod(
 #' @rdname fhir_crack-methods
 #' @aliases fhir_crack,fhir_table_description-method
 setMethod(
-	"fhir_crack",
+	f = "fhir_crack",
 	signature = c(design = "fhir_table_description"),
-	function(
+	definition = function(
 		bundles,
 		design,
 		sep = NULL,
 		remove_empty_columns = NULL,
 		brackets = NULL,
 		verbose = 2,
-		data.table = FALSE){
+		data.table = FALSE) {
 
 		#overwrite design with function arguments
-		if (!is.null(sep)) {
-			design@style@sep <- sep
-		}
-
-		if (!is.null(brackets)) {
+		if(!is.null(sep)) {design@style@sep <- sep}
+		if(!is.null(brackets)) {
 			brackets <- fix_brackets(brackets = brackets)
 			design@style@brackets <- brackets
 		}
-
-		if (!is.null(remove_empty_columns)) {
+		if(!is.null(remove_empty_columns)) {
 			design@style@rm_empty_cols <- remove_empty_columns
 		}
-
-		validObject(object = design, complete = T)
-
+		validObject(object = design, complete = TRUE)
 		#Check for dangerous XPath expressions ins cols
 		cols <- design@cols
-		dangerCols <- sapply(cols, function(x){any(grepl(esc("//"), x))})
-		if(any(dangerCols)){
-			warning("In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
-					"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
-					"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
-					"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
-					"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse=", "))
+		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
+		if(any(dangerCols)) {
+			warning(
+				"In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
+				"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
+				"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
+				"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
+				"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse = ", ")
+			)
 		}
-
 		#Add attributes to design
 		design <- add_attribute_to_design(design = design)
-
 		#crack
 		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose)
 		#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
 		remove <- design@style@rm_empty_cols
-
-		if(remove && ncol(df) > 0){
-			df_cleaned <- df[, colSums(!is.na(df))>0, with=F]
-		}else{
-			df_cleaned <- df}
-
-		if (0 < verbose) {message("FHIR-Resources cracked. \n")}
-		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
-
-		if(data.table){
-			df
+		if(remove && 0 < ncol(df)) {
+			df_cleaned <- df[, 0 < colSums(!is.na(df)), with = F]
 		} else {
-			data.frame(df)
+			df_cleaned <- df
 		}
+		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
+		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
+		if(data.table) {df} else {data.frame(df)}
 	}
 )
 
 #' @rdname fhir_crack-methods
 #' @aliases fhir_crack,list-method
 setMethod(
-	"fhir_crack",
+	f = "fhir_crack",
 	signature = c(design = "list"),
-	function(
+	definition = function(
 		bundles,
 		design,
 		sep = NULL,
 		remove_empty_columns = NULL,
 		brackets = NULL,
 		verbose = 2,
-		data.table = FALSE){
+		data.table = FALSE) {
 
-			warning("The use of an old-style design will be disallowed in the future. ",
-				 "Please consider building the design with the function fhir_design().\n",
-				 "Converting design to fhir_design object.")
-			suppressMessages(design <- fhir_design(design))
-
-			fhir_crack(bundles = bundles,
-					   design = design,
-					   sep = sep,
-					   remove_empty_columns = remove_empty_columns,
-					   brackets = brackets,
-					   verbose = verbose,
-					   data.table = data.table)
+		warning(
+			"The use of an old-style design will be disallowed in the future. ",
+			"Please consider building the design with the function fhir_design().\n",
+			"Converting design to fhir_design object."
+		)
+		suppressMessages(design <- fhir_design(design))
+		fhir_crack(
+			bundles = bundles,
+			design = design,
+			sep = sep,
+			remove_empty_columns = remove_empty_columns,
+			brackets = brackets,
+			verbose = verbose,
+			data.table = data.table
+		)
 	}
 )
-
 
 ############################################################################################
 ##############################################################################################
@@ -302,23 +289,24 @@ xtrct_all_columns <- function(
 	xpath = ".//@*",
 	brackets = NULL) {
 
-	if(length(brackets)==0){brackets <- NULL}
-
+	if(length(brackets) == 0) {brackets <- NULL}
 	tree <- xml2::xml_find_all(x = child, xpath = xpath)
-	if (length(tree) < 1) {return(data.table::data.table())}
+	if(length(tree) < 1) {return(data.table::data.table())}
 	xp.child  <- xml2::xml_path(x = child)
 	xp.remain <- xml2::xml_path(x = tree)
 	xp.rel    <- substr(x = xp.remain, start = nchar(xp.child) + 2, stop = nchar(xp.remain))
-	xp.cols   <- gsub(pattern = "/", replacement = ".",
-					  x = gsub(pattern = "@", replacement = "",
-					  		 x = unique(gsub(pattern = "\\[[0-9]+\\]", replacement = "",
-					  		 				x = xp.rel)
-					  		 				)
-					  		 )
-					  )
-	d <- lapply(1:length(xp.cols), function(dummy)character(0))
+	xp.cols   <- gsub(
+		pattern = "/",
+		replacement = ".",
+		x = gsub(
+			pattern = "@",
+			replacement = "",
+			x = unique(gsub(pattern = "\\[[0-9]+\\]", replacement = "", x = xp.rel))
+		)
+	)
+	d <- lapply(seq_len(length(xp.cols)), function(dummy) character(0))
 	names(d) <- xp.cols
-	val  <- xml2::xml_text(x = tree)
+	val <- xml2::xml_text(x = tree)
 	s <- stringr::str_split(string = xp.rel, pattern = "/")
 	o <- sapply(
 		seq_along(s),
@@ -327,25 +315,17 @@ xtrct_all_columns <- function(
 			i.f <- !grepl("\\[[0-9]+\\]", s.)
 			if (any(i.f)) {s.[i.f] <- paste0(s.[i.f], "[1]")}
 			c(
-				paste0(gsub(pattern = "]$",replacement = "",
-							x = gsub(pattern = ".*\\[",replacement = "",
-									 x = s.[-length(s.)])), collapse = "."),
-				gsub(pattern = "@", replacement = "",
-					 x = gsub(pattern = "\\[[0-9]+\\]", replacement = "",
-					 		 x = paste0(s., collapse = ".")
-					 		 )
-					 )
+				paste0(gsub(pattern = "]$",replacement = "", x = gsub(pattern = ".*\\[",replacement = "", x = s.[-length(s.)])), collapse = "."),
+				gsub(pattern = "@", replacement = "", x = gsub(pattern = "\\[[0-9]+\\]", replacement = "", x = paste0(s., collapse = ".")))
 			)
 		}
 	)
-	if (!is.null(brackets)) {
+	if(!is.null(brackets)) {
 		is_av_val <- ! is.na(val)
 		o. <- o[1, ]
 		val[is_av_val] <- paste0(brackets[1], o.[is_av_val], brackets[2], val[is_av_val])
 	}
-	for (col in xp.cols) {
-		#dbg
-		#col <- xp.cols[1]
+	for(col in xp.cols) {
 		d[[col]] <- paste0(val[col == o[2, ]], collapse = sep)
 	}
 	result <- data.table::as.data.table(x = d)
@@ -383,22 +363,16 @@ xtrct_all_columns <- function(
 #' #Extract columns
 #' result <- fhircrackr:::xtrct_columns(child = child, cols = cols)
 
-xtrct_columns <- function(
-	child,
-	cols,
-	sep = NULL,
-	brackets = NULL) {
-
-	if(length(brackets)==0){brackets <- NULL}
-
+xtrct_columns <- function(child, cols, sep = NULL, brackets = NULL) {
+	if(length(brackets) == 0) {brackets <- NULL}
 	xp <- xml2::xml_path(x = child)
 	l <- lapply(
 		lst(names(cols)),
-		function(column.name)  {
+		function(column.name) {
 			i.srch <- cols[[column.name]]
 			loc <- xml2::xml_find_all(x = child, xpath = i.srch)
 			val <- xml2::xml_text(x = loc)
-			if (!is.null(brackets)) {
+			if(!is.null(brackets)) {
 				loc.xp <- xml2::xml_path(x = loc)
 				loc.xp.rel <- substr(loc.xp, nchar(xp) + 2, nchar(loc.xp))
 				s <- stringr::str_split(string = loc.xp.rel, pattern = "/")
@@ -407,19 +381,17 @@ xtrct_columns <- function(
 					function(i) {
 						s. <- s[[i]]
 						i.f <- !grepl("\\[[0-9]+\\]", s.)
-						if (any(i.f)) {s.[i.f] <- paste0(s.[i.f], "[1]")}
+						if(any(i.f)) {s.[i.f] <- paste0(s.[i.f], "[1]")}
 						gsub(".1$", "", paste0(gsub(pattern = "[^0-9]", replacement = "", x = s.), collapse = "."))
 					}
 				)
-
-				if (0 < length(val)) {
+				if(0 < length(val)) {
 					is_av <- ! is.na(val)
 					paste0(brackets[1], o[is_av], brackets[2], val[is_av], collapse = sep)
 				}
 				else {NA}
-			}
-			else {
-				if (0 < length(val)) {paste0(val, collapse = sep)} else {NA}
+			} else {
+				if(0 < length(val)) {paste0(val, collapse = sep)} else {NA}
 			}
 		}
 	)
@@ -455,41 +427,33 @@ xtrct_columns <- function(
 #'
 #' #convert bundle to data frame
 #' result <- fhircrackr:::bundle2df(bundle = bundle, df_desc = df_desc)
-bundle2df <- function(
-	bundle,
-	df_desc,
-	verbose = 2) {
-
+bundle2df <- function(bundle, df_desc, verbose = 2) {
 	xpath <- paste0("//", df_desc@resource)
 	children <- xml2::xml_find_all(x = bundle, xpath = xpath)
-	df.list <- if (length(children) == 0) {
+	df.list <- if(length(children) == 0) {
 		list()
 	} else {
 		lapply(
 			children,
 			function(child) {
-		   	#dbg
-		   	#child <- children[[ 1 ]]
-
-
-			   	if (length(df_desc@cols)>0) {#if cols is not empty
+			   	if(0 < length(df_desc@cols)) {#if cols is not empty
 			   		cols <- df_desc@cols
 			   		res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets)
-			   		if (1 < verbose) {
-			   			if (all(sapply(res, is.na))) {cat("x")} else {cat(".")}
+			   		if(1 < verbose) {
+			   			if(all(sapply(res, is.na))) {cat("x")} else {cat(".")}
 			   		}
 			   	} else {#if cols empty
 			   		xp <- ".//@*"
-			   		res <- xtrct_all_columns( child = child, sep = df_desc@style@sep, xpath = xp, brackets = df_desc@style@brackets)
-			   		if (1 < verbose) {
-			   			if (nrow(res) < 1) {cat("x")} else {cat(".")}
+			   		res <- xtrct_all_columns(child = child, sep = df_desc@style@sep, xpath = xp, brackets = df_desc@style@brackets)
+			   		if(1 < verbose) {
+			   			if(nrow(res) < 1) {cat("x")} else {cat(".")}
 			   		}
 			   	}
 				res
 			}
 		)
 	}
-	data.table::rbindlist(l = df.list, fill=TRUE)
+	data.table::rbindlist(l = df.list, fill = TRUE)
 }
 
 #' Convert several bundles to one data frame
@@ -519,17 +483,11 @@ bundle2df <- function(
 #' #convert bundles to data frame
 #' result <- fhircrackr:::bundles2df(bundles = bundles, df_desc = df_desc)
 
-bundles2df <- function(
-	bundles,
-	df_desc,
-	verbose = 2) {
-
+bundles2df <- function(bundles, df_desc, verbose = 2) {
 	ret <- data.table::rbindlist(
 		lapply(
 			seq_along(bundles),
 			function(i) {
-				#dbg
-				#i<-1
 				if (1 < verbose) {cat("\n", i)}
 				bundle <- bundles[[i]]
 				bundle2df(bundle = bundle, df_desc = df_desc, verbose = verbose)
@@ -537,8 +495,8 @@ bundles2df <- function(
 		),
 		fill = TRUE
 	)
-	if(nrow(ret > 0)) {ret <- ret[rowSums(!is.na(ret)) > 0, ]}
-	if (1 < verbose) {cat("\n")}
+	if(nrow(0 < ret)) {ret <- ret[0 < rowSums(!is.na(ret)), ]}
+	if(1 < verbose) {cat("\n")}
 	ret
 }
 
@@ -585,39 +543,35 @@ bundles2df <- function(
 #' #convert fhir to data frames
 #' list_of_tables <- fhircrackr:::bundles2dfs(bundles = bundles, design = design)
 
-bundles2dfs <- function(
-	bundles,
-	design,
-	data.table = FALSE,
-	verbose = 2) {
-
+bundles2dfs <- function(bundles, design, data.table = FALSE, verbose = 2) {
 	dfs <- lapply(
 		lst(names(design)),
 		function(n) {
 			df_desc <- design[[n]]
-		  	if (1 < verbose) {cat("\n", n)}
-
-		  	if(is.null(df_desc)){NULL} else {bundles2df(bundles = bundles, df_desc = df_desc, verbose = verbose)}
+		  	if(1 < verbose) {cat("\n", n)}
+		  	if(is.null(df_desc)) {NULL} else {bundles2df(bundles = bundles, df_desc = df_desc, verbose = verbose)}
 		}
 	)
-	if (1 < verbose) {cat("\n")}
+	if(1 < verbose) {cat("\n")}
 	#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
 	remove <- sapply(
 		design,
-		function(x){x@style@rm_empty_cols}
+		function(x) {x@style@rm_empty_cols}
 	)
 	dfs_cleaned <- lapply(
 		seq_along(dfs),
 		function(i) {
-			if(remove[i] && ncol(dfs[[i]]) > 0){
-				dfs[[i]][, colSums(!is.na(dfs[[i]]))>0, with=F]} else {dfs[[i]]}
+			if(remove[i] && 0 < ncol(dfs[[i]])) {
+				dfs[[i]][, 0 < colSums(!is.na(dfs[[i]])), with = FALSE]
+			} else {
+				dfs[[i]]
+			}
 		}
 	)
 	names(dfs_cleaned) <- names(dfs)
-	if(data.table){
-		fhir_dt_list(dt_list = dfs_cleaned, design=design)
+	if(data.table) {
+		fhir_dt_list(dt_list = dfs_cleaned, design = design)
 	} else {
 		fhir_df_list(lapply(dfs_cleaned, data.frame), design)
 	}
 }
-
