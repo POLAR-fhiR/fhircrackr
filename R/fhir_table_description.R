@@ -43,10 +43,12 @@
 #' @seealso [fhir_resource_type()],[fhir_columns()],[fhir_style()], [fhir_design()], [fhir_crack()]
 #' @export
 setClass(
-	"fhir_table_description",
-	slots = c(resource = "fhir_resource_type",
-			  cols = "fhir_columns",
-			  style = "fhir_style")
+	Class = "fhir_table_description",
+	slots = c(
+		resource = "fhir_resource_type",
+		cols = "fhir_columns",
+		style = "fhir_style"
+	)
 )
 
 #' Create [fhir_table_description-class] object
@@ -127,21 +129,20 @@ setClass(
 #'                                 "id")
 #' )
 #' @export
-fhir_table_description <- function(resource,
-								   cols = fhir_columns(),
-								   style = fhir_style()){
+fhir_table_description <- function(
+	resource,
+	cols = fhir_columns(),
+	style = fhir_style()) {
 
 	resource <- fhir_resource_type(string = resource)
-	if(class(cols)!="fhir_columns"){cols <- fhir_columns(expressions = cols)}
-
-	new("fhir_table_description", resource = resource, cols = cols, style = style)
+	if(class(cols) != "fhir_columns") {cols <- fhir_columns(expressions = cols)}
+	new(Class = "fhir_table_description", resource = resource, cols = cols, style = style)
 }
 
-
 setMethod(
-	"show",
-	"fhir_table_description",
-	function(object){
+	f = "show",
+	signature = "fhir_table_description",
+	function(object) {
 		cat("A fhir_table_description with the following elements: \n\n")
 		cat(paste0("fhir_resource_type: ", as.character(object@resource), "\n\n"))
 		cat("fhir_columns: \n"); show(object@cols)
