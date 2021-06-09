@@ -72,4 +72,39 @@ kommt der Fehler.
 --> Readme wollte ich ja in Zukunft eigentlich nicht immer gesondert anpassen, das ist so viel Arbeit.
 Deshalb eigentlich die Lösung über das .Rmd, das einfach eine Kopie vom Intro ist, die das Github-fähige .md erzeugt (Hatte ich nur vergessen zu aktualisieren). Können wir das beibehalten? Ich glaube nicht, dass das Link-Verhalten die Zusatzarbeit rechtfertigt, die wir haben, wenn wir das Readme in Zukunft immer gesondert pflegen müssen.
 
+
+
+
+download_resources.R
+row ~ 108
+
+	####remove at some point####
+	if(is.logical(save_to_disc)){
+		warning("The use of TRUE/FALSE in the argument save_to_disc in combination with the argument directory is ",
+				"deprecated. Please specify the directory name in the save_to_disc argument directly (see ?fhir_search).")
+		if(save_to_disc){
+			message("Setting save_to_disc to '", directory, "'.")
+			save_to_disc <- directory
+			}
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <a href="" target="_blank"></a>

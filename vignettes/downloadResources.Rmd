@@ -89,7 +89,7 @@ fhir_resource_type(string = "medicationstatement") #fixed
 
 fhir_resource_type(string = "medicationstatement", fix_capitalization = FALSE) #not fixed
 
-fhir_resource_type(string = "Hospital") #a unknown resource type, a warning is issued
+fhir_resource_type(string = "Hospital") #an unknown resource type, a warning is issued
 # Warnmeldung:
 # In fhir_resource_type("Hospital") :
 #   You gave "Hospital" as the resource type.

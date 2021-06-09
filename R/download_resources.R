@@ -104,95 +104,84 @@ fhir_search <- function(
 	delay_between_bundles = 0,
 	directory = paste0("FHIR_bundles_", gsub("-| |:", "", Sys.time()))) {
 
-
 	####remove at some point####
-	if(is.logical(save_to_disc)){
-		warning("The use of TRUE/FALSE in the argument save_to_disc in combination with the argument directory is ",
-				"deprecated. Please specify the directory name in the save_to_disc argument directly (see ?fhir_search).")
-		if(save_to_disc){
+	if(is.logical(save_to_disc)) {
+		warning(
+			"The use of TRUE/FALSE in the argument save_to_disc in combination with the argument directory is ",
+			"deprecated. Please specify the directory name in the save_to_disc argument directly (see ?fhir_search)."
+		)
+		if(save_to_disc) {
 			message("Setting save_to_disc to '", directory, "'.")
 			save_to_disc <- directory
-			}
+		}
 	}
-
-	if(is.numeric(log_errors)){
+	if(is.numeric(log_errors)) {
 		warning("The use of numbers in log_errors is deprecated. Please specify a file name if you want to log erros and NULL if you don't.\n")
-		if(log_errors>0){
+		if(0 < log_errors) {
 			message("Setting log_errors to 'http_error_fhir_search.xml'.")
 			log_errors <- "http_error_fhir_search.xml"
-		}else{
+		} else {
 			log_errors <- NULL
 		}
-
 	}
 	#######################################################
-
-	if(is.null(request)){
-		stop("You have not provided a FHIR search request and there is no ",
-			 "current search request fhir_search() can fall back to. See documentation ",
-			 "for fhir_current_request()")
+	if(is.null(request)) {
+		stop(
+			"You have not provided a FHIR search request and there is no ",
+			"current search request fhir_search() can fall back to. See documentation ",
+			"for fhir_current_request()"
+		)
 	}
-
 	#prepare body
-	if(!is.null(body)){
-		if(verbose > 0){message("Initializing search via POST.\n")}
+	if(!is.null(body)) {
+		if(0 < verbose) {message("Initializing search via POST.\n")}
 		#filter out bad urls
-		if(grepl("\\?", request)){
-			stop("The url in argument request should only consist of base url and resource type. ",
-				 "The one you provided has a `?` which indicates the presence of parameters. ",
-				 "If your request just ends with a `?`, please remove it to remove this error.\n",
-				 "If you want to perform search via GET, please set body to NULL.")
+		if(grepl("\\?", request)) {
+			stop(
+				"The url in argument request should only consist of base url and resource type. ",
+				"The one you provided has a `?` which indicates the presence of parameters. ",
+				"If your request just ends with a `?`, please remove it to remove this error.\n",
+				"If you want to perform search via GET, please set body to NULL."
+			)
 		}
-
-		if(!grepl("_search", request)){
-			request <- paste(request, "_search", sep="/")
-		}
-
+		if(!grepl("_search", request)) {request <- paste(request, "_search", sep = "/")}
 		#convert body to appropriate class
-		if(is.character(body)){
+		if(is.character(body)) {
 			body <- fhir_body(content = body, type = "application/x-www-form-urlencoded")
-		}else if(is(body, "fhir_body")){
-			if(body@type != "application/x-www-form-urlencoded"){
+		} else if(is(body, "fhir_body")) {
+			if(body@type != "application/x-www-form-urlencoded") {
 				stop("The (content) type of the body for a search via POST must be `application/x-www-form-urlencoded`")
 			}
-		}else{
+		} else {
 			stop("The body must be either of type character or of class fhir_body")
 		}
 	}
-
 	#prepare token authorization
-	if(!is.null(token)){
-		if(!is.null(username)||is.null(password)){
-			warning("You provided username and password as well as a token for authentication.\n",
-					"Ignoring username and password, trying to authorize with token.")
+	if(!is.null(token)) {
+		if(!is.null(username) || is.null(password)) {
+			warning(
+				"You provided username and password as well as a token for authentication.\n",
+				"Ignoring username and password, trying to authorize with token."
+			)
 			username <- NULL
 			password <- NULL
 		}
-
-		if(is(token, "Token")){
+		if(is(token, "Token")) {
 			token <- token$credentials$access_token
 		}
-
-		if(length(token)>1){stop("token must be of length 1.")}
-
+		if(1 < length(token)) {stop("token must be of length 1.")}
 		bearerToken <- paste0("Bearer ", token)
-	}else{
+	} else {
 		bearerToken <- NULL
 	}
-
 	bundles <- list()
-
-	addr <- fhir_url(request)
-
+	addr <- fhir_url(url = request)
 	#starting message
-	if (0 < verbose) {
+	if(0 < verbose) {
 		message(
 			paste0(
 				"Starting download of ",
-				if (max_bundles < Inf)
-					max_bundles
-				else
-					"ALL!",
+				if(max_bundles < Inf) {max_bundles} else {"ALL!"},
 				" bundles of resource type ",
 				gsub("(^.+/)(.+)(\\?).*$", "\\2", request, perl = TRUE),
 				" from FHIR base URL ",
@@ -200,102 +189,79 @@ fhir_search <- function(
 				".\n"
 			)
 		)
-
-		if (9 < max_bundles)
-			message("This may take a while...")
+		if(9 < max_bundles) {message("This may take a while...")}
 	}
-
 	#download bundles
 	cnt <- 0
-
 	repeat {
 		cnt <- cnt + 1
-
-		if (1 < verbose) {
-			cat(paste0("bundle[", cnt, "]"))
-		}
-
-		bundle <-
-			get_bundle(
-				request = addr,
-				body = body,
-				username = username,
-				password = password,
-				token = bearerToken,
-				verbose = verbose,
-				max_attempts = max_attempts,
-				delay_between_attempts = delay_between_attempts,
-				log_errors = log_errors
-			)
-
-		if (is.null(bundle)) {
-			if (0 < verbose) {
+		if(1 < verbose) {cat(paste0("bundle[", cnt, "]"))}
+		bundle <- get_bundle(
+			request = addr,
+			body = body,
+			username = username,
+			password = password,
+			token = bearerToken,
+			verbose = verbose,
+			max_attempts = max_attempts,
+			delay_between_attempts = delay_between_attempts,
+			log_errors = log_errors
+		)
+		if(is.null(bundle)) {
+			if(0 < verbose) {
 				message("Download interrupted.\n")
 			}
-
 			break
 		}
-
-		if(!is.null(save_to_disc)){
-
-			if (!dir.exists(save_to_disc)){
-				dir.create(save_to_disc, recursive = TRUE)
+		if(!is.null(save_to_disc)) {
+			if (!dir.exists(save_to_disc)) {
+				dir.create(path = save_to_disc, recursive = TRUE)
 			}
-
 			xml2::write_xml(
-				bundle,
-				paste_paths(save_to_disc, paste0(cnt, ".xml")))
-
-		}else{
+				x = bundle,
+				file = paste_paths(save_to_disc, paste0(cnt, ".xml"))
+			)
+		} else {
 			bundles[[length(bundles) + 1]] <- bundle
 		}
-
-		if (cnt == max_bundles) { #stop because max_bundles is reached
-			if (0 < verbose) {
-				if (length(bundle@next_link)>0) {
+		if(cnt == max_bundles) { #stop because max_bundles is reached
+			if(0 < verbose) {
+				if(0 < length(bundle@next_link)) {
 					message(
 						"\nDownload completed. Number of downloaded bundles was limited to ",
 						cnt,
 						" bundles, this is less than the total number of bundles available.\n"
 					)
-
 					assign(x = "last_next_link", value = bundle@next_link, envir = fhircrackr_env)
 				}
 				else {
 					message("\nDownload completed. All available bundles were downloaded.\n")
 				}
 			}
-
 			break
-		}
-		else { #finished because there are no more bundles
+		} else { #finished because there are no more bundles
 			assign(x = "last_next_link", value = new("fhir_url"), envir = fhircrackr_env)
 		}
-
-		if (length(bundle@next_link)==0) {
-			if (0 < verbose) {
+		if(length(bundle@next_link) == 0) {
+			if(0 < verbose) {
 				message("\nDownload completed. All available bundles were downloaded.\n")
 			}
-
 			break
 		}
-
 		addr <- bundle@next_link
-
 		Sys.sleep(delay_between_bundles)
 	}
-
 	fhircrackr_env$current_request <- request
-
-	if(!is.null(save_to_disc)){
-
-		return(NULL)
-
-	}else{
-
-		return(fhir_bundle_list(bundles))
-
-	}
+	# if(!is.null(save_to_disc)) {
+	# 	return(NULL)
+	# } else {
+	# 	return(fhir_bundle_list(bundles))
+	# }
+	return(
+		if(is.null(save_to_disc)) {
+			fhir_bundle_list(bundles)
+		} else {NULL} #brauchts eigentlich auch nicht
+	)
 }
 
 
@@ -337,20 +303,18 @@ fhir_search <- function(
 #' dir(tempdir())
 #'}
 #'
-fhir_next_bundle_url <- function(bundle=NULL) {
-
-	if(!is.null(bundle)){
-		if(!is(bundle, "fhir_bundle")){
+fhir_next_bundle_url <- function(bundle = NULL) {
+	if(!is.null(bundle)) {
+		if(!is(bundle, "fhir_bundle")) {
 			stop("bundle must be an object of type fhir_bundle")
 		}
-		if(is(bundle, "fhir_bundle_xml")){
+		if(is(bundle, "fhir_bundle_xml")) {
 			bundle@next_link
-		}else{
+		} else {
 			b <- fhir_unserialize(b)
 			b@next_link
 		}
-
-	}else{
+	} else {
 		fhircrackr_env$last_next_link
 	}
 }
@@ -373,7 +337,6 @@ fhir_next_bundle_url <- function(bundle=NULL) {
 
 
 fhir_current_request <- function() {
-
 	fhircrackr_env$current_request
 }
 
@@ -424,86 +387,79 @@ fhir_current_request <- function() {
 #' head(resources)
 #'}
 
-fhir_capability_statement <-function(url = "https://hapi.fhir.org/baseR4",
-									 username = NULL,
-									 password = NULL,
-									 token=NULL,
-									 brackets = NULL,
-									 sep = " || ",
-									 log_errors = NULL,
-									 verbose = 2) {
-
+fhir_capability_statement <- function(
+	url = "https://hapi.fhir.org/baseR4",
+	username = NULL,
+	password = NULL,
+	token=NULL,
+	brackets = NULL,
+	sep = " || ",
+	log_errors = NULL,
+	verbose = 2) {
 
 	auth <- if (!is.null(username) && !is.null(password)) {
 		httr::authenticate(username, password)
 	}
-
 	response <- httr::GET(
-		paste_paths(url, "/metadata?"),
-		httr::add_headers(Accept = "application/fhir+xml",
-						  Authorization = token),
+		url = paste_paths(url, "/metadata?"),
+		config = httr::add_headers(
+			Accept = "application/fhir+xml",
+			Authorization = token
+		),
 		auth
 	)
-
 	#check for http errors
-	check_response(response, log_errors = log_errors)
-
+	check_response(response = response, log_errors = log_errors)
 	#extract payload
-	payload <- httr::content(response, as = "text", encoding = "UTF-8")
-	xml <- xml2::read_xml(payload)
-	xml2::xml_ns_strip(xml)
-
-	xml_meta <- xml2::xml_new_root(xml, .copy = T)
-	xml2::xml_remove(xml2::xml_find_all(xml_meta, "/CapabilityStatement/rest"))
-
-
-	xml_rest <- xml2::xml_new_root(xml, .copy = T)
-	xml_rest <- xml2::xml_find_all(xml_rest, "/CapabilityStatement/rest")
-	xml2::xml_remove(xml2::xml_find_all(xml_rest, "/CapabilityStatement/rest/resource"))
-
-	xml_resource <- xml2::xml_find_all(xml, "/CapabilityStatement/rest/resource")
-
+	payload <- httr::content(x = response, as = "text", encoding = "UTF-8")
+	xml <- xml2::read_xml(x = payload)
+	xml2::xml_ns_strip(x = xml)
+	xml_meta <- xml2::xml_new_root(.value = xml, .copy = TRUE)
+	xml2::xml_remove(.x = xml2::xml_find_all(x = xml_meta, xpath = "/CapabilityStatement/rest"))
+	xml_rest <- xml2::xml_new_root(.value = xml, .copy = TRUE)
+	xml_rest <- xml2::xml_find_all(x = xml_rest, xpath = "/CapabilityStatement/rest")
+	xml2::xml_remove(.x = xml2::xml_find_all(x = xml_rest, xpath = "/CapabilityStatement/rest/resource"))
+	xml_resource <- xml2::xml_find_all(x = xml, xpath = "/CapabilityStatement/rest/resource")
 	suppressWarnings({
 		desc_meta <- fhir_table_description(resource = "/CapabilityStatement")
 		desc_rest <- fhir_table_description(resource = "rest")
 		desc_resource <- fhir_table_description(resource = "resource")
 	})
-
 	META <- fhir_crack(
 		bundles = list(xml_meta),
 		design = fhir_design(desc_meta),
-		sep=sep, brackets = brackets,
+		sep = sep,
+		brackets = brackets,
 		verbose = verbose
 	)
-
-	restBrackets <- if(is.null(brackets)){c("[", "]")}else{brackets}
-
+	restBrackets <- if(is.null(brackets)) {c("[", "]")} else {brackets}
 	REST <- fhir_crack(
 		bundles = list(xml_rest),
 		design = fhir_design(desc_rest),
-		sep=sep,brackets = restBrackets,
+		sep = sep,
+		brackets = restBrackets,
 		verbose = verbose
 	)
-
-	rest <- fhir_melt(REST$desc_rest, brackets = restBrackets, sep = " || ",
-					  columns = fhir_common_columns(REST$desc_rest, column_names_prefix = "operation"),
-					  all_columns = T)
-
+	rest <- fhir_melt(
+		indexed_data_frame = REST$desc_rest,
+		brackets = restBrackets,
+		sep = " || ",
+		columns = fhir_common_columns(
+			data_frame = REST$desc_rest,
+			column_names_prefix = "operation"
+		),
+		all_columns = TRUE
+	)
 	rest$resource_identifier <- NULL
-	if(is.null(brackets)){rest <- fhir_rm_indices(rest, brackets = restBrackets)}
-
+	if(is.null(brackets)) {rest <- fhir_rm_indices(indexed_data_frame = rest, brackets = restBrackets)}
 	RESOURCE <- fhir_crack(
 		bundles = list(xml_resource),
 		design = fhir_design(desc_resource),
-		sep=sep, brackets = brackets,
+		sep = sep,
+		brackets = brackets,
 		verbose = verbose
 	)
-
-	list(Meta = META$desc_meta,
-		 Rest = unique(rest),
-		 Resources = RESOURCE$desc_resource
-		 )
-
+	list(Meta = META$desc_meta, Rest = unique(rest), Resources = RESOURCE$desc_resource)
 }
 
 ####Saving Bundles####
@@ -525,17 +481,16 @@ fhir_capability_statement <-function(url = "https://hapi.fhir.org/baseR4",
 
 
 fhir_save <- function(bundles, directory = "result") {
-
 	w <- 1 + floor(log10(length(bundles)))
-
-	if (!dir.exists(directory))
-
-		dir.create(directory, recursive = TRUE)
-
-	for (n in 1:length(bundles)) {
-		xml2::write_xml(bundles[[n]], paste_paths(directory, paste0(
-			stringr::str_pad(n, width = w, pad = "0"), ".xml"
-		)))
+	if(!dir.exists(directory)) {dir.create(directory, recursive = TRUE)}
+	for(n in seq_len(length(bundles))) {
+		xml2::write_xml(
+			x = bundles[[n]],
+			file = paste_paths(
+				directory,
+				paste0(stringr::str_pad(n, width = w, pad = "0"), ".xml")
+			)
+		)
 	}
 }
 
@@ -560,21 +515,14 @@ fhir_save <- function(bundles, directory = "result") {
 #' loaded_bundles <- fhir_load(tempdir())
 
 fhir_load <- function(directory) {
-
-	if(!dir.exists(directory)){
-		stop("Cannot find the specified directory.")
-	}
-
+	if(!dir.exists(directory)) {stop("Cannot find the specified directory.")}
 	xml.files <- dir(directory, "*.xml")
-
-	if(length(xml.files)==0){
-		stop("Cannot find any xml-files in the specified directory.")
-	}
-
-	list <- lapply(lst(xml.files), function(x)
-		xml2::read_xml(paste_paths(directory, x)))
-
-	fhir_bundle_list(list)
+	if(length(xml.files)==0){stop("Cannot find any xml-files in the specified directory.")}
+	list_ <- lapply(
+		lst(xml.files),
+		function(x) xml2::read_xml(paste_paths(directory, x))
+	)
+	fhir_bundle_list(bundles = list_)
 }
 
 
@@ -602,7 +550,7 @@ fhir_load <- function(directory) {
 
 setGeneric(
 	"fhir_serialize",
-	function(bundles){
+	function(bundles) {
 		standardGeneric("fhir_serialize")
 	}
 )
@@ -612,8 +560,8 @@ setGeneric(
 setMethod(
 	"fhir_serialize",
 	signature = c(bundles = "fhir_bundle_xml"),
-	function(bundles){
-		fhir_bundle_serialized(xml2::xml_serialize(bundles, connection = NULL))
+	function(bundles) {
+		fhir_bundle_serialized(bundle = xml2::xml_serialize(object = bundles, connection = NULL))
 	}
 )
 
@@ -622,7 +570,7 @@ setMethod(
 setMethod(
 	"fhir_serialize",
 	signature = c(bundles = "fhir_bundle_serialized"),
-	function(bundles){
+	function(bundles) {
 		bundles
 	}
 )
@@ -632,12 +580,16 @@ setMethod(
 setMethod(
 	"fhir_serialize",
 	signature = c(bundles = "fhir_bundle_list"),
-	function(bundles){
-		if(is(bundles[[1]], "fhir_bundle_xml")){
-
-			fhir_bundle_list(lapply(bundles, xml2::xml_serialize, connection=NULL))
-
-		}else{
+	function(bundles) {
+		if(is(bundles[[1]], "fhir_bundle_xml")) {
+			fhir_bundle_list(
+				lapply(
+					bundles,
+					xml2::xml_serialize,
+					connection = NULL
+				)
+			)
+		} else {
 			bundles
 		}
 	}
@@ -665,7 +617,7 @@ setMethod(
 
 setGeneric(
 	"fhir_unserialize",
-	function(bundles){
+	function(bundles) {
 		standardGeneric("fhir_unserialize")
 	}
 )
@@ -675,7 +627,7 @@ setGeneric(
 setMethod(
 	"fhir_unserialize",
 	signature = c(bundles = "fhir_bundle_xml"),
-	function(bundles){
+	function(bundles) {
 		bundles
 	}
 )
@@ -685,9 +637,9 @@ setMethod(
 setMethod(
 	"fhir_unserialize",
 	signature = c(bundles = "fhir_bundle_serialized"),
-	function(bundles){
-		b <- xml2::xml_unserialize(bundles)
-		fhir_bundle_xml(b)
+	function(bundles) {
+		b <- xml2::xml_unserialize(connection = bundles)
+		fhir_bundle_xml(bundle = b)
 	}
 )
 
@@ -696,10 +648,10 @@ setMethod(
 setMethod(
 	"fhir_unserialize",
 	signature = c(bundles = "fhir_bundle_list"),
-	function(bundles){
+	function(bundles) {
 		if(is(bundles[[1]], "fhir_bundle_xml")){
 			bundles
-		}else{
+		} else {
 			fhir_bundle_list(lapply(bundles, xml2::xml_unserialize))
 		}
 	}
@@ -730,15 +682,14 @@ setMethod(
 #' ```
 #' @export
 
-fhir_authenticate <- function(secret,
-							  key,
-							  base_url,
-							  access,
-							  authorize,
-							  query_authorize_extra = list()
-							  ){
-
-
+fhir_authenticate <- function(
+	secret,
+	key,
+	base_url,
+	access,
+	authorize,
+	query_authorize_extra = list()
+	) {
 
 	#Initialize app
 	app <- httr::oauth_app(
@@ -747,28 +698,24 @@ fhir_authenticate <- function(secret,
 		secret = secret,
 		redirect_uri = base_url
 	)
-
 	#set endpoint
-	endpoint <- httr::oauth_endpoint(
-		access = access,
-		authorize = authorize)
-
+	endpoint <- httr::oauth_endpoint(access = access, authorize = authorize)
 	#Create Token
-	t <- httr::oauth2.0_token(endpoint = endpoint,
-								  app=app,
-								  client_credentials = TRUE,
-								  cache = TRUE,
-								  query_authorize_extra = query_authorize_extra
+	t_ <- httr::oauth2.0_token(
+		endpoint = endpoint,
+		app = app,
+		client_credentials = TRUE,
+		cache = TRUE,
+		query_authorize_extra = query_authorize_extra
 	)
-
-	if(names(t$credentials)[1]=="error"){
-		stop("The token could not be created.\n\n",
-			 "Error code: ", t$credentials$error, "\n",
-			 "Error description: ", t$credentials$error_description, "\n")
+	if(names(t_$credentials)[1] == "error") {
+		stop(
+			"The token could not be created.\n\n",
+			"Error code: ", t_$credentials$error, "\n",
+			"Error description: ", t_$credentials$error_description, "\n")
 	}
 
-	t
-
+	t_
 }
 
 
@@ -809,57 +756,48 @@ get_bundle <- function(
 	log_errors = NULL) {
 
 	#download response
-	for (n in 1:max_attempts) {
-
-		if (1 < verbose)
-			cat(paste0("(", n, "): ", request, "\n"))
-
-		auth <- if (!is.null(username) && !is.null(password)) {
+	for(n in 1:max_attempts) {
+		if(1 < verbose){cat(paste0("(", n, "): ", request, "\n"))}
+		auth <- if(!is.null(username) && !is.null(password)) {
 			httr::authenticate(user = username, password = password)
 		}
-
 		#paging is implemented differently for Hapi/Vonk When initial request is POST
 		#VonK: Next-Links have to be POSTed, Hapi: Next-Links have to be GETed
 		#search via POST
-		if(grepl("_search", request)){
+		if(grepl("_search", request)) {
 			response <- httr::POST(
 				url = request,
-				httr::add_headers(Accept = "application/fhir+xml",
-								  Authorization = token),
-				httr::content_type(body@type),
+				config = httr::add_headers(
+					Accept = "application/fhir+xml",
+					Authorization = token
+				),
+				httr::content_type(type = body@type),
 				auth,
 				body = body@content
 			)
-		#search via GET
-		}else{
+
+		} else {#search via GET
 			response <- httr::GET(
 				url = request,
-				httr::add_headers(Accept = "application/fhir+xml",
-								  Authorization = token),
+				config = httr::add_headers(
+					Accept = "application/fhir+xml",
+					Authorization = token
+				),
 				auth
 			)
 		}
-
-
 		#check for http errors
 		check_response(response = response, log_errors = log_errors)
-
 		#extract payload
-		payload <-
-			try(httr::content(x = response, as = "text", encoding = "UTF-8"),
-				silent = TRUE)
-
-		if (class(payload)[1] != "try-error") {
+		payload <- try(httr::content(x = response, as = "text", encoding = "UTF-8"), silent = TRUE)
+		if(class(payload)[1] != "try-error") {
 			xml <- try(xml2::read_xml(x = payload), silent = TRUE)
-
-			if (class(xml)[1] != "try-error") {
+			if(class(xml)[1] != "try-error") {
 				return(fhir_bundle_xml(bundle = xml))
 			}
 		}
-
 		Sys.sleep(delay_between_attempts)
 	}
-
 	NULL
 }
 
@@ -869,13 +807,10 @@ get_bundle <- function(
 #' @param log_errors A string indicating the name of a file in which to save the http errors.
 #' @noRd
 #'
-error_to_file <- function(response,log_errors) {
+error_to_file <- function(response, log_errors) {
 	payload <- httr::content(x = response, as = "text", encoding = "UTF-8")
-
 	xml <- xml2::read_xml(x = payload)
-
 	xml2::write_xml(x = xml, file = log_errors)
-
 }
 #' Check http response
 #'
@@ -889,112 +824,86 @@ error_to_file <- function(response,log_errors) {
 #'
 check_response <- function(response, log_errors) {
 	code <- response$status_code
-
-	if (code != 200 && !is.null(log_errors)) {
+	if(code != 200 && !is.null(log_errors)) {
 		error_to_file(response = response, log_errors = log_errors)
 	}
-
-	if (code == 400) {
+	if(code == 400) {
 		if (!is.null(log_errors)) {
 			stop(
-				"HTTP code 400 - This can be caused by an invalid FHIR search request or a server issue. For more information see the generated error file."
+				"HTTP code 400 - This can be caused by an invalid FHIR search request or a server issue. ",
+				"For more information see the generated error file."
 			)
-
-		} else{
+		} else {
 			stop(
-				"HTTP code 400 - This can be caused by an invalid FHIR search request or a server issue. To print more detailed error information to a file, set argument log_errors to a filename and rerun fhir_search()."
+				"HTTP code 400 - This can be caused by an invalid FHIR search request or a server issue. ",
+				"To print more detailed error information to a file, set argument log_errors to a filename and rerun fhir_search()."
 			)
-
 		}
-
 	}
-
-	if (code == 401) {
-		if (!is.null(log_errors)) {
+	if(code == 401) {
+		if(!is.null(log_errors)) {
+			stop("HTTP code 401 - Authentication needed. For more information see the generated error file.")
+		} else {
 			stop(
-				"HTTP code 401 - Authentication needed. For more information see the generated error file."
+				"HTTP code 401 - Authentication needed. To print more detailed error information to a file, ",
+				"set argument log_errors to a filename and rerun fhir_search()."
 			)
-
-		} else{
-			stop(
-				"HTTP code 401 - Authentication needed. To print more detailed error information to a file, set argument log_errors to a filename and rerun fhir_search()."
-			)
-
 		}
-
 	}
-
-	if (code == 404) {
-		if (!is.null(log_errors)) {
+	if(code == 404) {
+		if(!is.null(log_errors)) {
+			stop("HTTP code 404 - Not found. Did you misspell the resource? For more information see the generated error file.")
+		} else {
 			stop(
-				"HTTP code 404 - Not found. Did you misspell the resource? For more information see the generated error file."
+				"HTTP code 404 - Not found. Did you misspell the resource? To print more detailed error information to a file, ",
+				"set argument log_errors to a filename and rerun fhir_search()."
 			)
-
-		} else{
-			stop(
-				"HTTP code 404 - Not found. Did you misspell the resource? To print more detailed error information to a file, set argument log_errors to a filename and rerun fhir_search()."
-			)
-
 		}
-
 	}
-
-	if (code >= 300 && code < 400) {
-		if (!is.null(log_errors)) {
+	if(300 <= code && code < 400) {
+		if(!is.null(log_errors)) {
 			warning(
 				"Your request generated a HTTP code ",
 				code,
 				". For more information see the generated error file ."
 			)
-
-		} else{
+		} else {
 			warning(
 				"Your request generated a HTTP code ",
 				code,
 				". To print more detailed information to a file, set argument log_errors to a filename and rerun fhir_search()."
 			)
-
 		}
-
 	}
-
-	if (code >= 400 & code < 500) {
-		if (!is.null(log_errors)) {
+	if(400 <= code && code < 500) {
+		if(!is.null(log_errors)) {
 			stop(
 				"Your request generated a client error, HTTP code ",
 				code,
 				". For more information see the generated error file."
 			)
-
-		} else{
+		} else {
 			stop(
 				"Your request generated a client error, HTTP code ",
 				code,
 				". To print more detailed information to a file, set argument log_errors to a filename and rerun fhir_search()."
 			)
-
 		}
-
 	}
-
-	if (code >= 500 && code < 600) {
-		if (!is.null(log_errors)) {
+	if(500 <= code && code < 600) {
+		if(!is.null(log_errors)) {
 			stop(
 				"Your request generated a server error, HTTP code ",
 				code,
 				". For more information see the generated error file."
 			)
-
-		} else{
+		} else {
 			stop(
 				"Your request generated a server error, HTTP code ",
 				code,
 				". To print more detailed error information to a file, set argument log_errors to a filename and rerun fhir_search()."
 			)
-
 		}
-
 	}
-
 }
 
