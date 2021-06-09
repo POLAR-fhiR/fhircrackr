@@ -15,16 +15,15 @@ setClass(
 #validity
 setValidity(
 	"fhir_body",
-	function(object){
+	function(object) {
 		messages <- c()
-		if(length(object@type)>1){
+		if(1 < length(object@type)) {
 			messages <- c(messages, "the type of a fhir_body must have length 1")
 		}
-		if(length(object@content)>1){
+		if(1 < length(object@content)) {
 			messages <- c(messages, "the content of a fhir_body must have length 1")
 		}
-
-		if(length(messages)>0){messages}else{TRUE}
+		if(0 < length(messages)){messages} else {TRUE}
 	}
 )
 
@@ -66,7 +65,6 @@ setMethod(
 		if(is.null(names(content))) {
 			stop("Please provide a named list.")
 		}
-
 		keys <- names(content)
 		values <- unlist(content)
 		pairs <- paste(keys, values, sep = "=")
@@ -82,22 +80,20 @@ setMethod(
 setMethod(
 	"fhir_body",
 	c(content = "list", type = "character"),
-	function(content, type){
+	function(content, type) {
 		message("When content is a list, the type you provided will be overwritten with 'application/x-www-form-urlencoded'")
-
 		if(any(!sapply(content, function(x) {is.character(x)}))) {
 			stop("The provided list must have elements of type character")
 		}
 		if(is.null(names(content))) {
 			stop("Please provide a named list.")
 		}
-
 		keys <- names(content)
 		values <- unlist(content)
 		pairs <- paste(keys, values, sep = "=")
 		string <- paste(pairs, collapse = "&")
 
-		new("fhir_body", content = string, type = "application/x-www-form-urlencoded")
+		new(Class = "fhir_body", content = string, type = "application/x-www-form-urlencoded")
 	}
 )
 #' @rdname fhir_body-methods
@@ -106,8 +102,7 @@ setMethod(
 	"fhir_body",
 	c(content = "character", type = "character"),
 	function(content, type){
-
-		new("fhir_body", content = content, type = type)
+		new(Class = "fhir_body", content = content, type = type)
 	}
 )
 
@@ -115,15 +110,7 @@ setMethod(
 setMethod(
 	"show",
 	"fhir_body",
-	function(object){
-		cat(
-			paste0(
-				"content:\n", object@content, "\n\n",
-				"type: ", object@type
-			)
-		)
+	function(object) {
+		cat(paste0("content:\n", object@content, "\n\ntype: ", object@type))
 	}
 )
-
-
-
