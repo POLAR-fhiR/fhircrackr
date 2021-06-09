@@ -20,20 +20,27 @@ setClass(
 
 setValidity(
 	"fhir_design",
-	function(object){
+	function(object) {
 		messages <- c()
-		if(length(object)!=length(object@names)){
+		if(length(object) != length(object@names)) {
 			messages <- c(messages, "You need exactly one name for every table_description in a design.")
 		}
-		if(any(sapply(object, function(x){class(x)!="fhir_table_description"}))){
+		if(any(sapply(object, function(x) {class(x) != "fhir_table_description"}))) {
 			messages <- c(messages, "A fhir_design can only contain fhir_table_descriptions")
 		}
 		#check df descriptions
-	 	messages <- c(messages, unlist(sapply(object, function(o){
-						 		v <- validObject(o, complete=T, test=T)
-						 		if(is.character(v)){v}
-						 		}))
+	 	messages <- c(
+	 		messages,
+	 		unlist(
+	 			sapply(
+	 				object,
+	 				function(o) {
+	 					v <- validObject(o, complete = TRUE, test = TRUE)
+	 					if(is.character(v)) {v}
+	 				}
+	 			)
 	 		)
+	 	)
 		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
@@ -180,7 +187,7 @@ setValidity(
 #'
 setGeneric(
 	"fhir_design",
-	function(...){
+	function(...) {
 		standardGeneric("fhir_design")
 	},
 	signature = "..."
@@ -191,19 +198,14 @@ setGeneric(
 #' @aliases fhir_design,fhir_table_description-method
 setMethod(
 	"fhir_design",
-	signature = c(...="fhir_table_description"),
-	function(...){
+	signature = c(... = "fhir_table_description"),
+	function(...) {
 		args <- list(...)
-
-		names <- paste0(sapply(args, function(x){x@resource}), "s")
-
-		name_index <- sapply(substitute(list(...))[-1], function(x)class(x)=="name")
-
+		names <- paste0(sapply(args, function(x) {x@resource}), "s")
+		name_index <- sapply(substitute(list(...))[-1], function(x) {class(x) == "name"})
 		names[name_index] <- sapply(substitute(list(...))[-1], deparse)[name_index]
-
 		names[names(args) != ""] <- names(args)[names(args) != ""]
-
-		new("fhir_design", args, names = names)
+		new(Class = "fhir_design", args, names = names)
 	}
 )
 
@@ -211,31 +213,31 @@ setMethod(
 #' @aliases fhir_design,list-method
 setMethod(
 	"fhir_design",
-	signature = c(...="list"),
-	function(...){
+	signature = c(... = "list"),
+	function(...) {
 		args <- list(...)
-		if(length(args) == 1){
-
-			args <- unlist(args, recursive = F)
-
-			if(all(sapply(args, is, "fhir_table_description"))){
-				new("fhir_design", args, names  = attr(args, "names"))
-
-			}else{
-				message("The old style design (simple named list) will be deprecated at some point. ",
-						"Please consider building your design as shown in the documentation for fhir_design(), ",
-						"see ?fhir_design.")
+		if(length(args) == 1) {
+			args <- unlist(args, recursive = FALSE)
+			if(all(sapply(args, is, "fhir_table_description"))) {
+				new(Class = "fhir_design", args, names  = attr(args, "names"))
+			} else {
+				message(
+					"The old style design (simple named list) will be deprecated at some point. ",
+					"Please consider building your design as shown in the documentation for fhir_design(), ",
+					"see ?fhir_design."
+				)
 				d <- fix_design(design = args)
-
-				df_desc <-lapply(d, function(x){
-					resource <- fhir_resource_type(string = gsub(paste0(esc("."),"|", esc("/")), "", x$resource))
-					style <- fhir_style(sep = x$style$sep, brackets =x$style$brackets, rm_empty_cols = x$style$rm_empty_cols)
-					fhir_table_description(resource = resource, cols = fhir_columns(x$cols), style = style)
-				})
-
-				new("fhir_design", df_desc, names = attr(d, "names"))
+				df_desc <-lapply(
+					d,
+					function(x) {
+						resource <- fhir_resource_type(string = gsub(paste0(esc("."),"|", esc("/")), "", x$resource))
+						style <- fhir_style(sep = x$style$sep, brackets = x$style$brackets, rm_empty_cols = x$style$rm_empty_cols)
+						fhir_table_description(resource = resource, cols = fhir_columns(x$cols), style = style)
+					}
+				)
+				new(Class = "fhir_design", df_desc, names = attr(d, "names"))
 			}
-		}else {
+		} else {
 			stop("You can only provide one list to fhir_design()")
 		}
 	}
@@ -245,21 +247,25 @@ setMethod(
 	"show",
 	"fhir_design",
 	function(object){
-		if(length(object)==0){
+		if(length(object) == 0) {
 			cat("An empty fhir_design_object")
-		}else{
+		} else {
 			cat(paste0("A fhir_design with ", length(object), " table_descriptions:\n"))
-			lapply(1:length(object), function(i){
-				df_desc <- object[[i]]
-				cat("=====================================================\n")
-				cat(paste0("Name: ", names(object)[i]))
-				cat("\n\n")
-				cat(paste0("Resource type: ", as.character(df_desc@resource), "\n\n"))
-				cat("Columns: \n"); show(df_desc@cols)
-				cat("\n\nStyle: \n");	show(df_desc@style)
-				cat("\n")
-			})
-			}
-
-
-	})
+			lapply(
+				seq_len(length(object)),
+				function(i) {
+					df_desc <- object[[i]]
+					cat("=====================================================\n")
+					cat(paste0("Name: ", names(object)[i]))
+					cat("\n\n")
+					cat(paste0("Resource type: ", as.character(df_desc@resource), "\n\n"))
+					cat("Columns: \n")
+					show(df_desc@cols)
+					cat("\n\nStyle: \n")
+					show(df_desc@style)
+					cat("\n")
+				}
+			)
+		}
+	}
+)
