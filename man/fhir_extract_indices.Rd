@@ -27,7 +27,7 @@ order are preserved during manipulation, the indices can then be restored again 
 }
 \examples{
 #unserialize example bundle
-bundles <- fhir_unserialize(example_bundles2)
+bundles <- fhir_unserialize(bundles = example_bundles2)
 
 #crack fhir resources
 patients <- fhir_table_description(resource = "Patient",
@@ -38,10 +38,10 @@ df <- fhir_crack(bundles = bundles,
                  design = patients)
 
 #Melt all multiple entries
-d <- fhir_melt_all(df, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
+d <- fhir_melt_all(indexed_data_frame = df, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
 
 #Extract indices
-fhir_extract_indices(d, brackets = c("[", "]"))
+fhir_extract_indices(indexed_data_frame = d, brackets = c("[", "]"))
 }
 \seealso{
 \code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_melt_all]{fhir_melt_all()}}, \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}

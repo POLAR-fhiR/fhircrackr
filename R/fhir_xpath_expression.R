@@ -20,10 +20,10 @@ setValidity(
 
 		#slightly hacky solution: use xml2 function and catch warning message
 		#this will validate xpath expression with libxml2 (accessed by xml2)
-		testbundle <- xml2::read_xml("<Bundle><Resource><item value='1'/></Resource></Bundle>")
+		testbundle <- xml2::read_xml(x = "<Bundle><Resource><item value='1'/></Resource></Bundle>")
 		for(i in 1:length(object)){
 			tryCatch(
-				xml2::xml_find_all(testbundle, object[i]),
+				xml2::xml_find_all(x = testbundle, xpath = object[i]),
 				warning = function(x) {
 					if (grepl("Invalid expression", x)) {
 						messages <<- c(messages, paste(esc(object[i]),"is not a valid XPath expression."))

@@ -28,7 +28,7 @@ the design.
 \examples{
 
 #unserialize example
-bundles <- fhir_unserialize(example_bundles1)
+bundles <- fhir_unserialize(bundles = example_bundles1)
 
 patients <- fhir_table_description(resource = "Patient")
 
@@ -36,7 +36,7 @@ df <- fhir_crack(bundles = bundles,
                   design = patients,
                   brackets = c("[", "]"))
 
-df_indices_removed <- fhir_rm_indices(df, brackets=c("[", "]"))
+df_indices_removed <- fhir_rm_indices(indexed_data_frame = df, brackets=c("[", "]"))
 
 }
 \seealso{

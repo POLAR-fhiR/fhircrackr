@@ -20,10 +20,10 @@ A string containing the concatenated path.
 Concatenates two strings to path string correctly.
 }
 \examples{
-paste_paths("data", "patients")
-paste_paths("/data", "patients")
-paste_paths("/data/", "patients")
-paste_paths("/data", "/patients")
-paste_paths("/data/", "/patients/")
-paste_paths("data", "patients", "windows")
+paste_paths(path1 = "data", path2 = "patients")
+paste_paths(path1 = "/data", path2 = "patients")
+paste_paths(path1 = "/data/", path2 = "patients")
+paste_paths(path1 = "/data", path2 = "/patients")
+paste_paths(path1 = "/data/", path2 = "/patients/")
+paste_paths(path1 = "data", path2 = "patients", os = "windows")
 }

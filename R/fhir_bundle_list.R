@@ -38,14 +38,14 @@ setValidity(
 #' b1 <- xml2::read_xml("<Bundle><Resource><item value='1'/></Resource></Bundle>")
 #' b2 <- xml2::read_xml("<Bundle><Resource><item value='2'/></Resource></Bundle>")
 #'
-#' fhir_bundle_list(list(b1, b2))
-#' fhir_bundle_list(list(fhir_bundle_xml(b1), fhir_bundle_xml(b2)))
+#' fhir_bundle_list(bundles = list(b1, b2))
+#' fhir_bundle_list(bundles = list(fhir_bundle_xml(b1), fhir_bundle_xml(b2)))
 #'
-#' r1 <- xml2::xml_serialize(b1, connection= NULL)
-#' r2 <- xml2::xml_serialize(b2, connection= NULL)
+#' r1 <- xml2::xml_serialize(object = b1, connection= NULL)
+#' r2 <- xml2::xml_serialize(object = b2, connection= NULL)
 #'
-#' fhir_bundle_list(list(r1, r2))
-#' fhir_bundle_list(list(fhir_bundle_serialized(r1), fhir_bundle_serialized(r2)))
+#' fhir_bundle_list(bundles = list(r1, r2))
+#' fhir_bundle_list(bundles = list(fhir_bundle_serialized(r1), fhir_bundle_serialized(r2)))
 #' @noRd
 
 fhir_bundle_list <- function(bundles){

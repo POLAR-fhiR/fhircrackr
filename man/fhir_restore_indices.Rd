@@ -20,80 +20,28 @@ restores its indices from a matrix of indices as produces by \code{\link[=fhir_e
 well as row and column ordering of index matrix and data frame have to be identical!
 }
 \examples{
-#generate example bundle
-bundle <- xml2::read_xml(
-"<Bundle>
-
-	<Patient>
-		<id value='id1'/>
-		<address>
-			<use value='home'/>
-			<city value='Amsterdam'/>
-			<type value='physical'/>
-			<country value='Netherlands'/>
-		</address>
-		<birthDate value='1992-02-06'/>
-	</Patient>
-
-	<Patient>
-		<id value='id2'/>
-		<address>
-			<use value='home'/>
-			<city value='Rome'/>
-			<type value='physical'/>
-			<country value='Italy'/>
-		</address>
-		<address>
-			<use value='work'/>
-			<city value='Stockholm'/>
-			<type value='postal'/>
-			<country value='Sweden'/>
-		</address>
-		<birthDate value='1980-05-23'/>
-	</Patient>
-
-	<Patient>
-		<id value='id3'/>
-		<address>
-			<use value='home'/>
-			<city value='Berlin'/>
-		</address>
-		<address>
-			<type value='postal'/>
-			<country value='France'/>
-		</address>
-		<address>
-			<use value='work'/>
-			<city value='London'/>
-			<type value='postal'/>
-			<country value='England'/>
-		</address>
-		<birthDate value='1974-12-25'/>
-		<birthDate value='1978-11-13'/>
-	</Patient>
-
-</Bundle>"
-)
+#unserialize example bundles
+bundles <- fhir_unserialize(example_bundles2)
 
 #crack fhir resources
 patients <- fhir_table_description(resource = "Patient",
                                style = fhir_style(brackets = c("[","]"),
 			                                     sep="||")
 			                  )
-dfs <- fhir_crack(bundles = list(bundle),
-                 design = fhir_design(patients))
+df <- fhir_crack(bundles = bundles,
+                 design = patients)
 
 #Melt multiple entries
-d <- fhir_melt_all(dfs$patients, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
+d <- fhir_melt_all(indexed_data_frame = df, brackets = c("[", "]"), sep="||", rm_indices = FALSE)
 
 #Extract indices
-indices <- fhir_extract_indices(d, brackets = c("[", "]"))
+indices <- fhir_extract_indices(indexed_data_frame = d, brackets = c("[", "]"))
 
 #remove indices
-d_removed <- fhir_rm_indices(d, brackets = c("[", "]"))
+d_removed <- fhir_rm_indices(indexed_data_frame = d, brackets = c("[", "]"))
 
 #restore indices
-d_restored <- fhir_restore_indices(d_removed, indices)
+d_restored <- fhir_restore_indices(d = d_removed, indices)
 
 #compare
 identical(d, d_restored)

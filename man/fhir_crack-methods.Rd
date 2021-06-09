@@ -112,7 +112,7 @@ medications <- fhir_table_description(
     		)
 )
 
-med_df <- fhir_crack(bundles, design = medications)
+med_df <- fhir_crack(bundles = bundles, design = medications)
 
 head(med_df) #data.frame
 
@@ -126,7 +126,7 @@ patients <- fhir_table_description(
 
 design <- fhir_design(medications, patients)
 
-df_list <- fhir_crack(bundles, design)
+df_list <- fhir_crack(bundles = bundles, design = design)
 
 #list of data.frames/fhir_df_list
 head(df_list$medications)

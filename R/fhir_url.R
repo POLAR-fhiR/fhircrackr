@@ -97,7 +97,7 @@ setMethod(
 	signature = c(url="character", resource = "missing", parameters = "missing"),
 	function(url, url_enc=TRUE){
 
-		if(length(url)>0&&url_enc){url <- utils::URLencode(url)}
+		if(length(url)>0&&url_enc){url <- utils::URLencode(URL = url)}
 
 		new("fhir_url", url)
 
@@ -112,9 +112,9 @@ setMethod(
 	signature = c(url = "character", resource = "character", parameters = "missing"),
 	function(url, resource, url_enc=TRUE){
 
-		resource <- fhir_resource_type(resource)
+		resource <- fhir_resource_type(string = resource)
 
-		if(stringr::str_sub(url, -1) =="/"){
+		if(stringr::str_sub(string = url, start = -1) =="/"){
 
 			request <- paste0(url, resource)
 
@@ -122,7 +122,7 @@ setMethod(
 			request <- paste(url, resource, sep="/")
 		}
 
-		if(url_enc){request <- utils::URLencode(request)}
+		if(url_enc){request <- utils::URLencode(URL = request)}
 	 	new("fhir_url", request)
 	}
 )
@@ -135,9 +135,9 @@ setMethod(
 	signature = c(url = "character", resource = "character", parameters = "character"),
 	function(url, resource, parameters, url_enc=TRUE){
 
-		resource <- fhir_resource_type(resource)
+		resource <- fhir_resource_type(string = resource)
 
-		if(stringr::str_sub(url, -1) =="/"){
+		if(stringr::str_sub(string = url, start = -1) =="/"){
 
 			request <- paste0(url, resource)
 
@@ -148,7 +148,7 @@ setMethod(
 
 		if(length(parameters)==1 && grepl("=", parameters)){
 			request <- paste0(request, "?", parameters)
-			if(url_enc){utils::URLencode(request)}
+			if(url_enc){utils::URLencode(URL = request)}
 			return(new("fhir_url", request))
 		}
 
@@ -167,7 +167,7 @@ setMethod(
 		string <- paste(pairs, collapse = "&")
 
 		request <- paste0(request, "?", string)
-		if(url_enc){request <- utils::URLencode(request)}
+		if(url_enc){request <- utils::URLencode(URL = request)}
 	 	new("fhir_url", request)
 	}
 
@@ -181,9 +181,9 @@ setMethod(
 	signature = c(url = "character", resource = "character", parameters = "list"),
 	function(url, resource, parameters, url_enc=TRUE){
 
-		resource <- fhir_resource_type(resource)
+		resource <- fhir_resource_type(string = resource)
 
-		if(stringr::str_sub(url, -1) =="/"){
+		if(stringr::str_sub(string = url, start = -1) =="/"){
 
 			request <- paste0(url, resource)
 
@@ -204,7 +204,7 @@ setMethod(
 		string <- paste(pairs, collapse = "&")
 
 		request <- paste0(request, "?", string)
-		if(url_enc){request <- utils::URLencode(request)}
+		if(url_enc){request <- utils::URLencode(URL = request)}
 
 		new("fhir_url", request)
 	}

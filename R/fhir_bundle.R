@@ -31,7 +31,7 @@ setValidity(
 	"fhir_bundle_xml",
 	function(object){
 		messages <- c()
-		if(xml2::xml_name(object) != "Bundle") {
+		if(xml2::xml_name(x = object) != "Bundle") {
 			messages <- c(
 				messages,
 				"This xml doesn't seem to represent a bundle, its name is not 'Bundle'. Use xml2::xml_name() to check."
@@ -49,17 +49,17 @@ setValidity(
 #'
 #' @param bundle A xml-object representing a FHIR bundle
 #' @examples
-#' fhir_bundle_xml(xml2::xml_unserialize(patient_bundles[[1]]))
+#' fhir_bundle_xml(bundle = xml2::xml_unserialize(patient_bundles[[1]]))
 #'
 #' @export
 #'
 fhir_bundle_xml <- function(bundle) {
 
-	xml2::xml_ns_strip(bundle)
-	links <- xml2::xml_find_all(bundle, "link")
-	rels.nxt <-	xml2::xml_text(xml2::xml_find_first(links, "./relation/@value")) == "next"
-	rels.self <- xml2::xml_text(xml2::xml_find_first(links, "./relation/@value")) == "self"
-	urls <- xml2::xml_attr(xml2::xml_find_all(links, "url"), "value")
+	xml2::xml_ns_strip(x = bundle)
+	links <- xml2::xml_find_all(x = bundle, xpath = "link")
+	rels.nxt <-	xml2::xml_text(x = xml2::xml_find_first(x = links, xpath = "./relation/@value")) == "next"
+	rels.self <- xml2::xml_text(x = xml2::xml_find_first(x = links,xpath = "./relation/@value")) == "self"
+	urls <- xml2::xml_attr(x = xml2::xml_find_all(x = links, xpath = "url"), attr = "value")
 
 	new("fhir_bundle_xml", bundle, next_link = fhir_url(urls[rels.nxt]), self_link = fhir_url(urls[rels.self]))
 }

@@ -34,7 +34,7 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "fhir_load()" )
 
-myBundles <- fhir_load( directory )
+myBundles <- fhir_load(directory =  directory )
 
 testthat::test_that(
 	"fhir_load reads all bundles as xml files from the given directory", {
@@ -56,7 +56,7 @@ testthat::test_that(
 
 		testthat::skip_on_cran()
 
-		caps <- fhir_capability_statement("https://server.fire.ly", sep = " ~ ")
+		caps <- fhir_capability_statement(url = "https://server.fire.ly", sep = " ~ ")
 
 		testthat::expect_false( is.null( caps ) )
 		testthat::expect_true( is.list( caps ) )
@@ -69,13 +69,13 @@ testthat::test_that(
 #########################################################################################################
 testthat::context( "fhir_crack()" )
 
-bundles <- fhir_unserialize(patient_bundles)
+bundles <- fhir_unserialize(bundles = patient_bundles)
 
 design <- fhir_design(
 	Patient = fhir_table_description(resource = "Patient")
 )
 
-df <- fhir_crack(bundles = bundles, design)
+df <- fhir_crack(bundles = bundles, design = design)
 
 testthat::test_that(
 	"crack creates a valid data frame", {

@@ -46,7 +46,7 @@ For a more detailed description on how to use this function please see the corre
 }
 \examples{
 #unserialize example
-bundles <- fhir_unserialize(example_bundles1)
+bundles <- fhir_unserialize(bundles = example_bundles1)
 
 #crack fhir resources
 table_desc <- fhir_table_description(resource = "Patient",

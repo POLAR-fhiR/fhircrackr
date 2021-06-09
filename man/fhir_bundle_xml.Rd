@@ -14,6 +14,6 @@ This should only be used if you want to create small examples. Usually, a \code{
 be returned by \code{\link[=fhir_search]{fhir_search()}}
 }
 \examples{
-fhir_bundle_xml(xml2::xml_unserialize(patient_bundles[[1]]))
+fhir_bundle_xml(bundle = xml2::xml_unserialize(patient_bundles[[1]]))
 
 }

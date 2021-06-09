@@ -169,8 +169,8 @@ setValidity(
 #' ###Extract design from fhir_df_list/fhir_dt_list
 #'
 #' #unserialize and crack example bundles
-#' med_bundles <- fhir_unserialize(medication_bundles)
-#' dfs <- fhir_crack(med_bundles, design = design1)
+#' med_bundles <- fhir_unserialize(bundles = medication_bundles)
+#' dfs <- fhir_crack(bundles = med_bundles, design = design1)
 #'
 #' #extract design
 #'
@@ -225,12 +225,12 @@ setMethod(
 				message("The old style design (simple named list) will be deprecated at some point. ",
 						"Please consider building your design as shown in the documentation for fhir_design(), ",
 						"see ?fhir_design.")
-				d <- fix_design(args)
+				d <- fix_design(design = args)
 
 				df_desc <-lapply(d, function(x){
-					resource <- fhir_resource_type(gsub(paste0(esc("."),"|", esc("/")), "", x$resource))
+					resource <- fhir_resource_type(string = gsub(paste0(esc("."),"|", esc("/")), "", x$resource))
 					style <- fhir_style(sep = x$style$sep, brackets =x$style$brackets, rm_empty_cols = x$style$rm_empty_cols)
-					fhir_table_description(resource, fhir_columns(x$cols), style)
+					fhir_table_description(resource = resource, cols = fhir_columns(x$cols), style = style)
 				})
 
 				new("fhir_design", df_desc, names = attr(d, "names"))

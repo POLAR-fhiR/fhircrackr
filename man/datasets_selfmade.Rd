@@ -212,10 +212,10 @@ xml versions look.
 }
 \examples{
 #unserialize xml objects before doing anything else with them!
-fhir_unserialize(example_bundles1)
+fhir_unserialize(bundles = example_bundles1)
 #unserialize xml objects before doing anything else with them!
 fhir_unserialize(example_bundles2)
 #unserialize xml objects before doing anything else with them!
-fhir_unserialize(example_bundles2)
+fhir_unserialize(bundles = example_bundles2)
 }
 \keyword{datasets}

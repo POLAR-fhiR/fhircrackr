@@ -28,20 +28,18 @@ see \code{?fhir_melt}.
 }
 \examples{
 #unserialize example bundles
-bundles <- fhir_unserialize(medication_bundles)
+bundles <- fhir_unserialize(bundles = medication_bundles)
 
 #crack Patient Resources
-design <- fhir_design(
-  Patients = fhir_table_description(resource = "Patient")
-)
+pats <- fhir_table_description(resource = "Patient")
 
-dfs <- fhir_crack(bundles, design)
+df <- fhir_crack(bundles = bundles, design = pats)
 
 #look at automatically generated names
-names(dfs$Patients)
+names(df)
 
 #extract all column names beginning with the string "name"
-fhir_common_columns(data_frame = dfs$Patients, column_names_prefix = "name")
+fhir_common_columns(data_frame = df, column_names_prefix = "name")
 }
 \seealso{
 \code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_melt_all]{fhir_melt_all()}}, \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
