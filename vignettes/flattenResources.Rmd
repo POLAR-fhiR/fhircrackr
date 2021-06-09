@@ -85,7 +85,7 @@ This is basically a string that defines the resource type (e.g. Patient or Obser
 fhir_table_description(resource = "Patient")
 ```
 
-Internally, `fhir_table_description()` calls `fhir_resource_type()` which checks the type you provided against list of all currently available resource types can be found at https://hl7.org/FHIR/resourcelist.html. Case errors are corrected automatically and the function throws a warning, if the resource type doesn't match the list under hl7.org.
+Internally, `fhir_table_description()` calls `fhir_resource_type()` which checks the type you provided against list of all currently available resource types can be found at <a href="https://hl7.org/FHIR/resourcelist.html" target="_blank">https://hl7.org/FHIR/resourcelist.html</a>. Case errors are corrected automatically and the function throws a warning, if the resource type doesn't match the list under hl7.org.
 
 As you can see in the above output, there are two more elements in a `fhir_table_description` which are filled automatically by `fhir_table_description()`.
 
@@ -287,7 +287,7 @@ fhir_load_design(paste0(temp_dir, "/design.xml"))
 
 
 ## Multiple entries
-A particularly complicated problem in flattening FHIR resources is caused by the fact that there can be multiple entries to an attribute. The profile according to which your FHIR resources have been built defines how often a particular attribute can appear in a resource. This is called the *cardinality* of the attribute. For example the Patient resource defined [here](https://www.hl7.org/fhir/patient.html#resource) can have zero or one birthdates but arbitrarily many addresses. In general, `fhir_crack()` will paste multiple entries for the same attribute together in the data frame, using the separator provided by the `sep` argument. In most cases this will work just fine, but there are some special cases that require a little more attention.
+A particularly complicated problem in flattening FHIR resources is caused by the fact that there can be multiple entries to an attribute. The profile according to which your FHIR resources have been built defines how often a particular attribute can appear in a resource. This is called the *cardinality* of the attribute. For example the Patient resource defined <a href="https://www.hl7.org/fhir/patient.html#resource" target="_blank">here</a> can have zero or one birthdates but arbitrarily many addresses. In general, `fhir_crack()` will paste multiple entries for the same attribute together in the data frame, using the separator provided by the `sep` argument. In most cases this will work just fine, but there are some special cases that require a little more attention.
 
 Let's have a look at an example bundle containing just three Patient resources. You can make it available in your workspace like this:
 
