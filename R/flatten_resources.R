@@ -217,7 +217,7 @@ setMethod(
 		#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
 		remove <- design@style@rm_empty_cols
 		if(remove && 0 < ncol(df)) {
-			df_cleaned <- df[, 0 < colSums(!is.na(df)), with = F]
+			df_cleaned <- df[, 0 < colSums(!is.na(df)), with = FALSE]
 		} else {
 			df_cleaned <- df
 		}
