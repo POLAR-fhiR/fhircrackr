@@ -103,7 +103,6 @@ setGeneric(
 		verbose = 2,
 		data.table = FALSE) {
 
-#		standardGeneric(f = "fhir_crack")
 		standardGeneric("fhir_crack")
 	}
 )
@@ -132,6 +131,7 @@ setMethod(
 				})
 			)
 		}
+
 		if(!is.null(brackets)) {
 			brackets <- fix_brackets(brackets = brackets)
 			design <-fhir_design(lapply(
@@ -142,7 +142,8 @@ setMethod(
 				}
 			))
 		}
-		if (!is.null(remove_empty_columns)) {
+
+		if(!is.null(remove_empty_columns)) {
 			design <- fhir_design(lapply(
 				design,
 				function(x) {
@@ -151,24 +152,27 @@ setMethod(
 				}
 			))
 		}
+
 		validObject(object = design, complete = TRUE)
 		#Check for dangerous XPath expressions ins cols
 		cols <- lapply(design, function(x) {c(x@cols)})
 		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
+
 		if(any(dangerCols)) {
 			warning(
 				"In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
 				"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
 				"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
 				"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
-				"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse=", ")
+				"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse = ", ")
 			)
 		}
+
 		#Add attributes to design
 		design <- add_attribute_to_design(design = design)
 		#crack
 		dfs <- bundles2dfs(bundles = bundles, design = design, data.table = data.table, verbose = verbose)
-		if (0 < verbose) {message("FHIR-Resources cracked. \n")}
+		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
 		dfs
 	}
@@ -190,17 +194,21 @@ setMethod(
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {design@style@sep <- sep}
+
 		if(!is.null(brackets)) {
 			brackets <- fix_brackets(brackets = brackets)
 			design@style@brackets <- brackets
 		}
+
 		if(!is.null(remove_empty_columns)) {
 			design@style@rm_empty_cols <- remove_empty_columns
 		}
+
 		validObject(object = design, complete = TRUE)
 		#Check for dangerous XPath expressions ins cols
 		cols <- design@cols
 		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
+
 		if(any(dangerCols)) {
 			warning(
 				"In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
@@ -210,17 +218,20 @@ setMethod(
 				"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse = ", ")
 			)
 		}
+
 		#Add attributes to design
 		design <- add_attribute_to_design(design = design)
 		#crack
 		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose)
 		#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
 		remove <- design@style@rm_empty_cols
+
 		if(remove && 0 < ncol(df)) {
 			df_cleaned <- df[, 0 < colSums(!is.na(df)), with = FALSE]
 		} else {
 			df_cleaned <- df
 		}
+
 		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
 		if(data.table) {df} else {data.frame(df)}

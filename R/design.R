@@ -416,7 +416,7 @@ xml2design <- function(xml) {
 			} else {
 				col_names <- xml2::xml_name(x = columns_list)
 				col_values <- xml2::xml_attr(x = columns_list, attr = "value")
-				columns <- fhir_columns(expressions = col_values, colnames = col_names)
+				columns <- fhir_columns(xpaths = col_values, colnames = col_names)
 			}
 			style <- xml2::xml_find_all(x = xml_df_desc, xpath = "style")
 			if (length(style) < 1) {#no style info

@@ -3,7 +3,7 @@
 #' An object of class `fhir_columns` is part of a [fhir_table_description-class]
 #' in a [fhir_design-class] and holds information on the elements
 #' that should be extracted from the FHIR resources, as well as the column names of the resulting data.frame.
-#' The elements to be extracted are indicated by XPath expressions.
+#' The elements to be extracted are indicated by XPath xpaths.
 #'
 #' @slot names The column names
 #' @include fhir_xpath_expression.R
@@ -18,6 +18,7 @@ setClass(
 setValidity(
 	Class = "fhir_columns",
 	method = function(object) {
+
 		messages <- c()
 		if(length(object) == 0) {return(TRUE)}
 		if(length(names(object)) == 0) {
@@ -31,35 +32,34 @@ setValidity(
 #'
 #' An object of class `fhir_columns` is part of a `fhir_table_description` in a `fhir_design` and holds information on the elements
 #' that should be extracted from the FHIR resources, as well as the column names of the resulting data.frame.
-#' The elements to be extracted are indicated by XPath expressions. If no column names are provided,
+#' The elements to be extracted are indicated by XPath xpaths. If no column names are provided,
 #' they are generated automatically and reflect the elements position in the resource.
 #'
-#' @param expressions A (named) character vector or (named) list containing xpath expressions,
+#' @param xpaths A (named) character vector or (named) list containing xpath xpaths,
 #' or a [fhir_xpath_expression-class] object.
 #' @param colnames The names of the columns to create. If no colnames are provided and the list or vector
-#' in `expressions` has names, those names are taken as the colnames. If no colnames are provided and
-#' `expressions` is unnamed too, the colnames are generated automatically from the xpath expressions. See examples.
+#' in `xpaths` has names, those names are taken as the colnames. If no colnames are provided and
+#' `xpaths` is unnamed too, the colnames are generated automatically from the xpath xpaths. See examples.
 #'
 #' @docType methods
 #' @rdname fhir_columns-methods
 #' @examples
 #'  #provide colnames explicitly
-#'  fhir_columns(expressions = c("name/given", "code/coding/code"),
+#'  fhir_columns(xpaths = c("name/given", "code/coding/code"),
 #'               colnames = c("name", "code"))
 #'
-#'  #colnames are taken from expressions argument
-#'  fhir_columns(expressions = c(name = "name/given", code = "code/coding/code"))
+#'  #colnames are taken from xpaths argument
+#'  fhir_columns(xpaths = c(name = "name/given", code = "code/coding/code"))
 #'
-#'  #colnames are taken from expressions argument
-#'  fhir_columns(expressions = list(name = "name/given", code = "code/coding/code"))
+#'  #colnames are taken from xpaths argument
+#'  fhir_columns(xpaths = list(name = "name/given", code = "code/coding/code"))
 #'
 #'  #colnames are generated automatically
-#'  fhir_columns(expressions = c("name/given", "code/coding/code"))
+#'  fhir_columns(xpaths = c("name/given", "code/coding/code"))
 #' @export
 setGeneric(
 	name = "fhir_columns",
-	def = function(expressions, colnames){
-		#standardGeneric(f = "fhir_columns")
+	def = function(xpaths, colnames) {
 		standardGeneric("fhir_columns")
 	}
 )
@@ -68,7 +68,7 @@ setGeneric(
 #' @aliases fhir_columns,missing,missing-method
 setMethod(
 	f = "fhir_columns",
-	signature = c(expressions = "missing", colnames = "missing"),
+	signature = c(xpaths = "missing", colnames = "missing"),
 	definition = function() {
 		new(Class = "fhir_columns")
 	}
@@ -79,8 +79,8 @@ setMethod(
 #'
 setMethod(
 	f = "fhir_columns",
-	signature = c(expressions = "NULL", colnames = "missing"),
-	definition = function(expressions) {
+	signature = c(xpaths = "NULL", colnames = "missing"),
+	definition = function(xpaths) {
 		new(Class = "fhir_columns")
 	}
 )
@@ -89,9 +89,9 @@ setMethod(
 #' @aliases fhir_columns,character,character-method
 setMethod(
 	f = "fhir_columns",
-	signature = c(expressions = "character", colnames = "character"),
-	definition = function(expressions, colnames){
-		new(Class = "fhir_columns", fhir_xpath_expression(expression = expressions), names = colnames)
+	signature = c(xpaths = "character", colnames = "character"),
+	definition = function(xpaths, colnames){
+		new(Class = "fhir_columns", fhir_xpath_expression(expression = xpaths), names = colnames)
 	}
 )
 
@@ -99,12 +99,12 @@ setMethod(
 #' @aliases fhir_columns,character,missing-method
 setMethod(
 	f = "fhir_columns",
-	signature = c(expressions = "character", colnames = "missing"),
-	definition = function(expressions) {
-		if(is.null(names(expressions))) {
-			new(Class = "fhir_columns", fhir_xpath_expression(expression = expressions), names = as.character(gsub("/", ".", expressions)))
+	signature = c(xpaths = "character", colnames = "missing"),
+	definition = function(xpaths) {
+		if(is.null(names(xpaths))) {
+			new(Class = "fhir_columns", fhir_xpath_expression(expression = xpaths), names = as.character(gsub("/", ".", xpaths)))
 		} else {
-			new(Class = "fhir_columns", fhir_xpath_expression(expression = expressions), names = names(expressions))
+			new(Class = "fhir_columns", fhir_xpath_expression(expression = xpaths), names = names(xpaths))
 		}
 	}
 )
@@ -113,19 +113,23 @@ setMethod(
 #' @aliases fhir_columns,list,missing-method
 setMethod(
 	f = "fhir_columns",
-	signature = list(expressions = "list", colnames = "missing"),
-	definition = function(expressions){
-		if(any(!sapply(expressions, is.character))){
-			stop("expressions can only contain elements of type character")
+	signature = list(xpaths = "list", colnames = "missing"),
+	definition = function(xpaths) {
+
+		if(any(!sapply(xpaths, is.character))) {
+			stop("xpaths can only contain elements of type character")
 		}
-		if(any(sapply(expressions, function(x){length(x)>1}))){
-			stop("expressions can only contain character vectors of length 1.")
+
+		if(any(sapply(xpaths, function(x){length(x)>1}))) {
+			stop("xpaths can only contain character vectors of length 1.")
 		}
-		if(is.null(names(expressions))){
-			new(Class = "fhir_columns", fhir_xpath_expression(expression = unlist(expressions)), names = gsub("/", ".", unlist(expressions)))
+
+		if(is.null(names(xpaths))) {
+			new(Class = "fhir_columns", fhir_xpath_expression(expression = unlist(xpaths)), names = gsub("/", ".", unlist(xpaths)))
 		} else {
-			new(Class = "fhir_columns", fhir_xpath_expression(expression = unlist(expressions)), names = names(expressions))
+			new(Class = "fhir_columns", fhir_xpath_expression(expression = unlist(xpaths)), names = names(xpaths))
 		}
+
 	}
 )
 
@@ -133,13 +137,16 @@ setMethod(
 	f = "show",
 	signature = "fhir_columns",
 	definition = function(object) {
+
 		if(length(object) == 0) {
 			cat("An empty fhir_columns object");
 			return()
 		}
+
 		pairs <- paste(names(object), object, sep = "=")
 		colwidth1 <- max(c(stringr::str_length(string = names(object)),11)) + 1
 		colwidth2 <- max(stringr::str_length(string = object)) + 1
+
 		header <- paste(
 			stringr::str_pad(string = "column name", width = colwidth1 - 1, side = "right"),
 			"| xpath expression", "\n",
@@ -147,9 +154,9 @@ setMethod(
 			"\n",
 			collapse = ""
 		)
+
 		cat(
 			paste0(
-			#	"A fhir_columns object:\n\n",
 				header,
 				paste(
 					paste0(stringr::str_pad(string = names(object), width = colwidth1, side = "right"), "| ", object),

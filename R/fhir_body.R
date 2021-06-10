@@ -9,20 +9,24 @@
 
 setClass(
 	Class = "fhir_body",
-	slots = c(content = "character", type="character")
+	slots = c(content = "character", type = "character")
 )
 
 #validity
 setValidity(
 	Class = "fhir_body",
 	method = function(object) {
+
 		messages <- c()
+
 		if(1 < length(object@type)) {
 			messages <- c(messages, "the type of a fhir_body must have length 1")
 		}
+
 		if(1 < length(object@content)) {
 			messages <- c(messages, "the content of a fhir_body must have length 1")
 		}
+
 		if(0 < length(messages)){messages} else {TRUE}
 	}
 )
@@ -49,7 +53,6 @@ setValidity(
 setGeneric(
 	name = "fhir_body",
 	def = function(content, type){
-		#standardGeneric(f = "fhir_body")
 		standardGeneric("fhir_body")
 	}
 )
@@ -60,18 +63,21 @@ setMethod(
 	f = "fhir_body",
 	signature = c(content = "list", type = "missing"),
 	definition = function(content){
+
 		if(any(!sapply(content, function(x) {is.character(x)}))) {
 			stop("The provided list must have elements of type character")
 		}
+
 		if(is.null(names(content))) {
 			stop("Please provide a named list.")
 		}
+
 		keys <- names(content)
 		values <- unlist(content)
 		pairs <- paste(keys, values, sep = "=")
 		string <- paste(pairs, collapse = "&")
 
-		new("fhir_body", content = string, type = "application/x-www-form-urlencoded")
+		new(Class = "fhir_body", content = string, type = "application/x-www-form-urlencoded")
 	}
 )
 
@@ -82,13 +88,17 @@ setMethod(
 	f = "fhir_body",
 	signature = c(content = "list", type = "character"),
 	definition = function(content, type) {
+
 		message("When content is a list, the type you provided will be overwritten with 'application/x-www-form-urlencoded'")
+
 		if(any(!sapply(content, function(x) {is.character(x)}))) {
 			stop("The provided list must have elements of type character")
 		}
+
 		if(is.null(names(content))) {
 			stop("Please provide a named list.")
 		}
+
 		keys <- names(content)
 		values <- unlist(content)
 		pairs <- paste(keys, values, sep = "=")
@@ -102,7 +112,7 @@ setMethod(
 setMethod(
 	f = "fhir_body",
 	signature = c(content = "character", type = "character"),
-	definition = function(content, type){
+	definition = function(content, type) {
 		new(Class = "fhir_body", content = content, type = type)
 	}
 )

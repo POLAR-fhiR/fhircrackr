@@ -21,13 +21,17 @@ setClass(
 setValidity(
 	Class = "fhir_design",
 	method = function(object) {
+
 		messages <- c()
+
 		if(length(object) != length(object@names)) {
 			messages <- c(messages, "You need exactly one name for every table_description in a design.")
 		}
+
 		if(any(sapply(object, function(x) {class(x) != "fhir_table_description"}))) {
 			messages <- c(messages, "A fhir_design can only contain fhir_table_descriptions")
 		}
+
 		#check df descriptions
 	 	messages <- c(
 	 		messages,
@@ -41,6 +45,7 @@ setValidity(
 	 			)
 	 		)
 	 	)
+
 		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
@@ -189,7 +194,6 @@ setGeneric(
 	name = "fhir_design",
 	def = function(...) {
 		standardGeneric("fhir_design")
-		#standardGeneric(f = "fhir_design")
 	},
 	signature = "..."
 )
@@ -201,6 +205,7 @@ setMethod(
 	f = "fhir_design",
 	signature = c(... = "fhir_table_description"),
 	definition = function(...) {
+
 		args <- list(...)
 		names <- paste0(sapply(args, function(x) {x@resource}), "s")
 		name_index <- sapply(substitute(list(...))[-1], function(x) {class(x) == "name"})
@@ -216,18 +221,24 @@ setMethod(
 	f = "fhir_design",
 	signature = c(... = "list"),
 	definition = function(...) {
+
 		args <- list(...)
+
 		if(length(args) == 1) {
 			args <- unlist(args, recursive = FALSE)
+
 			if(all(sapply(args, is, "fhir_table_description"))) {
 				new(Class = "fhir_design", args, names  = attr(args, "names"))
 			} else {
+
 				message(
 					"The old style design (simple named list) will be deprecated at some point. ",
 					"Please consider building your design as shown in the documentation for fhir_design(), ",
 					"see ?fhir_design."
 				)
+
 				d <- fix_design(design = args)
+
 				df_desc <-lapply(
 					d,
 					function(x) {
@@ -236,6 +247,7 @@ setMethod(
 						fhir_table_description(resource = resource, cols = fhir_columns(x$cols), style = style)
 					}
 				)
+
 				new(Class = "fhir_design", df_desc, names = attr(d, "names"))
 			}
 		} else {
@@ -247,11 +259,13 @@ setMethod(
 setMethod(
 	f = "show",
 	signature = "fhir_design",
-	definition = function(object){
+	definition = function(object) {
+
 		if(length(object) == 0) {
 			cat("An empty fhir_design_object")
 		} else {
 			cat(paste0("A fhir_design with ", length(object), " table_descriptions:\n"))
+
 			lapply(
 				seq_len(length(object)),
 				function(i) {
@@ -267,6 +281,7 @@ setMethod(
 					cat("\n")
 				}
 			)
+
 		}
 	}
 )

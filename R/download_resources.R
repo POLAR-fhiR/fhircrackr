@@ -115,6 +115,7 @@ fhir_search <- function(
 			save_to_disc <- directory
 		}
 	}
+
 	if(is.numeric(log_errors)) {
 		warning("The use of numbers in log_errors is deprecated. Please specify a file name if you want to log erros and NULL if you don't.\n")
 		if(0 < log_errors) {
@@ -124,6 +125,7 @@ fhir_search <- function(
 			log_errors <- NULL
 		}
 	}
+
 	#######################################################
 	if(is.null(request)) {
 		stop(
@@ -145,6 +147,7 @@ fhir_search <- function(
 			)
 		}
 		if(!grepl("_search", request)) {request <- paste(request, "_search", sep = "/")}
+
 		#convert body to appropriate class
 		if(is.character(body)) {
 			body <- fhir_body(content = body, type = "application/x-www-form-urlencoded")
@@ -249,14 +252,10 @@ fhir_search <- function(
 			break
 		}
 		addr <- bundle@next_link
-		Sys.sleep(delay_between_bundles)
+		if(0 < delay_between_bundles) {Sys.sleep(delay_between_bundles)}
 	}
 	fhircrackr_env$current_request <- request
-	# if(!is.null(save_to_disc)) {
-	# 	return(NULL)
-	# } else {
-	# 	return(fhir_bundle_list(bundles))
-	# }
+
 	return(
 		if(is.null(save_to_disc)) {
 			fhir_bundle_list(bundles)
@@ -304,16 +303,20 @@ fhir_search <- function(
 #'}
 #'
 fhir_next_bundle_url <- function(bundle = NULL) {
+
 	if(!is.null(bundle)) {
+
 		if(!is(bundle, "fhir_bundle")) {
 			stop("bundle must be an object of type fhir_bundle")
 		}
+
 		if(is(bundle, "fhir_bundle_xml")) {
 			bundle@next_link
 		} else {
 			b <- fhir_unserialize(b)
 			b@next_link
 		}
+
 	} else {
 		fhircrackr_env$last_next_link
 	}
@@ -400,6 +403,7 @@ fhir_capability_statement <- function(
 	auth <- if (!is.null(username) && !is.null(password)) {
 		httr::authenticate(username, password)
 	}
+
 	response <- httr::GET(
 		url = paste_paths(url, "/metadata?"),
 		config = httr::add_headers(
@@ -408,23 +412,28 @@ fhir_capability_statement <- function(
 		),
 		auth
 	)
+
 	#check for http errors
 	check_response(response = response, log_errors = log_errors)
+
 	#extract payload
 	payload <- httr::content(x = response, as = "text", encoding = "UTF-8")
 	xml <- xml2::read_xml(x = payload)
 	xml2::xml_ns_strip(x = xml)
+
 	xml_meta <- xml2::xml_new_root(.value = xml, .copy = TRUE)
 	xml2::xml_remove(.x = xml2::xml_find_all(x = xml_meta, xpath = "/CapabilityStatement/rest"))
 	xml_rest <- xml2::xml_new_root(.value = xml, .copy = TRUE)
 	xml_rest <- xml2::xml_find_all(x = xml_rest, xpath = "/CapabilityStatement/rest")
 	xml2::xml_remove(.x = xml2::xml_find_all(x = xml_rest, xpath = "/CapabilityStatement/rest/resource"))
 	xml_resource <- xml2::xml_find_all(x = xml, xpath = "/CapabilityStatement/rest/resource")
+
 	suppressWarnings({
 		desc_meta <- fhir_table_description(resource = "/CapabilityStatement")
 		desc_rest <- fhir_table_description(resource = "rest")
 		desc_resource <- fhir_table_description(resource = "resource")
 	})
+
 	META <- fhir_crack(
 		bundles = list(xml_meta),
 		design = fhir_design(desc_meta),
@@ -432,7 +441,9 @@ fhir_capability_statement <- function(
 		brackets = brackets,
 		verbose = verbose
 	)
+
 	restBrackets <- if(is.null(brackets)) {c("[", "]")} else {brackets}
+
 	REST <- fhir_crack(
 		bundles = list(xml_rest),
 		design = fhir_design(desc_rest),
@@ -440,6 +451,7 @@ fhir_capability_statement <- function(
 		brackets = restBrackets,
 		verbose = verbose
 	)
+
 	rest <- fhir_melt(
 		indexed_data_frame = REST$desc_rest,
 		brackets = restBrackets,
@@ -450,8 +462,10 @@ fhir_capability_statement <- function(
 		),
 		all_columns = TRUE
 	)
+
 	rest$resource_identifier <- NULL
 	if(is.null(brackets)) {rest <- fhir_rm_indices(indexed_data_frame = rest, brackets = restBrackets)}
+
 	RESOURCE <- fhir_crack(
 		bundles = list(xml_resource),
 		design = fhir_design(desc_resource),
@@ -459,6 +473,7 @@ fhir_capability_statement <- function(
 		brackets = brackets,
 		verbose = verbose
 	)
+
 	list(Meta = META$desc_meta, Rest = unique(rest), Resources = RESOURCE$desc_resource)
 }
 
@@ -481,8 +496,10 @@ fhir_capability_statement <- function(
 
 
 fhir_save <- function(bundles, directory = "result") {
+
 	w <- 1 + floor(log10(length(bundles)))
 	if(!dir.exists(directory)) {dir.create(directory, recursive = TRUE)}
+
 	for(n in seq_len(length(bundles))) {
 		xml2::write_xml(
 			x = bundles[[n]],
@@ -518,10 +535,12 @@ fhir_load <- function(directory) {
 	if(!dir.exists(directory)) {stop("Cannot find the specified directory.")}
 	xml.files <- dir(directory, "*.xml")
 	if(length(xml.files)==0){stop("Cannot find any xml-files in the specified directory.")}
+
 	list_ <- lapply(
 		lst(xml.files),
 		function(x) xml2::read_xml(paste_paths(directory, x))
 	)
+
 	fhir_bundle_list(bundles = list_)
 }
 
@@ -552,7 +571,6 @@ setGeneric(
 	name = "fhir_serialize",
 	def = function(bundles) {
 		standardGeneric("fhir_serialize")
-		#standardGeneric(f = "fhir_serialize")
 	}
 )
 
@@ -757,8 +775,8 @@ get_bundle <- function(
 	log_errors = NULL) {
 
 	#download response
-	for(n in 1:max_attempts) {
-		if(1 < verbose){cat(paste0("(", n, "): ", request, "\n"))}
+	for(n in seq_len(max_attempts)) {
+		if(1 < verbose) {cat(paste0("(", n, "): ", request, "\n"))}
 		auth <- if(!is.null(username) && !is.null(password)) {
 			httr::authenticate(user = username, password = password)
 		}

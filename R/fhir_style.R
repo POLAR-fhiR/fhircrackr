@@ -22,6 +22,7 @@ setClass(
 setValidity(
 	Class = "fhir_style",
 	method = function(object) {
+
 		messages <- c()
 		if(1 < length(object@sep)) {messages <- c(messages, "sep must be character of length 1")}
 		if(!length(object@brackets) %in% c(0, 2)) {messages <- c(messages, "brackets must be character of length 2 or empty")}
@@ -73,6 +74,7 @@ setValidity(
 
 
 fhir_style <- function(sep = " ", brackets = character(), rm_empty_cols = TRUE) {
+
 	if(is.null(brackets)) {brackets <- character()}
 	if(any(is.na(brackets))) {stop("You cannot use NA in brackets.")}
 	brackets <- fix_brackets(brackets = brackets)
@@ -84,10 +86,16 @@ setMethod(
 	f = "show",
 	signature = "fhir_style",
 	function(object) {
+
 		sep <- if(length(object@sep) == 0) {"character(0)"} else {paste0("'", object@sep, "'")}
-		brackets <- if(length(object@brackets) == 0) {"character(0)"} else {paste0("'", object@brackets[1], "' '", object@brackets[2], "'")}
-		rm_empty_cols <- if(length(object@rm_empty_cols)==0) {"logical(0)"} else {object@rm_empty_cols}
-		#	"A fhir_style object:\n\n",
-		cat(paste0("sep: ",sep, "\nbrackets: ", brackets, "\nrm_empty_cols: ", rm_empty_cols))
+
+		brackets <- if(length(object@brackets) == 0) {
+			"character(0)"
+		} else {
+			paste0("'", object@brackets[1], "' '", object@brackets[2], "'")
+		}
+
+		rm_empty_cols <- if(length(object@rm_empty_cols) == 0) {"logical(0)"} else {object@rm_empty_cols}
+		cat(paste0("sep: ", sep, "\nbrackets: ", brackets, "\nrm_empty_cols: ", rm_empty_cols))
 	}
 )

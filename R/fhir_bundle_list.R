@@ -15,14 +15,18 @@ setClass(
 setValidity(
 	Class = "fhir_bundle_list",
 	method = function(object) {
+
 		messages <- c()
+
 		if(any(!sapply(object, is, "fhir_bundle"))) {
 			messages <- c(messages, "All elements of a fhir_bundle_list must be fhir bundles." )
 		}
+
 		if(1 < length(unique(sapply(object, class)))) {
 			messages <- c(messages, "You cannot mix bundle types in a fhir_bundle_list.")
 		}
-		if(length(messages)>0) {messages} else {TRUE}
+
+		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
 
@@ -48,9 +52,11 @@ setValidity(
 #' @noRd
 
 fhir_bundle_list <- function(bundles) {
+
 	if(!is.list(bundles)) {
 		stop("You have to provide a list to fhir_bundle_list()")
 	}
+
 	if(all(sapply(bundles, is, "raw"))) {
 		bundles <- lapply(bundles, fhir_bundle_serialized)
 	} else if (all(sapply(bundles, is, "xml_node"))) {
@@ -61,5 +67,6 @@ fhir_bundle_list <- function(bundles) {
 			" either xml_node/fhir_bundle_xml or raw/fhir_bundle_serialized"
 		)
 	}
+
 	new(Class = "fhir_bundle_list", bundles)
 }

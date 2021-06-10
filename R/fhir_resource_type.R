@@ -16,10 +16,13 @@ setClass(
 setValidity(
 	Class = "fhir_resource_type",
 	method = function(object) {
+
 		messages <- c()
+
 		if(1 < length(object)) {
 			messages <- c(messages, paste0("Please provide only a single string to define the FHIR resource."))
 		}
+
 		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
@@ -41,14 +44,18 @@ setValidity(
 #' @export
 #'
 fhir_resource_type <- function(string, fix_capitalization = TRUE) {
-	if(length(string)>1){stop("Please provide only a single string to define the FHIR resource.")}
+
+	if(length(string)>1) {stop("Please provide only a single string to define the FHIR resource.")}
+
 	#convert to correct case and check for validity
 	if(tolower(string) %in% tolower(existing_resource_types) && fix_capitalization) {
+
 		if(!string %in% existing_resource_types) {
 			corrected <- existing_resource_types[tolower(string) == tolower(existing_resource_types)]
 			message("Changing resource type \"", string, "\" into \"", corrected, "\".")
 			string <- existing_resource_types[tolower(string) == tolower(existing_resource_types)]
 		}
+
 	} else {
 		warning(
 			"You gave \"", string, "\" as the resource type.\n",
@@ -56,8 +63,7 @@ fhir_resource_type <- function(string, fix_capitalization = TRUE) {
 			"If you are sure the resource type is correct anyway, you can ignore this warning.\n"
 		)
 	}
-	# result <- new(Class = "fhir_resource_type", string)
-	# result
+
 	new(Class = "fhir_resource_type", string)
 }
 

@@ -28,13 +28,16 @@ setClass(
 setValidity(
 	Class = "fhir_bundle_xml",
 	method = function(object) {
+
 		messages <- c()
+
 		if(xml2::xml_name(x = object) != "Bundle") {
 			messages <- c(
 				messages,
 				"This xml doesn't seem to represent a bundle, its name is not 'Bundle'. Use xml2::xml_name() to check."
 			)
 		}
+
 		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
@@ -52,6 +55,7 @@ setValidity(
 #' @export
 #'
 fhir_bundle_xml <- function(bundle) {
+
 	xml2::xml_ns_strip(x = bundle)
 	links <- xml2::xml_find_all(x = bundle, xpath = "link")
 	rels.nxt <-	xml2::xml_text(x = xml2::xml_find_first(x = links, xpath = "./relation/@value")) == "next"

@@ -17,22 +17,27 @@ setClass(
 setValidity(
 	Class = "fhir_table_list",
 	function(object) {
+
 		messages <- c()
+
 		if(length(object) != length(object)) {
 			messages <- c(messages, "Slot names has to have the same length as the list.")
 		}
+
 		if(length(object) != length(object@design)) {
 			messages <- c(
 				messages,
-				"The number of table_descriptions in the design doesn't correspond to the number of data.frames"
+				"The number of table_descriptions in the design doesn't correspond to the number of tables."
 			)
 		}
+
 		if(any(!names(object@design) %in% object@names)) {
 			messages <- c(
 				messages,
-				"The names in the design don't correspond to the names of the data.frames"
+				"The names in the design don't correspond to the names of the tables."
 			)
 		}
+
 		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
@@ -55,9 +60,11 @@ setClass(
 setValidity(
 	Class = "fhir_df_list",
 	method = function(object) {
+
 		messages <- c()
 		if(!all(sapply(object, is.data.frame))){"A fhir_df_list can only contain data.frames."}
 		if(0 < length(messages)) {messages} else {TRUE}
+
 	}
 )
 
@@ -151,7 +158,7 @@ fhir_dt_list <- function(dt_list, design){
 #' @aliases fhir_design,fhir_table_list-method
 setMethod(
 	f = "fhir_design",
-	signature = c(...="fhir_table_list"),
+	signature = c(... = "fhir_table_list"),
 	definition = function(...) {
 		args <- list(...)
 		tab <- args[[1]]
@@ -164,7 +171,7 @@ setMethod(
 	signature = "fhir_dt_list",
 	definition = function(object) {
 		cat("A fhir_dt_list:\n")
-		list <- S3Part(object, strictS3 = T)
+		list <- S3Part(object, strictS3 = TRUE)
 		names(list) <- names(object)
 		print(list)
 	}
@@ -175,7 +182,7 @@ setMethod(
 	signature = "fhir_df_list",
 	definition = function(object) {
 		cat("A fhir_df_list:\n")
-		list <- S3Part(object, strictS3 = T)
+		list <- S3Part(object, strictS3 = TRUE)
 		names(list) <- names(object)
 		print(list)
 	}

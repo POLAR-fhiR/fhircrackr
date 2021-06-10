@@ -8,7 +8,7 @@
 An object of class \code{fhir_columns} is part of a \linkS4class{fhir_table_description}
 in a \linkS4class{fhir_design} and holds information on the elements
 that should be extracted from the FHIR resources, as well as the column names of the resulting data.frame.
-The elements to be extracted are indicated by XPath expressions.
+The elements to be extracted are indicated by XPath xpaths.
 }
 \section{Slots}{
 

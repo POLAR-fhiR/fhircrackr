@@ -66,7 +66,7 @@ fhir_table_description(resource = "Patient",
                                           rm_empty_cols = FALSE)
 )
 
-#' #If style is ommitted, default values are assumed
+#If style is ommitted, default values are assumed
 fhir_table_description(resource = "Patient",
                        cols = c(name = "name/family",
                                 gender = "gender",

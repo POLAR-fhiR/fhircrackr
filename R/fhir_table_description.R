@@ -108,7 +108,7 @@ setClass(
 #'                                           rm_empty_cols = FALSE)
 #' )
 #'
-#' #' #If style is ommitted, default values are assumed
+#' #If style is ommitted, default values are assumed
 #' fhir_table_description(resource = "Patient",
 #'                        cols = c(name = "name/family",
 #'                                 gender = "gender",
@@ -135,7 +135,7 @@ fhir_table_description <- function(
 	style = fhir_style()) {
 
 	resource <- fhir_resource_type(string = resource)
-	if(class(cols) != "fhir_columns") {cols <- fhir_columns(expressions = cols)}
+	if(class(cols) != "fhir_columns") {cols <- fhir_columns(xpaths = cols)}
 	new(Class = "fhir_table_description", resource = resource, cols = cols, style = style)
 }
 

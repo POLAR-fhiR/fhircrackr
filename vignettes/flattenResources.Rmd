@@ -107,14 +107,13 @@ Internally, `fhir_table_description()` calls `fhir_columns()` to check the valid
 
 ```{r}
 #custom column names
-#note the c()-expression!
-fhir_columns(expressions = c(
+fhir_columns(xpaths = c(
 	gender = "gender",
 	name   = "name/family",
 	city   = "address/city"))
 
 #automatic column names
-fhir_columns(expressions = c("gender", "name/family", "address/city"))
+fhir_columns(xpaths = c("gender", "name/family", "address/city"))
 ```
 
 A `fhir_columns` object that is created explicitly like this can of course also be used in the `columns` argument of `fhir_table_description`. 
