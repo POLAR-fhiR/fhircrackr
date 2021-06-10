@@ -83,7 +83,8 @@ setValidity(
 setGeneric(
 	name = "fhir_url",
 	def = function(url, resource, parameters, url_enc = TRUE) {
-		request <- standardGeneric(f = "fhir_url")
+		request <- standardGeneric("fhir_url")
+		#request <- standardGeneric(f = "fhir_url")
 		fhircrackr_env$current_request <- request
 		request
 	}

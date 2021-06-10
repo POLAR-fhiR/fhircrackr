@@ -49,6 +49,7 @@ setValidity(
 setGeneric(
 	name = "fhir_body",
 	def = function(content, type){
+		#standardGeneric(f = "fhir_body")
 		standardGeneric("fhir_body")
 	}
 )

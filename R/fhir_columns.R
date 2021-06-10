@@ -59,7 +59,8 @@ setValidity(
 setGeneric(
 	name = "fhir_columns",
 	def = function(expressions, colnames){
-		standardGeneric(f = "fhir_columns")
+		#standardGeneric(f = "fhir_columns")
+		standardGeneric("fhir_columns")
 	}
 )
 

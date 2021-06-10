@@ -188,7 +188,8 @@ setValidity(
 setGeneric(
 	name = "fhir_design",
 	def = function(...) {
-		standardGeneric(f = "fhir_design")
+		standardGeneric("fhir_design")
+		#standardGeneric(f = "fhir_design")
 	},
 	signature = "..."
 )

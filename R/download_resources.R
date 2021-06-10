@@ -551,7 +551,8 @@ fhir_load <- function(directory) {
 setGeneric(
 	name = "fhir_serialize",
 	def = function(bundles) {
-		standardGeneric(f = "fhir_serialize")
+		standardGeneric("fhir_serialize")
+		#standardGeneric(f = "fhir_serialize")
 	}
 )
 
@@ -618,7 +619,8 @@ setMethod(
 setGeneric(
 	name = "fhir_unserialize",
 	def = function(bundles) {
-		standardGeneric(f = "fhir_unserialize")
+#		standardGeneric(f = "fhir_unserialize")
+		standardGeneric("fhir_unserialize")
 	}
 )
 

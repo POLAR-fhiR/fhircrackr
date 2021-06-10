@@ -103,7 +103,8 @@ setGeneric(
 		verbose = 2,
 		data.table = FALSE) {
 
-		standardGeneric(f = "fhir_crack")
+#		standardGeneric(f = "fhir_crack")
+		standardGeneric("fhir_crack")
 	}
 )
 

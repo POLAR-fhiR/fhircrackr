@@ -200,7 +200,8 @@ fhir_melt <- function(
 setGeneric(
 	name = "fhir_melt_all",
 	def = function(indexed_data_frame, sep, brackets, rm_indices = TRUE) {
-		standardGeneric(f = "fhir_melt_all")
+		standardGeneric("fhir_melt_all")
+		#standardGeneric(f = "fhir_melt_all")
 	},
 	signature = "indexed_data_frame"
 )
