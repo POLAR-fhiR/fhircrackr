@@ -391,7 +391,7 @@ fhir_capability_statement <- function(
 	url = "https://hapi.fhir.org/baseR4",
 	username = NULL,
 	password = NULL,
-	token=NULL,
+	token = NULL,
 	brackets = NULL,
 	sep = " || ",
 	log_errors = NULL,
@@ -618,7 +618,7 @@ setMethod(
 setGeneric(
 	name = "fhir_unserialize",
 	def = function(bundles) {
-		standardGeneric("fhir_unserialize")
+		standardGeneric(f = "fhir_unserialize")
 	}
 )
 
@@ -635,9 +635,9 @@ setMethod(
 #' @rdname fhir_unserialize-methods
 #' @aliases fhir_unserialize,fhir_bundle_serialized-method
 setMethod(
-	"fhir_unserialize",
+	f = "fhir_unserialize",
 	signature = c(bundles = "fhir_bundle_serialized"),
-	function(bundles) {
+	definition = function(bundles) {
 		b <- xml2::xml_unserialize(connection = bundles)
 		fhir_bundle_xml(bundle = b)
 	}
