@@ -172,7 +172,7 @@ fhir_search <- function(
 		if(is(token, "Token")) {
 			token <- token$credentials$access_token
 		}
-		if(1 < length(token)) {stop("token must be of length 1.")}
+		if(1 < length(token)) {stop("token must be of length one.")}
 		bearerToken <- paste0("Bearer ", token)
 	} else {
 		bearerToken <- NULL
@@ -693,7 +693,7 @@ setMethod(
 #' @param access The url used to exchange unauthenticated for authenticated token.
 #' This can be identical to `authorize`.
 #' @param query_authorize_extra A named list holding query parameters to append to initial auth page query.
-#' could hold info about user identity and scope for keycloak like this:
+#' Could hold info about user identity and scope for keycloak like this:
 #' ```
 #' list(scope = "openid",
 #'      grant_type = "password",

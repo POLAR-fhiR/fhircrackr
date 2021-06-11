@@ -67,10 +67,10 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #' @param indexed_data_frame A data.frame/data.table with indexed multiple entries.
 #' @param columns A character vector specifying the names of all columns that should be molten simultaneously.
 #' It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!
-#' @param brackets A character vector of length 2, defining the brackets used for the indices.
-#' @param sep A string defining the separator that was used when pasting together multiple entries in [fhir_crack()].
-#' @param id_name A string, the name of the column that will hold the identification of the origin of the new rows.
-#' @param all_columns A logical scalar. Return all columns or only the ones specified in `columns`?
+#' @param brackets A character vector of length two, defining the brackets used for the indices.
+#' @param sep A character vector of length one defining the separator that was used when pasting together multiple entries in [fhir_crack()].
+#' @param id_name A character vector of length one, the name of the column that will hold the identification of the origin of the new rows.
+#' @param all_columns Return all columns? Defaults to `FALSE`, meaning only those specified in `columns` are returned.
 #'
 #' @return A data.frame/data.table where each entry from the variables in `columns` appears in a separate row.
 #'
@@ -299,7 +299,7 @@ fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), columns 
 #' Please make sure there is no more than one index present per cell, i.e. all multiple entries have been molten into multiple
 #' rows as achieved by [fhir_melt_all()] with the `rm_indices=FALSE`.
 #' All columns have to be of class character.
-#' @param brackets A string vector of length two defining the brackets that were used in [fhir_crack()].
+#' @param brackets A character vector of length two defining the brackets that were used in [fhir_crack()].
 #' @return A character matrix with same dimensions as `indexed_data_frame` containing the indices. For use with
 #' `fhir_restore_indices()`.
 #'
@@ -442,9 +442,9 @@ fhir_restore_indices <- function(d, index_matrix) {
 #' @param columns A character vector specifying the names of all columns that should be molten simultaneously.
 #' It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!
 #' @param brackets A character vector of length 2, defining the brackets used for the indices.
-#' @param sep A string, the separator.
-#' @param all_columns A logical scalar. Return all columns or only the ones specified in `columns`?
-#' @return A data frame with nrow > 1
+#' @param sep A character vector of length one, the separator.
+#' @param all_columns Return all columns? Defaults to `FALSE`, meaning only those specified in `columns` are returned.
+#' @return A data frame with nrow > 1.
 #' @noRd
 
 
@@ -498,9 +498,9 @@ melt_row <- function(row, columns, brackets = c("<", ">"), sep = " ", all_column
 	data.table::data.table(d)
 }
 
-#' This functions melts a row regarding a set
+#' This function melts a row regarding a set
 #' of columns completely, i.e. until there is no separator left in the
-#' specified columns. It preserves the original ids
+#' specified columns. It preserves the original ids.
 #' @noRd
 melt_row_completely <- function(row, columns, brackets = c("<", ">"), sep = " ", all_columns = FALSE){
 	setDT(row)
@@ -531,7 +531,7 @@ melt_row_completely <- function(row, columns, brackets = c("<", ">"), sep = " ",
 
 #'This function does the same as fhir_melt but returns a data table
 #'that is molten completely with regard to the specified columns.
-#'It preserves the original ids
+#'It preserves the original ids.
 #'@noRd
 
 fhir_melt_dt_preserveID <- function(indexed_data_frame, columns, brackets = c("<", ">"), sep = " ", all_columns = FALSE) {

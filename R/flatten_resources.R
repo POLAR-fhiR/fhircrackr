@@ -12,7 +12,7 @@
 #' and the corresponding vignette (`vignette("flattenResources", package ="fhircrackr")`) for a more detailed explanation and
 #' comprehensive examples of both.
 #'
-#' @param sep Optional. A string to separate pasted multiple entries which will overwrite the `sep` defined in
+#' @param sep Optional. A character vector of length ones to separate pasted multiple entries which will overwrite the `sep` defined in
 #' `design`. If `sep = NULL`, it is looked up in `design`, where the default is `" "`.
 #'
 #' @param remove_empty_columns Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
@@ -22,10 +22,10 @@
 #' which will overwrite the `brackets` defined in `design`. If `brackets = NULL`, it is looked up in `design`, where the default is `character(0)`,
 #' i.e. no indices are added to multiple entries. Empty strings (`""`) are not allowed.
 #'
-#' @param verbose An Integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
+#' @param verbose An integer vector of length one.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
 #'
-#' @param data.table Logical scalar. Should tables be returned in data.table format instead of data.frame?
+#' @param data.table A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
 #' Defaults to FALSE.
 #'
 #' @return If a [fhir_design-class] was used, the result is a list of data.frames, i.e. a [fhir_df_list-class] object, or a list of data.tables,
@@ -280,9 +280,11 @@ setMethod(
 #'
 #' @param child A xml child object, representing one FHIR resource
 #' from the resource
-#' @param sep A String to separate pasted multiple entries.
-#' @param xpath A String to locate data in tree via xpath.
-#' @param brackets A Vector of Strings defining the Brackets surrounding the Indices. e.g. c( "<", ">") NULL means no brackets.
+#' @param sep A character vector of length one to separate pasted multiple entries.
+#' @param xpath A character vector of length one to locate data in tree via xpath.
+#' @param brackets A character vector of length one or two defining the Brackets
+#' surrounding the Indices. e.g. c( "<", ">") NULL means no brackets.
+#' A vector of length one like c("|") means that the "|"-sign will be used as opening and closing Brackets.
 #' @noRd
 #'
 #' @examples
@@ -349,9 +351,9 @@ xtrct_all_columns <- function(
 #'
 #' Extracts defined values from a single resource
 #'
-#' @param child A xml child object, representing one FHIR resource
+#' @param child A xml child object, representing one FHIR resource.
 #' @param df.columns A [fhir_columns-class] object describing which elements to extract
-#' from the resource
+#' from the resource.
 #' @param sep A string to separate pasted multiple entries.
 #' @param brackets A character vector defining the brackets surrounding the indices. e.g. c( "<", ">").
 #' `character(0)` means no brackets.

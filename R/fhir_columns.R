@@ -121,7 +121,7 @@ setMethod(
 		}
 
 		if(any(sapply(xpaths, function(x){length(x)>1}))) {
-			stop("xpaths can only contain character vectors of length 1.")
+			stop("xpaths can only contain character vectors of length one.")
 		}
 
 		if(is.null(names(xpaths))) {

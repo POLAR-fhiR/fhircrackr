@@ -34,7 +34,7 @@
 #' ```
 #'
 #' @slot resource An object of class [fhir_resource_type-class] defining the resource type that
-#' should be extracted
+#' should be extracted.
 #' @slot cols An object of class [fhir_columns-class] describing which columns should be created and how.
 #' If this is an empty [fhir_columns-class] object, the call to [fhir_crack()] will extract all available
 #' elements and put them in automatically named columns.

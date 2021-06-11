@@ -22,7 +22,7 @@ fhir_body(content, type)
 \arguments{
 \item{content}{A string representing the body for the post in the format specified in \code{type}.
 If you provide a named list here, it will be taken as key value pairs of FHIR search parameters
-and will be concatenated appropriately, in which case the \code{type} will automatically be set to
+and will be concatenated appropriately. In this case the \code{type} will automatically be set to
 \code{"application/x-www-form-urlencoded"}. See examples.}
 
 \item{type}{A string defining the type of the body e.g. \code{"application/x-www-form-urlencoded"} or \code{"xml"}.}
@@ -34,7 +34,7 @@ An object of type \linkS4class{fhir_body}
 Create \linkS4class{fhir_body} object
 }
 \examples{
- #body that could be used in a FHIR seach request POSTed to an URL like baseurl/Patient/_search
+#body that could be used in a FHIR search request POSTed to an URL like baseurl/Patient/_search
 fhir_body(content = "gender=female&_summary=count", type="application/x-www-form-urlencoded")
 fhir_body(content = list("gender" = "female", "_summary" = "count"))
 }

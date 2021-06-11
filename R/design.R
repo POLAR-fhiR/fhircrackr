@@ -26,10 +26,10 @@ fhir_canonical_design <- function() {
 
 
 #' Write design to xml
-#' @description Writes a [fhir_design-class] for use with [fhir_crack()] to an xml file
+#' @description Writes a [fhir_design-class] for use with [fhir_crack()] to an xml file.
 #' @param design A [fhir_design-class] object. See [fhir_design()].
 #' @param file A string specifying the file to write to, defaults to writing "design.xml"
-#' into the current working directory
+#' into the current working directory.
 #' @export
 #' @seealso [fhir_design()], [fhir_table_description()], [fhir_load_design()]
 #'
@@ -62,9 +62,9 @@ fhir_save_design <- function(design, file = "design.xml") {
 }
 
 #' Load design from xml
-#' @description Loads a [fhir_design-class] for use with [fhir_crack()] from an xml file into R
+#' @description Loads a [fhir_design-class] for use with [fhir_crack()] from an xml file into R.
 #'
-#' @param file A string specifying the file from which to read
+#' @param file A string specifying the file from which to read.
 #'
 #' @return A [fhir_design-class] object. See `?fhir_design`.
 #' @export
@@ -108,13 +108,13 @@ fhir_load_design <- function (file) {
 
 #' Fix list (like design or style) by assigning proper names and defaults
 #'
-#' @param list The list to fix
-#' @param names The names the list elements should have
-#' @param defaults The default values that should be assigned to empty list elements
+#' @param list The list to fix.
+#' @param names The names the list elements should have.
+#' @param defaults The default values that should be assigned to empty list elements.
 #'
 #' @example fix(list = list(resource = "//Patient"), names = c("resource", "cols", "style"))
 #'
-#' @return A list of length length(names) with proper names in proper order
+#' @return A list of length length(names) with proper names in proper order.
 #'
 #' @noRd
 
@@ -166,9 +166,9 @@ fix <- function (list, names, defaults = NULL) {
 
 
 #' Duplicate brackets, if just one string is provided as brackets, truncate if more than two
-#' @param brackets a character or NULL
+#' @param brackets A character or NULL.
 #'
-#' @return a character of length two or NULL
+#' @return A character of length two or NULL.
 #'
 #' @example fix_brackets(brackets = "|")
 #' @noRd
@@ -178,7 +178,7 @@ fix_brackets <- function(brackets) {
 	if(1 == length(brackets)) {
 		c(brackets[1], brackets[1])
 	} else if(2 < length(brackets)) {
-		warning("brackets has to be of length 2, using only the first two elements.")
+		warning("brackets has to be of length two, using only the first two elements.")
 		brackets[1:2]
 	} else {
 		brackets
@@ -187,9 +187,9 @@ fix_brackets <- function(brackets) {
 
 #' fix data.frame description
 #'
-#' This function is only here to allow for old style designs to be fixed before being turned into S4
-#' @param df_desc A data.frame description from an old-style design for fhir_crack()
-#' @return a fixed data.frame description with resource, cols, style, sep, brackets and rm_empty_cols
+#' This function is only here to allow for old style designs to be fixed before being turned into S4.
+#' @param df_desc A data.frame description from an old-style design for fhir_crack().
+#' @return A fixed data.frame description with resource, cols, style, sep, brackets and rm_empty_cols.
 #' @example fix_df_desc(df_desc = list(resource="//Patient"))
 #' @noRd
 #'
@@ -226,8 +226,8 @@ fix_df_desc <- function (df_desc) {
 #' fix design
 #'
 #' This function is only here to allow for old style designs to be fixed before being turned into S4
-#' @param design  An old style design (list, not S4)
-#' @return a fixed design, where all df description have resource, cols, style, sep, brackets and rm_empty_cols
+#' @param design  An old style design (list, not S4).
+#' @return A fixed design, where all table description have resource, cols, style, sep, brackets and rm_empty_cols.
 #' @example fix_design(design=(list(resource="//Patient")))
 #' @noRd
 #'
@@ -254,8 +254,8 @@ fix_design <- function(design) {
 
 
 #' @description Add attributes to xpath expressions
-#' @param design A [fhir_design-class]
-#' @param attrib The attribute that should be added to the xpath expressions. Default is 'value'
+#' @param design A [fhir_design-class].
+#' @param attrib The attribute that should be added to the xpath expressions. Default is 'value'.
 #' @return A [fhir_design-class] with attribute `attrib` in all xpath expressions.
 #' @noRd
 #'
@@ -292,8 +292,8 @@ add_attribute_to_design <- function(design, attrib = "value") {
 ####save designs####
 
 #' Convert design into xml format
-#' @param design a design for fhir_crack()
-#' @return the design as an xml object
+#' @param design A design for fhir_crack().
+#' @return The design as an xml object.
 #' @noRd
 design2xml <- function (design) {
 
@@ -336,8 +336,8 @@ design2xml <- function (design) {
 ####read designs####
 
 #' Read design from xml object
-#' @param xml An xml object representing a design for fhir_crack()
-#' @return An object of class [fhir_design-class]
+#' @param xml An xml object representing a design for fhir_crack().
+#' @return An object of class [fhir_design-class].
 #' @noRd
 #' @examples
 #' df_desc1 <- fhir_table_description(resource = "Patient",

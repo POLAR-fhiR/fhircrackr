@@ -24,10 +24,10 @@ setValidity(
 	method = function(object) {
 
 		messages <- c()
-		if(1 < length(object@sep)) {messages <- c(messages, "sep must be character of length 1")}
-		if(!length(object@brackets) %in% c(0, 2)) {messages <- c(messages, "brackets must be character of length 2 or empty")}
+		if(1 < length(object@sep)) {messages <- c(messages, "sep must be character of length one")}
+		if(!length(object@brackets) %in% c(0, 2)) {messages <- c(messages, "brackets must be character of length two or empty")}
 		if("" %in% object@brackets) {messages <- c(messages, "You cannot use \"\" for brackets.")}
-		if(1 < length(object@rm_empty_cols)) {messages <- c(messages, "remove_empty_columns must be logical of length 1")}
+		if(1 < length(object@rm_empty_cols)) {messages <- c(messages, "remove_empty_columns must be logical of length one")}
 		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
@@ -58,12 +58,12 @@ setValidity(
 #' rm_empty_cols: FALSE
 #' ```
 #'
-#' @param sep A character vector of length 1 to separate pasted multiple entries. Defaults to `" "`
+#' @param sep A character vector of length one to separate pasted multiple entries. Defaults to `" "`
 #' @param brackets  A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`.
-#' If this is empty (i.e. character of length 0, the default) or 'NULL', no indices will be added to multiple entries. If it is a character
-#' vector of length 1, it will be recycled to length two, i.e. `"|"` will become `c("|", "|")`.
+#' If this is empty (i.e. character of length zero, the default) or 'NULL', no indices will be added to multiple entries. If it is a character
+#' vector of length one, it will be recycled to length two, i.e. `"|"` will become `c("|", "|")`.
 #' Empty strings (`""`) are not allowed.
-#' @param rm_empty_cols Logical scalar. Remove empty columns? Defaults to `FALSE`.
+#' @param rm_empty_cols A logical vector of length one. Remove empty columns? Defaults to `FALSE`.
 #' @return A fhir_style object
 #' @examples
 #' fhir_style(sep = " ",

@@ -19,13 +19,13 @@ fhir_melt(
 \item{columns}{A character vector specifying the names of all columns that should be molten simultaneously.
 It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!}
 
-\item{brackets}{A character vector of length 2, defining the brackets used for the indices.}
+\item{brackets}{A character vector of length two, defining the brackets used for the indices.}
 
-\item{sep}{A string defining the separator that was used when pasting together multiple entries in \code{\link[=fhir_crack]{fhir_crack()}}.}
+\item{sep}{A character vector of length one defining the separator that was used when pasting together multiple entries in \code{\link[=fhir_crack]{fhir_crack()}}.}
 
-\item{id_name}{A string, the name of the column that will hold the identification of the origin of the new rows.}
+\item{id_name}{A character vector of length one, the name of the column that will hold the identification of the origin of the new rows.}
 
-\item{all_columns}{A logical scalar. Return all columns or only the ones specified in \code{columns}?}
+\item{all_columns}{Return all columns? Defaults to \code{FALSE}, meaning only those specified in \code{columns} are returned.}
 }
 \value{
 A data.frame/data.table where each entry from the variables in \code{columns} appears in a separate row.

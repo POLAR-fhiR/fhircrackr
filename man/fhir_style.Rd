@@ -7,14 +7,14 @@
 fhir_style(sep = " ", brackets = character(), rm_empty_cols = FALSE)
 }
 \arguments{
-\item{sep}{A character vector of length 1 to separate pasted multiple entries. Defaults to \code{" "}}
+\item{sep}{A character vector of length one to separate pasted multiple entries. Defaults to \code{" "}}
 
 \item{brackets}{A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
-If this is empty (i.e. character of length 0, the default) or 'NULL', no indices will be added to multiple entries. If it is a character
-vector of length 1, it will be recycled to length two, i.e. \code{"|"} will become \code{c("|", "|")}.
+If this is empty (i.e. character of length zero, the default) or 'NULL', no indices will be added to multiple entries. If it is a character
+vector of length one, it will be recycled to length two, i.e. \code{"|"} will become \code{c("|", "|")}.
 Empty strings (\code{""}) are not allowed.}
 
-\item{rm_empty_cols}{Logical scalar. Remove empty columns? Defaults to \code{FALSE}.}
+\item{rm_empty_cols}{A logical vector of length one. Remove empty columns? Defaults to \code{FALSE}.}
 }
 \value{
 A fhir_style object

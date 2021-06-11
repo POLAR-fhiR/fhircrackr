@@ -12,7 +12,7 @@ Please make sure there is no more than one index present per cell, i.e. all mult
 rows as achieved by \code{\link[=fhir_melt_all]{fhir_melt_all()}} with the \code{rm_indices=FALSE}.
 All columns have to be of class character.}
 
-\item{brackets}{A string vector of length two defining the brackets that were used in \code{\link[=fhir_crack]{fhir_crack()}}.}
+\item{brackets}{A character vector of length two defining the brackets that were used in \code{\link[=fhir_crack]{fhir_crack()}}.}
 }
 \value{
 A character matrix with same dimensions as \code{indexed_data_frame} containing the indices. For use with

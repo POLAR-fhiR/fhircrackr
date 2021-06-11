@@ -38,7 +38,7 @@ setValidity(
 #'
 #' @param content A string representing the body for the post in the format specified in `type`.
 #' If you provide a named list here, it will be taken as key value pairs of FHIR search parameters
-#' and will be concatenated appropriately, in which case the `type` will automatically be set to
+#' and will be concatenated appropriately. In this case the `type` will automatically be set to
 #' `"application/x-www-form-urlencoded"`. See examples.
 #' @param type A string defining the type of the body e.g. `"application/x-www-form-urlencoded"` or `"xml"`.
 #'
@@ -47,7 +47,7 @@ setValidity(
 #' @docType methods
 #' @rdname fhir_body-methods
 #' @examples
-#'  #body that could be used in a FHIR seach request POSTed to an URL like baseurl/Patient/_search
+#' #body that could be used in a FHIR search request POSTed to an URL like baseurl/Patient/_search
 #' fhir_body(content = "gender=female&_summary=count", type="application/x-www-form-urlencoded")
 #' fhir_body(content = list("gender" = "female", "_summary" = "count"))
 setGeneric(

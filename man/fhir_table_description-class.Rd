@@ -41,7 +41,7 @@ rm_empty_cols: FALSE
 
 \describe{
 \item{\code{resource}}{An object of class \linkS4class{fhir_resource_type} defining the resource type that
-should be extracted}
+should be extracted.}
 
 \item{\code{cols}}{An object of class \linkS4class{fhir_columns} describing which columns should be created and how.
 If this is an empty \linkS4class{fhir_columns} object, the call to \code{\link[=fhir_crack]{fhir_crack()}} will extract all available

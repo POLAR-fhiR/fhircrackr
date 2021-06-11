@@ -20,13 +20,13 @@ globalVariables(".")
 
 
 #' Concatenate paths
-#' @description Concatenates two strings to path string correctly.
+#' @description Concatenates two strings to a path string correctly.
 #'
-#' @param path1 A string specifying the left hand part of the resulting path.
-#' @param path2 A string specifying the right hand part of the resulting path.
-#' @param os A string specifying the operating system you're operating on: windows or linux.
+#' @param path1 A a character vector of length one specifying the left hand part of the resulting path.
+#' @param path2 A a character vector of length one specifying the right hand part of the resulting path.
+#' @param os A a character vector of length one specifying the operating system you're operating on: windows or linux.
 #'
-#' @return A string containing the concatenated path.
+#' @return A a character vector of length one containing the concatenated path.
 #' @export
 #'
 #' @examples
@@ -358,8 +358,8 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 #' @description Transforms a vector of items to a named list. The names are created with a prefix and a suffix surrounding the items.
 #'
 #' @param ... A vector that can be coerced to a character.
-#' @param prefix A string taken as the prefix for the names of the list elements.
-#' @param suffix A string taken as the suffix for the names of the list elements.
+#' @param prefix A a character vector of length one taken as the prefix for the names of the list elements.
+#' @param suffix A a character vector of length one taken as the suffix for the names of the list elements.
 #'
 #' @return A named list, where the names are the content surrounded by a prefix and a suffix.
 #'
@@ -374,8 +374,8 @@ lst <- function(..., prefix = NULL, suffix = NULL) {
 
 
 #' Escape special characters
-#' @param s A string in which the characters should be escaped
-#' @return A string with all special characters escaped
+#' @param s A a character vector of length one in which the characters should be escaped.
+#' @return A a character vector of length one with all special characters escaped.
 #' @example esc(s = c("(",")"))
 #' @noRd
 #'

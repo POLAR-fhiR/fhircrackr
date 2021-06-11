@@ -7,13 +7,13 @@
 fhir_load_design(file)
 }
 \arguments{
-\item{file}{A string specifying the file from which to read}
+\item{file}{A string specifying the file from which to read.}
 }
 \value{
 A \linkS4class{fhir_design} object. See \code{?fhir_design}.
 }
 \description{
-Loads a \linkS4class{fhir_design} for use with \code{\link[=fhir_crack]{fhir_crack()}} from an xml file into R
+Loads a \linkS4class{fhir_design} for use with \code{\link[=fhir_crack]{fhir_crack()}} from an xml file into R.
 }
 \examples{
 

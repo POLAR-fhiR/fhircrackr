@@ -10,10 +10,10 @@ fhir_save_design(design, file = "design.xml")
 \item{design}{A \linkS4class{fhir_design} object. See \code{\link[=fhir_design]{fhir_design()}}.}
 
 \item{file}{A string specifying the file to write to, defaults to writing "design.xml"
-into the current working directory}
+into the current working directory.}
 }
 \description{
-Writes a \linkS4class{fhir_design} for use with \code{\link[=fhir_crack]{fhir_crack()}} to an xml file
+Writes a \linkS4class{fhir_design} for use with \code{\link[=fhir_crack]{fhir_crack()}} to an xml file.
 }
 \examples{
 #create design

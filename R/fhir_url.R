@@ -1,7 +1,7 @@
 #' An S4 object to represent a URL for a FHIR server
 #'
-#' Objects of this class are basically strings (character vectors of length 1) representing
-#' a URL. They are usually url encoded. See [fhir_url()] for how to build them..
+#' Objects of this class are basically strings (character vectors of length one) representing
+#' a URL. They are usually url encoded. See [fhir_url()] for how to build them.
 #' @export
 #'
 setClass(
@@ -15,7 +15,7 @@ setValidity(
 	method = function(object) {
 		messages <- c()
 		if(1 < length(object)) {
-			messages <- c(messages, paste0("A fhir_url has to be a character of length 1."))
+			messages <- c(messages, paste0("A fhir_url has to be a character of length one."))
 		}
 		if(0 < length(messages)) {messages} else {TRUE}
 	}
@@ -24,7 +24,7 @@ setValidity(
 #' Create FHIR URL
 #'
 #' This function creates an object of class [fhir_url-class] which mostly represents a URL-encoded URL for
-#' a FHIR search request. A valid Search URL contains a base URL and a resource type and can contain additional
+#' a FHIR search request. A valid Search URL contains a base URL and a resource type and may contain additional
 #' search parameters. For more info on FHIR search see https://www.hl7.org/fhir/search.html.
 #'
 #' You can use this function in two ways. If you provide just one string in the argument url with the full FHIR search request, this string
@@ -35,10 +35,10 @@ setValidity(
 #'
 #' You can disable URL-encoding by setting `url_enc=FALSE`.
 #'
-#' @param url A character of length 1 specifying either the full search request,
+#' @param url A character of length one specifying either the full search request,
 #' e.g. `"http://hapi.fhir.org/baseR4/Patient?gender=male&_summary=count"`, or
 #' the base URL to the FHIR server, e.g. `"http://hapi.fhir.org/baseR4"`.
-#' @param resource A character of length 1 of [fhir_resource_type-class] object with the resource type to be searched, e.g. `"Patient"`.
+#' @param resource A character of length one of [fhir_resource_type-class] object with the resource type to be searched, e.g. `"Patient"`.
 #' @param parameters Optional. Either a length 1 character containing properly formatted FHIR search parameters, e.g.
 #' `"gender=male&_summary=count"` or a named list or named character vector e.g. `list(gender="male", "_summary"="count")`
 #' or `c(gender="male", "_summary"="count")`. Note that parameter names beginning with `_` have to be put in quotation marks!

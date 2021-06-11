@@ -1,7 +1,7 @@
 #' Virtual superclass for [fhir_df_list-class] and [fhir_dt_list-class]
 #'
-#' @slot names Character vector containing the names of the tables
-#' @slot design An object of class [fhir_design-class] that was used to create the table list
+#' @slot names A character vector containing the names of the tables.
+#' @slot design An object of class [fhir_design-class] that was used to create the table list.
 #' @include fhir_design.R
 #' @noRd
 #'
@@ -74,7 +74,7 @@ setValidity(
 #' They behave like an ordinary named list of data.tables but have some additional information
 #' in the slot `design`.
 #'
-#' @slot names Character vector containing the names of the data.tables.
+#' @slot names A character vector containing the names of the data.tables.
 #' @slot design An object of class [fhir_design-class] that was used to create the dt_list.
 #' @export
 setClass(
@@ -94,8 +94,8 @@ setValidity(
 #'
 #' This function is only for internal use and should not be exported
 #' An object of this class should **only** be created inside of [fhir_crack()]
-#' @param df_list A named list of data.frames
-#' @param design The design that was used to create the list
+#' @param df_list A named list of data.frames.
+#' @param design The design that was used to create the list.
 #' @noRd
 #' @examples
 #' df_desc1 <- fhir_table_description(resource = "Patient",
@@ -125,8 +125,8 @@ fhir_df_list <- function(df_list, design) {
 #'
 #' This function is only for internal use and should not be exported
 #' An object of this class should **only** be created inside of [fhir_crack()]
-#' @param dt_list A named list of data.tables
-#' @param design The design that was used to create the list
+#' @param dt_list A named list of data.tables.
+#' @param design The design that was used to create the list.
 #'
 #' @examples
 #' df_desc1 <- fhir_table_description(resource = "Patient",
