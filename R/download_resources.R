@@ -429,14 +429,14 @@ fhir_capability_statement <- function(
 	xml_resource <- xml2::xml_find_all(x = xml, xpath = "/CapabilityStatement/rest/resource")
 
 	suppressWarnings({
-		desc_meta <- fhir_table_description(resource = "/CapabilityStatement")
-		desc_rest <- fhir_table_description(resource = "rest")
-		desc_resource <- fhir_table_description(resource = "resource")
+		Meta <- fhir_table_description(resource = "/CapabilityStatement")
+		Rest <- fhir_table_description(resource = "rest")
+		Resource <- fhir_table_description(resource = "resource")
 	})
 
 	META <- fhir_crack(
 		bundles = list(xml_meta),
-		design = fhir_design(desc_meta),
+		design = fhir_design(Meta),
 		sep = sep,
 		brackets = brackets,
 		verbose = verbose
@@ -446,18 +446,18 @@ fhir_capability_statement <- function(
 
 	REST <- fhir_crack(
 		bundles = list(xml_rest),
-		design = fhir_design(desc_rest),
+		design = fhir_design(Rest),
 		sep = sep,
 		brackets = restBrackets,
 		verbose = verbose
 	)
 
 	rest <- fhir_melt(
-		indexed_data_frame = REST$desc_rest,
+		indexed_data_frame = REST$Rest,
 		brackets = restBrackets,
 		sep = " || ",
 		columns = fhir_common_columns(
-			data_frame = REST$desc_rest,
+			data_frame = REST$Rest,
 			column_names_prefix = "operation"
 		),
 		all_columns = TRUE
@@ -468,13 +468,13 @@ fhir_capability_statement <- function(
 
 	RESOURCE <- fhir_crack(
 		bundles = list(xml_resource),
-		design = fhir_design(desc_resource),
+		design = fhir_design(Resource),
 		sep = sep,
 		brackets = brackets,
 		verbose = verbose
 	)
 
-	list(Meta = META$desc_meta, Rest = unique(rest), Resources = RESOURCE$desc_resource)
+	list(Meta = META$Meta, Rest = unique(rest), Resources = RESOURCE$Resource)
 }
 
 ####Saving Bundles####

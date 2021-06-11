@@ -11,8 +11,8 @@ It is usually found inside a \code{fhir_bundle_list} which is returned by a call
 \section{Slots}{
 
 \describe{
-\item{\code{next_link}}{A \linkS4class{fhir_url} pointing to the next bundle on the server}
+\item{\code{next_link}}{A \linkS4class{fhir_url} pointing to the next bundle on the server.}
 
-\item{\code{self_link}}{A \linkS4class{fhir_url} pointing to this bundle on the server}
+\item{\code{self_link}}{A \linkS4class{fhir_url} pointing to this bundle on the server.}
 }}
 

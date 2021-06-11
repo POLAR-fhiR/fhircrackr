@@ -11,7 +11,7 @@ fhir_bundle_xml(bundle)
 }
 \description{
 This should only be used if you want to create small examples. Usually, a \code{fhir_bundle_xml} will
-be returned by \code{\link[=fhir_search]{fhir_search()}}
+be returned by \code{\link[=fhir_search]{fhir_search()}}.
 }
 \examples{
 fhir_bundle_xml(bundle = xml2::xml_unserialize(patient_bundles[[1]]))
