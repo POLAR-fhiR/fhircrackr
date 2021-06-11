@@ -14,8 +14,8 @@ setOldClass(Classes = "xml_node")
 #' A `fhir_bundle_xml` is an xml representation of a FHIR bundle (https://www.hl7.org/fhir/bundle.html).
 #' It is usually found inside a `fhir_bundle_list` which is returned by a call to [fhir_search()].
 #'
-#' @slot next_link A [fhir_url-class] pointing to the next bundle on the server
-#' @slot self_link A [fhir_url-class] pointing to this bundle on the server
+#' @slot next_link A [fhir_url-class] pointing to the next bundle on the server.
+#' @slot self_link A [fhir_url-class] pointing to this bundle on the server.
 #' @export
 #'
 setClass(
@@ -46,7 +46,7 @@ setValidity(
 #' Create [fhir_bundle_xml-class] object
 #'
 #' This should only be used if you want to create small examples. Usually, a `fhir_bundle_xml` will
-#' be returned by [fhir_search()]
+#' be returned by [fhir_search()].
 #'
 #' @param bundle A xml-object representing a FHIR bundle
 #' @examples

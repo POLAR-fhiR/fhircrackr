@@ -18,19 +18,19 @@ fhir_capability_statement(
 \arguments{
 \item{url}{The base URL of the FHIR server.}
 
-\item{username}{A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.}
+\item{username}{A character vector of length one containing the username for basic authentication. Defaults to NULL, meaning no authentication.}
 
-\item{password}{A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.}
+\item{password}{A character vector of length one containing the password for basic authentication. Defaults to NULL, meaning no authentication.}
 
-\item{token}{A string or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
+\item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
 for how to create this.}
 
 \item{brackets}{A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
 If \code{NULL}, no indices will be added to multiple entries.}
 
-\item{sep}{A string to separate pasted multiple entries}
+\item{sep}{A character vector of length one to separate pasted multiple entries}
 
-\item{log_errors}{Either \code{NULL} or a string indicating the name of a file in which to save the http errors.
+\item{log_errors}{Either \code{NULL} or a character vector of length one indicating the name of a file in which to save the http errors.
 \code{NULL} means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to \code{NULL}}
 
 \item{verbose}{An integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,

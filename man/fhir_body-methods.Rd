@@ -20,7 +20,7 @@ fhir_body(content, type)
 \S4method{fhir_body}{character,character}(content, type)
 }
 \arguments{
-\item{content}{A string representing the body for the post in the format specified in \code{type}.
+\item{content}{A character vector of length one representing the body for the post in the format specified in \code{type}.
 If you provide a named list here, it will be taken as key value pairs of FHIR search parameters
 and will be concatenated appropriately. In this case the \code{type} will automatically be set to
 \code{"application/x-www-form-urlencoded"}. See examples.}
@@ -28,7 +28,7 @@ and will be concatenated appropriately. In this case the \code{type} will automa
 \item{type}{A string defining the type of the body e.g. \code{"application/x-www-form-urlencoded"} or \code{"xml"}.}
 }
 \value{
-An object of type \linkS4class{fhir_body}
+An object of type \linkS4class{fhir_body}.
 }
 \description{
 Create \linkS4class{fhir_body} object

@@ -14,18 +14,18 @@ fhir_authenticate(
 )
 }
 \arguments{
-\item{secret}{The consumer/client secret, belonging to \code{key}}
+\item{secret}{The consumer/client secret, belonging to \code{key}.}
 
 \item{key}{Consumer key, also called client ID.
 For Keycloak this would for instance be the Keycloak client, e.g. "postman".}
 
 \item{base_url}{The URL the user will be redirected to after authorization is complete.
-This will usually be the base url of you FHIR server}
+This will usually be the base url of you FHIR server.}
 
 \item{access}{The url used to exchange unauthenticated for authenticated token.
 This can be identical to \code{authorize}.}
 
-\item{authorize}{The url to send the client for authorization}
+\item{authorize}{The url to send the client for authorization.}
 
 \item{query_authorize_extra}{A named list holding query parameters to append to initial auth page query.
 Could hold info about user identity and scope for keycloak like this:\preformatted{list(scope = "openid",

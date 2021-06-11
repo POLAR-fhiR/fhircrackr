@@ -10,8 +10,8 @@ Objects of this class should always be created with a call to the function \code
 \section{Slots}{
 
 \describe{
-\item{\code{content}}{a length 1 character representing the body for the post}
+\item{\code{content}}{A vector of length one representing the body for the post.}
 
-\item{\code{type}}{a length 1 character defining the type of the body e.g. \code{"application/x-www-form-urlencoded"} or \code{"xml"}}
+\item{\code{type}}{A vector of length one defining the type of the body e.g. \code{"application/x-www-form-urlencoded"} or \code{"xml"}.}
 }}
 

@@ -3,8 +3,8 @@
 #' An s4 class to represent a body for a POST to a FHIR server
 #'
 #' Objects of this class should always be created with a call to the function [fhir_body()]
-#' @slot content a length 1 character representing the body for the post
-#' @slot type a length 1 character defining the type of the body e.g. `"application/x-www-form-urlencoded"` or `"xml"`
+#' @slot content A vector of length one representing the body for the post.
+#' @slot type A vector of length one defining the type of the body e.g. `"application/x-www-form-urlencoded"` or `"xml"`.
 #' @export
 
 setClass(
@@ -36,13 +36,13 @@ setValidity(
 
 #' Create [fhir_body-class] object
 #'
-#' @param content A string representing the body for the post in the format specified in `type`.
+#' @param content A character vector of length one representing the body for the post in the format specified in `type`.
 #' If you provide a named list here, it will be taken as key value pairs of FHIR search parameters
 #' and will be concatenated appropriately. In this case the `type` will automatically be set to
 #' `"application/x-www-form-urlencoded"`. See examples.
 #' @param type A string defining the type of the body e.g. `"application/x-www-form-urlencoded"` or `"xml"`.
 #'
-#' @return An object of type [fhir_body-class]
+#' @return An object of type [fhir_body-class].
 #' @export
 #' @docType methods
 #' @rdname fhir_body-methods

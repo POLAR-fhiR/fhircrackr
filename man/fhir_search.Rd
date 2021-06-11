@@ -21,36 +21,36 @@ fhir_search(
 )
 }
 \arguments{
-\item{request}{An object of class \linkS4class{fhir_url} or a string containing the full FHIR search request. It is
+\item{request}{An object of class \linkS4class{fhir_url} or a character vector of length one containing the full FHIR search request. It is
 recommended to explicitly create the request via \code{\link[=fhir_url]{fhir_url()}} as this will do some validity checks and format the url properly.
 Defaults to \code{\link[=fhir_current_request]{fhir_current_request()}}}
 
-\item{body}{A string or object of class \code{fhir_body} with type \code{"application/x-www-form-urlencoded"}. A body should be provided
+\item{body}{A character vector of length one or object of class \code{fhir_body} with type \code{"application/x-www-form-urlencoded"}. A body should be provided
 when the FHIR search request is too long and might exceed the maximal allowed length of the URL when send to the server. In this case
 a search via POST (see https://www.hl7.org/fhir/search.html#Introduction) can be used. The body should contain all the parameters that
 follow after the \verb{?} in the FHIR search request. When a body is provided, the required \verb{_search} is automatically added
 to the url in \code{request}. See examples and \code{?fhir_body}.}
 
-\item{username}{A string containing the username for basic authentication.}
+\item{username}{A character vector of length one containing the username for basic authentication.}
 
-\item{password}{A string containing the password for basic authentication.}
+\item{password}{A character vector of length one containing the password for basic authentication.}
 
-\item{token}{A string or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
+\item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
 for how to create this.}
 
 \item{max_bundles}{Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
 
-\item{verbose}{An Integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
+\item{verbose}{An integer vector of length one. If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
 downloading progress will be printed. Defaults to 2.}
 
-\item{max_attempts}{A numeric scalar. The maximal number of attempts to send a request, defaults to 5.}
+\item{max_attempts}{A numeric vector of length one. The maximal number of attempts to send a request, defaults to 5.}
 
-\item{delay_between_attempts}{A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.}
+\item{delay_between_attempts}{A numeric vector of length one specifying the delay in seconds between two attempts. Defaults to 10.}
 
-\item{log_errors}{Either \code{NULL} or a string indicating the name of a file in which to save the http errors.
+\item{log_errors}{Either \code{NULL} or a character vector of length one indicating the name of a file in which to save the http errors.
 \code{NULL} means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to \code{NULL}}
 
-\item{save_to_disc}{Either \code{NULL} or a string indicating the name of a directory in which to save the bundles.
+\item{save_to_disc}{Either \code{NULL} or a character vector of length one indicating the name of a directory in which to save the bundles.
 If a directory name is provided, the bundles are saved as numerated xml-files into the directory specified
 and not returned as a bundle list in the R session. This is useful when a lot of bundles are to be downloaded and keeping them all
 in one R session might overburden working memory. When the download is complete, the bundles can be loaded into R using \code{\link[=fhir_load]{fhir_load()}}.
@@ -94,7 +94,7 @@ There are several ways of authentication implemented in \code{fhir_search()}. If
 just leave the arguments described in the following at their default values of \code{NULL}.
 \enumerate{
 \item Basic Authentication: Provide the \code{username} and the \code{password} for basic authentication in the respective arguments.
-\item Token Authentication: Provide a token in the argument \code{token}, either as a string or as as an object of class
+\item Token Authentication: Provide a token in the argument \code{token}, either as a character vector of length one or as as an object of class
 \link[httr:Token-class]{httr::Token}. You can use the function \code{\link[=fhir_authenticate]{fhir_authenticate()}} to create this object.
 }
 }

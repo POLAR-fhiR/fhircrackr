@@ -9,7 +9,7 @@ fhir_save(bundles, directory = "result")
 \arguments{
 \item{bundles}{A list of xml objects representing the FHIR bundles.}
 
-\item{directory}{A string containing the path to the folder to store the data in.}
+\item{directory}{A character vector of length one containing the path to the folder to store the data in.}
 }
 \description{
 Writes a list of FHIR bundles as numbered xml files into a directory.
