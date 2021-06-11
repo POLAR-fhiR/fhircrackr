@@ -26,29 +26,29 @@
 #' just leave the arguments described in the following at their default values of `NULL`.
 #' 1. Basic Authentication: Provide the `username` and the `password` for basic authentication in the respective arguments.
 #'
-#' 2. Token Authentication: Provide a token in the argument `token`, either as a string or as as an object of class
+#' 2. Token Authentication: Provide a token in the argument `token`, either as a character vector of length one or as as an object of class
 #' [httr::Token-class]. You can use the function [fhir_authenticate()] to create this object.
 #'
-#' @param request An object of class [fhir_url-class] or a string containing the full FHIR search request. It is
+#' @param request An object of class [fhir_url-class] or a character vector of length one containing the full FHIR search request. It is
 #' recommended to explicitly create the request via [fhir_url()] as this will do some validity checks and format the url properly.
 #' Defaults to [fhir_current_request()]
-#' @param body A string or object of class `fhir_body` with type `"application/x-www-form-urlencoded"`. A body should be provided
+#' @param body A character vector of length one or object of class `fhir_body` with type `"application/x-www-form-urlencoded"`. A body should be provided
 #' when the FHIR search request is too long and might exceed the maximal allowed length of the URL when send to the server. In this case
 #' a search via POST (see https://www.hl7.org/fhir/search.html#Introduction) can be used. The body should contain all the parameters that
 #' follow after the `?` in the FHIR search request. When a body is provided, the required `_search` is automatically added
 #' to the url in `request`. See examples and `?fhir_body`.
-#' @param username A string containing the username for basic authentication.
-#' @param password A string containing the password for basic authentication.
-#' @param token A string or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
+#' @param username A character vector of length one containing the username for basic authentication.
+#' @param password A character vector of length one containing the password for basic authentication.
+#' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
 #' @param max_bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
-#' @param verbose An Integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
+#' @param verbose An integer vector of length one. If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
 #' downloading progress will be printed. Defaults to 2.
-#' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
-#' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
-#' @param log_errors Either `NULL` or a string indicating the name of a file in which to save the http errors.
+#' @param max_attempts A numeric vector of length one. The maximal number of attempts to send a request, defaults to 5.
+#' @param delay_between_attempts A numeric vector of length one specifying the delay in seconds between two attempts. Defaults to 10.
+#' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`
-#' @param save_to_disc Either `NULL` or a string indicating the name of a directory in which to save the bundles.
+#' @param save_to_disc Either `NULL` or a character vector of length one indicating the name of a directory in which to save the bundles.
 #' If a directory name is provided, the bundles are saved as numerated xml-files into the directory specified
 #' and not returned as a bundle list in the R session. This is useful when a lot of bundles are to be downloaded and keeping them all
 #' in one R session might overburden working memory. When the download is complete, the bundles can be loaded into R using [fhir_load()].
@@ -356,14 +356,14 @@ fhir_current_request <- function() {
 #' will also be assigned indices so you can melt them using [fhir_melt()].
 #'
 #' @param url The base URL of the FHIR server.
-#' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
-#' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
-#' @param token A string or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
+#' @param username A character vector of length one containing the username for basic authentication. Defaults to NULL, meaning no authentication.
+#' @param password A character vector of length one containing the password for basic authentication. Defaults to NULL, meaning no authentication.
+#' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
-#' @param sep A string to separate pasted multiple entries
+#' @param sep A character vector of length one to separate pasted multiple entries
 #' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`.
 #' If `NULL`, no indices will be added to multiple entries.
-#' @param log_errors Either `NULL` or a string indicating the name of a file in which to save the http errors.
+#' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`
 #' @param verbose An integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
@@ -483,7 +483,7 @@ fhir_capability_statement <- function(
 #' @description Writes a list of FHIR bundles as numbered xml files into a directory.
 #'
 #' @param bundles A list of xml objects representing the FHIR bundles.
-#' @param directory A string containing the path to the folder to store the data in.
+#' @param directory A character vector of length one containing the path to the folder to store the data in.
 
 #' @export
 #'
@@ -516,7 +516,7 @@ fhir_save <- function(bundles, directory = "result") {
 #' Load bundles from xml-files
 #' @description Reads all bundles stored as xml files from a directory.
 #'
-#' @param directory A string containing the path to the folder were the files are stored.
+#' @param directory A character vector of length one containing the path to the folder were the files are stored.
 #'
 #' @return A [fhir_bundle_list-class].
 #' @export
@@ -686,10 +686,10 @@ setMethod(
 #'
 #' @param key Consumer key, also called client ID.
 #' For Keycloak this would for instance be the Keycloak client, e.g. "postman".
-#' @param secret The consumer/client secret, belonging to `key`
+#' @param secret The consumer/client secret, belonging to `key`.
 #' @param base_url The URL the user will be redirected to after authorization is complete.
-#' This will usually be the base url of you FHIR server
-#' @param authorize The url to send the client for authorization
+#' This will usually be the base url of you FHIR server.
+#' @param authorize The url to send the client for authorization.
 #' @param access The url used to exchange unauthenticated for authenticated token.
 #' This can be identical to `authorize`.
 #' @param query_authorize_extra A named list holding query parameters to append to initial auth page query.
@@ -744,14 +744,14 @@ fhir_authenticate <- function(
 #' Download single FHIR bundle
 #' @description Download a single FHIR bundle via FHIR search request and return it as a xml object.
 #'
-#' @param request An object of class [fhir_search_url-class] or string containing the full FHIR search request.
-#' @param username A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.
-#' @param password A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.
-#' @param token A bearer token as a string or NULL.
+#' @param request An object of class [fhir_search_url-class] or character vector of length one containing the full FHIR search request.
+#' @param username A character vector of length one containing the username for basic authentication. Defaults to NULL, meaning no authentication.
+#' @param password A character vector of length one containing the password for basic authentication. Defaults to NULL, meaning no authentication.
+#' @param token A bearer token as a character vector of length one or NULL.
 #' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
 #' @param verbose An integer scalar. If > 1,  Downloading progress is printed. Defaults to 2.
 #' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
-#' @param log_errors Either `NULL` or a string indicating the name of a file in which to save the http errors.
+#' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`
 #'
 #' @return The downloaded bundle as an [fhir_bundle_xml-class].
@@ -823,7 +823,7 @@ get_bundle <- function(
 #'log the error message of a http response
 #'
 #' @param response A http response
-#' @param log_errors A string indicating the name of a file in which to save the http errors.
+#' @param log_errors A character vector of length one indicating the name of a file in which to save the http errors.
 #' @noRd
 #'
 error_to_file <- function(response, log_errors) {
@@ -836,7 +836,7 @@ error_to_file <- function(response, log_errors) {
 #' Checks the http response and issues an error or warning if necessary
 #'
 #' @param response A http response
-#' @param log_errors Either `NULL` or a string indicating the name of a file in which to save the http errors.
+#' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file.
 #' @noRd
 #'
