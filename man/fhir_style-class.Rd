@@ -16,6 +16,6 @@ An S4 class to represent a design for cracking FHIR resources
 e.g. \code{c( "<", ">")}. If this is empty (i.e. character of length 0, the default), no indices will be added to multiple entries.
 Empty strings (\code{""}) are not allowed.}
 
-\item{\code{rm_empty_cols}}{Logical scalar. Remove empty columns? Defaults to TRUE.}
+\item{\code{rm_empty_cols}}{Logical scalar. Remove empty columns? Defaults to FALSE.}
 }}
 

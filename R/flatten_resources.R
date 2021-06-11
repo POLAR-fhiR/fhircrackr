@@ -13,13 +13,13 @@
 #' comprehensive examples of both.
 #'
 #' @param sep Optional. A string to separate pasted multiple entries which will overwrite the `sep` defined in
-#' `design`. If `sep=NULL`, it is looked up in `design`, where the default is `" "`.
+#' `design`. If `sep = NULL`, it is looked up in `design`, where the default is `" "`.
 #'
 #' @param remove_empty_columns Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
-#' `design`. If `remove_empty_columns=NULL`, it is looked up in `design`, where the default is `TRUE`.
+#' `design`. If `remove_empty_columns = NULL`, it is looked up in `design`, where the default is `FALSE`.
 #'
 #' @param brackets Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")},
-#' which will overwrite the `brackets` defined in `design`. If `brackets=NULL`, it is looked up in `design`, where the default is `character(0)`,
+#' which will overwrite the `brackets` defined in `design`. If `brackets = NULL`, it is looked up in `design`, where the default is `character(0)`,
 #' i.e. no indices are added to multiple entries. Empty strings (`""`) are not allowed.
 #'
 #' @param verbose An Integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,

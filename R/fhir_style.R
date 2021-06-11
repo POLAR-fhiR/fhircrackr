@@ -6,7 +6,7 @@
 #' @slot brackets  A character vector of length two defining the brackets surrounding indices for multiple entries,
 #' e.g. `c( "<", ">")`. If this is empty (i.e. character of length 0, the default), no indices will be added to multiple entries.
 #' Empty strings (`""`) are not allowed.
-#' @slot rm_empty_cols Logical scalar. Remove empty columns? Defaults to TRUE.
+#' @slot rm_empty_cols Logical scalar. Remove empty columns? Defaults to FALSE.
 #' @export
 #'
 setClass(
@@ -63,17 +63,17 @@ setValidity(
 #' If this is empty (i.e. character of length 0, the default) or 'NULL', no indices will be added to multiple entries. If it is a character
 #' vector of length 1, it will be recycled to length two, i.e. `"|"` will become `c("|", "|")`.
 #' Empty strings (`""`) are not allowed.
-#' @param rm_empty_cols Logical scalar. Remove empty columns? Defaults to `TRUE`.
+#' @param rm_empty_cols Logical scalar. Remove empty columns? Defaults to `FALSE`.
 #' @return A fhir_style object
 #' @examples
 #' fhir_style(sep = " ",
 #'            brackets = c("[", "]"),
-#'            rm_empty_cols = FALSE)
+#'            rm_empty_cols = TRUE)
 #'
 #' @export
 
 
-fhir_style <- function(sep = " ", brackets = character(), rm_empty_cols = TRUE) {
+fhir_style <- function(sep = " ", brackets = character(), rm_empty_cols = FALSE) {
 
 	if(is.null(brackets)) {brackets <- character()}
 	if(any(is.na(brackets))) {stop("You cannot use NA in brackets.")}
