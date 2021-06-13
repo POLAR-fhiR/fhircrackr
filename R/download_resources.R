@@ -431,7 +431,7 @@ fhir_capability_statement <- function(
 	suppressWarnings({
 		Meta <- fhir_table_description(resource = "/CapabilityStatement")
 		Rest <- fhir_table_description(resource = "rest")
-		Resource <- fhir_table_description(resource = "resource")
+		Resources <- fhir_table_description(resource = "resource")
 	})
 
 	META <- fhir_crack(
@@ -468,13 +468,13 @@ fhir_capability_statement <- function(
 
 	RESOURCE <- fhir_crack(
 		bundles = list(xml_resource),
-		design = fhir_design(Resource),
+		design = fhir_design(Resources),
 		sep = sep,
 		brackets = brackets,
 		verbose = verbose
 	)
 
-	list(Meta = META$Meta, Rest = unique(rest), Resources = RESOURCE$Resource)
+	list(Meta = META$Meta, Rest = unique(rest), Resources = RESOURCE$Resources)
 }
 
 ####Saving Bundles####
