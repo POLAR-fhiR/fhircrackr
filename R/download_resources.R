@@ -361,7 +361,7 @@ fhir_current_request <- function() {
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
 #' @param sep A character vector of length one to separate pasted multiple entries
-#' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`.
+#' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`. Default to `NULL`.
 #' If `NULL`, no indices will be added to multiple entries.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`
@@ -431,7 +431,7 @@ fhir_capability_statement <- function(
 	suppressWarnings({
 		Meta <- fhir_table_description(resource = "/CapabilityStatement")
 		Rest <- fhir_table_description(resource = "rest")
-		Resource <- fhir_table_description(resource = "resource")
+		Resources <- fhir_table_description(resource = "resource")
 	})
 
 	META <- fhir_crack(
@@ -468,13 +468,13 @@ fhir_capability_statement <- function(
 
 	RESOURCE <- fhir_crack(
 		bundles = list(xml_resource),
-		design = fhir_design(Resource),
+		design = fhir_design(Resources),
 		sep = sep,
 		brackets = brackets,
 		verbose = verbose
 	)
 
-	list(Meta = META$Meta, Rest = unique(rest), Resources = RESOURCE$Resource)
+	list(Meta = META$Meta, Rest = unique(rest), Resources = RESOURCE$Resources)
 }
 
 ####Saving Bundles####
