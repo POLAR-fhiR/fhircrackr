@@ -361,7 +361,7 @@ fhir_current_request <- function() {
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
 #' @param sep A character vector of length one to separate pasted multiple entries
-#' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`. Default to `NULL`.
+#' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`. Defaults to `NULL`.
 #' If `NULL`, no indices will be added to multiple entries.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`
