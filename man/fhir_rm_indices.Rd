@@ -40,5 +40,5 @@ df_indices_removed <- fhir_rm_indices(indexed_data_frame = df, brackets=c("[", "
 
 }
 \seealso{
-\code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_melt_all]{fhir_melt_all()}}
+\code{\link[=fhir_melt]{fhir_melt()}}
 }

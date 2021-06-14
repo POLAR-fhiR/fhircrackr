@@ -38,7 +38,7 @@
 #' @seealso
 #' - Downloading bundles from a FHIR server: [fhir_search()]
 #' - Creating designs/table_descriptions: [fhir_table_description()] and [fhir_design()]
-#' - Dealing with multiple entries: [fhir_melt()], [fhir_melt_all()], [fhir_rm_indices()]
+#' - Dealing with multiple entries: [fhir_melt()],  [fhir_rm_indices()]
 #' @examples
 #' #unserialize example bundle
 #' bundles <- fhir_unserialize(medication_bundles)

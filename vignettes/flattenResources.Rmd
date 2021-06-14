@@ -470,18 +470,6 @@ molten_2
 ```
 This will give you the appropriate product of all multiple entries.
 
-If you just want all multiple entries molten correctly, you can use `fhir_melt_all()`. This function will find all columns containing multiple entries and melt them appropriately. Note that this will only work if the column names reflect the path to the corresponding resource element with . as a separator, e.g. `name.given`. These names are produced automatically by `fhir_table_description()` when the cols element is unnamed or omitted.
-
-```{r}
-fhir_melt_all(indexed_data_frame = df2, brackets = c("[", "]"), sep=" | ")
-```
-
-As you can see `fhir_melt_all()` removes the indices by default. If you need the indices for some reason, you can set `rm_indices = FALSE`:
-
-```{r}
-fhir_melt_all(indexed_data_frame = df2, brackets = c("[", "]"), sep=" | ", rm_indices = FALSE)
-```
-
 ### Remove indices
 Once you have sorted out the multiple entries, you might want to get rid of the indices in your data.frame. This can be achieved using `fhir_rm_indices()`:
 

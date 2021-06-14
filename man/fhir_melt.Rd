@@ -69,5 +69,5 @@ fhir_melt(indexed_data_frame = df, columns = col_names,
           brackets = c("[","]"), sep = " ", all_columns = TRUE)
 }
 \seealso{
-\code{\link[=fhir_common_columns]{fhir_common_columns()}}, \code{\link[=fhir_melt_all]{fhir_melt_all()}}, \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
+\code{\link[=fhir_common_columns]{fhir_common_columns()}}, \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
 }

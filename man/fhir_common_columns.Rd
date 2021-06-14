@@ -42,5 +42,5 @@ names(df)
 fhir_common_columns(data_frame = df, column_names_prefix = "name")
 }
 \seealso{
-\code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_melt_all]{fhir_melt_all()}}, \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
+\code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
 }
