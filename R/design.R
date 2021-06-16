@@ -207,10 +207,10 @@ fix_df_desc <- function (df_desc) {
 		df_desc$style <- list(
 			sep = " ",
 			brackets = NULL,
-			rm_empty_cols = TRUE
+			rm_empty_cols = FALSE
 		)
 	} else {
-		fix_res <- fix(list = df_desc$style, c("sep", "brackets", "rm_empty_cols"), defaults = list(" ", NULL, TRUE))
+		fix_res <- fix(list = df_desc$style, c("sep", "brackets", "rm_empty_cols"), defaults = list(" ", NULL, FALSE))
 		if(is.null(fix_res$value)) {
 			fix_res$msg <- paste0("style ", fix_res$msg)
 			return(fix_res)

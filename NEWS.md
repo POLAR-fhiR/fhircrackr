@@ -12,10 +12,6 @@ Other new functions or behavior are listed in the following:
 ## New functions
 - `fhir_authenticate()`: Set up authentication using OAuth2/OpenID Connect
 - `fhir_current_request()`: Get search request used in most recent call to `fhir_search()`or `fhir_url()`
-- `fhir_extract_indices()`: Extract indices from a table with multiple entries
-- `fhir_restore_indices()`: Restore removed indices in a table with multiple entries
-- `fhir_melt_all()`: Melt all multiple entries in a table.
-
 
 ## New behavior
 - `fhir_search()` now allows for a search via POST via the argument `body`.
@@ -28,12 +24,13 @@ Other new functions or behavior are listed in the following:
 
 - New argument `delay_between_bundles` for `fhir_search()` allows to put a delay between the download of bundles (i.e. pages) in a bigger search request to prevent weak servers from choking.
 
-- The output of `fhir_capability_statement()` is slightly restructured.
+- The output of `fhir_capability_statement()` is slightly restructured: The names of the tables and their structure has changed.
 
 - The deprecated argument `add_indices` in `fhir_crack()` is now fully removed.
 
 - The most recently used FHIR search request is now implicitly saved whenever `fhir_search()` or `fhir_url()` is called. It can be accessed with the new function `fhir_current_request()`.
 
+- The default value of `rm_empty_cols` is now `FALSE`
 
 
 
