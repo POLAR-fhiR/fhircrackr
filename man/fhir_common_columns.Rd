@@ -7,7 +7,7 @@
 fhir_common_columns(data_frame, column_names_prefix)
 }
 \arguments{
-\item{data_frame}{A data frame with automatically named columns as produced by \code{\link{fhir_crack}}.}
+\item{data_frame}{A data.frame/data.table with automatically named columns as produced by \code{\link[=fhir_crack]{fhir_crack()}}.}
 
 \item{column_names_prefix}{A string containing the common prefix of the desired columns.}
 }
@@ -16,29 +16,31 @@ A character vector with the names of all columns matching \code{column_names_pre
 }
 \description{
 This is a convenience function to find all column names in a data frame starting with the same string that can
-then be used for \code{\link{fhir_melt}}.
+then be used for \code{\link[=fhir_melt]{fhir_melt()}}.
 }
 \details{
-It is intended for use on data frames with column names that have been automatically produced by \code{\link{fhir_crack}}
-and follow the form \code{level1.level2.level3} such as \code{name.given.value} or \code{code.coding.system.value}.
-Note that this function will only work on column names following exactly this schema.
+It is intended for use on data frames with column names that have been automatically produced by \code{\link[=fhir_design]{fhir_design()}}/\code{\link[=fhir_crack]{fhir_crack()}}
+and follow the form \code{level1.level2.level3} such as \code{name.given} or \code{code.coding.system}.
+Note that this function will only work on column names following exactly this scheme.
 
-The resulting character vector can be used for melting all columns belonging to the same attribute in an indexed data frame, see \code{?fhir_melt}.
+The resulting character vector can be used for melting all columns belonging to the same attribute in an indexed data frame,
+see \code{?fhir_melt}.
 }
 \examples{
 #unserialize example bundles
-bundles <- fhir_unserialize(medication_bundles)
+bundles <- fhir_unserialize(bundles = medication_bundles)
 
 #crack Patient Resources
-design <- list(
-  Patients = list(".//Patient")
-)
+pats <- fhir_table_description(resource = "Patient")
 
-dfs <- fhir_crack(bundles, design)
+df <- fhir_crack(bundles = bundles, design = pats)
 
 #look at automatically generated names
-names(dfs$Patients)
+names(df)
 
 #extract all column names beginning with the string "name"
-fhir_common_columns(data_frame = dfs$Patients, column_names_prefix = "name")
+fhir_common_columns(data_frame = df, column_names_prefix = "name")
+}
+\seealso{
+\code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_rm_indices]{fhir_rm_indices()}}
 }

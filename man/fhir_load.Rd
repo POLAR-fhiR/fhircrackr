@@ -7,10 +7,10 @@
 fhir_load(directory)
 }
 \arguments{
-\item{directory}{A string containing the path to the folder were the files are stored.}
+\item{directory}{A character vector of length one containing the path to the folder were the files are stored.}
 }
 \value{
-A list of bundles in xml format.
+A \linkS4class{fhir_bundle_list}.
 }
 \description{
 Reads all bundles stored as xml files from a directory.

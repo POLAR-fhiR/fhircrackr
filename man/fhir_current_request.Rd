@@ -2,10 +2,24 @@
 % Please edit documentation in R/download_resources.R
 \name{fhir_current_request}
 \alias{fhir_current_request}
-\title{return FHIR search request used in last call to fhir_search}
+\title{Return FHIR search request used in last call to \code{\link[=fhir_search]{fhir_search()}} or \code{\link[=fhir_url]{fhir_url()}}}
 \usage{
 fhir_current_request()
 }
+\value{
+An object of class \code{\link[=fhir_url]{fhir_url()}}
+}
 \description{
-return FHIR search request used in last call to fhir_search
+Return FHIR search request used in last call to \code{\link[=fhir_search]{fhir_search()}} or \code{\link[=fhir_url]{fhir_url()}}
+}
+\examples{
+\donttest{
+request <- fhir_url(url = "https://server.fire.ly", resource = "Patient")
+fhir_current_request()
+
+fhir_search("https://server.fire.ly/Medication", max_bundles = 1)
+fhir_current_request()
+}
+
+
 }

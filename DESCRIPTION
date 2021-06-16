@@ -1,8 +1,8 @@
 Package: fhircrackr
 Type: Package
 Title: Handling HL7 FHIR Resources in R
-Version: 0.2.1.9000
-Date: 2020-11-24
+Version: 1.0.0
+Date: 2021-06-07
 Authors@R: c(
     person( given = "Thomas", 
             family = "Peschel", 
@@ -38,11 +38,29 @@ Imports:
     utils,
     dplyr,
     plyr,
-    data.table
+    data.table,
+    methods
 Suggests: 
     knitr,
     rmarkdown
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 Depends: 
-    R (>= 3.5.0)
+    R (>= 4.0.0)
+Collate: 
+    'design.R'
+    'fhir_url.R'
+    'fhir_bundle.R'
+    'fhir_bundle_list.R'
+    'download_resources.R'
+    'fhir_body.R'
+    'fhir_xpath_expression.R'
+    'fhir_columns.R'
+    'fhir_style.R'
+    'fhir_resource_type.R'
+    'fhir_table_description.R'
+    'fhir_design.R'
+    'fhir_table_list.R'
+    'flatten_resources.R'
+    'miscellaneous.R'
+    'multiple_entries.R'

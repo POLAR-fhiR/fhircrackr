@@ -7,29 +7,40 @@
 fhir_load_design(file)
 }
 \arguments{
-\item{file}{A string specifying the file from which to read}
+\item{file}{A string specifying the file from which to read.}
 }
 \value{
-A list representing a valid design for \code{\link{fhir_crack}}
+A \linkS4class{fhir_design} object. See \code{?fhir_design}.
 }
 \description{
-Loads a design for use with \code{\link{fhir_crack}} from an xml file into R
+Loads a \linkS4class{fhir_design} for use with \code{\link[=fhir_crack]{fhir_crack()}} from an xml file into R.
 }
 \examples{
 
 #create and save design
-design <- list(
-   Pat = list(
-      resource = "//Patient",
-      cols = list(
-        gender = "gender",
-        name = "name/family"
-      )
-   )
+df_desc1 <- fhir_table_description(resource = "Patient",
+                    cols = c(name = "name/family",
+                             gender = "gender",
+                             id = "id"),
+                    style = fhir_style(sep = "||",
+                                       brackets = c("[", "]"),
+                                       rm_empty_cols = FALSE
+                            )
+             )
 
-)
+df_desc2 <- fhir_table_description(resource = "Observation",
+                    cols = c("code/coding/system", "code/coding/code")
+            )
+
+#create design
+design <- fhir_design(Patients = df_desc1, Observations = df_desc2)
+
 temp <- tempfile()
 
-fhir_save_design(design, file = temp)
-design <- fhir_load_design(temp)
+fhir_save_design(design = design, file = temp)
+
+design <- fhir_load_design(file = temp)
+}
+\seealso{
+\code{\link[=fhir_design]{fhir_design()}}, \code{\link[=fhir_table_description]{fhir_table_description()}}, \code{\link[=fhir_save_design]{fhir_save_design()}}
 }

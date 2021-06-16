@@ -1,11 +1,10 @@
 ## code to prepare `medication_bundles` dataset goes here
-search_request  <- paste0(
-	"https://hapi.fhir.org/baseR4/", #server endpoint
-	"MedicationStatement?", #look for MedicationsStatements
-	"code=http://snomed.info/ct|429374003", #only choose resources with this loinc code
-	"&_include=MedicationStatement:subject") #include the corresponding Patient resources
+search_request  <- fhir_url("https://hapi.fhir.org/baseR4",
+							resource = "MedicationStatement",
+							parameters = c("code" = "http://snomed.info/ct|429374003",
+										   "_include" = "MedicationStatement:subject"))
 
-bundles <- fhir_search(search_request, max.bundles = 3)
+bundles <- fhir_search(search_request, max_bundles = 3)
 
 medication_bundles<-fhir_serialize(bundles)
 

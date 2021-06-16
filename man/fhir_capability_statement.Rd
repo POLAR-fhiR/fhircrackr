@@ -8,40 +8,68 @@ fhir_capability_statement(
   url = "https://hapi.fhir.org/baseR4",
   username = NULL,
   password = NULL,
-  sep = " ",
-  remove_empty_columns = TRUE,
+  token = NULL,
   brackets = NULL,
-  verbose = 2,
-  add_indices
+  sep = " || ",
+  log_errors = NULL,
+  verbose = 2
 )
 }
 \arguments{
 \item{url}{The base URL of the FHIR server.}
 
-\item{username}{A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.}
+\item{username}{A character vector of length one containing the username for basic authentication. Defaults to NULL, meaning no authentication.}
 
-\item{password}{A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.}
+\item{password}{A character vector of length one containing the password for basic authentication. Defaults to NULL, meaning no authentication.}
 
-\item{sep}{A string to separate pasted multiple entries}
+\item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
+for how to create this.}
 
-\item{remove_empty_columns}{Logical scalar. Remove empty columns?}
+\item{brackets}{A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}. Defaults to \code{NULL}.
+If \code{NULL}, no indices will be added to multiple entries.}
 
-\item{brackets}{A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
-If \code{NULL}, no indices will be added to multiple entries. \code{NULL} means \code{brackets} is looked up in design, if it is \code{NULL} there too, no indices are added.}
+\item{sep}{A character vector of length one to separate pasted multiple entries}
 
-\item{verbose}{An integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
-downloading/extraction progress will be printed. Defaults to 2.}
+\item{log_errors}{Either \code{NULL} or a character vector of length one indicating the name of a file in which to save the http errors.
+\code{NULL} means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to \code{NULL}}
 
-\item{add_indices}{Deprecated. This argument was used to control adding of indices for multiple entries. This is now
-done via the brackets argument. If brackets is \code{NULL}, no indices are added, if brackets is not \code{NULL}, indices are added to multiple entries.}
+\item{verbose}{An integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
+extraction progress will be printed. Defaults to 2.}
 }
 \value{
 A list of data frames containing the information from the statement
 }
 \description{
 Get the capability statement of a FHIR server.
+
+This function downloads a capability statement and creates three data.frames from it:
+\itemize{
+\item \code{Meta} contains general information on the server
+\item \code{Rest} contains information on the Rest operations the server supports
+\item \code{Resources} contains information on the supported resource types
+}
+
+When there is more than one piece of information regarding a variable in these data.frames,
+they are divided by the string specified in \code{sep}. If \code{brackets} is not NULL, those entries
+will also be assigned indices so you can melt them using \code{\link[=fhir_melt]{fhir_melt()}}.
 }
 \examples{
-\donttest{cap <- fhir_capability_statement("https://hapi.fhir.org/baseR4")}
+\donttest{
+#without indices
+cap <- fhir_capability_statement("https://server.fire.ly")
 
+#with indices
+cap <- fhir_capability_statement("https://server.fire.ly", brackets = c("[","]"))
+
+#melt searchInclude variable
+resources <- fhir_melt(cap$Resources,
+                       columns = "searchInclude",
+                       brackets = c("[", "]"), sep = " || ",
+                       all_columns = TRUE)
+
+#remove indices
+resources <- fhir_rm_indices(resources, brackets = c("[", "]"))
+
+head(resources)
+}
 }

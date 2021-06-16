@@ -2,7 +2,7 @@
 % Please edit documentation in R/multiple_entries.R
 \name{fhir_rm_indices}
 \alias{fhir_rm_indices}
-\title{Remove indices from data frame}
+\title{Remove indices from data.frame/data.table}
 \usage{
 fhir_rm_indices(
   indexed_data_frame,
@@ -11,57 +11,34 @@ fhir_rm_indices(
 )
 }
 \arguments{
-\item{indexed_data_frame}{A data frame with indices for multiple entries as produced by \code{\link{fhir_crack}}}
+\item{indexed_data_frame}{A data frame with indices for multiple entries as produced by \code{\link[=fhir_crack]{fhir_crack()}}}
 
-\item{brackets}{A string vector of length two defining the brackets that were used in \code{\link{fhir_crack}}}
+\item{brackets}{A character vector of length two defining the brackets that were used in \code{\link[=fhir_crack]{fhir_crack()}}}
 
-\item{columns}{A string vector of column names, indicating from which columns indices should be removed. Defaults to all columns.}
+\item{columns}{A character vector of column names, indicating from which columns indices should be removed.
+Defaults to all columns.}
 }
 \value{
 A data frame without indices.
 }
 \description{
-Removes the indices produced by \code{\link{fhir_crack}} when \code{add_indices=TRUE}
+Removes the indices in front of multiple entries as produced by \code{\link[=fhir_crack]{fhir_crack()}} when brackets are provided in
+the design.
 }
 \examples{
 
-bundle <- xml2::read_xml(
-"<Bundle>
+#unserialize example
+bundles <- fhir_unserialize(bundles = example_bundles1)
 
-        <Patient>
-            <id value='id1'/>
-            <address>
-                <use value='home'/>
-                <city value='Amsterdam'/>
-                <type value='physical'/>
-               <country value='Netherlands'/>
-            </address>
-            <birthDate value='1992-02-06'/>
-        </Patient>
+patients <- fhir_table_description(resource = "Patient")
 
-        <Patient>
-            <id value='id2'/>
-            <address>
-                <use value='home'/>
-                <city value='Rome'/>
-                <type value='physical'/>
-                <country value='Italy'/>
-            </address>
-            <address>
-                <use value='work'/>
-                <city value='Stockholm'/>
-                <type value='postal'/>
-                <country value='Sweden'/>
-            </address>
-            <birthDate value='1980-05-23'/>
-        </Patient>
-</Bundle>"
-)
+df <- fhir_crack(bundles = bundles,
+                  design = patients,
+                  brackets = c("[", "]"))
 
+df_indices_removed <- fhir_rm_indices(indexed_data_frame = df, brackets=c("[", "]"))
 
-dfs <- fhir_crack(bundles = list(bundle),
-                  design = list(Patients = list(resource = "/Bundle/Patient")),
-                  brackets = c("[", "]"),verbose = 2)
-
-df_indices_removed <- fhir_rm_indices(dfs[[1]], brackets=c("[", "]"))
+}
+\seealso{
+\code{\link[=fhir_melt]{fhir_melt()}}
 }

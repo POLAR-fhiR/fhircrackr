@@ -6,61 +6,126 @@
 \usage{
 fhir_search(
   request = fhir_current_request(),
+  body = NULL,
   username = NULL,
   password = NULL,
+  token = NULL,
   max_bundles = Inf,
   verbose = 1,
   max_attempts = 5,
   delay_between_attempts = 10,
-  log_errors = 0,
-  save_to_disc = FALSE,
-  delay_between_pages = 0,
+  log_errors = NULL,
+  save_to_disc = NULL,
+  delay_between_bundles = 0,
   directory = paste0("FHIR_bundles_", gsub("-| |:", "", Sys.time()))
 )
 }
 \arguments{
-\item{request}{A string containing the full FHIR search request. Defaults to \code{\link{fhir_current_request}}}
+\item{request}{An object of class \linkS4class{fhir_url} or a character vector of length one containing the full FHIR search request. It is
+recommended to explicitly create the request via \code{\link[=fhir_url]{fhir_url()}} as this will do some validity checks and format the url properly.
+Defaults to \code{\link[=fhir_current_request]{fhir_current_request()}}}
 
-\item{username}{A string containing the username for basic authentication. Defaults to NULL, meaning no authentication.}
+\item{body}{A character vector of length one or object of class \code{fhir_body} with type \code{"application/x-www-form-urlencoded"}. A body should be provided
+when the FHIR search request is too long and might exceed the maximal allowed length of the URL when send to the server. In this case
+a search via POST (see https://www.hl7.org/fhir/search.html#Introduction) can be used. The body should contain all the parameters that
+follow after the \verb{?} in the FHIR search request. When a body is provided, the required \verb{_search} is automatically added
+to the url in \code{request}. See examples and \code{?fhir_body}.}
 
-\item{password}{A string containing the password for basic authentication. Defaults to NULL, meaning no authentication.}
+\item{username}{A character vector of length one containing the username for basic authentication.}
+
+\item{password}{A character vector of length one containing the password for basic authentication.}
+
+\item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
+for how to create this.}
 
 \item{max_bundles}{Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
 
-\item{verbose}{An Integer Scalar.  If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
+\item{verbose}{An integer vector of length one. If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
 downloading progress will be printed. Defaults to 2.}
 
-\item{max_attempts}{A numeric scalar. The maximal number of attempts to send a request, defaults to 5.}
+\item{max_attempts}{A numeric vector of length one. The maximal number of attempts to send a request, defaults to 5.}
 
-\item{delay_between_attempts}{A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.}
+\item{delay_between_attempts}{A numeric vector of length one specifying the delay in seconds between two attempts. Defaults to 10.}
 
-\item{log_errors}{Takes values 0, 1 or 2. Controls the logging of errors. 1 and 2 will write a file to the current working directory.
+\item{log_errors}{Either \code{NULL} or a character vector of length one indicating the name of a file in which to save the http errors.
+\code{NULL} means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to \code{NULL}}
 
-0: no logging of errors,
+\item{save_to_disc}{Either \code{NULL} or a character vector of length one indicating the name of a directory in which to save the bundles.
+If a directory name is provided, the bundles are saved as numerated xml-files into the directory specified
+and not returned as a bundle list in the R session. This is useful when a lot of bundles are to be downloaded and keeping them all
+in one R session might overburden working memory. When the download is complete, the bundles can be loaded into R using \code{\link[=fhir_load]{fhir_load()}}.
+Defaults to \code{NULL}, i.e. bundles are returned as a list within the R session.}
 
-1: tabulate http response and write to csv-file
-
-2: write http response as to xml-file}
-
-\item{save_to_disc}{A logical scalar. If TRUE the bundles are saved as numerated xml-files into the directory specified
-in the argument \code{directory} and not returned as a bundle list in the R session. This is useful when a lot of
-bundles are to be downloaded and keeping them all in one R session might overburden working memory. When download
-is complete, the bundles can be loaded into R using \code{\link{fhir_load}}. Defaults to FALSE, i.e. bundles are
-returned as a list within the R session.}
-
-\item{delay_between_pages}{A numeric scalar specifying a time in seconds to wait between pages of the search result,
+\item{delay_between_bundles}{A numeric scalar specifying a time in seconds to wait between pages of the search result,
 i.e. between downloading the current bundle and the next bundle. This can be used to avoid choking a weak server with
 too many requests to quickly. Defaults to zero.}
 
-\item{directory}{The directory the bundles are saved to when \code{save_to_disc} is TRUE. Defaults to creating a
-time-stamped directory into the current working directory.}
+\item{directory}{Deprecated. Please specify the directory directly in the \code{save_to_disc} argument.}
 }
 \value{
-A list of bundles in xml format when \code{save_to_disc = FALSE} (the default),  else NULL.
+A \linkS4class{fhir_bundle_list} when \code{save_to_disc = NULL} (the default),  else \code{NULL}.
 }
 \description{
-Downloads all FHIR bundles of a FHIR search request from a FHIR server.
+Downloads all FHIR bundles of a FHIR search request from a FHIR server by iterating through the bundles. Search via GET
+and POST is possible, see Details.
+}
+\details{
+\subsection{Request type}{
+
+\code{fhir_search} allows for two types of search request:
+\enumerate{
+\item FHIR search via GET:
+This is the more common approach. All information on which resources to download is contained in the URL
+that is send to the server (\code{request} argument). This encompasses the base url of the server, the resource type and possible
+search parameters to further qualify the search (see \code{\link[=fhir_url]{fhir_url()}}). The search via GET is the default and performed whenever
+the argument \code{body} is NULL.
+\item FHIR search via POST:
+This option should only be used when the parameters make the search URL so long the server might deny it
+because it exceeds the allowed length. In this case the search parameters (everything that would usually follow the resource type
+after the \verb{?}) can be transferred to a body of type \code{"application/x-www-form-urlencoded"} and send via POST. If you provide a body in
+\code{fhir_search()}, the url in \code{request} should only contain the base URL and the resource type.
+The function will automatically amend it with \verb{_search} and perform a POST.
+}
+}
+
+\subsection{Authentication}{
+
+There are several ways of authentication implemented in \code{fhir_search()}. If you don't need any authentication,
+just leave the arguments described in the following at their default values of \code{NULL}.
+\enumerate{
+\item Basic Authentication: Provide the \code{username} and the \code{password} for basic authentication in the respective arguments.
+\item Token Authentication: Provide a token in the argument \code{token}, either as a character vector of length one or as as an object of class
+\link[httr:Token-class]{httr::Token}. You can use the function \code{\link[=fhir_authenticate]{fhir_authenticate()}} to create this object.
+}
+}
 }
 \examples{
-\donttest{bundles <- fhir_search("https://hapi.fhir.org/baseR4/Medication?", max_bundles=3)}
+\donttest{
+#Search with GET
+#create fhir search url
+request <- fhir_url(url = "https://server.fire.ly",
+                    resource = "Patient",
+                    parameters = c(gender="female"))
+#download bundles
+bundles <- fhir_search(request, max_bundles = 5)
+
+
+#Search with POST (should actually be used for longer requests)
+request <- fhir_url(url = "https://server.fire.ly",
+                    resource = "Patient")
+
+body <- fhir_body(content = list(gender = "female"))
+
+bundles <- fhir_search(request = request,
+                       body = body,
+                       max_bundles = 5)
+}
+}
+\seealso{
+\itemize{
+\item Creating a FHIR search request: \code{\link[=fhir_url]{fhir_url()}} and \code{\link[=fhir_body]{fhir_body()}} (for POST based search)
+\item OAuth2 Authentication: \code{\link[=fhir_authenticate]{fhir_authenticate()}}
+\item Saving/reading bundles from disc: \code{\link[=fhir_save]{fhir_save()}} and \code{\link[=fhir_load]{fhir_load()}}
+\item Flattening the bundles: \code{\link[=fhir_crack]{fhir_crack()}}
+}
 }
