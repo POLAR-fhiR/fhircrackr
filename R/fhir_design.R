@@ -209,7 +209,7 @@ setMethod(
 		args <- list(...)
 		names <- paste0(sapply(args, function(x) {x@resource}), "s")
 		name_index <- sapply(substitute(list(...))[-1], function(x) {class(x) == "name"})
-		names[name_index] <- sapply(substitute(list(...))[-1], deparse)[name_index]
+		names[name_index] <- as.character(sapply(substitute(list(...))[-1], deparse))[name_index]
 		names[names(args) != ""] <- names(args)[names(args) != ""]
 		new(Class = "fhir_design", args, names = names)
 	}

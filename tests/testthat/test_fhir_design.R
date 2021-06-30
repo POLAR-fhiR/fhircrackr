@@ -72,3 +72,53 @@ testthat::test_that(
 		testthat::expect_identical(design1, design2)
 	}
 )
+
+testthat::test_that(
+	"fhir_design gets names correctly", {
+		d1 <- fhir_design(
+			fhir_table_description(resource = "Patient",
+									 cols = c(name = "name/family",
+									 		 gender = "gender",
+									 		 id = "id")
+			),
+			fhir_table_description(resource = "Patient",
+									 cols = c(name = "name/family",
+									 		 gender = "gender",
+									 		 id = "id")
+			)
+		)
+
+		d2 <- fhir_design(
+			Pat = fhir_table_description(resource = "Patient",
+								   cols = c(name = "name/family",
+								   		 gender = "gender",
+								   		 id = "id")
+			),
+			fhir_table_description(resource = "Patient",
+								   cols = c(name = "name/family",
+								   		 gender = "gender",
+								   		 id = "id")
+			)
+		)
+
+		d3 <- fhir_design(
+			Pat = fhir_table_description(resource = "Patient",
+										 cols = c(name = "name/family",
+										 		 gender = "gender",
+										 		 id = "id")
+			),
+			Pat2 =fhir_table_description(resource = "Patient",
+								   cols = c(name = "name/family",
+								   		 gender = "gender",
+								   		 id = "id")
+			)
+		)
+
+		testthat::expect_identical(names(d1), c("Patients", "Patients"))
+		testthat::expect_identical(names(d2), c("Pat", "Patients"))
+		testthat::expect_identical(names(d3), c("Pat", "Pat2"))
+
+
+
+	}
+)
