@@ -47,7 +47,9 @@
 #' @param max_attempts A numeric vector of length one. The maximal number of attempts to send a request, defaults to 5.
 #' @param delay_between_attempts A numeric vector of length one specifying the delay in seconds between two attempts. Defaults to 10.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
-#' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`
+#' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`.
+#' Regardless of the value of `log_errors` the most recent http error message whithin the current R session is saved internally and can
+#' be accessed with [fhir_recent_http_error()].
 #' @param save_to_disc Either `NULL` or a character vector of length one indicating the name of a directory in which to save the bundles.
 #' If a directory name is provided, the bundles are saved as numerated xml-files into the directory specified
 #' and not returned as a bundle list in the R session. This is useful when a lot of bundles are to be downloaded and keeping them all
@@ -341,6 +343,27 @@ fhir_next_bundle_url <- function(bundle = NULL) {
 
 fhir_current_request <- function() {
 	fhircrackr_env$current_request
+}
+
+
+#' Return most recent http error from [fhir_search()]
+#'
+#' Whenever a call to [fhir_search()] produces any http error, the error information is saved internally
+#' until the next http error occurs (or the R session ends). The error information can be accessed with `fhir_recent_http_error`.
+#' If you want to log that information outside of your R session, set the argument `log_errors` of [fhir_search()] .
+#' @return A string containing the error message
+#'
+#' @examples
+#' \dontrun{
+#' fhir_search("https://server.fire.ly/Medicatio", max_bundles = 1)
+#' cat(fhir_recent_http_error())
+#' }
+#'
+#' @seealso [fhir_search()]
+#' @export
+
+fhir_recent_http_error <- function() {
+	fhircrackr_env$recent_http_error
 }
 
 #' Get capability statement
@@ -843,6 +866,9 @@ error_to_file <- function(response, log_errors) {
 #'
 check_response <- function(response, log_errors) {
 	code <- response$status_code
+	if(code != 200){
+		fhircrackr_env$recent_http_error <- httr::content(x = response, as = "text", encoding = "UTF-8")
+	}
 	if(code != 200 && !is.null(log_errors)) {
 		error_to_file(response = response, log_errors = log_errors)
 	}

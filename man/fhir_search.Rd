@@ -48,7 +48,9 @@ downloading progress will be printed. Defaults to 2.}
 \item{delay_between_attempts}{A numeric vector of length one specifying the delay in seconds between two attempts. Defaults to 10.}
 
 \item{log_errors}{Either \code{NULL} or a character vector of length one indicating the name of a file in which to save the http errors.
-\code{NULL} means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to \code{NULL}}
+\code{NULL} means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to \code{NULL}.
+Regardless of the value of \code{log_errors} the most recent http error message whithin the current R session is saved internally and can
+be accessed with \link{fhir_recent_http_error}.}
 
 \item{save_to_disc}{Either \code{NULL} or a character vector of length one indicating the name of a directory in which to save the bundles.
 If a directory name is provided, the bundles are saved as numerated xml-files into the directory specified
