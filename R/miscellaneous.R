@@ -6,6 +6,7 @@ fhircrackr_env <- new.env(parent = emptyenv())
 assign(x = "last_next_link", value = new(Class = "fhir_url"), envir = fhircrackr_env)
 assign(x = "canonical_design", value = NULL, envir = fhircrackr_env)
 assign(x = "current_request", value = new(Class = "fhir_url"), envir = fhircrackr_env)
+assign(x = "recent_http_error", value = NULL, envir= fhircrackr_env)
 
 #imports
 #' @import data.table
