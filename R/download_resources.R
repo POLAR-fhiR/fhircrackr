@@ -49,7 +49,7 @@
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`.
 #' Regardless of the value of `log_errors` the most recent http error message whithin the current R session is saved internally and can
-#' be accessed with [fhir_recent_http_error].
+#' be accessed with [fhir_recent_http_error()].
 #' @param save_to_disc Either `NULL` or a character vector of length one indicating the name of a directory in which to save the bundles.
 #' If a directory name is provided, the bundles are saved as numerated xml-files into the directory specified
 #' and not returned as a bundle list in the R session. This is useful when a lot of bundles are to be downloaded and keeping them all
