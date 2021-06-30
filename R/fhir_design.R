@@ -28,6 +28,10 @@ setValidity(
 			messages <- c(messages, "You need exactly one name for every table_description in a design.")
 		}
 
+		if(any(duplicated(object@names))){
+			messages <- c(messages, "Each fhir_table_description in the design must have a unique name.")
+		}
+
 		if(any(sapply(object, function(x) {class(x) != "fhir_table_description"}))) {
 			messages <- c(messages, "A fhir_design can only contain fhir_table_descriptions")
 		}
@@ -209,7 +213,7 @@ setMethod(
 		args <- list(...)
 		names <- paste0(sapply(args, function(x) {x@resource}), "s")
 		name_index <- sapply(substitute(list(...))[-1], function(x) {class(x) == "name"})
-		names[name_index] <- sapply(substitute(list(...))[-1], deparse)[name_index]
+		names[name_index] <- as.character(sapply(substitute(list(...))[-1], deparse))[name_index]
 		names[names(args) != ""] <- names(args)[names(args) != ""]
 		new(Class = "fhir_design", args, names = names)
 	}
