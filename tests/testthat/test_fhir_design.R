@@ -81,9 +81,8 @@ testthat::test_that(
 									 		 gender = "gender",
 									 		 id = "id")
 			),
-			fhir_table_description(resource = "Patient",
-									 cols = c(name = "name/family",
-									 		 gender = "gender",
+			fhir_table_description(resource = "Medication",
+									 cols = c(name = "code",
 									 		 id = "id")
 			)
 		)
@@ -94,9 +93,8 @@ testthat::test_that(
 								   		 gender = "gender",
 								   		 id = "id")
 			),
-			fhir_table_description(resource = "Patient",
-								   cols = c(name = "name/family",
-								   		 gender = "gender",
+			fhir_table_description(resource = "Medication",
+								   cols = c(name = "code",
 								   		 id = "id")
 			)
 		)
@@ -107,16 +105,15 @@ testthat::test_that(
 										 		 gender = "gender",
 										 		 id = "id")
 			),
-			Pat2 =fhir_table_description(resource = "Patient",
-								   cols = c(name = "name/family",
-								   		 gender = "gender",
-								   		 id = "id")
+			Med =			fhir_table_description(resource = "Medication",
+											cols = c(name = "code",
+													 id = "id")
 			)
 		)
 
-		testthat::expect_identical(names(d1), c("Patients", "Patients"))
-		testthat::expect_identical(names(d2), c("Pat", "Patients"))
-		testthat::expect_identical(names(d3), c("Pat", "Pat2"))
+		testthat::expect_identical(names(d1), c("Patients", "Medications"))
+		testthat::expect_identical(names(d2), c("Pat", "Medications"))
+		testthat::expect_identical(names(d3), c("Pat", "Med"))
 
 
 

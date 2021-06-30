@@ -28,6 +28,10 @@ setValidity(
 			messages <- c(messages, "You need exactly one name for every table_description in a design.")
 		}
 
+		if(any(duplicated(object@names))){
+			messages <- c(messages, "Each fhir_table_description in the design must have a unique name.")
+		}
+
 		if(any(sapply(object, function(x) {class(x) != "fhir_table_description"}))) {
 			messages <- c(messages, "A fhir_design can only contain fhir_table_descriptions")
 		}
