@@ -6,12 +6,12 @@ citEntry(entry = "Manual",
                    as.person("Julia Palm"),
                    as.person("Jens Przybilla"),
                    as.person("Frank Meineke")),
-  note		     = "R package version 0.1.0",
+  note		     = "R package version 1.0.2",
   url		       = "https://CRAN.R-project.org/package=fhircrackr",
-  year		     = "2020",
+  year		     = "2021",
   textVersion  =
-  paste("Peschel, T., Palm, J., Przybilla, J., Meineke, F. (2020).",
+  paste("Peschel, T., Palm, J., Przybilla, J., Meineke, F. (2021).",
         "Handling HL7 FHIR resources in R with fhircrackr.",
-        "R package version 0.1.0")
+        "R package version 1.0.2")
 
 )
