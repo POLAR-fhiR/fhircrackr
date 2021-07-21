@@ -28,24 +28,20 @@ fhir_cast <- function(indexed_df = df.patients, sep = desc.patients@style@sep, b
 			name_vec <- strsplit(name, "\\.")[[1]]
 			u <- unlist(
 				lapply(
-					ids,
+					ids[sapply(ids, function(i) all(!is.na(i)))],
 					function(id){
 						if(1 < length(name_vec)) {
 							sapply(
 								id,
-								function(i){
-									if(!all(is.na(i))) {
-										paste0(paste0(name_vec, strsplit(i, "\\.")[[1]]), collapse = ".")
-									} else NULL
+								function(i) {
+									paste0(paste0(name_vec, strsplit(i, "\\.")[[1]]), collapse = ".")
 								},
 								simplify = F
 							)
 						} else {
-							if(!all(is.na(id))){
-								a <- paste0(name_vec, id)
-								names(a) <- id
-								a
-							} else NULL
+							a <- paste0(name_vec, id)
+							names(a) <- id
+							a
 						}
 					}
 				),
@@ -63,16 +59,21 @@ fhir_cast <- function(indexed_df = df.patients, sep = desc.patients@style@sep, b
 		for(id in names(map[[name]])) {
 			sname <- map[[name]][[id]]
 			if(0 < verbose) cat("  ", sname, "\n")
-			g <- grep(paste0(bra_, id, ket_), indexed_df[[name]], perl = T)
-			s <- strsplit(indexed_df[[name]][g], sep_)
-			p <- sapply(
-				s,
-				function(s_) {
-					s_[grep(paste0(bra_, id, ket_), s_, perl = T)]
-				},
-				simplify = F
+			id_str <- paste0(bra_, id, ket_)
+			row_with_id <- grep(id_str, indexed_df[[name]], perl = T)
+			entries <- strsplit(indexed_df[[name]][row_with_id], sep_)
+			values <- gsub(
+				id_str,
+				"",
+				sapply(
+					entries,
+					function(entry) {
+						entry[grep(id_str, entry, perl = T)]
+					},
+					simplify = F
+				)
 			)
-			d[[sname]][g] <- gsub(paste0(bra_, id, ket_), "", p)
+			d[[sname]][row_with_id] <- values
 		}
 	}
 	d
@@ -83,8 +84,7 @@ tree <- function(column_subnames, value, node, i = 1) {
 	l <- length(column_subnames)
 	if(i < l) {
 		node[[column_subnames[i]]] <- tree(column_subnames = column_subnames, value = value, node[[column_subnames[i]]], i + 1)
-	}
-	if(i == l) {
+	} else if(i == l) {
 		node[[column_subnames[i]]] <- value
 	}
 	node
@@ -94,18 +94,17 @@ build_tree <- function(df, fun = n_av, verbose = 0) {
 	df_names <- names(df)
 	col_subnames <- strsplit(df_names, "\\.")
 	names(col_subnames) <- df_names
-	l <- list()
+	tree_ <- list()
 	for(n in df_names) {
 		if(0 < verbose) cat(n, "\n")
 		csn <- col_subnames[[n]]
-		l <- tree(column_subnames = csn, value = fun(df[[n]]), node = l)
+		tree_ <- tree(column_subnames = csn, value = fun(df[[n]]), node = tree_)
 	}
-	l
+	tree_
 }
 
-print_tree <- function(tre = tree_, tab = "") {
+print_tree <- function(tre, tab = "") {
 	for(n in names(tre)) {
-		#n <- names(tre)[3]
 		tr <- tre[[n]]
 		cat(tab, n)
 		if(!is.list(tr)) {
@@ -120,26 +119,24 @@ print_tree <- function(tre = tree_, tab = "") {
 build_xml <- function(tre, tab = "") {
 	s <- ""
 	for(n in names(tre)) {
-		#n <- names(tre)[[1]]
 		tr <- tre[[n]]
-		n_ <- gsub("(.+)([0-9]+)$", "\\1", n)
+		n_ <- gsub("([^0-9]+)([0-9]+)$", "\\1", n)
 		if(!is.list(tr)) {
-			if(!is.na(tr)) {
-				s <- paste0(s, tab, "<", n_, " value=\"", tr, "\"/>\n")
+			if(0 < length(tr)) {
+				tr <- tr[!sapply(tr, is.na)]
+				if(0 < length(tr)) s <- paste0(s, tab, "<", n_, " value=\"", tr, "\"/>\n")
 			}
 		} else {
 			s_ <- build_xml(tre = tr, tab = paste0(tab, "  "))
 			if(s_ != "") {
-				s <- paste0(s, tab, "<", n_, ">\n")
-				s <- paste0(s, s_)
-				s <- paste0(s, tab, "</", n_, ">\n")
+				s <- paste0(s, tab, "<", n_, ">\n", s_, tab, "</", n_, ">\n")
 			}
 		}
 	}
 	s
 }
 
-build_bundle <- function(cast_table, resource_name, bundle_size = 50) {
+build_bundles <- function(cast_table, resource_name, bundle_size = 50) {
 	max_ <- nrow(cast_table)
 	i <- 1
 	cat(i - 1, "\n")
@@ -149,9 +146,10 @@ build_bundle <- function(cast_table, resource_name, bundle_size = 50) {
 		end_ <- min(c(max_, i + bundle_size - 1))
 		while(i <= end_) {
 			tree_cast_table <- build_tree(cast_table[i,], fun = function(x)x)
-			s <- paste0(s, "  <", resource_name, ">\n")
-			s <- paste0(s, build_xml(tree_cast_table, tab = "    "))
-			s <- paste0(s, "  </", res_, ">\n")
+			s_ <- paste0("  <", resource_name, ">\n")
+			s_ <- paste0(s_, build_xml(tree_cast_table, tab = "    "))
+			s_ <- paste0(s_, "  </", resource_name, ">\n")
+			s  <- paste0(s, s_)
 			i <- i + 1
 		}
 		s <- paste0(s, "</Bundle>\n")
@@ -256,54 +254,57 @@ desc.patients <- fhir_table_description(
 
 
 (df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1))
-(tree.patients_cast <- build_tree(df.patients_cast[1,], fun = function(x)x))
-print_tree(tree.patients_cast)
-cat(build_xml(tree.patients_cast))
+(tree.patients_cast <- build_tree(df = df.patients_cast[1,], fun = function(x)x))
+print_tree(tre = tree.patients_cast)
+cat(build_xml(tre = tree.patients_cast))
+bundles <- build_bundles(df.patients_cast, "Patient", 50)
+cat(bundles[[1]])
 
-s <- ""
-for(i in seq_len(nrow(df.patients_cast))) {
-	tree.patients_cast <- build_tree(df.patients_cast[i,], fun = function(x)x)
-	s <- paste0(s, "<Patient>\n")
-	s <- paste0(s, build_xml(tree.patients_cast,tab = "  "))
-	s <- paste0(s, "</Patient>\n")
-}
-cat(s)
+bundle
+xml2::read_xml(bundles[[1]])
 
 
-sep <- desc.patients@style@sep
-brackets <- desc.patients@style@brackets
+# sep <- desc.patients@style@sep
+# brackets <- desc.patients@style@brackets
 
-cs <- fhir_capability_statement("https://mii-agiop-3p.life.uni-leipzig.de/fhir", verbose = 2, sep = sep)
-#cs <- fhir_capability_statement("https://hapi.fhir.org/baseR4", verbose = 2, sep = sep, brackets = brackets)
-
-res <- cs$Resources
-
-totals <- sapply(
-	res$type,
-	function(res_) {
-		b <- fhir_search(paste0("https://mii-agiop-3p.life.uni-leipzig.de/fhir/", res_, "?_summary=count"), verbose = 1)
-		d <- fhir_table_description(
-			resource = "Bundle",
-			cols = c("total" = "./total")
-		)
-		df <- fhir_crack(b, d, verbose = 0)
-		as.numeric(df$total)
-	}
-)
-
-totals <- totals[0 < totals]
-(totals <- totals[order(totals)])
-
-(res_ <- names(totals)[6])
-
+# cs <- fhir_capability_statement("https://mii-agiop-3p.life.uni-leipzig.de/fhir", verbose = 2, sep = sep)
+# #cs <- fhir_capability_statement("https://hapi.fhir.org/baseR4", verbose = 2, sep = sep, brackets = brackets)
+#
+# res <- cs$Resources
+#
+# totals <- sapply(
+# 	res$type,
+# 	function(res_) {
+# 		b <- fhir_search(paste0("https://mii-agiop-3p.life.uni-leipzig.de/fhir/", res_, "?_summary=count"), verbose = 1)
+# 		d <- fhir_table_description(
+# 			resource = "Bundle",
+# 			cols = c("total" = "./total")
+# 		)
+# 		df <- fhir_crack(b, d, verbose = 0)
+# 		as.numeric(df$total)
+# 	}
+# )
+#
+# totals <- totals[0 < totals]
+# (totals <- totals[order(totals)])
+#
+# (res_ <- names(totals)[8])
+res_ <- "Patient"
 bundles <- fhir_search(paste0("https://mii-agiop-3p.life.uni-leipzig.de/fhir/", res_, "?_count=500"), verbose = 2)
-table_desc <- fhir_table_description(res_, style = fhir_style(sep = "<~>", brackets = c("<[", "]>")))
-table_res <- fhir_crack(bundles, table_desc, verbose = 2)
-table_cast <- fhir_cast(table_res, table_desc@style@sep, table_desc@style@brackets)
-table_tree <- build_tree(table_cast[2,], function(i)i)
+(table_desc <- fhir_table_description(res_, style = fhir_style(sep = "<~>", brackets = c("<[", "]>"))))
+(table_res <- fhir_crack(bundles, table_desc, verbose = 2))
+(table_cast <- fhir_cast(table_res, table_desc@style@sep, table_desc@style@brackets, verbose = 1))
+(table_tree <- build_tree(table_cast[1,], function(i)i))
 print_tree(table_tree)
 cat(build_xml(tre = table_tree))
-
-s <- build_bundle(cast_table = table_cast, resource_name = res_, bundle_size = 500)
+s <- build_bundles(cast_table = table_cast, resource_name = res_, bundle_size = 100)
 cat(s[[1]])
 xml2::read_xml(s[[1]])
+bundles[[1]]
+
+cs_style <- fhir_style(sep = "<~>", brackets = c("<[", "]>"))
+cs <- fhir_capability_statement("https://vonk.fire.ly/R4", verbose = 2, sep = cs_style@sep, brackets = cs_style@brackets)
+table_res <- cs$Resources
+table_cast <- fhir_cast(table_res, cs_style@sep, cs_style@brackets, verbose = 1)
+s <- build_bundles(cast_table = table_cast, resource_name = "Resources", bundle_size = 50)
+cat(s[[1]])
