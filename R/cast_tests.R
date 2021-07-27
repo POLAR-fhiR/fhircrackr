@@ -312,12 +312,12 @@ for(n in names(all_data_equality_summary)) {
 	cat(
 		frame_string(
 			text = paste0(
-				"\n", frame_string(n), "\n",
-				frame_string(
+				"\n", frame_string(n, vert = "|", hori = "-"), "\n",
+				frame_string(vert = " ", hori = " ",
 					tree2string(all_data_equality_summary[[n]])
 				)
 			),
-			side = "both"
+			side = "both", vert = " ", hori = " "
 		),
 		"\n"
 	)
@@ -333,22 +333,35 @@ all_data_availables_summary <- lapply(
 	}
 )
 
-cat(frame_string("show availables summaries"))
+cat(frame_string("show\navailables\nsummaries\nLange Zeile, um zu zeigen, wie side funktioniert.\n", side = "both", edge = "+"))
 for(n in names(all_data_availables_summary)) {
 	cat(
 		frame_string(
 			text = paste0(
-				"\n", frame_string(n), "\n",
+				"\n", frame_string(paste0(n), edge = "|--|", vert = "|", hori = "-"), "\n",
 				frame_string(
+					edge = " ",
+					hori = " ",
+					vert = " ",
 					paste0(
-						"availables + missings = total  [ percentage ]\n",
+						"availables + missings = total  [ percentage ]\n\n",
 						tree2string(all_data_availables_summary[[n]])
 					)
 				)
 			),
-			side = "both"
+			side = "both",
+			edge = " ",
+			hori = ".",
+			vert = ":"
 		),
 		"\n"
 	)
 }
 
+cat(frame_string(side = "both", hori = "6", vert = "5", edge = "1234"))
+cat(frame_string(side = "both", hori = "|", vert = "-", edge = "\\//\\"))
+cat(frame_string(side = "right", hori = "|", vert = "-", edge = "/\\\\/"))
+cat(frame_string(side = "left", hori = "-", vert = "|", edge = "/\\\\/"))
+cat(frame_string(side = "both", edge = "O"))
+cat(frame_string(side = "both"))
+cat(frame_string())

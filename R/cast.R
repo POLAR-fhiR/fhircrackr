@@ -29,17 +29,19 @@ desc_xml <- function(s) {
 	)
 }
 
-frame_string <- function(text = "Hallo\nihr\nda draussen!", side = "right") {
+frame_string <- function(text = "\nHello !!!\n\n\nIs\nthere\n\nA N Y O N E\n\nout\nthere\n???\n ", side = "right", edge = " ", hori = "-", vert = "|") {
+	edge <- rep_len(strsplit(edge, "")[[1]], 4)[1 : 4]
 	r <- ""
 	s <- strsplit(text, "\n")[[1]]
 	h <- length(s)
 	w <- max(sapply(s, nchar))
-	hb <- paste0("o", paste0(rep_len("-", w + 2), collapse = ""), "o\n")
-	r <- hb
+	hbt <- paste0(edge[1], paste0(rep_len(hori, w + 2), collapse = ""), edge[2], "\n")
+	hbb <- paste0(edge[3], paste0(rep_len(hori, w + 2), collapse = ""), edge[4], "\n")
+	r <- hbt
 	for(s_ in s) {
-		r <- paste0(r, "| ", stringr::str_pad(string = s_, width = w, side = side, " "), " |\n")
+		r <- paste0(r, vert, " ", stringr::str_pad(string = s_, width = w, side = side, " "), " ", vert, "\n")
 	}
-	r <- paste0(r, hb)
+	r <- paste0(r, hbb)
 	r
 }
 
