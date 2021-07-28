@@ -78,6 +78,10 @@ bundle <- xml2::read_xml(
 </Bundle>"
 )
 
+xml2::xml_path(xml2::xml_find_all(bundle, "//*/@value"))
+
+xml2::xml_path(xml2::xml_find_all(fhir_unserialize(bundles = fhircrackr::example_bundles3)[[1]], "//*/@value"))
+
 desc.patients <- fhir_table_description(
 	resource = "Patient",
 	style = fhir_style(
@@ -179,7 +183,7 @@ totals <- sapply(
 	cs$Resources$type,
 	function(res_) {
 		cat(res_, "\n")
-		b <- fhir_search(paste0(endpoint, "/", res_, "?_summary=", bundle_size), verbose = 0)
+		b <- fhir_search(paste0(endpoint, "/", res_, "?_summary=count"), verbose = 0)
 		d <- fhir_table_description(
 			resource = "Bundle",
 			cols = c("total" = "./total")
@@ -317,7 +321,7 @@ for(n in names(all_data_equality_summary)) {
 					tree2string(all_data_equality_summary[[n]])
 				)
 			),
-			side = "both", vert = " ", hori = " "
+			pos = "center", vert = " ", hori = " "
 		),
 		"\n"
 	)
@@ -333,7 +337,7 @@ all_data_availables_summary <- lapply(
 	}
 )
 
-cat(frame_string("show\navailables\nsummaries\nLange Zeile, um zu zeigen, wie side funktioniert.\n", side = "both", edge = "+"))
+cat(frame_string(t = "show\navailables\nsummaries", p = "center", e = "·", v = " ", h = " "))
 for(n in names(all_data_availables_summary)) {
 	cat(
 		frame_string(
@@ -349,7 +353,7 @@ for(n in names(all_data_availables_summary)) {
 					)
 				)
 			),
-			side = "both",
+			pos = "center",
 			edge = " ",
 			hori = ".",
 			vert = ":"
@@ -358,10 +362,127 @@ for(n in names(all_data_availables_summary)) {
 	)
 }
 
-cat(frame_string(side = "both", hori = "6", vert = "5", edge = "1234"))
-cat(frame_string(side = "both", hori = "|", vert = "-", edge = "\\//\\"))
-cat(frame_string(side = "right", hori = "|", vert = "-", edge = "/\\\\/"))
-cat(frame_string(side = "left", hori = "-", vert = "|", edge = "/\\\\/"))
-cat(frame_string(side = "both", edge = "O"))
-cat(frame_string(side = "both"))
+cat(frame_string(pos = "center", hori = "6", vert = "5", edge = "1234"))
+cat(frame_string(pos = "center", hori = "|", vert = "-", edge = "\\//\\"))
+cat(frame_string(pos = "left", hori = "|", vert = "-", edge = "/\\\\/"))
+cat(frame_string(pos = "right", hori = "-", vert = "|", edge = "/\\\\/"))
+cat(frame_string(pos = "center", edge = "O"))
+cat(frame_string(pos = "center", hori = " ", vert = " ", edge = " "))
 cat(frame_string())
+
+
+sample_resources <- function(endpoint = endpoints[[3]], resource_name = "Patient", number_of_resources = number_of_resources, bundle_size = bundle_size) {
+	cs <- fhir_capability_statement(endpoint, verbose = 0, sep = sep)
+	mx <- fhir_search(fhir_url(endpoint, resource_name, c("_summary" = "count")))
+	cnt <- as.numeric(xml2::xml_attr(x = xml2::xml_find_all(mx[[1]], "//total"), "value"))
+	if(cnt < number_of_resources) {
+		cat("Hier irgendwas machen. Entweder alle runterladen oder Fehler werfen\n")
+		return(NULL)
+	}
+	ids <- sort(sample(cnt, number_of_resources, replace = F))
+	bundles <- list()
+	if(cs$Meta$software.name == "HAPI FHIR Server") {
+		bundle1 <- fhir_search(fhir_url(endpoint, resource_name, c("_count" = "1")), max_bundles = 1, verbose = 2)
+		nxt <- xml2::xml_attr(xml2::xml_find_all(bundle1[[1]], "//url")[2], "value")
+		(get_pages <- gsub("^.*_getpages=([0-9a-z-]+).+$", "\\1", nxt))
+		#(get_pages <- gsub("^.*_getpages=([0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}).+$", "\\1", nxt))
+		i <- 1
+		b <- 1
+		while(i <= number_of_resources) {
+			end <- min(c(i + bundle_size - 1, number_of_resources))
+			blist <- list()
+			j <- 1
+			while(i <= end) {
+				url_ <- paste0(endpoint, "?_getpages=", get_pages, "&_getpagesoffset=", ids[i], "&_count=1&_pretty=true&_bundletype=searchset")
+				bnd_ <- fhir_search(request = url_, max_bundles = 1, verbose = 0)
+				blist[[j]] <- bnd_[[1]]
+				i <- i + 1
+				j <- j + 1
+			}
+			bundles[[b]] <- fhircrackr:::fhir_bundle_list(blist)
+			cat(paste0("Bundle ", b, " a ", j - 1, " ", resource_name, "s  \u03A3 ", resource_name, "s = ", i - 1, "\n"))
+			b <- b + 1
+		}
+		# bundles <- lapply(
+		# 	ids,
+		# 	function(id) {
+		# 		url_ <- paste0(endpoint, "?_getpages=", get_pages, "&_getpagesoffset=", id, "&_count=1&_pretty=true&_bundletype=searchset")
+		# 		cat(url_, "\n")
+		# 		fhir_search(request = url_, max_bundles = 1, verbose = 0)
+		# 	}
+		# )
+	} else if(cs$Meta$software.name == "Vonk") {
+		i <- 1
+		b <- 1
+		while(i <= number_of_resources) {
+			end <- min(c(i + bundle_size - 1, number_of_resources))
+			blist <- list()
+			j <- 1
+			while(i <= end) {
+				url_ <- paste0(paste_paths(endpoint, resource_name), "?_sort=-_lastUpdated&_count=1&skip=", i)
+				bnd_ <- fhir_search(request = url_, max_bundles = 1, verbose = 0)
+				blist[[j]] <- bnd_[[1]]
+				i <- i + 1
+				j <- j + 1
+			}
+			bundles[[b]] <- fhircrackr:::fhir_bundle_list(blist)
+			cat(paste0("Bundle ", b, " a ", j - 1, " ", resource_name, "s  \u03A3 ", resource_name, "s = ", i - 1, "\n"))
+			b <- b + 1
+		}
+		# bundles <- lapply(
+		# 	ids,
+		# 	function(id) {
+		# 		url_ <- paste0(paste_paths(endpoint, resource_name), "?_sort=-_lastUpdated&_count=1&skip=", id)
+		# 		cat(url_, "\n")
+		# 		fhir_search(request = url_, max_bundles = 1, verbose = 0)
+		# 	}
+		# )
+	}
+	bundles
+}
+
+
+
+sep <- " <~> "
+brackets <- c("<|", "|>")
+#endpoint <- "https://hapi.fhir.org/baseR4"
+endpoints <- list(
+	hapi = "https://hapi.fhir.org/baseR4",
+	agiop = "https://mii-agiop-3p.life.uni-leipzig.de/fhir",
+	#	blaze = "https://mii-agiop-3p.life.uni-leipzig.de/blaze",
+	vonk  = "https://vonk.fire.ly/R4"
+)
+
+bundle_size <- 11
+number_of_resources <- 51
+resource_name <- "Observation"
+
+three_servers_1000_patients_bundles <- lapply(
+	endpoints,
+	function(endpoint) {
+		#endpoint <- endpoints[[1]]
+		sample_resources(endpoint = endpoint, resource_name = resource_name, number_of_resources = number_of_resources, bundle_size = bundle_size)
+	}
+)
+
+tables <- lapply(
+	three_servers_1000_patients_bundles,
+	function(srv) {
+		#srv <- three_servers_1000_patients_bundles[[1]]
+		data.table::rbindlist(
+			fill = T,
+			lapply(
+				srv,
+				function(bndl) {
+					#bndl <- srv[[1]]
+					fhir_crack(bndl, fhir_table_description(resource_name), data.table = T, verbose = 0)
+				}
+			)
+		)
+	}
+)
+
+tables$hapi
+tables$agiop
+tables$vonk
+

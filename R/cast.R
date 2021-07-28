@@ -29,8 +29,9 @@ desc_xml <- function(s) {
 	)
 }
 
-frame_string <- function(text = "\nHello !!!\n\n\nIs\nthere\n\nA N Y O N E\n\nout\nthere\n???\n ", side = "right", edge = " ", hori = "-", vert = "|") {
+frame_string <- function(text = "\nHello !!!\n\n\nIs\nthere\n\nA N Y O N E\n\nout\nthere\n???\n ", pos = c("left", "center", "right")[1], edge = " ", hori = "-", vert = "|") {
 	edge <- rep_len(strsplit(edge, "")[[1]], 4)[1 : 4]
+	side <- c("right", "both", "left")[match(pos, c("left", "center", "right"))]
 	r <- ""
 	s <- strsplit(text, "\n")[[1]]
 	h <- length(s)
