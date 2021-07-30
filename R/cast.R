@@ -2,7 +2,6 @@ library(fhircrackr)
 library(data.table)
 library(dplyr)
 
-
 lst <- function(v){names(v)<-v;v}
 esc <- function(s) {gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s)}
 esc_xml <- function(s) {
@@ -27,6 +26,12 @@ desc_xml <- function(s) {
 		 	 )
 		 )
 	)
+}
+
+vlist <- function(.value, ...) {
+	list <- list(...)
+	attr(list, "value") <- .value
+	list
 }
 
 frame_string <- function(text = "\nHello !!!\n\n\nIs\nthere\n\nA N Y O N E\n\nout\nthere\n???\n ", pos = c("left", "center", "right")[1], edge = " ", hori = "-", vert = "|") {
@@ -194,7 +199,7 @@ build_tree_bundles <- function(df = df.patients_cast, resource_name = "Patient",
 		j <- i
 		while(i <= end_) {
 			row <- df[i,]
-			bundle <- c(bundle, fit_tree_for_xml_document(build_tree(row = row, root = resource_name, keep_nas = F)))
+			bundle <- c(bundle, rm_ids_from_tree(build_tree(row = row, root = resource_name, keep_nas = F)))
 			i <- i + 1
 		}
 		bundle <- list(Bundle = bundle)
@@ -204,109 +209,6 @@ build_tree_bundles <- function(df = df.patients_cast, resource_name = "Patient",
 	}
 	bundles
 }
-
-
-
-# build_tree <- function(row =  df.patients_cast[4,], root = "Bundle", keep_nas = F) {
-# 	tree <- function(col_names, tre, value = 1) {
-# 		len <- length(col_names)
-# 		if(is.null(tre)) tre <- list()
-# 		if(len == 0) {
-# 			setattr(tre, "value", value)
-# 		} else {
-# 			tr <- tree(col_names = col_names[-1], tre = tre[[col_names[1]]], value = value)
-# 			tre[[col_names[1]]] <- tr
-# 		}
-# 		tre
-# 	}
-# 	tre <- list()
-# 	row <- sapply(row, function(x)x)
-# 	if(!keep_nas) row <- row[!is.na(row)]
-# 	names(row) <- paste0(root, ".", names(row))
-# 	for(col_name in names(row)) {
-# 		value <- row[[col_name]]
-# 		col_names_split <- strsplit(col_name, "\\.")[[1]]
-# 		if(length(col_names_split) == 1) {
-# 			tr <- list()
-# 			setattr(tr, "value", value)
-# 		} else {
-# 			tr <- tree(col_names = col_names_split[-1], tre = tre[[col_names_split[[1]]]], value = value)
-# 		}
-# 		tre[[col_names_split[1]]] <- tr
-# 	}
-# 	tre
-# }
-
-
-# build_tree <- function(row, root, keep_nas = F) {
-# 	tree <- function(col_names, tre, value = 1) {
-# 		len <- length(col_names)
-# 		if(is.null(tre)) tre <- list()
-# 		if(len == 1) {
-# 			tre[[col_names[[1]]]] <- value
-# 		} else {
-# 			tre[[col_names[1]]] <- tree(col_names = col_names[-1], tre = tre[[col_names[1]]], value = value)
-# 		}
-# 		tre
-# 	}
-# 	tre <- list()
-# 	row <- sapply(row, function(x)x)
-# 	if(!keep_nas) row <- row[!is.na(row)]
-# 	names(row) <- paste0(root, ".", names(row))
-# 	row <- row[sort(names(row))]
-# 	for(col_name in names(row)) {
-# 		#col_name <- "Patient.component2.extension.valueCodeableConcept.coding.code"
-# 		#col_name <- names(row)[[1]]
-# 		value <- row[[col_name]]
-# 		col_names_split <- strsplit(col_name, "\\.")[[1]]
-# 		if(length(col_names_split) == 1) {
-# 			tr <- value
-# 		} else {
-# 			tr <- tree(col_names = col_names_split[-1], tre = tre[[col_names_split[[1]]]], value = value)
-# 		}
-# 		tre[[col_names_split[1]]] <- tr
-# 	}
-# 	tre
-# }
-# build_tree <- function(row, verbose = 0) {
-# 	tree <- function(column_subnames, value, node, i = 1) {
-# 		len <- length(column_subnames)
-# 		if(i < len) {
-# 			node_ <- try(node[[column_subnames[i]]])
-# 			if(inherits(node_, "try-error")){
-# 				print(column_subnames[i])
-# 				stop("ERROR A")
-# 			} else {
-# 				node_ <- try(node[[column_subnames[i]]])
-# 				if(inherits(node_, "try-error")) {
-# 					print(column_subnames[i])
-# 					stop("ERROR B")
-# 				} else {
-# 					tr <- tree(column_subnames = column_subnames, value = value, node_, i + 1)
-# 					if(inherits(try(node[[column_subnames[i]]] <- tr), "try-error")) {
-# 						stop("ERROR C")
-# 					}
-# 				}
-# 			}
-# 		} else if(i == len) {
-# 			node[[column_subnames[i]]] <- value
-# 		}
-# 		node
-# 	}
-# 	row_names <- names(row)
-# 	col_subnames <- strsplit(row_names, "\\.")
-# 	names(col_subnames) <- row_names
-# 	tree_ <- list()
-# 	for(n in row_names) {
-# 		#n <- row_names[[34]]
-# 		if(0 < verbose) cat(n, "\n")
-# 		csn <- col_subnames[[n]]
-# 		if(inherits(try(tree_ <- tree(column_subnames = csn, value = row[[n]], node = tree_)), "try-error")) {
-# 			stop(n)
-# 		}
-# 	}
-# 	tree_
-# }
 
 tree2string <- function(tre = tree.patients_cast, str = "", tab = "") {
 	for(i in seq_along(tre)) {
@@ -344,6 +246,7 @@ tree2xml <- function(tre = tree.patients_cast, str = "", tab = "") {
 	str
 }
 
+
 xml2_tree2string <- function(tre = t2) {
 	s <- toString(xml2::as_xml_document(tre))
 	s <- gsub("^[^(\\\n)]+\\\n", "", s)
@@ -354,86 +257,75 @@ xml2_tree2string <- function(tre = t2) {
 	cat(s)
 }
 
-#
+tree2json <- function(tree, tab = "", add = "    ") {
+	inc_tab <- function(tab, add = "....") paste0(tab, add)
+	dec_tab <- function(tab, sub = "....") substr(tab, 1, nchar(tab) - nchar(sub))
+	get_arrays <- function(tree) {
+		s <- ""
+		names_of_siblings <- names(tree)
+		names_of_siblings_without_ids <- gsub("(\\[[0-9]+]$)|([0-9]+$)", "", names_of_siblings)
+		arrays_indices <- sapply(
+			simplify = F,
+			unique(names_of_siblings_without_ids),
+			function(n) {
+				#n <- unique(names_of_siblings_without_ids)[[1]]
+				which(names_of_siblings_without_ids == n)
+			}
+		)
+		names_of_arrays <- names(arrays_indices)
+		arrays_indices
+	}
+	dict <- function(tree, tab = "", add = "    ") {
+		s <- "{ \n"
+		arrays <- get_arrays(tree)
+		len <- length(arrays)
+		for(i in seq_len(len)) {
+			name_of_array <- names(arrays)[[i]]
+			s <- paste0(s, inc_tab(tab, add), "\"", name_of_array, "\": ")
+			array <- arrays[[name_of_array]]
+			s <- paste0(s, arr(tree[array], tab, add))
+			if(i != len) s <- paste0(s, ",\n")
+		}
+		s <- paste0(s, "\n", tab, "}")
+	}
+	arr <- function(tree, tab = "", add = "    ") {
+		s <- "[ "
+		len <- length(tree)
+		for(i in seq_len(len)) {
+			tre <- tree[[i]]
+			s <- paste0(s, tree2json(tre, inc_tab(tab, add), add))
+			if(i != len) s <- paste0(s, ", ")
+		}
+		s <- paste0(s, " ]")
+	}
+	s <- ""
+	a <- attr(tree, "value")
+	if(!is.null(a)) {
+		s <- paste0(s, "\"", a, "\"")
+		return(s)
+	}
+	if(length(names(tree)) == 0) {
+		s <- paste0(s, arr(tree, tab, add))
+	} else {
+		s <- paste0(s, dict(tree, tab, add))
+	}
+}
+
 print_tree <- function(tre, tab = "") {
 	cat(tree2string(tre = tre, str = "", tab = tab))
 }
 
-# build_xml <- function(tre, tab = "") {
-# 	s <- ""
-# 	for(n in names(tre)) {
-# 		tr <- tre[[n]]
-# 		n_ <- gsub("([^0-9]+)([0-9]+)$", "\\1", n)
-# 		if(!is.list(tr)) {
-# 			if(0 < length(tr)) {
-# 				tr <- tr[!sapply(tr, is.na)]
-# 				if(0 < length(tr)) s <- paste0(s, tab, "<", n_, " value=\"", esc_xml(tr), "\"/>\n")
-# 			}
-# 		} else {
-# 			s_ <- build_xml(tre = tr, tab = paste0(tab, "\t"))
-# 			if(s_ != "") {
-# 				s <- paste0(s, tab, "<", n_, ">\n", s_, tab, "</", n_, ">\n")
-# 			}
-# 		}
-# 	}
-# 	s
-# }
-#
-# build_json <- function(tre, tab = "") {
-# 	s <- ""
-# 	for(n in names(tre)) {
-# 		tr <- tre[[n]]
-# 		n_ <- gsub("([^0-9]+)([0-9]+)$", "\\1", n)
-# 		if(!is.list(tr)) {
-# 			if(0 < length(tr)) {
-# 				tr <- tr[!sapply(tr, is.na)]
-# 				if(0 < length(tr)) s <- paste0(s, tab, "<", n_, " value=\"", esc_xml(tr), "\"/>\n")
-# 			}
-# 		} else {
-# 			s_ <- build_xml(tre = tr, tab = paste0(tab, "\t"))
-# 			if(s_ != "") {
-# 				s <- paste0(s, tab, "<", n_, ">\n", s_, tab, "</", n_, ">\n")
-# 			}
-# 		}
-# 	}
-# 	s
-# }
-
-fit_tree_for_xml_document <- function(tre = tree.patients_cast) {
+rm_ids_from_tree <- function(tre = tree.patients_cast) {
 	if(!is.null(names(tre))) {
 		for(n in names(tre)) {
 			#n <- names(tre)[[1]]
-			tre[[n]] <- fit_tree_for_xml_document(tre = tre[[n]])
+			tre[[n]] <- rm_ids_from_tree(tre = tre[[n]])
 		}
 		names(tre) <- gsub("(\\[[0-9]+])|([0-9]+)", "", names(tre))
 	}
 	tre
 }
 
-# build_bundles <- function(cast_table, resource_name, bundle_size = 50) {
-# 	max_ <- nrow(cast_table)
-# 	i <- 1
-# 	cat(i - 1, "\n")
-# 	bundles = list()
-# 	while(i <= max_) {
-# 		#i <- 1
-# 		s <- "<Bundle>\n"
-# 		end_ <- min(c(max_, i + bundle_size - 1))
-# 		while(i <= end_) {
-# 			tree_cast_table <- build_tree(row = cast_table[i,])
-# 			s_ <- paste0("  <", resource_name, ">\n")
-# 			s_ <- paste0(s_, build_xml(tree_cast_table, tab = "    "))
-# 			s_ <- paste0(s_, "  </", resource_name, ">\n")
-# 			s  <- paste0(s, s_)
-# 			i <- i + 1
-# 		}
-# 		s <- paste0(s, "</Bundle>\n")
-# 		bundles <- c(bundles, s)
-# 		cat(i - 1, "\n")
-# 	}
-# 	bundles
-# }
-#
 build_xml_bundles <- function(cast_table = cast_table_obs, resource_name="Observation", bundle_size = 500) {
 	max_ <- nrow(cast_table)
 	i <- 1
@@ -444,8 +336,8 @@ build_xml_bundles <- function(cast_table = cast_table_obs, resource_name="Observ
 		end_ <- min(c(max_, i + bundle_size - 1))
 		j <- i
 		while(i <= end_) {
-			s <- paste0(s, tree2xml(fit_tree_for_xml_document(build_tree(row = cast_table[i,], resource_name)), tab = "  "))
-			#s_ <- paste0(s_, xml2::as_xml_document(fit_tree_for_xml_document(build_tree(row = cast_table[i,], resource_name))))
+			s <- paste0(s, tree2xml(rm_ids_from_tree(build_tree(row = cast_table[i,], resource_name)), tab = "  "))
+			#s_ <- paste0(s_, xml2::as_xml_document(rm_ids_from_tree(build_tree(row = cast_table[i,], resource_name))))
 			i <- i + 1
 		}
 		s <- paste0("<Bundle>\n", s, "</Bundle>")
@@ -456,14 +348,3 @@ build_xml_bundles <- function(cast_table = cast_table_obs, resource_name="Observ
 	}
 	bundles
 }
-# fun <- function(col) {min(col, na.rm = T)}
-# sel_row <- function(df) cs_casted[2]
-# n_av <- function(row) sum(!is.na(row))
-#
-
-
-# sep <- desc.patients@style@sep
-# brackets <- desc.patients@style@brackets
-
-#endpoint <- "https://mii-agiop-3p.life.uni-leipzig.de/fhir"
-

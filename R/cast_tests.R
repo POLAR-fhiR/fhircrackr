@@ -101,13 +101,14 @@ desc.patients <- fhir_table_description(
 (df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = T, shift_index = 0, use_brackets = F))
 (df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = T, shift_index = -1, use_brackets = F))
 (df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1))
-(df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = T, shift_index = 0, use_brackets = F))
+(df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = F, shift_index = 0, use_brackets = F))
+(df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = T, shift_index = 0, use_brackets = T))
 (tree.patients_cast <- build_tree(row = df.patients_cast[4,], root = "Patient"))
 cat(tree2string(tre = tree.patients_cast))
-cat(tree2string(tre = fit_tree_for_xml_document(tre = tree.patients_cast)))
-print_tree(tre = fit_tree_for_xml_document(tre = tree.patients_cast))
-print(xml2::as_xml_document(fit_tree_for_xml_document(tre = tree.patients_cast)))
-cat(toString(xml2::as_xml_document(fit_tree_for_xml_document(tre = tree.patients_cast))))
+cat(tree2string(tre = rm_ids_from_tree(tre = tree.patients_cast)))
+print_tree(tre = rm_ids_from_tree(tre = tree.patients_cast))
+print(xml2::as_xml_document(rm_ids_from_tree(tre = tree.patients_cast)))
+cat(toString(xml2::as_xml_document(rm_ids_from_tree(tre = tree.patients_cast))))
 
 tree_bundles <- build_tree_bundles(df = df.patients_cast, resource_name = "Patient", bundle_size = 2)
 cat(toString(xml2::as_xml_document(tree_bundles$Bundle1)))
@@ -144,7 +145,7 @@ start <- Sys.time()
 tree_bundles <- build_tree_bundles(df = cast_table_orig, resource_name = resource_name, bundle_size = bundle_size)
 Sys.time() - start
 start <- Sys.time()
-fit_tree <- lapply(tree_bundles, fit_tree_for_xml_document)
+fit_tree <- lapply(tree_bundles, rm_ids_from_tree)
 Sys.time() - start
 start <- Sys.time()
 xml_bundles_str <- lapply(fit_tree, tree2xml)
@@ -160,7 +161,7 @@ start <- Sys.time()
 tree_bundles <- build_tree_bundles(df = cast_table_orig, resource_name = resource_name, bundle_size = bundle_size)
 Sys.time() - start
 start <- Sys.time()
-xml_bundles2s <- lapply(tree_bundles, function(b) xml2::read_xml(tree2xml(fit_tree_for_xml_document(b))))
+xml_bundles2s <- lapply(tree_bundles, function(b) xml2::read_xml(tree2xml(rm_ids_from_tree(b))))
 Sys.time() - start
 Sys.time() - start_total
 
@@ -371,118 +372,199 @@ cat(frame_string(pos = "center", hori = " ", vert = " ", edge = " "))
 cat(frame_string())
 
 
-sample_resources <- function(endpoint = endpoints[[3]], resource_name = "Patient", number_of_resources = number_of_resources, bundle_size = bundle_size) {
-	cs <- fhir_capability_statement(endpoint, verbose = 0, sep = sep)
-	mx <- fhir_search(fhir_url(endpoint, resource_name, c("_summary" = "count")))
-	cnt <- as.numeric(xml2::xml_attr(x = xml2::xml_find_all(mx[[1]], "//total"), "value"))
-	if(cnt < number_of_resources) {
-		cat("Hier irgendwas machen. Entweder alle runterladen oder Fehler werfen\n")
-		return(NULL)
-	}
-	ids <- sort(sample(cnt, number_of_resources, replace = F))
-	bundles <- list()
-	if(cs$Meta$software.name == "HAPI FHIR Server") {
-		bundle1 <- fhir_search(fhir_url(endpoint, resource_name, c("_count" = "1")), max_bundles = 1, verbose = 2)
-		nxt <- xml2::xml_attr(xml2::xml_find_all(bundle1[[1]], "//url")[2], "value")
-		(get_pages <- gsub("^.*_getpages=([0-9a-z-]+).+$", "\\1", nxt))
-		#(get_pages <- gsub("^.*_getpages=([0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}).+$", "\\1", nxt))
-		i <- 1
-		b <- 1
-		while(i <= number_of_resources) {
-			end <- min(c(i + bundle_size - 1, number_of_resources))
-			blist <- list()
-			j <- 1
-			while(i <= end) {
-				url_ <- paste0(endpoint, "?_getpages=", get_pages, "&_getpagesoffset=", ids[i], "&_count=1&_pretty=true&_bundletype=searchset")
-				bnd_ <- fhir_search(request = url_, max_bundles = 1, verbose = 0)
-				blist[[j]] <- bnd_[[1]]
-				i <- i + 1
-				j <- j + 1
-			}
-			bundles[[b]] <- fhircrackr:::fhir_bundle_list(blist)
-			cat(paste0("Bundle ", b, " a ", j - 1, " ", resource_name, "s  \u03A3 ", resource_name, "s = ", i - 1, "\n"))
-			b <- b + 1
-		}
-		# bundles <- lapply(
-		# 	ids,
-		# 	function(id) {
-		# 		url_ <- paste0(endpoint, "?_getpages=", get_pages, "&_getpagesoffset=", id, "&_count=1&_pretty=true&_bundletype=searchset")
-		# 		cat(url_, "\n")
-		# 		fhir_search(request = url_, max_bundles = 1, verbose = 0)
-		# 	}
-		# )
-	} else if(cs$Meta$software.name == "Vonk") {
-		i <- 1
-		b <- 1
-		while(i <= number_of_resources) {
-			end <- min(c(i + bundle_size - 1, number_of_resources))
-			blist <- list()
-			j <- 1
-			while(i <= end) {
-				url_ <- paste0(paste_paths(endpoint, resource_name), "?_sort=-_lastUpdated&_count=1&skip=", i)
-				bnd_ <- fhir_search(request = url_, max_bundles = 1, verbose = 0)
-				blist[[j]] <- bnd_[[1]]
-				i <- i + 1
-				j <- j + 1
-			}
-			bundles[[b]] <- fhircrackr:::fhir_bundle_list(blist)
-			cat(paste0("Bundle ", b, " a ", j - 1, " ", resource_name, "s  \u03A3 ", resource_name, "s = ", i - 1, "\n"))
-			b <- b + 1
-		}
-		# bundles <- lapply(
-		# 	ids,
-		# 	function(id) {
-		# 		url_ <- paste0(paste_paths(endpoint, resource_name), "?_sort=-_lastUpdated&_count=1&skip=", id)
-		# 		cat(url_, "\n")
-		# 		fhir_search(request = url_, max_bundles = 1, verbose = 0)
-		# 	}
-		# )
-	}
-	bundles
-}
 
 
 
-sep <- " <~> "
+# sample_resources <- function(endpoint = endpoints[[3]], resource_name = "Patient", number_of_resources = number_of_resources, bundle_size = bundle_size) {
+# 	cs <- fhir_capability_statement(endpoint, verbose = 0, sep = sep)
+# 	mx <- fhir_search(fhir_url(endpoint, resource_name, c("_summary" = "count")))
+# 	cnt <- as.numeric(xml2::xml_attr(x = xml2::xml_find_all(mx[[1]], "//total"), "value"))
+# 	if(cnt < number_of_resources) {
+# 		cat("Hier irgendwas machen. Entweder alle runterladen oder Fehler werfen\n")
+# 		return(NULL)
+# 	}
+# 	ids <- sort(sample(cnt, number_of_resources, replace = F))
+# 	bundles <- list()
+# 	if(cs$Meta$software.name == "HAPI FHIR Server") {
+# 		bundle1 <- fhir_search(fhir_url(endpoint, resource_name, c("_count" = "1")), max_bundles = 1, verbose = 2)
+# 		nxt <- xml2::xml_attr(xml2::xml_find_all(bundle1[[1]], "//url")[2], "value")
+# 		(get_pages <- gsub("^.*_getpages=([0-9a-z-]+).+$", "\\1", nxt))
+# 		#(get_pages <- gsub("^.*_getpages=([0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}).+$", "\\1", nxt))
+# 		i <- 1
+# 		b <- 1
+# 		while(i <= number_of_resources) {
+# 			end <- min(c(i + bundle_size - 1, number_of_resources))
+# 			blist <- list()
+# 			j <- 1
+# 			while(i <= end) {
+# 				url_ <- paste0(endpoint, "?_getpages=", get_pages, "&_getpagesoffset=", ids[i], "&_count=1&_pretty=true&_bundletype=searchset")
+# 				bnd_ <- fhir_search(request = url_, max_bundles = 1, verbose = 0)
+# 				blist[[j]] <- bnd_[[1]]
+# 				i <- i + 1
+# 				j <- j + 1
+# 			}
+# 			bundles[[b]] <- fhircrackr:::fhir_bundle_list(blist)
+# 			cat(paste0("Bundle ", b, " a ", j - 1, " ", resource_name, "s  \u03A3 ", resource_name, "s = ", i - 1, "\n"))
+# 			b <- b + 1
+# 		}
+# 		# bundles <- lapply(
+# 		# 	ids,
+# 		# 	function(id) {
+# 		# 		url_ <- paste0(endpoint, "?_getpages=", get_pages, "&_getpagesoffset=", id, "&_count=1&_pretty=true&_bundletype=searchset")
+# 		# 		cat(url_, "\n")
+# 		# 		fhir_search(request = url_, max_bundles = 1, verbose = 0)
+# 		# 	}
+# 		# )
+# 	} else if(cs$Meta$software.name == "Vonk") {
+# 		i <- 1
+# 		b <- 1
+# 		while(i <= number_of_resources) {
+# 			end <- min(c(i + bundle_size - 1, number_of_resources))
+# 			blist <- list()
+# 			j <- 1
+# 			while(i <= end) {
+# 				url_ <- paste0(paste_paths(endpoint, resource_name), "?_sort=-_lastUpdated&_count=1&skip=", i)
+# 				bnd_ <- fhir_search(request = url_, max_bundles = 1, verbose = 0)
+# 				blist[[j]] <- bnd_[[1]]
+# 				i <- i + 1
+# 				j <- j + 1
+# 			}
+# 			bundles[[b]] <- fhircrackr:::fhir_bundle_list(blist)
+# 			cat(paste0("Bundle ", b, " a ", j - 1, " ", resource_name, "s  \u03A3 ", resource_name, "s = ", i - 1, "\n"))
+# 			b <- b + 1
+# 		}
+# 		# bundles <- lapply(
+# 		# 	ids,
+# 		# 	function(id) {
+# 		# 		url_ <- paste0(paste_paths(endpoint, resource_name), "?_sort=-_lastUpdated&_count=1&skip=", id)
+# 		# 		cat(url_, "\n")
+# 		# 		fhir_search(request = url_, max_bundles = 1, verbose = 0)
+# 		# 	}
+# 		# )
+# 	}
+# 	bundles
+# }
+#
+#
+#
+# sep <- " <~> "
+# brackets <- c("<|", "|>")
+# #endpoint <- "https://hapi.fhir.org/baseR4"
+# endpoints <- list(
+# 	hapi = "https://hapi.fhir.org/baseR4",
+# 	agiop = "https://mii-agiop-3p.life.uni-leipzig.de/fhir",
+# 	#	blaze = "https://mii-agiop-3p.life.uni-leipzig.de/blaze",
+# 	vonk  = "https://vonk.fire.ly/R4"
+# )
+#
+# bundle_size <- 11
+# number_of_resources <- 51
+# resource_name <- "Observation"
+#
+# three_servers_1000_patients_bundles <- lapply(
+# 	endpoints,
+# 	function(endpoint) {
+# 		#endpoint <- endpoints[[1]]
+# 		sample_resources(endpoint = endpoint, resource_name = resource_name, number_of_resources = number_of_resources, bundle_size = bundle_size)
+# 	}
+# )
+#
+# tables <- lapply(
+# 	three_servers_1000_patients_bundles,
+# 	function(srv) {
+# 		#srv <- three_servers_1000_patients_bundles[[1]]
+# 		data.table::rbindlist(
+# 			fill = T,
+# 			lapply(
+# 				srv,
+# 				function(bndl) {
+# 					#bndl <- srv[[1]]
+# 					fhir_crack(bndl, fhir_table_description(resource_name), data.table = T, verbose = 0)
+# 				}
+# 			)
+# 		)
+# 	}
+# )
+#
+# tables$hapi
+# tables$agiop
+# tables$vonk
+
+tree_example <- vlist(
+	NULL,
+	Patient = vlist(
+		NULL,
+		id = vlist("0001"),
+		name = vlist(
+			NULL,
+			given = vlist("Ernie"),
+			use   = vlist("usual")
+		),
+		name = vlist(
+			NULL,
+			given = vlist("Ernest"),
+			family = vlist("Borgnine"),
+			use   = vlist("official")
+		),
+		address = vlist(
+			NULL,
+			city = vlist("New York"),
+			street = vlist("Sesamstraße"),
+			number = vlist("1")
+		),
+		address = vlist(
+			NULL,
+			city = vlist("Los Angeles"),
+			street = vlist("Mullholland Drive"),
+			number = vlist("42")
+		),
+		gender = vlist("male"),
+		birthdate = vlist("1917-01-24")
+	),
+	Patient = vlist(
+		NULL,
+		id = vlist("0002"),
+		name = vlist(
+			NULL,
+			given = vlist("Bert"),
+			use   = vlist("usual")
+		),
+		name = vlist(
+			NULL,
+			given = vlist("Burt"),
+			family = vlist("Reynolds"),
+			use   = vlist("official")
+		),
+		address = vlist(
+			NULL,
+			city = vlist("New York"),
+			street = vlist("Sesamstraße"),
+			number = vlist("1")
+		),
+		address = vlist(
+			NULL,
+			city = vlist("Los Angeles"),
+			street = vlist("Mullholland Drive"),
+			number = vlist("43")
+		),
+		gender = vlist("male"),
+		birthdate = vlist("1936-02-11")
+	)
+)
+
+tree <- tree_example
+
+cat(t2j <- tree2json(tree, add = "  "))
+
+
+res_name <- "Patient"
+sep      <- " <~> "
 brackets <- c("<|", "|>")
-#endpoint <- "https://hapi.fhir.org/baseR4"
-endpoints <- list(
-	hapi = "https://hapi.fhir.org/baseR4",
-	agiop = "https://mii-agiop-3p.life.uni-leipzig.de/fhir",
-	#	blaze = "https://mii-agiop-3p.life.uni-leipzig.de/blaze",
-	vonk  = "https://vonk.fire.ly/R4"
-)
+style    <- fhir_style(sep = sep, brackets, T)
+descr    <- fhir_table_description(resource = res_name, style = style)
+bundles  <- fhir_unserialize(bundles = patient_bundles)
+table    <- fhir_crack(bundles = bundles, design = descr, verbose = 2)
+ctable   <- fhir_cast(indexed_df = table, sep = sep, brackets = brackets, keep_1st_index = T, shift_index = 0, use_brackets = T, verbose = 1)
+tbundles <- build_tree_bundles(df = ctable, resource_name = "Patient", bundle_size = 13)
 
-bundle_size <- 11
-number_of_resources <- 51
-resource_name <- "Observation"
-
-three_servers_1000_patients_bundles <- lapply(
-	endpoints,
-	function(endpoint) {
-		#endpoint <- endpoints[[1]]
-		sample_resources(endpoint = endpoint, resource_name = resource_name, number_of_resources = number_of_resources, bundle_size = bundle_size)
-	}
-)
-
-tables <- lapply(
-	three_servers_1000_patients_bundles,
-	function(srv) {
-		#srv <- three_servers_1000_patients_bundles[[1]]
-		data.table::rbindlist(
-			fill = T,
-			lapply(
-				srv,
-				function(bndl) {
-					#bndl <- srv[[1]]
-					fhir_crack(bndl, fhir_table_description(resource_name), data.table = T, verbose = 0)
-				}
-			)
-		)
-	}
-)
-
-tables$hapi
-tables$agiop
-tables$vonk
-
+cat(tree2json(tbundles$Bundle0))
