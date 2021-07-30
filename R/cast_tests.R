@@ -553,9 +553,11 @@ tree_example <- vlist(
 )
 
 tree <- tree_example
+cat(tree2string(tree, tab = "....", add = "    "))
+cat(tree2xml(tree, tab = "....", add = "    "))
+cat(tree2json(tree, tab = "....", add = "    "))
 
-cat(t2j <- tree2json(tree, add = "  "))
-
+cat(tree2json(tree, add = "_____|"))
 
 
 endpoint <- endpoints$agiop
@@ -563,7 +565,7 @@ bundle_size <- 11
 res_name <- "Patient"
 sep      <- " <~> "
 brackets <- c("<|", "|>")
-style    <- fhir_style(sep = sep, brackets, T)
+style    <- fhir_style(sep = sep, brackets = brackets, T)
 descr    <- fhir_table_description(resource = res_name, style = style)
 bundles  <- fhir_search(paste0(paste_paths(endpoint, res_name), "?_count", bundle_size), verbose = 2)
 table    <- fhir_crack(bundles = bundles, design = descr, verbose = 2)

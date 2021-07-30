@@ -27,6 +27,8 @@ desc_xml <- function(s) {
 		 )
 	)
 }
+inc_tab <- function(tab, add = "....") paste0(tab, add)
+dec_tab <- function(tab, sub = "....") substr(tab, 1, nchar(tab) - nchar(sub))
 
 vlist <- function(.value, ...) {
 	list <- list(...)
@@ -210,7 +212,7 @@ build_tree_bundles <- function(df = df.patients_cast, resource_name = "Patient",
 	bundles
 }
 
-tree2string <- function(tre = tree.patients_cast, str = "", tab = "") {
+tree2string <- function(tre = tree.patients_cast, str = "", tab = "", add = "  ") {
 	for(i in seq_along(tre)) {
 		n <- names(tre)[i]
 		#n<-names(tre)[[1]]
@@ -220,12 +222,12 @@ tree2string <- function(tre = tree.patients_cast, str = "", tab = "") {
 		if(!is.null(a)) {
 			str <- paste0(str, " : ", a)
 		}
-		str <- tree2string(tre = tr, str = paste0(str, "\n"), tab = paste0(tab, "  "))
+		str <- tree2string(tre = tr, str = paste0(str, "\n"), tab = inc_tab(tab, add), add = add)
 	}
 	str
 }
 
-tree2xml <- function(tre = tree.patients_cast, str = "", tab = "") {
+tree2xml <- function(tre = tree.patients_cast, escaped = T, str = "", tab = "", add = "  ") {
 	for(i in seq_along(tre)) {
 		s <- ""
 		#i<-1
@@ -236,10 +238,10 @@ tree2xml <- function(tre = tree.patients_cast, str = "", tab = "") {
 		s <- paste0(tab, "<", n)
 		a <- attr(tr, "value")
 		if(!is.null(a)) {
-			s <- paste0(s, " value=\"", esc_xml(a), "\"")
+			s <- paste0(s, " value=\"", if(escaped) esc_xml(a) else a, "\"")
 		}
 		s <- if(length(tr) == 0) paste0(s, "/>") else paste0(s, ">")
-		s <- tree2xml(tre = tr, str = paste0(s, "\n"), tab = paste0(tab, "  "))
+		s <- tree2xml(tre = tr, escaped = escaped, str = paste0(s, "\n"), tab = inc_tab(tab, add), add = add)
 		if(0 < length(tr)) s <- paste0(s, tab, "</", n, ">\n")
 		str <- paste0(str, s)
 	}
@@ -257,9 +259,7 @@ xml2_tree2string <- function(tre = t2) {
 	cat(s)
 }
 
-tree2json <- function(tree, tab = "", add = "    ") {
-	inc_tab <- function(tab, add = "....") paste0(tab, add)
-	dec_tab <- function(tab, sub = "....") substr(tab, 1, nchar(tab) - nchar(sub))
+tree2json <- function(tree, tab = "", add = "  ") {
 	get_arrays <- function(tree) {
 		s <- ""
 		names_of_siblings <- names(tree)
