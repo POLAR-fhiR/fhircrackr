@@ -450,12 +450,12 @@ cat(frame_string())
 # sep <- " <~> "
 # brackets <- c("<|", "|>")
 # #endpoint <- "https://hapi.fhir.org/baseR4"
-# endpoints <- list(
-# 	hapi = "https://hapi.fhir.org/baseR4",
-# 	agiop = "https://mii-agiop-3p.life.uni-leipzig.de/fhir",
-# 	#	blaze = "https://mii-agiop-3p.life.uni-leipzig.de/blaze",
-# 	vonk  = "https://vonk.fire.ly/R4"
-# )
+endpoints <- list(
+	hapi = "https://hapi.fhir.org/baseR4",
+	agiop = "https://mii-agiop-3p.life.uni-leipzig.de/fhir",
+	#	blaze = "https://mii-agiop-3p.life.uni-leipzig.de/blaze",
+	vonk  = "https://vonk.fire.ly/R4"
+)
 #
 # bundle_size <- 11
 # number_of_resources <- 51
@@ -557,12 +557,15 @@ tree <- tree_example
 cat(t2j <- tree2json(tree, add = "  "))
 
 
+
+endpoint <- endpoints$agiop
+bundle_size <- 11
 res_name <- "Patient"
 sep      <- " <~> "
 brackets <- c("<|", "|>")
 style    <- fhir_style(sep = sep, brackets, T)
 descr    <- fhir_table_description(resource = res_name, style = style)
-bundles  <- fhir_unserialize(bundles = patient_bundles)
+bundles  <- fhir_search(paste0(paste_paths(endpoint, res_name), "?_count", bundle_size), verbose = 2)
 table    <- fhir_crack(bundles = bundles, design = descr, verbose = 2)
 ctable   <- fhir_cast(indexed_df = table, sep = sep, brackets = brackets, keep_1st_index = T, shift_index = 0, use_brackets = T, verbose = 1)
 tbundles <- build_tree_bundles(df = ctable, resource_name = "Patient", bundle_size = 13)
