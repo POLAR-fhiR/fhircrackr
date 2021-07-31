@@ -212,23 +212,25 @@ build_tree_bundles <- function(df = df.patients_cast, resource_name = "Patient",
 	bundles
 }
 
-tree2string <- function(tre = tree.patients_cast, str = "", tab = "", add = "  ") {
+tree2string <- function(tre = tree.patients_cast, tab = "", add = "  ") {
+	s = ""
 	for(i in seq_along(tre)) {
 		n <- names(tre)[i]
 		#n<-names(tre)[[1]]
 		tr <- tre[[i]]
-		str <- paste0(str, tab, n)
+		s <- paste0(s, tab, n)
 		a <- attr(tr, "value")
 		if(!is.null(a)) {
-			str <- paste0(str, " : ", a)
+			s <- paste0(s, " : ", a)
 		}
-		str <- tree2string(tre = tr, str = paste0(str, "\n"), tab = inc_tab(tab, add), add = add)
+		s <- paste0(s, "\n", tree2string(tre = tr, tab = inc_tab(tab, add), add = add))
 	}
-	str
+	s
 }
 
-tree2xml <- function(tre = tree.patients_cast, escaped = T, str = "", tab = "", add = "  ") {
-	for(i in seq_along(tre)) {
+tree2xml <- function(tre = tree.patients_cast, escaped = T, tab = "", add = "  ") {
+	str = ""
+		for(i in seq_along(tre)) {
 		s <- ""
 		#i<-1
 		n <- names(tre)[i]
@@ -241,7 +243,7 @@ tree2xml <- function(tre = tree.patients_cast, escaped = T, str = "", tab = "", 
 			s <- paste0(s, " value=\"", if(escaped) esc_xml(a) else a, "\"")
 		}
 		s <- if(length(tr) == 0) paste0(s, "/>") else paste0(s, ">")
-		s <- tree2xml(tre = tr, escaped = escaped, str = paste0(s, "\n"), tab = inc_tab(tab, add), add = add)
+		s = paste0(s, "\n", tree2xml(tre = tr, escaped = escaped, tab = inc_tab(tab, add), add = add))
 		if(0 < length(tr)) s <- paste0(s, tab, "</", n, ">\n")
 		str <- paste0(str, s)
 	}
@@ -312,7 +314,7 @@ tree2json <- function(tree, tab = "", add = "  ") {
 }
 
 print_tree <- function(tre, tab = "") {
-	cat(tree2string(tre = tre, str = "", tab = tab))
+	cat(tree2string(tre = tre, tab = tab))
 }
 
 rm_ids_from_tree <- function(tre = tree.patients_cast) {
