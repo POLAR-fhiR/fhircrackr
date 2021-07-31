@@ -573,3 +573,4 @@ ctable   <- fhir_cast(indexed_df = table, sep = sep, brackets = brackets, keep_1
 tbundles <- build_tree_bundles(df = ctable, resource_name = "Patient", bundle_size = 13)
 
 cat(tree2json(tbundles$Bundle0))
+

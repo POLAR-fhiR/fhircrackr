@@ -53,9 +53,8 @@ frame_string <- function(text = "\nHello !!!\n\n\nIs\nthere\n\nA N Y O N E\n\nou
 	r
 }
 
-fhir_cast <- function(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, keep_1st_index = F, shift_index = 0, use_brackets = F, verbose = 1) {
+fhir_cast <- function(indexed_df, sep, brackets, keep_1st_index = F, shift_index = 0, use_brackets = F, verbose = 1) {
 	if(!inherits(indexed_df, "data.table")) setDT(indexed_df)
-
 	df_names <- names(indexed_df)
 	s <- strsplit(df_names, "\\.")
 	names(s) <- df_names
@@ -161,7 +160,7 @@ fhir_cast <- function(indexed_df = df.patients, sep = desc.patients@style@sep, b
 }
 
 
-build_tree <- function(row =  df.patients_cast[4,], root = "Bundle", keep_nas = F) {
+build_tree <- function(row, root = "Bundle", keep_nas = F) {
 	tree <- function(col_names, tre, value = 1) {
 		len <- length(col_names)
 		if(is.null(tre)) tre <- list()
@@ -191,7 +190,7 @@ build_tree <- function(row =  df.patients_cast[4,], root = "Bundle", keep_nas = 
 	tre
 }
 
-build_tree_bundles <- function(df = df.patients_cast, resource_name = "Patient", bundle_size = 50) {
+build_tree_bundles <- function(df, resource_name, bundle_size = 50) {
 	bundles <- list()
 	b <- 0
 	i <- 1
@@ -277,7 +276,7 @@ tree2json <- function(tree, tab = "", add = "  ") {
 		names_of_arrays <- names(arrays_indices)
 		arrays_indices
 	}
-	dict <- function(tree, tab = "", add = "    ") {
+	dict <- function(tree, tab = "", add = "  ") {
 		s <- "{ \n"
 		arrays <- get_arrays(tree)
 		len <- length(arrays)
@@ -290,7 +289,7 @@ tree2json <- function(tree, tab = "", add = "  ") {
 		}
 		s <- paste0(s, "\n", tab, "}")
 	}
-	arr <- function(tree, tab = "", add = "    ") {
+	arr <- function(tree, tab = "", add = "  ") {
 		s <- "[ "
 		len <- length(tree)
 		for(i in seq_len(len)) {
@@ -313,8 +312,8 @@ tree2json <- function(tree, tab = "", add = "  ") {
 	}
 }
 
-print_tree <- function(tre, tab = "") {
-	cat(tree2string(tre = tre, tab = tab))
+print_tree <- function(tre, tab = "", add = "") {
+	cat(tree2string(tre = tre, tab = tab, add = add))
 }
 
 rm_ids_from_tree <- function(tre = tree.patients_cast) {
@@ -328,7 +327,7 @@ rm_ids_from_tree <- function(tre = tree.patients_cast) {
 	tre
 }
 
-build_xml_bundles <- function(cast_table = cast_table_obs, resource_name="Observation", bundle_size = 500) {
+build_xml_bundles <- function(cast_table, resource_name, bundle_size = 500) {
 	max_ <- nrow(cast_table)
 	i <- 1
 	b <- 0
