@@ -212,19 +212,19 @@ build_tree_bundles <- function(df, resource_name, bundle_size = 50) {
 }
 
 tree2string <- function(tre = tree.patients_cast, tab = "", add = "  ") {
-	s = ""
+	str = ""
 	for(i in seq_along(tre)) {
+		#s <- ""
 		n <- names(tre)[i]
-		#n<-names(tre)[[1]]
 		tr <- tre[[i]]
-		s <- paste0(s, tab, n)
+		s <- paste0(tab, n)
 		a <- attr(tr, "value")
 		if(!is.null(a)) {
 			s <- paste0(s, " : ", a)
 		}
-		s <- paste0(s, "\n", tree2string(tre = tr, tab = inc_tab(tab, add), add = add))
+		str <- paste0(str, s, "\n", tree2string(tre = tr, tab = inc_tab(tab, add), add = add))
 	}
-	s
+	str
 }
 
 tree2xml <- function(tre = tree.patients_cast, escaped = T, tab = "", add = "  ") {
