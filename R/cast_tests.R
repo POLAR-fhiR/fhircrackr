@@ -104,11 +104,12 @@ desc.patients <- fhir_table_description(
 (df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = F, shift_index = 0, use_brackets = F))
 (df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = T, shift_index = 0, use_brackets = T))
 (tree.patients_cast <- build_tree(row = df.patients_cast[4,], root = "Patient"))
-cat(tree2string(tre = tree.patients_cast))
-cat(tree2string(tre = rm_ids_from_tree(tre = tree.patients_cast)))
-print_tree(tre = rm_ids_from_tree(tre = tree.patients_cast))
-print(xml2::as_xml_document(rm_ids_from_tree(tre = tree.patients_cast)))
-cat(toString(xml2::as_xml_document(rm_ids_from_tree(tre = tree.patients_cast))))
+cat(tree2string(tree = tree.patients_cast))
+cat(tree2treestring(tree = tree.patients_cast))
+cat(tree2string(tree = rm_ids_from_tree(tree = tree.patients_cast)))
+print_tree(tree = rm_ids_from_tree(tree = tree.patients_cast))
+print(xml2::as_xml_document(rm_ids_from_tree(tree = tree.patients_cast)))
+cat(toString(xml2::as_xml_document(rm_ids_from_tree(tree = tree.patients_cast))))
 
 tree_bundles <- build_tree_bundles(df = df.patients_cast, resource_name = "Patient", bundle_size = 2)
 cat(toString(xml2::as_xml_document(tree_bundles$Bundle1)))
@@ -554,6 +555,7 @@ tree_example <- vlist(
 
 tree <- tree_example
 cat(tree2string(tree, tab = "....", add = "    "))
+cat(tree2treestring(tree))
 
 
 
@@ -576,5 +578,5 @@ table    <- fhir_crack(bundles = bundles, design = descr, verbose = 2)
 ctable   <- fhir_cast(indexed_df = table, sep = sep, brackets = brackets, keep_1st_index = T, shift_index = 0, use_brackets = T, verbose = 1)
 tbundles <- build_tree_bundles(df = ctable, resource_name = "Patient", bundle_size = 13)
 
-cat(tree2json(tbundles$Bundle0))
+cat(tree2treestring(tbundles$Bundle0))
 

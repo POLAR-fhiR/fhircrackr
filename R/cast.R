@@ -229,40 +229,33 @@ tree2string <- function(tree = tree.patients_cast, tab = "", add = "  ") {
 	str
 }
 
-tree2treestring <- function(tree, sign = c("\u2500", ":")[1]) {
-	tree2treestring_ <- function(tree, pre, sign, not_first = TRUE) {
-		if(is.null(tree)) return(NULL)
-		rows <- list()
-		len <- length(tree)
-		for(i in seq_len(len)) {
-			#i <- 1
-			n <- names(tree)[i]
-			tr <- tree[[i]]
-
-			s <- if(not_first){
-				paste0(pre, (if(i == len) "\u2514" else "\u251C"), "\u2500", (if(length(tr) == 0) "\u2500" else "\u2510"), " ", n)
-			} else {
-				paste0(pre, if(i < len) "\u251C " else "\u2514 ", n)
-			}
-			a <- attr(tr, "value")
-			if(!is.null(a)) {
-				s <- paste0(s, " ", sign, " ", a)
-			}
-			rows[[i]] <- paste0(
-				s,
-				"\n",
-				tree2treestring_(
-					tree = tr,
-					pre = if(i < len) paste0(pre, "\u2502", " ") else paste0(pre, "  "),
-					sign = sign
-				)
-			)
+tree2treestring <- function(tree, pre = "", sign = c("\u2500", ":")[1]) {
+	if(is.null(tree)) return(NULL)
+	rows <- list()
+	len <- length(tree)
+	for(i in seq_len(len)) {
+		#i <- 1
+		n <- names(tree)[i]
+		tr <- tree[[i]]
+		s <- paste0(pre, (if(i == len) "\u2514" else "\u251C"), "\u2500", (if(length(tr) == 0) "\u2500" else "\u2510"), " ", n)
+		a <- attr(tr, "value")
+		if(!is.null(a)) {
+			s <- paste0(s, " ", sign, " ", a)
 		}
-
-		paste0(rows, collapse = "")
+		rows[[i]] <- paste0(
+			s,
+			"\n",
+			tree2treestring(
+				tree = tr,
+				pre = if(i < len) paste0(pre, "\u2502", " ") else paste0(pre, "  "),
+				sign = sign
+			)
+		)
 	}
-	paste0(".\n", tree2treestring_(tree, "", sign, F))
+
+	paste0(rows, collapse = "")
 }
+
 tr <- vlist(
 	NULL,
 	A = vlist(
@@ -284,7 +277,7 @@ cat(tree2string(tree = tr))
 cat(tree2treestring(tree = tr))
 cat(tree2string(tree = tree))
 cat(tree2treestring(tree = tree, sign = ":"))
-cat(tree2treestring(tree = tree))
+cat(tree2treestring(tree = tree, sign = "-"))
 
 
 tree2xml <- function(tree = tree.patients_cast, escaped = T, tab = "", add = "  ") {
