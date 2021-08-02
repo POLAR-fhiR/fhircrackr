@@ -276,8 +276,8 @@ cat(tree2xml(tr))
 cat(tree2string(tree = tr))
 cat(tree2treestring(tree = tr))
 cat(tree2string(tree = tree))
+cat(tree2treestring(tree = tree))
 cat(tree2treestring(tree = tree, sign = ":"))
-cat(tree2treestring(tree = tree, sign = "-"))
 
 
 tree2xml <- function(tree = tree.patients_cast, escaped = T, tab = "", add = "  ") {
