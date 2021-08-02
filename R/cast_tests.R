@@ -554,6 +554,10 @@ tree_example <- vlist(
 
 tree <- tree_example
 cat(tree2string(tree, tab = "....", add = "    "))
+
+
+
+
 cat(tree2xml(tree, tab = "....", add = "    "))
 cat(tree2json(tree, tab = "....", add = "    "))
 

@@ -36,6 +36,8 @@ vlist <- function(.value, ...) {
 	list
 }
 
+charn <- function(char, count) paste0(rep_len(char, count), collapse = "")
+
 frame_string <- function(text = "\nHello !!!\n\n\nIs\nthere\n\nA N Y O N E\n\nout\nthere\n???\n ", pos = c("left", "center", "right")[1], edge = " ", hori = "-", vert = "|") {
 	edge <- rep_len(strsplit(edge, "")[[1]], 4)[1 : 4]
 	side <- c("right", "both", "left")[match(pos, c("left", "center", "right"))]
@@ -161,18 +163,18 @@ fhir_cast <- function(indexed_df, sep, brackets, keep_1st_index = F, shift_index
 
 
 build_tree <- function(row, root = "Bundle", keep_nas = F) {
-	tree <- function(col_names, tre, value = 1) {
+	new_tree <- function(col_names, tree, value = 1) {
 		len <- length(col_names)
-		if(is.null(tre)) tre <- list()
+		if(is.null(tree)) tree <- list()
 		if(len == 0) {
-			setattr(tre, "value", value)
+			setattr(tree, "value", value)
 		} else {
-			tr <- tree(col_names = col_names[-1], tre = tre[[col_names[1]]], value = value)
-			tre[[col_names[1]]] <- tr
+			tr <- new_tree(col_names = col_names[-1], tree = tree[[col_names[1]]], value = value)
+			tree[[col_names[1]]] <- tr
 		}
-		tre
+		tree
 	}
-	tre <- list()
+	tree <- list()
 	row <- sapply(row, function(x)x)
 	if(!keep_nas) row <- row[!is.na(row)]
 	names(row) <- paste0(root, ".", names(row))
@@ -183,11 +185,11 @@ build_tree <- function(row, root = "Bundle", keep_nas = F) {
 			tr <- list()
 			setattr(tr, "value", value)
 		} else {
-			tr <- tree(col_names = col_names_split[-1], tre = tre[[col_names_split[[1]]]], value = value)
+			tr <- new_tree(col_names = col_names_split[-1], tree = tree[[col_names_split[[1]]]], value = value)
 		}
-		tre[[col_names_split[1]]] <- tr
+		tree[[col_names_split[1]]] <- tr
 	}
-	tre
+	tree
 }
 
 build_tree_bundles <- function(df, resource_name, bundle_size = 50) {
@@ -211,30 +213,88 @@ build_tree_bundles <- function(df, resource_name, bundle_size = 50) {
 	bundles
 }
 
-tree2string <- function(tre = tree.patients_cast, tab = "", add = "  ") {
+tree2string <- function(tree = tree.patients_cast, tab = "", add = "  ") {
 	str = ""
-	for(i in seq_along(tre)) {
+	for(i in seq_along(tree)) {
 		#s <- ""
-		n <- names(tre)[i]
-		tr <- tre[[i]]
+		n <- names(tree)[i]
+		tr <- tree[[i]]
 		s <- paste0(tab, n)
 		a <- attr(tr, "value")
 		if(!is.null(a)) {
 			s <- paste0(s, " : ", a)
 		}
-		str <- paste0(str, s, "\n", tree2string(tre = tr, tab = inc_tab(tab, add), add = add))
+		str <- paste0(str, s, "\n", tree2string(tree = tr, tab = inc_tab(tab, add), add = add))
 	}
 	str
 }
 
-tree2xml <- function(tre = tree.patients_cast, escaped = T, tab = "", add = "  ") {
+tree2treestring <- function(tree, sign = c("\u2500", ":")[1]) {
+	tree2treestring_ <- function(tree, pre, sign, not_first = TRUE) {
+		if(is.null(tree)) return(NULL)
+		rows <- list()
+		len <- length(tree)
+		for(i in seq_len(len)) {
+			#i <- 1
+			n <- names(tree)[i]
+			tr <- tree[[i]]
+
+			s <- if(not_first){
+				paste0(pre, (if(i == len) "\u2514" else "\u251C"), "\u2500", (if(length(tr) == 0) "\u2500" else "\u2510"), " ", n)
+			} else {
+				paste0(pre, if(i < len) "\u251C " else "\u2514 ", n)
+			}
+			a <- attr(tr, "value")
+			if(!is.null(a)) {
+				s <- paste0(s, " ", sign, " ", a)
+			}
+			rows[[i]] <- paste0(
+				s,
+				"\n",
+				tree2treestring_(
+					tree = tr,
+					pre = if(i < len) paste0(pre, "\u2502", " ") else paste0(pre, "  "),
+					sign = sign
+				)
+			)
+		}
+
+		paste0(rows, collapse = "")
+	}
+	paste0(".\n", tree2treestring_(tree, "", sign, F))
+}
+tr <- vlist(
+	NULL,
+	A = vlist(
+		"a",
+		B = vlist(
+			NULL,
+			C = vlist("bc"),
+			D = vlist("bd")
+			),
+		E = vlist("e")
+	),
+	vlist(
+		"f",
+		G = vlist("g")
+	)
+)
+cat(tree2xml(tr))
+cat(tree2string(tree = tr))
+cat(tree2treestring(tree = tr))
+cat(tree2string(tree = tree))
+cat(tree2treestring(tree = tree, sign = ":"))
+cat(tree2treestring(tree = tree))
+
+
+tree2xml <- function(tree = tree.patients_cast, escaped = T, tab = "", add = "  ") {
 	str = ""
-		for(i in seq_along(tre)) {
+		for(i in seq_along(tree)) {
 		s <- ""
 		#i<-1
-		n <- names(tre)[i]
-		#n<-names(tre)[[1]]
-		tr <- tre[[i]]
+		n <- names(tree)[i]
+		#n<-names(tree)[[1]]
+		tr <- tree[[i]]
 
 		s <- paste0(tab, "<", n)
 		a <- attr(tr, "value")
@@ -242,7 +302,7 @@ tree2xml <- function(tre = tree.patients_cast, escaped = T, tab = "", add = "  "
 			s <- paste0(s, " value=\"", if(escaped) esc_xml(a) else a, "\"")
 		}
 		s <- if(length(tr) == 0) paste0(s, "/>") else paste0(s, ">")
-		s = paste0(s, "\n", tree2xml(tre = tr, escaped = escaped, tab = inc_tab(tab, add), add = add))
+		s = paste0(s, "\n", tree2xml(tree = tr, escaped = escaped, tab = inc_tab(tab, add), add = add))
 		if(0 < length(tr)) s <- paste0(s, tab, "</", n, ">\n")
 		str <- paste0(str, s)
 	}
@@ -250,8 +310,8 @@ tree2xml <- function(tre = tree.patients_cast, escaped = T, tab = "", add = "  "
 }
 
 
-xml2_tree2string <- function(tre = t2) {
-	s <- toString(xml2::as_xml_document(tre))
+xml2_tree2string <- function(tree = t2) {
+	s <- toString(xml2::as_xml_document(tree))
 	s <- gsub("^[^(\\\n)]+\\\n", "", s)
 	s <- gsub("<\\/[^(\\\n)]+", "", s)
 	s <- gsub(" +\\\n", "", s)
@@ -293,8 +353,7 @@ tree2json <- function(tree, tab = "", add = "  ") {
 		s <- "[ "
 		len <- length(tree)
 		for(i in seq_len(len)) {
-			tre <- tree[[i]]
-			s <- paste0(s, tree2json(tre, inc_tab(tab, add), add))
+			s <- paste0(s, tree2json(tree = tree[[i]], inc_tab(tab, add), add))
 			if(i != len) s <- paste0(s, ", ")
 		}
 		s <- paste0(s, " ]")
@@ -312,19 +371,19 @@ tree2json <- function(tree, tab = "", add = "  ") {
 	}
 }
 
-print_tree <- function(tre, tab = "", add = "") {
-	cat(tree2string(tre = tre, tab = tab, add = add))
+print_tree <- function(tree, tab = "", add = "") {
+	cat(tree2string(tree = tree, tab = tab, add = add))
 }
 
-rm_ids_from_tree <- function(tre = tree.patients_cast) {
-	if(!is.null(names(tre))) {
-		for(n in names(tre)) {
-			#n <- names(tre)[[1]]
-			tre[[n]] <- rm_ids_from_tree(tre = tre[[n]])
+rm_ids_from_tree <- function(tree = tree.patients_cast) {
+	if(!is.null(names(tree))) {
+		for(n in names(tree)) {
+			#n <- names(tree)[[1]]
+			tree[[n]] <- rm_ids_from_tree(tree = tree[[n]])
 		}
-		names(tre) <- gsub("(\\[[0-9]+])|([0-9]+)", "", names(tre))
+		names(tree) <- gsub("(\\[[0-9]+])|([0-9]+)", "", names(tree))
 	}
-	tre
+	tree
 }
 
 build_xml_bundles <- function(cast_table, resource_name, bundle_size = 500) {
