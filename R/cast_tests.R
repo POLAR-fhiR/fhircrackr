@@ -2,6 +2,13 @@ rm(list = ls())
 
 source("R/cast.R")
 
+endpoints <- list(
+	hapi = "https://hapi.fhir.org/baseR4",
+	agiop = "https://mii-agiop-3p.life.uni-leipzig.de/fhir",
+	#	blaze = "https://mii-agiop-3p.life.uni-leipzig.de/blaze",
+	vonk  = "https://vonk.fire.ly/R4"
+)
+
 bundle <- xml2::read_xml(
 	"<Bundle>
 
@@ -104,9 +111,10 @@ desc.patients <- fhir_table_description(
 (df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = F, shift_index = 0, use_brackets = F))
 (df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = T, shift_index = 0, use_brackets = T))
 (tree.patients_cast <- build_tree(row = df.patients_cast[4,], root = "Patient"))
+cat(tree2text(tree = tree.patients_cast))
 cat(tree2string(tree = tree.patients_cast))
-cat(tree2treestring(tree = tree.patients_cast))
-cat(tree2string(tree = rm_ids_from_tree(tree = tree.patients_cast)))
+cat(tree2text(tree = rm_ids_from_tree(tree = tree.patients_cast)))
+print_tree(tree = tree.patients_cast)
 print_tree(tree = rm_ids_from_tree(tree = tree.patients_cast))
 print(xml2::as_xml_document(rm_ids_from_tree(tree = tree.patients_cast)))
 cat(toString(xml2::as_xml_document(rm_ids_from_tree(tree = tree.patients_cast))))
@@ -117,8 +125,7 @@ xml_bundles <- lapply(tree_bundles, function(b)xml2::as_xml_document(b))
 fhir_crack(bundles = xml_bundles, fhir_table_description(resource = "Patient"), verbose = 2)
 
 ###########################################################################################################################
-#endpoint <- "https://mii-agiop-3p.life.uni-leipzig.de/fhir"
-endpoint <- "https://hapi.fhir.org/baseR4"
+endpoint <- endpoints$hapi
 resource_name <- "Observation"
 bundle_size <- 500
 xml_bundles <- fhir_search(paste0(paste_paths(endpoint, resource_name), "?_count=", bundle_size), max_bundles = 5, verbose = 2)
@@ -174,11 +181,9 @@ Sys.time() - start
 
 sep <- " <~> "
 brackets <- c("<|", "|>")
-#endpoint <- "https://hapi.fhir.org/baseR4"
-#endpoint <- "https://hapi.fhir.org/baseR4"
-endpoint <- "https://mii-agiop-3p.life.uni-leipzig.de/fhir"
+endpoint <- endpoints$vonk
 bundle_size <- 500
-#
+
 cs <- fhir_capability_statement(endpoint, verbose = 2, sep = sep)
 
 totals <- sapply(
@@ -196,7 +201,9 @@ totals <- sapply(
 )
 
 totals <- totals[0 < totals]
+totals <- totals[names(totals) %in% fhircrackr:::existing_resource_types]
 (totals <- totals[order(totals, decreasing = T)])
+totals <- totals[setdiff(names(totals), c("Bundle", "ConceptMap", "StructureDefinition"))]
 totals_small <- totals[totals <= 10000]
 
 all_data <- lapply(
@@ -255,7 +262,7 @@ cat(frame_string("check whether original and new tables are identical"))
 # 		frame_string(
 # 			text = paste0(
 # 				"\n", frame_string(n), "\n",
-# 				frame_string(tree2string(all_data_av[[n]]))
+# 				frame_string(tree2text(all_data_av[[n]]))
 # 			),
 # 			side = "both"
 # 		),
@@ -279,7 +286,7 @@ cat(frame_string("check whether original and new tables are identical"))
 # 		frame_string(
 # 			text = paste0(
 # 				"\n", frame_string(n), "\n",
-# 				frame_string(tree2string(all_data_not_av[[n]]))
+# 				frame_string(tree2text(all_data_not_av[[n]]))
 # 			),
 # 			side = "both"
 # 		),
@@ -287,47 +294,49 @@ cat(frame_string("check whether original and new tables are identical"))
 # 	)
 # }
 
-all_data_equality_summary <- lapply(
-	lst(names(all_data)),
-	function(n) {
-		#n<-lst(names(all_data))[[1]]
-		dori <- all_data[[n]]$orig
-		dnew <- all_data[[n]]$new
-		if(!all(names(dori) == names(dnew))) stop("names are not equal for ", n, " tables.")
-		e <- sapply(
-			names(dori),
-			function(nm) {
-				#nm <- names(dori)[[2]]
-				#nm <- "code.coding.code"
-				print(nm)
-				do_av <- !is.na(dori[[nm]])
-				dn_av <- !is.na(dnew[[nm]])
-				if(all(do_av == dn_av)) {
-					do <- dori[dn_av, ..nm]
-					dn <- dnew[dn_av, ..nm]
-					if(all(do == dn)) "equal in both tables" else "nor equal in both tables"
-				} else "not the same missings"
-			}
-		)
-		build_tree(e, n)
-	}
-)
-
-cat(frame_string("show equality summaries"))
-for(n in names(all_data_equality_summary)) {
-	cat(
-		frame_string(
-			text = paste0(
-				"\n", frame_string(n, vert = "|", hori = "-"), "\n",
-				frame_string(vert = " ", hori = " ",
-					tree2string(all_data_equality_summary[[n]])
-				)
-			),
-			pos = "center", vert = " ", hori = " "
-		),
-		"\n"
-	)
-}
+# all_data_equality_summary <- lapply(
+# 	lst(names(all_data)),
+# 	function(n) {
+# 		#n<-lst(names(all_data))[[1]]
+# 		dori <- all_data[[n]]$orig
+# 		dnew <- all_data[[n]]$new
+# 		dori_names <- sort(names(dori))
+# 		dnew_names <- sort(names(dnew))
+# 		if(!all(dori_names == dnew_names)) stop("names are not equal for ", n, " tables.")
+# 		e <- sapply(
+# 			names(dori),
+# 			function(nm) {
+# 				#nm <- names(dori)[[2]]
+# 				#nm <- "code.coding.code"
+# 				print(nm)
+# 				do_av <- !is.na(dori[[nm]])
+# 				dn_av <- !is.na(dnew[[nm]])
+# 				if(all(do_av == dn_av)) {
+# 					do <- dori[dn_av, ..nm]
+# 					dn <- dnew[dn_av, ..nm]
+# 					if(all(do == dn)) "equal in both tables" else "nor equal in both tables"
+# 				} else "not the same missings"
+# 			}
+# 		)
+# 		build_tree(e, n)
+# 	}
+# )
+#
+# cat(frame_string("show equality summaries"))
+# for(n in names(all_data_equality_summary)) {
+# 	cat(
+# 		frame_string(
+# 			text = paste0(
+# 				"\n", frame_string(n, vert = "|", hori = "-"), "\n",
+# 				frame_string(vert = " ", hori = " ",
+# 					tree2text(all_data_equality_summary[[n]])
+# 				)
+# 			),
+# 			pos = "center", vert = " ", hori = " "
+# 		),
+# 		"\n"
+# 	)
+# }
 
 
 all_data_availables_summary <- lapply(
@@ -350,15 +359,15 @@ for(n in names(all_data_availables_summary)) {
 					hori = " ",
 					vert = " ",
 					paste0(
-						"availables + missings = total  [ percentage ]\n\n",
+						"availables + missings = total  [ percentage of availables ]\n\n",
 						tree2string(all_data_availables_summary[[n]])
 					)
 				)
 			),
 			pos = "center",
-			edge = " ",
-			hori = ".",
-			vert = ":"
+			edge = "o",
+			hori = "-",
+			vert = "|"
 		),
 		"\n"
 	)
@@ -371,6 +380,8 @@ cat(frame_string(pos = "right", hori = "-", vert = "|", edge = "/\\\\/"))
 cat(frame_string(pos = "center", edge = "O"))
 cat(frame_string(pos = "center", hori = " ", vert = " ", edge = " "))
 cat(frame_string())
+
+cat(frame_string("\u2514\u2500\u2510"))
 
 
 
@@ -451,12 +462,6 @@ cat(frame_string())
 # sep <- " <~> "
 # brackets <- c("<|", "|>")
 # #endpoint <- "https://hapi.fhir.org/baseR4"
-endpoints <- list(
-	hapi = "https://hapi.fhir.org/baseR4",
-	agiop = "https://mii-agiop-3p.life.uni-leipzig.de/fhir",
-	#	blaze = "https://mii-agiop-3p.life.uni-leipzig.de/blaze",
-	vonk  = "https://vonk.fire.ly/R4"
-)
 #
 # bundle_size <- 11
 # number_of_resources <- 51
@@ -554,11 +559,8 @@ tree_example <- vlist(
 )
 
 tree <- tree_example
-cat(tree2string(tree, tab = "....", add = "    "))
-cat(tree2treestring(tree))
-
-
-
+cat(tree2text(tree, tab = "....", add = "    "))
+cat(tree2string(tree))
 
 cat(tree2xml(tree, tab = "....", add = "    "))
 cat(tree2json(tree, tab = "....", add = "    "))
@@ -566,17 +568,41 @@ cat(tree2json(tree, tab = "....", add = "    "))
 cat(tree2json(tree, add = "_____|"))
 
 
-endpoint <- endpoints$agiop
+endpoint <- endpoints$hapi
 bundle_size <- 11
-res_name <- "Patient"
+res_name <- "Observation"
 sep      <- " <~> "
 brackets <- c("<|", "|>")
 style    <- fhir_style(sep = sep, brackets = brackets, T)
 descr    <- fhir_table_description(resource = res_name, style = style)
-bundles  <- fhir_search(paste0(paste_paths(endpoint, res_name), "?_count", bundle_size), verbose = 2)
+bundles  <- fhir_search(paste0(paste_paths(endpoint, res_name), "?_count", bundle_size), verbose = 2, max_bundles = 10)
 table    <- fhir_crack(bundles = bundles, design = descr, verbose = 2)
 ctable   <- fhir_cast(indexed_df = table, sep = sep, brackets = brackets, keep_1st_index = T, shift_index = 0, use_brackets = T, verbose = 1)
-tbundles <- build_tree_bundles(df = ctable, resource_name = "Patient", bundle_size = 13)
+tbundles <- build_tree_bundles(df = ctable, resource_name = res_name, bundle_size = 13)
 
-cat(tree2treestring(tbundles$Bundle0))
+cat(tree2string(tbundles$Bundle0))
+cat(tree2string(tbundles$Bundle1, ":"))
 
+tr <- vlist(
+	NULL,
+	Bundle = vlist(
+		NULL,
+		A = vlist("Das ist okay."),
+		B = vlist(
+			"Das sollte verboten sein.",
+			C = vlist("Weil hier noch ein Node kommt.")
+		)
+	)
+)
+cat(frame_string(text = tree2string(tr), edge = "\u250C\u2510\u2514\u2518", vert = "\u2502", hori = "\u2500"))
+
+
+# endpoint <- endpoints$vonk
+# res_name <- "ConceptMap"
+# sep <- " <~> "
+# brackets <- c("<|", "|>")
+# bundle_size <- 500
+#
+# bundles <- fhir_search(paste0(paste_paths(endpoint, res_name), "?_count=", bundle_size), verbose = 2)
+# tables  <- fhir_crack(bundles, fhir_table_description(res_name, style = fhir_style(sep, brackets)))
+# names(tables)

@@ -36,11 +36,19 @@ vlist <- function(.value, ...) {
 	list
 }
 
-charn <- function(char, count) paste0(rep_len(char, count), collapse = "")
-
 frame_string <- function(text = "\nHello !!!\n\n\nIs\nthere\n\nA N Y O N E\n\nout\nthere\n???\n ", pos = c("left", "center", "right")[1], edge = " ", hori = "-", vert = "|") {
+	strpad <- function(string, width, pos = c("left", "right"), pad) {
+		n_chars <- function(char, count) paste0(rep_len(char, count), collapse = "")
+		w <- nchar(string)
+		if(pos == "left") {
+			paste0(string, n_chars(pad, width - w))
+		} else if(pos == "right") {
+			paste0(n_chars(pad, width - w), string)
+		} else {
+			paste0(n_chars(pad, (width - w) %/% 2), string, n_chars(pad, width - w - (width - w) %/% 2))
+		}
+	}
 	edge <- rep_len(strsplit(edge, "")[[1]], 4)[1 : 4]
-	side <- c("right", "both", "left")[match(pos, c("left", "center", "right"))]
 	r <- ""
 	s <- strsplit(text, "\n")[[1]]
 	h <- length(s)
@@ -49,7 +57,7 @@ frame_string <- function(text = "\nHello !!!\n\n\nIs\nthere\n\nA N Y O N E\n\nou
 	hbb <- paste0(edge[3], paste0(rep_len(hori, w + 2), collapse = ""), edge[4], "\n")
 	r <- hbt
 	for(s_ in s) {
-		r <- paste0(r, vert, " ", stringr::str_pad(string = s_, width = w, side = side, " "), " ", vert, "\n")
+		r <- paste0(r, vert, " ", strpad(string = s_, width = w, pos = pos, pad = " "), " ", vert, "\n")
 	}
 	r <- paste0(r, hbb)
 	r
@@ -213,7 +221,7 @@ build_tree_bundles <- function(df, resource_name, bundle_size = 50) {
 	bundles
 }
 
-tree2string <- function(tree = tree.patients_cast, tab = "", add = "  ") {
+tree2text <- function(tree, tab = "", add = "  ") {
 	str = ""
 	for(i in seq_along(tree)) {
 		#s <- ""
@@ -224,60 +232,62 @@ tree2string <- function(tree = tree.patients_cast, tab = "", add = "  ") {
 		if(!is.null(a)) {
 			s <- paste0(s, " : ", a)
 		}
-		str <- paste0(str, s, "\n", tree2string(tree = tr, tab = inc_tab(tab, add), add = add))
+		str <- paste0(str, s, "\n", tree2text(tree = tr, tab = inc_tab(tab, add), add = add))
 	}
 	str
 }
 
-tree2treestring <- function(tree, pre = "", sign = c("\u2500", ":")[1]) {
-	if(is.null(tree)) return(NULL)
-	rows <- list()
-	len <- length(tree)
-	for(i in seq_len(len)) {
-		#i <- 1
-		n <- names(tree)[i]
-		tr <- tree[[i]]
-		s <- paste0(pre, (if(i == len) "\u2514" else "\u251C"), "\u2500", (if(length(tr) == 0) "\u2500" else "\u2510"), " ", n)
-		a <- attr(tr, "value")
-		if(!is.null(a)) {
-			s <- paste0(s, " ", sign, " ", a)
-		}
-		rows[[i]] <- paste0(
-			s,
-			"\n",
-			tree2treestring(
-				tree = tr,
-				pre = if(i < len) paste0(pre, "\u2502", " ") else paste0(pre, "  "),
-				sign = sign
+tree2string <- function(tree, sign = c("\u2500", ":")[1]) {
+	tree2string_ <- function(tree, pre, sign) {
+		if(is.null(tree)) return(NULL)
+		rows <- list()
+		len <- length(tree)
+		for(i in seq_len(len)) {
+			#i <- 1
+			n <- names(tree)[i]
+			tr <- tree[[i]]
+			s <- paste0(pre, (if(i == len) "\u2514" else "\u251C"), "\u2500", (if(length(tr) == 0) "\u2500" else "\u2510"), " ", n)
+			a <- attr(tr, "value")
+			if(!is.null(a)) {
+				s <- paste0(s, " ", sign, " ", a)
+			}
+			rows[[i]] <- paste0(
+				s,
+				"\n",
+				tree2string_(
+					tree = tr,
+					pre = if(i < len) paste0(pre, "\u2502", " ") else paste0(pre, "  "),
+					sign = sign
+				)
 			)
-		)
+		}
+
+		paste0(rows, collapse = "")
 	}
-
-	paste0(rows, collapse = "")
+	tree2string_(tree = tree, pre = "", sign = sign)
 }
-
-tr <- vlist(
-	NULL,
-	A = vlist(
-		"a",
-		B = vlist(
-			NULL,
-			C = vlist("bc"),
-			D = vlist("bd")
-			),
-		E = vlist("e")
-	),
-	vlist(
-		"f",
-		G = vlist("g")
-	)
-)
-cat(tree2xml(tr))
-cat(tree2string(tree = tr))
-cat(tree2treestring(tree = tr))
-cat(tree2string(tree = tree))
-cat(tree2treestring(tree = tree))
-cat(tree2treestring(tree = tree, sign = ":"))
+# tr <- vlist(
+# 	NULL,
+# 	A = vlist(
+# 		"a",
+# 		B = vlist(
+# 			NULL,
+# 			C = vlist("bc"),
+# 			D = vlist("bd")
+# 			),
+# 		E = vlist("e")
+# 	),
+# 	vlist(
+# 		"f",
+# 		G = vlist("g")
+# 	)
+# )
+# cat(tree2xml(tr))
+# cat(tree2text(tree = tr))
+# cat(tree2string(tree = tr))
+# cat(tree2text(tree = tree))
+# cat(tree2string(tree = tree))
+# cat(tree2string(tree = tree, sign = ":"))
 
 
 tree2xml <- function(tree = tree.patients_cast, escaped = T, tab = "", add = "  ") {
@@ -303,7 +313,7 @@ tree2xml <- function(tree = tree.patients_cast, escaped = T, tab = "", add = "  
 }
 
 
-xml2_tree2string <- function(tree = t2) {
+xml2_tree2text <- function(tree = t2) {
 	s <- toString(xml2::as_xml_document(tree))
 	s <- gsub("^[^(\\\n)]+\\\n", "", s)
 	s <- gsub("<\\/[^(\\\n)]+", "", s)
@@ -364,8 +374,8 @@ tree2json <- function(tree, tab = "", add = "  ") {
 	}
 }
 
-print_tree <- function(tree, tab = "", add = "") {
-	cat(tree2string(tree = tree, tab = tab, add = add))
+print_tree <- function(tree, tab = "", add = "  ") {
+	cat(tree2text(tree = tree, tab = tab, add = add))
 }
 
 rm_ids_from_tree <- function(tree = tree.patients_cast) {
