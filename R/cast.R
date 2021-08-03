@@ -1,16 +1,70 @@
-rm(list = ls())
-
 library(fhircrackr)
 library(data.table)
 library(dplyr)
 
-fhir_cast <- function(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, keep_1st_index = F, shift_index = 0, use_brackes = F, verbose = 0) {
+lst <- function(v){names(v)<-v;v}
+esc <- function(s) {gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s)}
+esc_xml <- function(s) {
+	gsub("\"", "&quot;",
+		 gsub("'", "&apos;",
+		 	 gsub("<", "&lt;",
+		 	 	 gsub(">", "&gt;",
+		 	 	 	 gsub("&", "&amp;", s)
+		 	 	 )
+		 	 )
+		 )
+	)
+}
 
-	lst <- function(v){names(v)<-v;v}
-	esc <- function(s) {gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s)}
+desc_xml <- function(s) {
+	gsub("&quot;", "\"",
+		 gsub("&apos;", "'",
+		 	 gsub("&lt;", "<",
+		 	 	 gsub("&gt;", ">",
+		 	 	 	 gsub("&amp;", "&", s)
+		 	 	 )
+		 	 )
+		 )
+	)
+}
+inc_tab <- function(tab, add = "....") paste0(tab, add)
+dec_tab <- function(tab, sub = "....") substr(tab, 1, nchar(tab) - nchar(sub))
 
+vlist <- function(.value, ...) {
+	list <- list(...)
+	attr(list, "value") <- .value
+	list
+}
+
+frame_string <- function(text = "\nHello !!!\n\n\nIs\nthere\n\nA N Y O N E\n\nout\nthere\n???\n ", pos = c("left", "center", "right")[1], edge = " ", hori = "-", vert = "|") {
+	strpad <- function(string, width, pos = c("left", "right"), pad) {
+		n_chars <- function(char, count) paste0(rep_len(char, count), collapse = "")
+		w <- nchar(string)
+		if(pos == "left") {
+			paste0(string, n_chars(pad, width - w))
+		} else if(pos == "right") {
+			paste0(n_chars(pad, width - w), string)
+		} else {
+			paste0(n_chars(pad, (width - w) %/% 2), string, n_chars(pad, width - w - (width - w) %/% 2))
+		}
+	}
+	edge <- rep_len(strsplit(edge, "")[[1]], 4)[1 : 4]
+	r <- ""
+	s <- strsplit(text, "\n")[[1]]
+	h <- length(s)
+	w <- max(sapply(s, nchar))
+	hbt <- paste0(edge[1], paste0(rep_len(hori, w + 2), collapse = ""), edge[2], "\n")
+	hbb <- paste0(edge[3], paste0(rep_len(hori, w + 2), collapse = ""), edge[4], "\n")
+	r <- hbt
+	for(s_ in s) {
+		r <- paste0(r, vert, " ", strpad(string = s_, width = w, pos = pos, pad = " "), " ", vert, "\n")
+	}
+	r <- paste0(r, hbb)
+	r
+}
+
+fhir_cast <- function(indexed_df, sep, brackets, keep_1st_index = F, shift_index = 0, use_brackets = F, verbose = 1) {
 	if(!inherits(indexed_df, "data.table")) setDT(indexed_df)
-
 	df_names <- names(indexed_df)
 	s <- strsplit(df_names, "\\.")
 	names(s) <- df_names
@@ -22,6 +76,7 @@ fhir_cast <- function(indexed_df = df.patients, sep = desc.patients@style@sep, b
 	map <- sapply(
 		names(indexed_df),
 		function(name) {
+			#name <- names(indexed_df)[[6]]
 			if(0 < verbose) cat(name, "\n")
 			entries <- strsplit(indexed_df[[name]], sep_)
 			ids <- lapply(entries, function(entry)gsub(regexpr_ids, "\\1", entry))
@@ -30,33 +85,66 @@ fhir_cast <- function(indexed_df = df.patients, sep = desc.patients@style@sep, b
 				lapply(
 					ids[sapply(ids, function(i) all(!is.na(i)))],
 					function(id){
+						#id <- ids[sapply(ids, function(i) all(!is.na(i)))][[2]]
 						if(1 < length(name_vec)) {
 							sapply(
 								id,
 								function(i) {
-									paste0(paste0(name_vec, strsplit(i, "\\.")[[1]]), collapse = ".")
+									#i <- id[[2]]
+									i_ <- strsplit(i, "\\.")[[1]]
+									i_ <- as.numeric(i_)
+									ones_ <- 1 == i_
+									i_ <- i_ + shift_index
+									if(!keep_1st_index) {
+										i_[ones_] <- ""
+									}
+									if(use_brackets) {
+										bras_ <- rep_len("[", length(i_))
+										kets_ <- rep_len("]", length(i_))
+										if(!keep_1st_index) {
+											bras_[ones_] <- ""
+											kets_[ones_] <- ""
+										}
+										paste0(paste0(name_vec, bras_, i_, kets_), collapse = ".")
+									} else {
+										paste0(paste0(name_vec, i_), collapse = ".")
+									}
 								},
 								simplify = F
 							)
 						} else {
-							a <- paste0(name_vec, id)
-							names(a) <- id
-							a
+							if(1 < id || keep_1st_index) {
+								i <- as.numeric(id) + shift_index
+								a <- if(use_brackets) {
+									paste0(name_vec, "[", i, "]")
+								} else {
+									paste0(name_vec, i)
+								}
+								names(a) <- id
+								a
+							} else {
+								i <- as.numeric(id) + shift_index
+								a <- rep_len(name_vec, length(id))
+								names(a) <- id
+								a
+							}
 						}
 					}
 				),
 				use.names = T
 			)
-			u[unique(names(u))]
+			sort(u[unique(names(u))])
 		},
 		simplify = F
 	)
 	df_new_names <- unlist(map, use.names = F)
-	d <- data.table(matrix(nrow = nrow(indexed_df), ncol = length(df_new_names))) %>% setnames(df_new_names)
+	d <- data.table(matrix(data = rep_len(character(), nrow(indexed_df) * length(df_new_names)), nrow = nrow(indexed_df), ncol = length(df_new_names))) %>% setnames(df_new_names)
 	if(0 < verbose) cat("Pass 2\n")
 	for(name in names(map)) {
+		#name <- names(map)[[1]]
 		if(0 < verbose) cat(paste0(name, ":\n"))
 		for(id in names(map[[name]])) {
+			#id <- names(map[[name]])[[1]]
 			sname <- map[[name]][[id]]
 			if(0 < verbose) cat("  ", sname, "\n")
 			id_str <- paste0(bra_, id, ket_)
@@ -73,238 +161,253 @@ fhir_cast <- function(indexed_df = df.patients, sep = desc.patients@style@sep, b
 					simplify = F
 				)
 			)
-			d[[sname]][row_with_id] <- values
+			d[row_with_id, (sname) := values]
 		}
 	}
+	#setcolorder(x = d, neworder = sort(names(d)))
+
 	d
 }
 
-tree <- function(column_subnames, value, node, i = 1) {
 
-	l <- length(column_subnames)
-	if(i < l) {
-		node[[column_subnames[i]]] <- tree(column_subnames = column_subnames, value = value, node[[column_subnames[i]]], i + 1)
-	} else if(i == l) {
-		node[[column_subnames[i]]] <- value
-	}
-	node
-}
-
-build_tree <- function(df, fun = n_av, verbose = 0) {
-	df_names <- names(df)
-	col_subnames <- strsplit(df_names, "\\.")
-	names(col_subnames) <- df_names
-	tree_ <- list()
-	for(n in df_names) {
-		if(0 < verbose) cat(n, "\n")
-		csn <- col_subnames[[n]]
-		tree_ <- tree(column_subnames = csn, value = fun(df[[n]]), node = tree_)
-	}
-	tree_
-}
-
-print_tree <- function(tre, tab = "") {
-	for(n in names(tre)) {
-		tr <- tre[[n]]
-		cat(tab, n)
-		if(!is.list(tr)) {
-			cat(":", tr, "\n")
+build_tree <- function(row, root = "Bundle", keep_nas = F) {
+	new_tree <- function(col_names, tree, value = 1) {
+		len <- length(col_names)
+		if(is.null(tree)) tree <- list()
+		if(len == 0) {
+			setattr(tree, "value", value)
 		} else {
-			cat("\n")
-			print_tree(tre = tr, paste0(tab, "  "))
+			tr <- new_tree(col_names = col_names[-1], tree = tree[[col_names[1]]], value = value)
+			tree[[col_names[1]]] <- tr
 		}
+		tree
 	}
-}
-
-build_xml <- function(tre, tab = "") {
-	s <- ""
-	for(n in names(tre)) {
-		tr <- tre[[n]]
-		n_ <- gsub("([^0-9]+)([0-9]+)$", "\\1", n)
-		if(!is.list(tr)) {
-			if(0 < length(tr)) {
-				tr <- tr[!sapply(tr, is.na)]
-				if(0 < length(tr)) s <- paste0(s, tab, "<", n_, " value=\"", tr, "\"/>\n")
-			}
+	tree <- list()
+	row <- sapply(row, function(x)x)
+	if(!keep_nas) row <- row[!is.na(row)]
+	names(row) <- paste0(root, ".", names(row))
+	for(col_name in names(row)) {
+		value <- row[[col_name]]
+		col_names_split <- strsplit(col_name, "\\.")[[1]]
+		if(length(col_names_split) == 1) {
+			tr <- list()
+			setattr(tr, "value", value)
 		} else {
-			s_ <- build_xml(tre = tr, tab = paste0(tab, "  "))
-			if(s_ != "") {
-				s <- paste0(s, tab, "<", n_, ">\n", s_, tab, "</", n_, ">\n")
-			}
+			tr <- new_tree(col_names = col_names_split[-1], tree = tree[[col_names_split[[1]]]], value = value)
 		}
+		tree[[col_names_split[1]]] <- tr
 	}
-	s
+	tree
 }
 
-build_bundles <- function(cast_table, resource_name, bundle_size = 50) {
-	max_ <- nrow(cast_table)
+build_tree_bundles <- function(df, resource_name, bundle_size = 50) {
+	bundles <- list()
+	b <- 0
 	i <- 1
-	cat(i - 1, "\n")
-	bundles = list()
-	while(i <= max_) {
-		s <- "<Bundle>\n"
-		end_ <- min(c(max_, i + bundle_size - 1))
+	while(i <= nrow(df)) {
+		end_ <- min(c(i - 1 + bundle_size, nrow(df)))
+		bundle <- list()
+		j <- i
 		while(i <= end_) {
-			tree_cast_table <- build_tree(cast_table[i,], fun = function(x)x)
-			s_ <- paste0("  <", resource_name, ">\n")
-			s_ <- paste0(s_, build_xml(tree_cast_table, tab = "    "))
-			s_ <- paste0(s_, "  </", resource_name, ">\n")
-			s  <- paste0(s, s_)
+			row <- df[i,]
+			bundle <- c(bundle, rm_ids_from_tree(build_tree(row = row, root = resource_name, keep_nas = F)))
 			i <- i + 1
 		}
-		s <- paste0(s, "</Bundle>\n")
-		bundles <- c(bundles, s)
-		cat(i - 1, "\n")
+		bundle <- list(Bundle = bundle)
+		bundles[[paste0("Bundle", b)]] <- bundle
+		b <- b + 1
+		cat(paste0("Bundle ", b, " a ", i - j, " ", resource_name, "s  \u03A3 ", resource_name, "s = ", i - 1, "\n"))
 	}
 	bundles
 }
 
-fun <- function(col) {min(col, na.rm = T)}
-sel_row <- function(df) cs_casted[2]
-n_av <- function(row) sum(!is.na(row))
+tree2text <- function(tree, tab = "", add = "  ") {
+	str = ""
+	for(i in seq_along(tree)) {
+		#s <- ""
+		n <- names(tree)[i]
+		tr <- tree[[i]]
+		s <- paste0(tab, n)
+		a <- attr(tr, "value")
+		if(!is.null(a)) {
+			s <- paste0(s, " : ", a)
+		}
+		str <- paste0(str, s, "\n", tree2text(tree = tr, tab = inc_tab(tab, add), add = add))
+	}
+	str
+}
 
-bundle <- xml2::read_xml(
-	"<Bundle>
+tree2string <- function(tree, sign = c("\u2500", ":")[1]) {
+	tree2string_ <- function(tree, pre, sign) {
+		if(is.null(tree)) return(NULL)
+		rows <- list()
+		len <- length(tree)
+		for(i in seq_len(len)) {
+			#i <- 1
+			n <- names(tree)[i]
+			tr <- tree[[i]]
+			s <- paste0(pre, (if(i == len) "\u2514" else "\u251C"), "\u2500", (if(length(tr) == 0) "\u2500" else "\u2510"), " ", n)
+			a <- attr(tr, "value")
+			if(!is.null(a)) {
+				s <- paste0(s, " ", sign, " ", a)
+			}
+			rows[[i]] <- paste0(
+				s,
+				"\n",
+				tree2string_(
+					tree = tr,
+					pre = if(i < len) paste0(pre, "\u2502", " ") else paste0(pre, "  "),
+					sign = sign
+				)
+			)
+		}
 
-	<Patient>
-		<id value='id1'/>
-		<address>
-			<use value='home'/>
-			<city value='Amsterdam'/>
-			<type value='physical'/>
-			<country value='Netherlands'/>
-		</address>
-		<birthDate value='1992-02-06'/>
-	</Patient>
-
-	<Patient>
-		<id value='id2'/>
-		<address>
-			<use value='home'/>
-			<city value='Rome'/>
-			<type value='physical'/>
-			<country value='Italy'/>
-		</address>
-		<address>
-			<use value='work'/>
-			<city value='Stockholm'/>
-			<type value='postal'/>
-			<country value='Sweden'/>
-		</address>
-		<address>
-		</address>
-		<birthDate value='1980-05-23'/>
-	</Patient>
-
-	<Patient>
-		<id value='id3'/>
-		<address>
-		</address>
-		<birthDate value='1980-05-24'/>
-		<birthDate value='1980-05-25'/>
-	</Patient>
-
-	<Patient>
-		<id value='id4'/>
-		<address>
-			<use value='home'/>
-			<city value='Berlin'/>
-		</address>
-		<address>
-			<type value='postal'/>
-			<country value='France'/>
-		</address>
-		<address>
-			<use value='work'/>
-			<city value='London'/>
-			<type value='postal'/>
-			<country value='England'/>
-		</address>
-		<birthDate value='1974-12-25'/>
-		<birthDate value='1978-11-13'/>
-		<birth_date value='1918-11-13'/>
-	</Patient>
-
-	<Patient>
-		<id value='id5'/>
-	</Patient>
-
-	<Patient>
-	</Patient>
-
-	<Patient>
-		<ID value='id7'/>
-	</Patient>
-
-</Bundle>"
-)
-
-desc.patients <- fhir_table_description(
-	resource = "Patient",
-	style = fhir_style(
-		brackets = c("<(>", "<)>"),
-		sep = "<|>"
-	)
-)
-
-(df.patients <- fhir_crack(
-	bundles = list(bundle),
-	design = desc.patients,
-	remove_empty_columns = FALSE))
-
-
-(df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1))
-(tree.patients_cast <- build_tree(df = df.patients_cast[1,], fun = function(x)x))
-print_tree(tre = tree.patients_cast)
-cat(build_xml(tre = tree.patients_cast))
-bundles <- build_bundles(df.patients_cast, "Patient", 50)
-cat(bundles[[1]])
-
-bundle
-xml2::read_xml(bundles[[1]])
-
-
-# sep <- desc.patients@style@sep
-# brackets <- desc.patients@style@brackets
-
-# cs <- fhir_capability_statement("https://mii-agiop-3p.life.uni-leipzig.de/fhir", verbose = 2, sep = sep)
-# #cs <- fhir_capability_statement("https://hapi.fhir.org/baseR4", verbose = 2, sep = sep, brackets = brackets)
-#
-# res <- cs$Resources
-#
-# totals <- sapply(
-# 	res$type,
-# 	function(res_) {
-# 		b <- fhir_search(paste0("https://mii-agiop-3p.life.uni-leipzig.de/fhir/", res_, "?_summary=count"), verbose = 1)
-# 		d <- fhir_table_description(
-# 			resource = "Bundle",
-# 			cols = c("total" = "./total")
-# 		)
-# 		df <- fhir_crack(b, d, verbose = 0)
-# 		as.numeric(df$total)
-# 	}
+		paste0(rows, collapse = "")
+	}
+	tree2string_(tree = tree, pre = "", sign = sign)
+}
+# tr <- vlist(
+# 	NULL,
+# 	A = vlist(
+# 		"a",
+# 		B = vlist(
+# 			NULL,
+# 			C = vlist("bc"),
+# 			D = vlist("bd")
+# 			),
+# 		E = vlist("e")
+# 	),
+# 	vlist(
+# 		"f",
+# 		G = vlist("g")
+# 	)
 # )
-#
-# totals <- totals[0 < totals]
-# (totals <- totals[order(totals)])
-#
-# (res_ <- names(totals)[8])
-res_ <- "Patient"
-bundles <- fhir_search(paste0("https://mii-agiop-3p.life.uni-leipzig.de/fhir/", res_, "?_count=500"), verbose = 2)
-(table_desc <- fhir_table_description(res_, style = fhir_style(sep = "<~>", brackets = c("<[", "]>"))))
-(table_res <- fhir_crack(bundles, table_desc, verbose = 2))
-(table_cast <- fhir_cast(table_res, table_desc@style@sep, table_desc@style@brackets, verbose = 1))
-(table_tree <- build_tree(table_cast[1,], function(i)i))
-print_tree(table_tree)
-cat(build_xml(tre = table_tree))
-s <- build_bundles(cast_table = table_cast, resource_name = res_, bundle_size = 100)
-cat(s[[1]])
-xml2::read_xml(s[[1]])
-bundles[[1]]
+# cat(tree2xml(tr))
+# cat(tree2text(tree = tr))
+# cat(tree2string(tree = tr))
+# cat(tree2text(tree = tree))
+# cat(tree2string(tree = tree))
+# cat(tree2string(tree = tree, sign = ":"))
 
-cs_style <- fhir_style(sep = "<~>", brackets = c("<[", "]>"))
-cs <- fhir_capability_statement("https://vonk.fire.ly/R4", verbose = 2, sep = cs_style@sep, brackets = cs_style@brackets)
-table_res <- cs$Resources
-table_cast <- fhir_cast(table_res, cs_style@sep, cs_style@brackets, verbose = 1)
-s <- build_bundles(cast_table = table_cast, resource_name = "Resources", bundle_size = 50)
-cat(s[[1]])
+
+tree2xml <- function(tree = tree.patients_cast, escaped = T, tab = "", add = "  ") {
+	str = ""
+		for(i in seq_along(tree)) {
+		s <- ""
+		#i<-1
+		n <- names(tree)[i]
+		#n<-names(tree)[[1]]
+		tr <- tree[[i]]
+
+		s <- paste0(tab, "<", n)
+		a <- attr(tr, "value")
+		if(!is.null(a)) {
+			s <- paste0(s, " value=\"", if(escaped) esc_xml(a) else a, "\"")
+		}
+		s <- if(length(tr) == 0) paste0(s, "/>") else paste0(s, ">")
+		s = paste0(s, "\n", tree2xml(tree = tr, escaped = escaped, tab = inc_tab(tab, add), add = add))
+		if(0 < length(tr)) s <- paste0(s, tab, "</", n, ">\n")
+		str <- paste0(str, s)
+	}
+	str
+}
+
+
+xml2_tree2text <- function(tree = t2) {
+	s <- toString(xml2::as_xml_document(tree))
+	s <- gsub("^[^(\\\n)]+\\\n", "", s)
+	s <- gsub("<\\/[^(\\\n)]+", "", s)
+	s <- gsub(" +\\\n", "", s)
+	s <- gsub("\"", "", s)
+	s <- gsub("value=", ": ", gsub("(<)|(</)", "", gsub("(>)|(/>)", "", s)))
+	cat(s)
+}
+
+tree2json <- function(tree, tab = "", add = "  ") {
+	get_arrays <- function(tree) {
+		s <- ""
+		names_of_siblings <- names(tree)
+		names_of_siblings_without_ids <- gsub("(\\[[0-9]+]$)|([0-9]+$)", "", names_of_siblings)
+		arrays_indices <- sapply(
+			simplify = F,
+			unique(names_of_siblings_without_ids),
+			function(n) {
+				#n <- unique(names_of_siblings_without_ids)[[1]]
+				which(names_of_siblings_without_ids == n)
+			}
+		)
+		names_of_arrays <- names(arrays_indices)
+		arrays_indices
+	}
+	dict <- function(tree, tab = "", add = "  ") {
+		s <- "{ \n"
+		arrays <- get_arrays(tree)
+		len <- length(arrays)
+		for(i in seq_len(len)) {
+			name_of_array <- names(arrays)[[i]]
+			s <- paste0(s, inc_tab(tab, add), "\"", name_of_array, "\": ")
+			array <- arrays[[name_of_array]]
+			s <- paste0(s, arr(tree[array], tab, add))
+			if(i != len) s <- paste0(s, ",\n")
+		}
+		s <- paste0(s, "\n", tab, "}")
+	}
+	arr <- function(tree, tab = "", add = "  ") {
+		s <- "[ "
+		len <- length(tree)
+		for(i in seq_len(len)) {
+			s <- paste0(s, tree2json(tree = tree[[i]], inc_tab(tab, add), add))
+			if(i != len) s <- paste0(s, ", ")
+		}
+		s <- paste0(s, " ]")
+	}
+	s <- ""
+	a <- attr(tree, "value")
+	if(!is.null(a)) {
+		s <- paste0(s, "\"", a, "\"")
+		return(s)
+	}
+	if(length(names(tree)) == 0) {
+		s <- paste0(s, arr(tree, tab, add))
+	} else {
+		s <- paste0(s, dict(tree, tab, add))
+	}
+}
+
+print_tree <- function(tree, tab = "", add = "  ") {
+	cat(tree2text(tree = tree, tab = tab, add = add))
+}
+
+rm_ids_from_tree <- function(tree = tree.patients_cast) {
+	if(!is.null(names(tree))) {
+		for(n in names(tree)) {
+			#n <- names(tree)[[1]]
+			tree[[n]] <- rm_ids_from_tree(tree = tree[[n]])
+		}
+		names(tree) <- gsub("(\\[[0-9]+])|([0-9]+)", "", names(tree))
+	}
+	tree
+}
+
+build_xml_bundles <- function(cast_table, resource_name, bundle_size = 500) {
+	max_ <- nrow(cast_table)
+	i <- 1
+	b <- 0
+	bundles <- list()
+	while(i <= max_) {
+		s <- ""
+		end_ <- min(c(max_, i + bundle_size - 1))
+		j <- i
+		while(i <= end_) {
+			s <- paste0(s, tree2xml(rm_ids_from_tree(build_tree(row = cast_table[i,], resource_name)), tab = "  "))
+			#s_ <- paste0(s_, xml2::as_xml_document(rm_ids_from_tree(build_tree(row = cast_table[i,], resource_name))))
+			i <- i + 1
+		}
+		s <- paste0("<Bundle>\n", s, "</Bundle>")
+		b <- b + 1
+		#cat(s)
+		bundles[[paste0("Bundle", b)]] <- xml2::read_xml(s)
+		cat(paste0("Bundle ", b, " a ", i - j, " ", resource_name, "s  \u03A3 ", resource_name, "s = ", i - 1, "\n"))
+	}
+	bundles
+}
