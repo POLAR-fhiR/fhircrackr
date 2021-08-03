@@ -465,29 +465,13 @@ fhir_capability_statement <- function(
 		verbose = verbose
 	)
 
-	restBrackets <- if(is.null(brackets)) {c("[", "]")} else {brackets}
-
 	REST <- fhir_crack(
 		bundles = list(xml_rest),
 		design = fhir_design(Rest),
 		sep = sep,
-		brackets = restBrackets,
+		brackets = brackets,
 		verbose = verbose
 	)
-
-	rest <- fhir_melt(
-		indexed_data_frame = REST$Rest,
-		brackets = restBrackets,
-		sep = " || ",
-		columns = fhir_common_columns(
-			data_frame = REST$Rest,
-			column_names_prefix = "operation"
-		),
-		all_columns = TRUE
-	)
-
-	rest$resource_identifier <- NULL
-	if(is.null(brackets)) {rest <- fhir_rm_indices(indexed_data_frame = rest, brackets = restBrackets)}
 
 	RESOURCE <- fhir_crack(
 		bundles = list(xml_resource),
@@ -497,7 +481,7 @@ fhir_capability_statement <- function(
 		verbose = verbose
 	)
 
-	list(Meta = META$Meta, Rest = unique(rest), Resources = RESOURCE$Resources)
+	list(Meta = META$Meta, Rest = REST$Rest, Resources = RESOURCE$Resources)
 }
 
 ####Saving Bundles####
