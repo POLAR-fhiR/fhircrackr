@@ -52,24 +52,36 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 	paste0(sub(pattern = "/$" , replacement = "", x = path1), "/", sub(pattern = "^/", replacement = "", x = path2))
 }
 
+
 fhir_ns_strip <- function(xml) {
-	###
-	# Andre.Medek@ukbonn.de
-	###
-	xml2::read_xml(
-		paste(
-			sapply(
-				readLines(f),
-				function(x) {
-					gsub(' xmlns="[^"]+"', '', x)
+	# cat("\nis(xml):\n")
+	# print(is(xml))
+	# (xml2::xml_ns_strip(xml))
+	# cat("\nis(xml2):\n")
+	# print(is(xml))
+	# return(xml)
+	xml_2 <- if(inherits(xml, "fhir_bundle_list")) {
+		fhir_bundle_list(
+			lapply(
+				xml,
+				function(bundle) {
+					xml2::read_xml(gsub(" xmlns=\"[^\"]+\"", "", toString(bundle)))
 				}
-			),
-			collapse = ""
+			)
 		)
-	)
+	}
+	else if(inherits(xml, "fhir_bundle_xml")) {
+		fhir_bundle_xml(xml2::read_xml(gsub(" xmlns=\"[^\"]+\"", "", toString(xml))))
+	} else {
+		xml2::read_xml(gsub(" xmlns=\"[^\"]+\"", "", toString(xml)))
+	}
+
+	# cat("\nis(xml):\n")
+	# print(is(xml))
+	# cat("\nis(xml2):\n")
+	# print(is(xml_2))
+	xml_2
 }
-
-
 
 ##### Documentation for medication_bundles data set ######
 
