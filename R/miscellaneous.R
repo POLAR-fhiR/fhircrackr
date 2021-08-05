@@ -52,6 +52,25 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 	paste0(sub(pattern = "/$" , replacement = "", x = path1), "/", sub(pattern = "^/", replacement = "", x = path2))
 }
 
+fhir_ns_strip <- function(xml) {
+	###
+	# Andre.Medek@ukbonn.de
+	###
+	xml2::read_xml(
+		paste(
+			sapply(
+				readLines(f),
+				function(x) {
+					gsub(' xmlns="[^"]+"', '', x)
+				}
+			),
+			collapse = ""
+		)
+	)
+}
+
+
+
 ##### Documentation for medication_bundles data set ######
 
 #' Exemplary FHIR bundles

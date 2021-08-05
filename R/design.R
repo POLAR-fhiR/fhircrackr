@@ -327,7 +327,8 @@ design2xml <- function (design) {
 		}
 		xml2::xml_set_attr(x = rme, attr = "value", value = df_desc@style@rm_empty_cols)
 	}
-	xml2::xml_ns_strip(x = xml2::xml_root(x = xml))
+	#xml2::xml_ns_strip(x = xml2::xml_root(x = xml))
+	xml <- fhir_ns_strip(xml = xml2::xml_root(x = xml))
 	xml2::xml_root(x = xml)
 }
 
