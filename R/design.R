@@ -210,7 +210,7 @@ fix_df_desc <- function (df_desc) {
 			rm_empty_cols = FALSE
 		)
 	} else {
-		fix_res <- fix(list = df_desc$style, c("sep", "brackets", "rm_empty_cols"), defaults = list(" ", NULL, FALSE))
+		fix_res <- fix(list = df_desc$style, c("sep", "brackets", "rm_empty_cols"), defaults = list(":::", NULL, FALSE))
 		if(is.null(fix_res$value)) {
 			fix_res$msg <- paste0("style ", fix_res$msg)
 			return(fix_res)
@@ -423,7 +423,7 @@ xml2design <- function(xml) {
 				style <- fhir_style()
 			} else {
 				sep <- xml2::xml_attr(x = xml2::xml_find_all(x = style, xpath = "sep"), attr = "value")
-				if(length(sep) < 1 || all(is.na(sep))){sep <- " "}
+				if(length(sep) < 1 || all(is.na(sep))){sep <- ":::"}
 				bra_open <- xml2::xml_attr(x = xml2::xml_find_all(x = style, xpath = "brackets/open"), attr = "value")
 				if(length(bra_open) < 1 || all(is.na(bra_open))){bra_open <- NULL}
 				bra_close <- xml2::xml_attr(x = xml2::xml_find_all(x = style, xpath = "brackets/close"), attr = "value")

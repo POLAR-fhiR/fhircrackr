@@ -68,13 +68,15 @@ setMethod(
 	f = "show",
 	signature = "fhir_bundle_xml",
 	definition = function(object) {
+		entries <- length(xml2::xml_find_all(object, "entry"))
+
 		cat(
 			paste0(
 				"A fhir_bundle_xml object\n",
-				"No. of entries : ", length(xml2::xml_find_all(object, "entry")), "\n",
-				"Self Link: ", object@self_link, "\n",
-				"Next Link: ", object@next_link
-			), "\n\n"
+				if(entries>0){paste0("No. of entries : ", entries, "\n")},
+				if(length(object@self_link)>0){paste0("Self Link: ", object@self_link, "\n")},
+				if(length(object@next_link)>0){paste0("Next Link: ", object@next_link, "\n")}
+			), "\n"
 		)
 		print(object)
     }

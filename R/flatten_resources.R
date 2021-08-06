@@ -13,16 +13,16 @@
 #' comprehensive examples of both.
 #'
 #' @param sep Optional. A character vector of length ones to separate pasted multiple entries which will overwrite the `sep` defined in
-#' `design`. If `sep = NULL`, it is looked up in `design`, where the default is `" "`.
+#' `design`. If `sep = NULL`, it is looked up in `design`, where the default is `":::"`.
 #'
 #' @param remove_empty_columns Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
 #' `design`. If `remove_empty_columns = NULL`, it is looked up in `design`, where the default is `FALSE`.
 #'
-#' @param brackets Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")},
+#' @param brackets Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c("<|", "|>")},
 #' which will overwrite the `brackets` defined in `design`. If `brackets = NULL`, it is looked up in `design`, where the default is `character(0)`,
 #' i.e. no indices are added to multiple entries. Empty strings (`""`) are not allowed.
 #'
-#' @param verbose An integer vector of length one.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
+#' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
 #'
 #' @param data.table A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
@@ -282,8 +282,8 @@ setMethod(
 #' from the resource
 #' @param sep A character vector of length one to separate pasted multiple entries.
 #' @param xpath A character vector of length one to locate data in tree via xpath.
-#' @param brackets A character vector of length one or two defining the Brackets
-#' surrounding the Indices. e.g. c( "<", ">") NULL means no brackets.
+#' @param brackets A character vector of length one or two defining the brackets
+#' surrounding the indices. e.g. c( "<", ">") NULL means no brackets.
 #' A vector of length one like c("|") means that the "|"-sign will be used as opening and closing Brackets.
 #' @noRd
 #'

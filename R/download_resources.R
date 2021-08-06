@@ -43,7 +43,7 @@
 #' for how to create this.
 #' @param max_bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
 #' @param verbose An integer vector of length one. If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
-#' downloading progress will be printed. Defaults to 2.
+#' downloading progress will be printed. Defaults to 1.
 #' @param max_attempts A numeric vector of length one. The maximal number of attempts to send a request, defaults to 5.
 #' @param delay_between_attempts A numeric vector of length one specifying the delay in seconds between two attempts. Defaults to 10.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.

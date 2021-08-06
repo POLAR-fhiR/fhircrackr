@@ -41,7 +41,7 @@ for how to create this.}
 \item{max_bundles}{Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
 
 \item{verbose}{An integer vector of length one. If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
-downloading progress will be printed. Defaults to 2.}
+downloading progress will be printed. Defaults to 1.}
 
 \item{max_attempts}{A numeric vector of length one. The maximal number of attempts to send a request, defaults to 5.}
 

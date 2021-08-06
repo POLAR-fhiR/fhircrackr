@@ -2,9 +2,9 @@
 #' An S4 class to represent a design for cracking FHIR resources
 #'
 #'
-#' @slot sep A string to separate pasted multiple entries. Defaults to `" "`.
+#' @slot sep A string to separate pasted multiple entries. Defaults to `":::"`.
 #' @slot brackets  A character vector of length two defining the brackets surrounding indices for multiple entries,
-#' e.g. `c( "<", ">")`. If this is empty (i.e. character of length 0, the default), no indices will be added to multiple entries.
+#' e.g. `c("<|", "|>")`. If this is empty (i.e. character of length 0, the default), no indices will be added to multiple entries.
 #' Empty strings (`""`) are not allowed.
 #' @slot rm_empty_cols Logical scalar. Remove empty columns? Defaults to FALSE.
 #' @export
@@ -45,7 +45,7 @@ setValidity(
 #'
 #' - `sep`: A string defining the separator used to separate multiple entries for the same element in a FHIR resource,
 #' e.g. multiple `address/city` elements in a Patient resource.
-#' - `brackets`: A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`.
+#' - `brackets`: A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c("<|", "|>")`.
 #' If this is empty (i.e. character of length 0, the default), no indices will be added to multiple entries.
 #' Empty strings (`""`) are not allowed.
 #' - `rm_empty_cols`: A logical scalar defining whether or not to remove empty columns after cracking. Empty columns arise when you
@@ -53,27 +53,27 @@ setValidity(
 #' A `fhir_style` object looks for example like this:
 #'
 #' ```
-#' sep: ' '
-#' brackets: '[' ']'
+#' sep: ':::'
+#' brackets: '<|' '|>'
 #' rm_empty_cols: FALSE
 #' ```
 #'
-#' @param sep A character vector of length one to separate pasted multiple entries. Defaults to `" "`
-#' @param brackets  A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`.
+#' @param sep A character vector of length one to separate pasted multiple entries. Defaults to `":::"`
+#' @param brackets  A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c("<|", "|>")`.
 #' If this is empty (i.e. character of length zero, the default) or 'NULL', no indices will be added to multiple entries. If it is a character
 #' vector of length one, it will be recycled to length two, i.e. `"|"` will become `c("|", "|")`.
 #' Empty strings (`""`) are not allowed.
 #' @param rm_empty_cols A logical vector of length one. Remove empty columns? Defaults to `FALSE`.
 #' @return A fhir_style object
 #' @examples
-#' fhir_style(sep = " ",
-#'            brackets = c("[", "]"),
+#' fhir_style(sep = ":::",
+#'            brackets = c("<|", "|>"),
 #'            rm_empty_cols = TRUE)
 #'
 #' @export
 
 
-fhir_style <- function(sep = " ", brackets = character(), rm_empty_cols = FALSE) {
+fhir_style <- function(sep = ":::", brackets = character(), rm_empty_cols = FALSE) {
 
 	if(is.null(brackets)) {brackets <- character()}
 	if(any(is.na(brackets))) {stop("You cannot use NA in brackets.")}

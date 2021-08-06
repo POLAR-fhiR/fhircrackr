@@ -1,6 +1,6 @@
-rm(list = ls())
+#rm(list = ls())
 
-source("R/cast.R")
+#source("R/cast.R")
 
 endpoints <- list(
 	hapi = "https://hapi.fhir.org/baseR4",
@@ -12,8 +12,51 @@ endpoints <- list(
 bundle <- xml2::read_xml(
 	"<Bundle>
 
+		<Patient>
+			<id value='id1'/>
+			<address>
+				<use value='home'/>
+				<city>
+					<x>
+						<y value='Berlin'/>
+					</x>
+					<x>
+						<y value='Paris'/>
+					</x>
+				</city>
+				<type value='physical'/>
+				<country value='Netherlands'/>
+			</address>
+			<birthDate value='1992-02-06'/>
+		</Patient>
+
+		<Patient>
+			<id value='id1'/>
+			<address>
+				<use value='home'/>
+				<city>
+					<x>
+						<y value='Berlin'/>
+					</x>
+					<x>
+						<y value='Paris'/>
+					</x>
+				</city>
+				<type value='physical'/>
+				<country value='Netherlands'/>
+			</address>
+			<birthDate value='1992-02-06'/>
+		</Patient>
+	</Bundle>
+	"
+)
+
+bundle <- xml2::read_xml(
+	"<Bundle>
+
 	<Patient>
 		<id value='id1'/>
+		<id value='id2'/>
 		<address>
 			<use value='home'/>
 			<city value='Amsterdam'/>
@@ -92,25 +135,37 @@ xml2::xml_path(xml2::xml_find_all(fhir_unserialize(bundles = fhircrackr::example
 desc.patients <- fhir_table_description(
 	resource = "Patient",
 	style = fhir_style(
-		brackets = c("<(", ")>"),
-		sep = " <~> "
+		brackets = c("<|", "|>"),
+		sep = " ::: "
 	)
 )
+
+# desc.patients <- fhir_table_description(
+# 	resource = "Patient",
+# 	cols = list(
+# 		id ="id",
+# 		city="address/city",
+# 		type="address/type"
+# 	),
+# 	style = fhir_style(
+# 		brackets = c("<(", ")>"),
+# 		sep = " <~> "
+# 	)
+# )
 
 (df.patients <- fhir_crack(
 	bundles = list(bundle),
 	design = desc.patients,
 	remove_empty_columns = FALSE))
 
+df.patients_cast <-fhir_cast(indexed_df = df.patients,
+							sep = desc.patients@style@sep,
+							brackets = desc.patients@style@brackets,
+							verbose = 2)
 
-(df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = T, shift_index = 0, use_brackets = T))
-(df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = F, shift_index = -1, use_brackets = T))
-(df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = T, shift_index = 0, use_brackets = F))
-(df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = T, shift_index = -1, use_brackets = F))
-(df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1))
-(df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = F, shift_index = 0, use_brackets = F))
-(df.patients_cast <- fhir_cast(indexed_df = df.patients, sep = desc.patients@style@sep, brackets = desc.patients@style@brackets, verbose = 1, keep_1st_index = T, shift_index = 0, use_brackets = T))
-(tree.patients_cast <- build_tree(row = df.patients_cast[4,], root = "Patient"))
+
+
+tree.patients_cast <- build_tree(row = df.patients_cast[4,], root = "Patient")
 cat(tree2text(tree = tree.patients_cast))
 cat(tree2string(tree = tree.patients_cast))
 cat(tree2text(tree = rm_ids_from_tree(tree = tree.patients_cast)))
@@ -119,7 +174,7 @@ print_tree(tree = rm_ids_from_tree(tree = tree.patients_cast))
 print(xml2::as_xml_document(rm_ids_from_tree(tree = tree.patients_cast)))
 cat(toString(xml2::as_xml_document(rm_ids_from_tree(tree = tree.patients_cast))))
 
-tree_bundles <- build_tree_bundles(df = df.patients_cast, resource_name = "Patient", bundle_size = 2)
+tree_bundles <- build_bundle_trees(df = df.patients_cast, resource_name = "Patient", bundle_size = 2)
 cat(toString(xml2::as_xml_document(tree_bundles$Bundle1)))
 xml_bundles <- lapply(tree_bundles, function(b)xml2::as_xml_document(b))
 fhir_crack(bundles = xml_bundles, fhir_table_description(resource = "Patient"), verbose = 2)
@@ -128,19 +183,20 @@ fhir_crack(bundles = xml_bundles, fhir_table_description(resource = "Patient"), 
 endpoint <- endpoints$hapi
 resource_name <- "Observation"
 bundle_size <- 500
-xml_bundles <- fhir_search(paste0(paste_paths(endpoint, resource_name), "?_count=", bundle_size), max_bundles = 5, verbose = 2)
+xml_bundles <- fhir_search(paste0(paste_paths(endpoint, resource_name), "?_count=", bundle_size), max_bundles = 10, verbose = 2)
 
 sep <- " <~> "
 brackets <- c("<|", "|>")
 style <- fhir_style(sep = sep, brackets = brackets)
 descr <- fhir_table_description(resource = resource_name, style = style)
 table_orig <- fhir_crack(bundles = xml_bundles, design = descr, data.table = T)
-cast_table_orig <- fhir_cast(table_orig, sep = sep, brackets = brackets)
+
+system.time(cast_table_orig <- fhir_cast(table_orig, sep = sep, brackets = brackets))
 
 cat(frame_string("Version 1"))
 start_total <- Sys.time()
 start <- Sys.time()
-tree_bundles <- build_tree_bundles(df = cast_table_orig, resource_name = resource_name, bundle_size = bundle_size)
+tree_bundles <- build_bundle_trees(df = cast_table_orig, resource_name = resource_name, bundle_size = bundle_size)
 Sys.time() - start
 start <- Sys.time()
 xml_bundles1 <- lapply(tree_bundles, function(b) xml2::as_xml_document(b))
@@ -150,7 +206,7 @@ Sys.time() - start_total
 cat(frame_string("Version 2"))
 start_total <- Sys.time()
 start <- Sys.time()
-tree_bundles <- build_tree_bundles(df = cast_table_orig, resource_name = resource_name, bundle_size = bundle_size)
+tree_bundles <- build_bundle_trees(df = cast_table_orig, resource_name = resource_name, bundle_size = bundle_size)
 Sys.time() - start
 start <- Sys.time()
 fit_tree <- lapply(tree_bundles, rm_ids_from_tree)
@@ -166,7 +222,7 @@ Sys.time() - start_total
 cat(frame_string("Version 2 short"))
 start_total <- Sys.time()
 start <- Sys.time()
-tree_bundles <- build_tree_bundles(df = cast_table_orig, resource_name = resource_name, bundle_size = bundle_size)
+tree_bundles <- build_bundle_trees(df = cast_table_orig, resource_name = resource_name, bundle_size = bundle_size)
 Sys.time() - start
 start <- Sys.time()
 xml_bundles2s <- lapply(tree_bundles, function(b) xml2::read_xml(tree2xml(rm_ids_from_tree(b))))
@@ -578,7 +634,7 @@ descr    <- fhir_table_description(resource = res_name, style = style)
 bundles  <- fhir_search(paste0(paste_paths(endpoint, res_name), "?_count", bundle_size), verbose = 2, max_bundles = 10)
 table    <- fhir_crack(bundles = bundles, design = descr, verbose = 2)
 ctable   <- fhir_cast(indexed_df = table, sep = sep, brackets = brackets, keep_1st_index = T, shift_index = 0, use_brackets = T, verbose = 1)
-tbundles <- build_tree_bundles(df = ctable, resource_name = res_name, bundle_size = 13)
+tbundles <- build_bundle_trees(df = ctable, resource_name = res_name, bundle_size = 13)
 
 cat(tree2string(tbundles$Bundle0))
 cat(tree2string(tbundles$Bundle1, ":"))

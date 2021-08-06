@@ -375,11 +375,121 @@ lst <- function(..., prefix = NULL, suffix = NULL) {
 
 
 #' Escape special characters
-#' @param s A a character vector of length one in which the characters should be escaped.
-#' @return A a character vector of length one with all special characters escaped.
+#' @param s A character vector in which the characters should be escaped.
+#' @return A character vector with all special characters escaped.
 #' @example esc(s = c("(",")"))
 #' @noRd
 #'
 esc <- function(s) {
 	gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s)
+}
+
+#' Escape characters reserved in xml
+#' #' @param s A character vector in which the characters should be escaped.
+#' @return A character vector of with all special characters escaped.
+#' @example esc_xml(s = c("<","&"))
+#' @noRd
+#'
+esc_xml <- function(s) {
+	gsub("\"", "&quot;",
+		 gsub("'", "&apos;",
+		 	 gsub("<", "&lt;",
+		 	 	 gsub(">", "&gt;",
+		 	 	 	 gsub("&", "&amp;", s)
+		 	 	 )
+		 	 )
+		 )
+	)
+}
+
+
+#' Unescape characters reserved in xml
+#' @param s A character vector of with all special characters escaped.
+#' @return The unescaped version
+#' @example esc_xml(s = c("&quot;","&amp;"))
+#' @noRd
+#'
+#'
+desc_xml <- function(s) {
+	gsub("&quot;", "\"",
+		 gsub("&apos;", "'",
+		 	 gsub("&lt;", "<",
+		 	 	 gsub("&gt;", ">",
+		 	 	 	 gsub("&amp;", "&", s)
+		 	 	 )
+		 	 )
+		 )
+	)
+}
+
+#' Increment tab
+#' @param tab A character vector with strings to increment
+#' @param add The string to use for incrementation
+#' @return The incremented tab
+#' @noRd
+inc_tab <- function(tab, add = "....") {paste0(tab, add)}
+
+#' Decrement tab
+#' @param tab A character vector with strings to dencrement
+#' @param add The string to remove
+#' @return The decremented tab
+#' @noRd
+dec_tab <- function(tab, sub = "....") {substr(tab, 1, nchar(tab) - nchar(sub))}
+
+
+#' Create value list
+#' This function creates a list that has values as attributes.
+#' Can be used to create trees that are digesteable by xml2.
+#' @param .value The value for the attribure
+#' @param ... other vlists
+#' @return A value list
+#' @noRd
+vlist <- function(.value, ...) {
+	list <- list(...)
+	attr(list, "value") <- .value
+	list
+}
+
+#' Wrap string in frame
+#' Creates a string that is wrapped in a frame for nicer printing.
+#' Has to be used with `cat()`
+#' @param text The string to wrap
+#' @param pos Horizontal alignment within the frame
+#' @param edge Single character which will be the corner of the frame
+#' @param hori String making up the horizontal edge of the frame
+#' @param vert String making up the vertical edge of the frame
+#' @return A String ready for `cat()`
+#' @examples
+#' cat(frame_string(text="Some\ntest\n       text", pos="right", edge="*"))
+#' @noRd
+frame_string <- function(text = "\nHello !!!\n\n\nIs\nthere\n\nA N Y O N E\n\nout\nthere\n???\n ",
+						 pos = c("left", "center", "right")[1],
+						 edge = " ",
+						 hori = "-",
+						 vert = "|") {
+
+	strpad <- function(string, width, pos = c("left", "right"), pad) {
+		n_chars <- function(char, count) paste0(rep_len(char, count), collapse = "")
+		w <- nchar(string)
+		if(pos == "left") {
+			paste0(string, n_chars(pad, width - w))
+		} else if(pos == "right") {
+			paste0(n_chars(pad, width - w), string)
+		} else {
+			paste0(n_chars(pad, (width - w) %/% 2), string, n_chars(pad, width - w - (width - w) %/% 2))
+		}
+	}
+	edge <- rep_len(strsplit(edge, "")[[1]], 4)[1 : 4]
+	r <- ""
+	s <- strsplit(text, "\n")[[1]]
+	h <- length(s)
+	w <- max(sapply(s, nchar))
+	hbt <- paste0(edge[1], paste0(rep_len(hori, w + 2), collapse = ""), edge[2], "\n")
+	hbb <- paste0(edge[3], paste0(rep_len(hori, w + 2), collapse = ""), edge[4], "\n")
+	r <- hbt
+	for(s_ in s) {
+		r <- paste0(r, vert, " ", strpad(string = s_, width = w, pos = pos, pad = " "), " ", vert, "\n")
+	}
+	r <- paste0(r, hbb)
+	r
 }
