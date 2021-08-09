@@ -48,6 +48,7 @@ fhir_show_tree <- function(cast_table, resource, nrow = 5, rm_indices=TRUE){
 }
 
 #' Build a list of FHIR bundles
+#'
 #' This function takes a table as produced by [fhir_cast()] and builds a [fhir_bundle_list-class] object from it. It is primarily used
 #' to create transaction/batch bundles to POST back to a FHIR server. The column names of the table must represent the XPath expression of the
 #' respective element with indices for repeating items. A table like this is produced when FHIR resources have been cracked with [fhir_crack()] without
@@ -120,6 +121,7 @@ fhir_show_tree <- function(cast_table, resource, nrow = 5, rm_indices=TRUE){
 #' either `"transaction"` (the default) or `"batch"`.
 #' @param bundle_size Numeric of length one defining how many resources to put in each bundle
 #' @return A [fhir_bundle_list-class] object.
+#' @export
 #' @examples
 #' #unserialize example
 #' bundles <- fhir_unserialize(bundles = example_bundles1)

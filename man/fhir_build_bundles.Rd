@@ -2,12 +2,7 @@
 % Please edit documentation in R/build_resources.R
 \name{fhir_build_bundles}
 \alias{fhir_build_bundles}
-\title{Build a list of FHIR bundles
-This function takes a table as produced by \code{\link[=fhir_cast]{fhir_cast()}} and builds a \linkS4class{fhir_bundle_list} object from it. It is primarily used
-to create transaction/batch bundles to POST back to a FHIR server. The column names of the table must represent the XPath expression of the
-respective element with indices for repeating items. A table like this is produced when FHIR resources have been cracked with \code{\link[=fhir_crack]{fhir_crack()}} without
-assigning explicit column names in the \linkS4class{fhir_design}/\linkS4class{fhir_table_description} and this table has in turn been cast to wide format with
-\code{\link[=fhir_cast]{fhir_cast()}}.}
+\title{Build a list of FHIR bundles}
 \usage{
 fhir_build_bundles(
   cast_table,
@@ -31,6 +26,13 @@ either \code{"transaction"} (the default) or \code{"batch"}.}
 A \linkS4class{fhir_bundle_list} object.
 }
 \description{
+This function takes a table as produced by \code{\link[=fhir_cast]{fhir_cast()}} and builds a \linkS4class{fhir_bundle_list} object from it. It is primarily used
+to create transaction/batch bundles to POST back to a FHIR server. The column names of the table must represent the XPath expression of the
+respective element with indices for repeating items. A table like this is produced when FHIR resources have been cracked with \code{\link[=fhir_crack]{fhir_crack()}} without
+assigning explicit column names in the \linkS4class{fhir_design}/\linkS4class{fhir_table_description} and this table has in turn been cast to wide format with
+\code{\link[=fhir_cast]{fhir_cast()}}.
+}
+\details{
 The typical use case would look like this:
 \enumerate{
 \item Download resources from a server whith \code{\link[=fhir_search]{fhir_search()}}
@@ -39,8 +41,7 @@ The typical use case would look like this:
 \item Translate the data back into FHIR resources whith \code{\link[=fhir_build_bundles]{fhir_build_bundles()}}
 \item Post the resources to a server
 }
-}
-\details{
+
 A FHIR bundle that can be POSTed to a server is usually of type \code{transaction} or \code{batch}. Each entry of these bundles consists of the resource itself
 as well as an instruction for the server of what to to with the resource. A very simple example looks like this:\preformatted{<Bundle>
    <type value="transaction"/>
