@@ -51,7 +51,7 @@ fhir_cast <- function(
 	verbose = 1) {
 
 	if(is.null(indexed_df)) stop("indexed_df is NULL.")
-	if(nrow(indexed_df) < 1) stop("indexed_df contains no data.")
+	if(nrow(indexed_df) < 1) stop("indexed_df doesn't contain any data.")
 
 	is_DT <- data.table::is.data.table(x = indexed_df)
 	if(!is_DT) {data.table::setDT(x = indexed_df)}
