@@ -42,13 +42,13 @@
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
 #' @param max_bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
-#' @param verbose An integer vector of length one. If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
+#' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' downloading progress will be printed. Defaults to 1.
 #' @param max_attempts A numeric vector of length one. The maximal number of attempts to send a request, defaults to 5.
 #' @param delay_between_attempts A numeric vector of length one specifying the delay in seconds between two attempts. Defaults to 10.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`.
-#' Regardless of the value of `log_errors` the most recent http error message whithin the current R session is saved internally and can
+#' Regardless of the value of `log_errors` the most recent http error message within the current R session is saved internally and can
 #' be accessed with [fhir_recent_http_error()].
 #' @param save_to_disc Either `NULL` or a character vector of length one indicating the name of a directory in which to save the bundles.
 #' If a directory name is provided, the bundles are saved as numerated xml-files into the directory specified
@@ -569,12 +569,12 @@ fhir_load <- function(directory) {
 
 
 
-#' Serialize a [fhir_bundle-class] or [fhir_bundle_list-class]
+#' Serialize a [fhir_bundle-class], [fhir_bundle_list-class] or [fhir_resource-class]
 #'
-#' @description Serializes FHIR bundles to allow for saving in .rda or .RData format without losing integrity of pointers
-#' i.e. it turns a [fhir_bundle_xml-class] object into an [fhir_bundle_serialized-class] object.
-#' @param bundles A [fhir_bundle-class] or [fhir_bundle_list-class] object.
-#' @return A  [fhir_bundle_xml-class] or [fhir_bundle_list-class] object.
+#' @description Serializes FHIR bundles or resources to allow for saving in .rda or .RData format without losing integrity of pointers
+#' i.e. it turns a [fhir_bundle_xml-class]/[fhir_resource_xml-class] object into an [fhir_bundle_serialized-class]/[fhir_resource_serialized-class] object.
+#' @param bundles A [fhir_bundle-class], [fhir_bundle_list-class] or [fhir_resource-class] object.
+#' @return A  [fhir_bundle_xml-class], [fhir_bundle_list-class] or [fhir_resource_xml-class]  object.
 #' @export
 #' @docType methods
 #' @rdname fhir_serialize-methods
@@ -588,6 +588,7 @@ fhir_load <- function(directory) {
 #'
 #' #works also on single bundles
 #' fhir_serialize(bundles[[1]])
+#'
 #'
 
 setGeneric(
@@ -637,13 +638,32 @@ setMethod(
 	}
 )
 
+#' @rdname fhir_serialize-methods
+#' @aliases fhir_serialize,fhir_resource_xml-method
+setMethod(
+	f = "fhir_serialize",
+	signature = c(bundles = "fhir_resource_xml"),
+	definition = function(bundles) {
+		fhir_resource_serialized(resource = xml2::xml_serialize(object = bundles, connection = NULL))
+	}
+)
 
-#' Unserialize a [fhir_bundle-class] or [fhir_bundle_list-class]
+#' @rdname fhir_serialize-methods
+#' @aliases fhir_serialize,fhir_resource_serialized-method
+setMethod(
+	f = "fhir_serialize",
+	signature = c(bundles = "fhir_resource_serialized"),
+	definition = function(bundles) {
+		bundles
+	}
+)
+
+#' Unserialize a [fhir_bundle-class], [fhir_bundle_list-class] or [fhir_resource-class]
 #'
-#' @description Unserializes FHIR bundles that have been serialized to allow for saving in .rda or .RData format,
-#' i.e. it turns a [fhir_bundle_serialized-class] object into an [fhir_bundle_xml-class] object.
-#' @param bundles A [fhir_bundle-class] or [fhir_bundle_list-class] object.
-#' @return A  [fhir_bundle_serialized-class] or [fhir_bundle_list-class] object.
+#' @description Unserializes FHIR resources or bundles that have been serialized to allow for saving in .rda or .RData format,
+#' i.e. it turns a [fhir_bundle_serialized-class]/[fhir_resource_serialized-class] object into an [fhir_bundle_xml-class]/[fhir_resource_xml-class] object.
+#' @param bundles A [fhir_bundle-class], [fhir_bundle_list-class] or [fhir_resource-class] object.
+#' @return A  [fhir_bundle_serialized-class], [fhir_bundle_list-class] or [fhir_resource_serialized-class]object.
 #' @export
 #' @docType methods
 #' @rdname fhir_unserialize-methods
@@ -683,6 +703,27 @@ setMethod(
 	definition = function(bundles) {
 		b <- xml2::xml_unserialize(connection = bundles)
 		fhir_bundle_xml(bundle = b)
+	}
+)
+
+#' @rdname fhir_unserialize-methods
+#' @aliases fhir_unserialize,fhir_resource_xml-method
+setMethod(
+	f = "fhir_unserialize",
+	signature = c(bundles = "fhir_resource_xml"),
+	definition = function(bundles) {
+		bundles
+	}
+)
+
+#' @rdname fhir_unserialize-methods
+#' @aliases fhir_unserialize,fhir_resource_serialized-method
+setMethod(
+	f = "fhir_unserialize",
+	signature = c(bundles = "fhir_resource_serialized"),
+	definition = function(bundles) {
+		b <- xml2::xml_unserialize(connection = bundles)
+		fhir_resource_xml(b)
 	}
 )
 
@@ -847,12 +888,12 @@ get_bundle <- function(
 #'
 #' @param response A http response
 #' @param log_errors A character vector of length one indicating the name of a file in which to save the http errors.
+#' @param append Append to existing file?
 #' @noRd
 #'
-error_to_file <- function(response, log_errors) {
+error_to_file <- function(response, log_errors, append) {
 	payload <- httr::content(x = response, as = "text", encoding = "UTF-8")
-	xml <- xml2::read_xml(x = payload)
-	xml2::write_xml(x = xml, file = log_errors)
+	write(x = payload, file = log_errors, append = append)
 }
 #' Check http response
 #'
@@ -861,27 +902,28 @@ error_to_file <- function(response, log_errors) {
 #' @param response A http response
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file.
+#' @param append Append message to existing file? Defaults to FALSE
 #' @noRd
 #'
 #'
-check_response <- function(response, log_errors) {
+check_response <- function(response, log_errors, append = FALSE) {
 	code <- response$status_code
-	if(code != 200){
+	if(code >= 400){
 		fhircrackr_env$recent_http_error <- httr::content(x = response, as = "text", encoding = "UTF-8")
 	}
-	if(code != 200 && !is.null(log_errors)) {
-		error_to_file(response = response, log_errors = log_errors)
+	if(code >= 400 && !is.null(log_errors)) {
+		error_to_file(response = response, log_errors = log_errors, append = append)
 	}
 	if(code == 400) {
 		if (!is.null(log_errors)) {
 			stop(
-				"HTTP code 400 - This can be caused by an invalid FHIR search request or a server issue. ",
+				"HTTP code 400 - This can be caused by an invalid request or a server issue. ",
 				"For more information see the generated error file."
 			)
 		} else {
 			stop(
-				"HTTP code 400 - This can be caused by an invalid FHIR search request or a server issue. ",
-				"To print more detailed error information to a file, set argument log_errors to a filename and rerun fhir_search()."
+				"HTTP code 400 - This can be caused by an invalid request or a server issue. ",
+				"To print more detailed error information to a file, set argument log_errors to a filename and rerun you request."
 			)
 		}
 	}
@@ -891,7 +933,7 @@ check_response <- function(response, log_errors) {
 		} else {
 			stop(
 				"HTTP code 401 - Authentication needed. To print more detailed error information to a file, ",
-				"set argument log_errors to a filename and rerun fhir_search()."
+				"set argument log_errors to a filename and rerun you request."
 			)
 		}
 	}
@@ -901,7 +943,7 @@ check_response <- function(response, log_errors) {
 		} else {
 			stop(
 				"HTTP code 404 - Not found. Did you misspell the resource? To print more detailed error information to a file, ",
-				"set argument log_errors to a filename and rerun fhir_search()."
+				"set argument log_errors to a filename and rerun you request."
 			)
 		}
 	}
@@ -916,7 +958,7 @@ check_response <- function(response, log_errors) {
 			warning(
 				"Your request generated a HTTP code ",
 				code,
-				". To print more detailed information to a file, set argument log_errors to a filename and rerun fhir_search()."
+				". To print more detailed information to a file, set argument log_errors to a filename and rerun you request."
 			)
 		}
 	}
@@ -931,7 +973,7 @@ check_response <- function(response, log_errors) {
 			stop(
 				"Your request generated a client error, HTTP code ",
 				code,
-				". To print more detailed information to a file, set argument log_errors to a filename and rerun fhir_search()."
+				". To print more detailed information to a file, set argument log_errors to a filename and rerun you request."
 			)
 		}
 	}
@@ -946,7 +988,7 @@ check_response <- function(response, log_errors) {
 			stop(
 				"Your request generated a server error, HTTP code ",
 				code,
-				". To print more detailed error information to a file, set argument log_errors to a filename and rerun fhir_search()."
+				". To print more detailed error information to a file, set argument log_errors to a filename and rerun you request."
 			)
 		}
 	}

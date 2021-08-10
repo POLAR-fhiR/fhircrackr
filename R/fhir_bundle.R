@@ -1,13 +1,10 @@
 #Class definition
 #' An S4 class to represent FHIR bundles
-#' @include fhir_url.R
+#' @include fhir_url.R fhir_resource.R
 setClass(
 	Class = "fhir_bundle",
 	contains = "VIRTUAL"
 )
-
-setOldClass(Classes = "xml_node")
-
 
 #' An S4 class to represent a FHIR bundle in xml form
 #'
@@ -20,7 +17,7 @@ setOldClass(Classes = "xml_node")
 #'
 setClass(
 	Class = "fhir_bundle_xml",
-	contains = c("fhir_bundle", "xml_node"),
+	contains = c("fhir_resource_xml", "fhir_bundle"),
 	slots = c(next_link = "fhir_url", self_link = "fhir_url"),
 	prototype = prototype(xml2::read_xml(x = "<Bundle></Bundle>"))
 )
@@ -91,7 +88,7 @@ setMethod(
 
 setClass(
 	Class = "fhir_bundle_serialized",
-	contains = c("fhir_bundle", "raw")
+	contains = c("fhir_bundle", "fhir_resource_serialized")
 )
 
 #' Create [fhir_bundle_serialized-class] object

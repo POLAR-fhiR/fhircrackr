@@ -50,6 +50,7 @@ Depends:
 Collate: 
     'build_resources.R'
     'design.R'
+    'fhir_resource.R'
     'fhir_url.R'
     'fhir_bundle.R'
     'fhir_bundle_list.R'

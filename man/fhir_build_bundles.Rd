@@ -8,7 +8,8 @@ fhir_build_bundles(
   cast_table,
   resource_type,
   bundle_type = "transaction",
-  bundle_size = 500
+  bundle_size = 500,
+  verbose = 1
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ indicating which resource type the table is build from.}
 either \code{"transaction"} (the default) or \code{"batch"}.}
 
 \item{bundle_size}{Numeric of length one defining how many resources to put in each bundle}
+
+\item{verbose}{An integer vector of length one. If 0, nothing is printed, if > 0 progress message is printed. Defaults to 1.}
 }
 \value{
 A \linkS4class{fhir_bundle_list} object.
@@ -118,5 +121,5 @@ bundles <- fhir_build_bundles(request_df, "Patient", bundle_type = "transaction"
 cat(toString(bundles[[1]]))
 }
 \seealso{
-\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_crack]{fhir_crack()}}
+\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_crack]{fhir_crack()}}, \code{\link[=fhir_build_resource]{fhir_build_resource()}}
 }

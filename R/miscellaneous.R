@@ -372,6 +372,164 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 #'
 
 "example_bundles3"
+
+
+##### Documentation for transaction_bundle_example data set ######
+#' Toy examples to POST on a server
+#'
+#' @description These data examples are simple examples to try out POSTing resources
+#' to a server. See **Source** for how the xml versions look.
+#'
+#' @details
+#' `transaction_bundle_example` contains 1 transaction bundle with 2 Patient resources.
+#'
+#' @examples
+#' #unserialize xml objects before doing anything else with them!
+#' fhir_unserialize(bundles = transaction_bundle_example)
+
+#' @rdname datasets_for_post
+#'
+#' @source
+#' **transaction_bundle_example**
+#'
+#'```
+#' <Bundle>
+#'    <type value='transaction'/>
+#' 	  <entry>
+#' 	     <resource>
+#' 	        <Patient>
+#' 	           <id value='id1'/>
+#' 	           <address>
+#' 	              <use value='home'/>
+#' 	              <city value='Amsterdam'/>
+#' 	              <type value='physical'/>
+#' 	              <country value='Netherlands'/>
+#' 	           </address>
+#' 	           <name>
+#' 	              <given value='Marie'/>
+#' 	           </name>
+#' 	        </Patient>
+#' 	     </resource>
+#' 	     <request>
+#' 	        <method value='POST'/>
+#' 	        <url value='Patient'/>
+#' 	     </request>
+#' 	  </entry>
+#' 	  <entry>
+#' 	      <resource>
+#' 	         <Patient>
+#' 	            <id value='id3'/>
+#' 	            <address>
+#' 	               <use value='home'/>
+#' 	               <city value='Berlin'/>
+#' 	            </address>
+#' 	            <address>
+#' 	               <use value='work'/>
+#' 	               <city value='London'/>
+#' 	               <type value='postal'/>
+#' 	               <country value='England'/>
+#'              </address>
+#' 	            <address>
+#' 	               <type value='postal'/>
+#' 	               <country value='France'/>
+#' 	            </address>
+#' 	            <name>
+#' 	               <given value='Frank'/>
+#' 	            </name>
+#' 	            <name>
+#' 	               <given value='Max'/>
+#' 	            </name>
+#' 	        </Patient>
+#' 	     </resource>
+#' 	     <request>
+#' 	        <method value='POST'/>
+#' 	        <url value='Patient'/>
+#' 	     </request>
+#' 	  </entry>
+#' </Bundle>
+#'```
+#'
+
+"transaction_bundle_example"
+
+##### Documentation for example_resource ######
+#' Toy examples to POST on a server
+#'
+#' @description These data examples are simple examples to try out POSTing resources
+#' to a server. See **Source** for how the xml versions look.
+#'
+#' @details
+#' `example_resource` contains 1 patient resource
+#'
+#' @examples
+#' #unserialize xml objects before doing anything else with them!
+#' fhir_unserialize(example_resource)
+
+#' @rdname datasets_for_post
+#'
+#' @source
+#' **transaction_bundle_example**
+#'
+#'```
+#' <Bundle>
+#'    <type value='transaction'/>
+#' 	  <entry>
+#' 	     <resource>
+#' 	        <Patient>
+#' 	           <address>
+#' 	              <use value='home'/>
+#' 	              <city value='Amsterdam'/>
+#' 	              <type value='physical'/>
+#' 	              <country value='Netherlands'/>
+#' 	           </address>
+#' 	           <name>
+#' 	              <given value='Marie'/>
+#' 	           </name>
+#' 	        </Patient>
+#' 	     </resource>
+#' 	     <request>
+#' 	        <method value='POST'/>
+#' 	        <url value='Patient'/>
+#' 	     </request>
+#' 	  </entry>
+#' 	  <entry>
+#' 	      <resource>
+#' 	         <Patient>
+#' 	            <address>
+#' 	               <use value='home'/>
+#' 	               <city value='Berlin'/>
+#' 	            </address>
+#' 	            <address>
+#' 	               <use value='work'/>
+#' 	               <city value='London'/>
+#' 	               <type value='postal'/>
+#' 	               <country value='England'/>
+#'              </address>
+#' 	            <address>
+#' 	               <type value='postal'/>
+#' 	               <country value='France'/>
+#' 	            </address>
+#' 	            <name>
+#' 	               <given value='Frank'/>
+#' 	            </name>
+#' 	            <name>
+#' 	               <given value='Max'/>
+#' 	            </name>
+#' 	        </Patient>
+#' 	     </resource>
+#' 	     <request>
+#' 	        <method value='POST'/>
+#' 	        <url value='Patient'/>
+#' 	     </request>
+#' 	  </entry>
+#' </Bundle>
+#'```
+#'
+
+"example_resource"
+
+
+
 #################################################################################
 #################################################################################
 #' Transform vector to named list

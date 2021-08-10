@@ -40,7 +40,7 @@ for how to create this.}
 
 \item{max_bundles}{Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
 
-\item{verbose}{An integer vector of length one. If 0, nothings is printed, if 1, only finishing message is printed, if > 1,
+\item{verbose}{An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 downloading progress will be printed. Defaults to 1.}
 
 \item{max_attempts}{A numeric vector of length one. The maximal number of attempts to send a request, defaults to 5.}
@@ -49,7 +49,7 @@ downloading progress will be printed. Defaults to 1.}
 
 \item{log_errors}{Either \code{NULL} or a character vector of length one indicating the name of a file in which to save the http errors.
 \code{NULL} means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to \code{NULL}.
-Regardless of the value of \code{log_errors} the most recent http error message whithin the current R session is saved internally and can
+Regardless of the value of \code{log_errors} the most recent http error message within the current R session is saved internally and can
 be accessed with \code{\link[=fhir_recent_http_error]{fhir_recent_http_error()}}.}
 
 \item{save_to_disc}{Either \code{NULL} or a character vector of length one indicating the name of a directory in which to save the bundles.

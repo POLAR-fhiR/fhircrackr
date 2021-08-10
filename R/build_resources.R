@@ -47,6 +47,50 @@ fhir_show_tree <- function(cast_table, resource, nrow = 5, rm_indices=TRUE){
 	print_tree(bundle)
 }
 
+#' Build a single FHIR resource
+#'
+#' This function takes a single row from a table as produced by [fhir_cast()] and builds a [fhir_resource_xml-class] object from it. The column names of the table
+#' must represent the XPath expression of the respective element with indices for repeating items. A table like this is produced when FHIR resources have
+#' been cracked with [fhir_crack()] without assigning explicit column names in the [fhir_design-class]/[fhir_table_description-class] and this table has in turn
+#' been cast to wide format with [fhir_cast()].
+#'
+#' @param cast_row Single row from a cast table as produced by [fhir_cast()]
+#' @param resource_type A character vector of length one or [fhir_resource_type-class] object
+#' indicating which resource type the table is build from.
+#' @return A [fhir_resource_xml-class] object.
+#' @export
+#' @examples
+#' #unserialize example
+#' bundles <- fhir_unserialize(bundles = example_bundles1)
+#'
+#' #crack fhir resources
+#' Pat <- fhir_table_description(resource = "Patient",
+#'                                      style = fhir_style(brackets = c("[","]"),
+#'                                                         sep = " "))
+#'
+#' df <- fhir_crack(bundles = bundles, design = Pat)
+#'
+#' #cast
+#' cast_df <- fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+#'
+#' #build bundles
+#' resource <- fhir_build_resource(cast_df[1,], "Patient")
+#'
+#' #print to console
+#' resource
+#' @export
+#' @seealso [fhir_cast()], [fhir_crack()], [fhir_build_bundles()]
+
+fhir_build_resource <- function(
+	cast_row,
+	resource_type) {
+
+	s <- tree2xml(rm_ids_from_tree(build_tree(cast_row, root = resource_type)))
+	fhir_resource_xml(xml2::read_xml(s))
+}
+
+
+
 #' Build a list of FHIR bundles
 #'
 #' This function takes a table as produced by [fhir_cast()] and builds a [fhir_bundle_list-class] object from it. It is primarily used
@@ -120,6 +164,7 @@ fhir_show_tree <- function(cast_table, resource, nrow = 5, rm_indices=TRUE){
 #' @param bundle_type A character vector of length one defining the bundle type. Will usually be
 #' either `"transaction"` (the default) or `"batch"`.
 #' @param bundle_size Numeric of length one defining how many resources to put in each bundle
+#' @param verbose An integer vector of length one. If 0, nothing is printed, if > 0 progress message is printed. Defaults to 1.
 #' @return A [fhir_bundle_list-class] object.
 #' @export
 #' @examples
@@ -148,13 +193,14 @@ fhir_show_tree <- function(cast_table, resource, nrow = 5, rm_indices=TRUE){
 #' #print to console
 #' cat(toString(bundles[[1]]))
 #' @export
-#' @seealso [fhir_cast()], [fhir_crack()]
+#' @seealso [fhir_cast()], [fhir_crack()], [fhir_build_resource()]
 
 fhir_build_bundles <- function(
 	cast_table,
 	resource_type,
 	bundle_type = "transaction",
-	bundle_size = 500) {
+	bundle_size = 500,
+	verbose = 1) {
 
 	names(cast_table)[!grepl("^request", names(cast_table))] <- paste0("resource.", resource_type, ".", names(cast_table)[!grepl("^request", names(cast_table))])
 
@@ -175,11 +221,178 @@ fhir_build_bundles <- function(
 		b <- b + 1
 		#cat(s)
 		bundles[[paste0("Bundle", b)]] <- xml2::read_xml(s)
-		cat(paste0("Bundle ", b, " a ", i - j, " ", resource_type, "s  \u03A3 ", resource_type, "s = ", i - 1, "\n"))
+		if(verbose > 0) {cat(paste0("Bundle ", b, " a ", i - j, " ", resource_type, "s  \u03A3 ", resource_type, "s = ", i - 1, "\n"))}
 	}
 	fhir_bundle_list(bundles)
 }
 
+#' POST to a FHIR server
+#'
+#' This function is a convenience wrapper around [httr::POST()].
+#'
+#' [fhir_post()] accepts three classes for the body:
+#'  1) A [fhir_bundle_list-class] representing a list of transaction or batch bundles as created by [fhir_build_bundles()].
+#'  This is used to POST or PUT several resources to the server. When `body` is a [fhir_bundle_list-class], the `url` has to be the base
+#'  url of the server, e.g. http://hapi.fhir.org/baseR4.
+#'
+#'  2) A [fhir_resource-class] as created by [fhir_build_resource()]. This is used when just a single resource should be POSTed to the server.
+#'  In this case `url` must contain the base url plus the resource type, e.g. http://hapi.fhir.org/baseR4/Patient.
+#'
+#'  3) A [fhir_body-class] as created by [fhir_body()]. This is the most flexible approach, because within the [fhir_body-class] object you can represent
+#'  any kind of `content` as a string and set the `type` accordingly. See examples.
+#'
+#'  For examples of how to create the different body types see the respective help pages. For an example of the entire workflow around creating
+#'  and POSTing resources, see the package vignette on recreating resources.
+#'
+#' @param url An object of class [fhir_url-class] or a character vector of length one containing the url to POST to.
+#' @param body An object of class [fhir_bundle_list-class], [fhir_resource-class] or [fhir_body-class]. See details for how to generate them.
+#' @param username A character vector of length one containing the username for basic authentication.
+#' @param password A character vector of length one containing the password for basic authentication.
+#' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
+#' for how to create this.
+#' @param verbose An integer vector of length one. If 0, nothing is printed, if > 0 success message is printed. Defaults to 1.
+#' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save http errors.
+#' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`.
+#' Regardless of the value of `log_errors` the most recent http error message within the current R session is saved internally and can
+#' be accessed with [fhir_recent_http_error()].
+#'
+#' @export
+#' @examples
+#' \donttest{
+#' ### 1. POST transaction bundles
+#' #unserialize example bundles
+#' bundles <- fhir_unserialize(transaction_bundle_example)
+#'
+#' #have a look at the bundle
+#' cat(toString(bundles[[1]]))
+#'
+#' #post
+#' fhir_post(url = "http://hapi.fhir.org/baseR4", body = bundles)
+#'
+#'
+#' ### 2. POST single resouce
+#' #unserialize example resource
+#' resource <- fhir_unserialize(example_resource)
+#'
+#' #have a look at the resource
+#' resource
+#'
+#' #post
+#' url <- fhir_url(url = "http://hapi.fhir.org/baseR4", resource = "Patient")
+#' fhir_post(url = url, body = resource)
+#'
+#'
+#' ### 3. POST arbitrary body
+#' #define body
+#' body <- fhir_body(content = "<Patient> <gender value='female'/> </Patient>", type = "xml")
+#'
+#' #post
+#' url <- fhir_url(url = "http://hapi.fhir.org/baseR4", resource = "Patient")
+#' fhir_post(url = url, body = body)
+#' }
+
+fhir_post <- function(
+	url,
+	body,
+	username = NULL,
+	password = NULL,
+	token = NULL,
+	verbose = 1,
+	log_errors = NULL){
+
+	auth <- if(!is.null(username) && !is.null(password)) {
+		httr::authenticate(user = username, password = password)
+	}
+
+	#prepare token authorization
+	if(!is.null(token)) {
+		if(!is.null(username) || is.null(password)) {
+			warning(
+				"You provided username and password as well as a token for authentication.\n",
+				"Ignoring username and password, trying to authorize with token."
+			)
+			username <- NULL
+			password <- NULL
+		}
+		if(is(token, "Token")) {
+			token <- token$credentials$access_token
+		}
+		if(1 < length(token)) {stop("token must be of length one.")}
+		bearerToken <- paste0("Bearer ", token)
+	} else {
+		bearerToken <- NULL
+	}
+
+	if (is(body, "fhir_bundle_list")){
+		i<-0
+		invisible(lapply(body,
+				function(bundle){
+					i<<-i+1
+					response <- httr::POST(
+						url = url,
+						config = httr::add_headers(
+							Accept = "application/fhir+xml",
+							Authorization = token
+						),
+						httr::content_type(type = "xml"),
+						auth,
+						body = toString(bundle)
+					)
+
+					#check for http errors
+					check_response(response = response, log_errors = log_errors, append = TRUE)
+
+					if(response$status_code==200 && verbose>0){
+						cat(paste0("Bundle ", i, " sucessfully POSTed\n"))
+					}
+				}
+			))
+
+	}else if (is(body, "fhir_resource_xml")){
+
+		response <- httr::POST(
+			url = url,
+			config = httr::add_headers(
+				Accept = "application/fhir+xml",
+				Authorization = token
+			),
+			httr::content_type(type = "xml"),
+			auth,
+			body = toString(body)
+		)
+
+		#check for http errors
+		check_response(response = response, log_errors = log_errors)
+
+		if(response$status_code==201 && verbose>0){
+			cat("Resource sucessfully POSTed")
+		}
+
+	}else if (is(body, "fhir_body")){
+
+		response <- httr::POST(
+			url = url,
+			config = httr::add_headers(
+				Accept = "application/fhir+xml",
+				Authorization = token
+			),
+			httr::content_type(type = body@type),
+			auth,
+			body = body@content
+		)
+
+		#check for http errors
+		check_response(response = response, log_errors = log_errors)
+		if(response$status_code %in% c(200,201,202) && verbose>0){
+			cat("Body sucessfully POSTed")
+		}
+
+	}else{
+		stop("body must be of type fhir_bundle_xml, fhir_resource_xml or fhir_body")
+	}
+
+
+}
 
 #######################################################################################################################
 #######################################################################################################################

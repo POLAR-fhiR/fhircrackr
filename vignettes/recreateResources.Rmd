@@ -1,0 +1,166 @@
+---
+title: "fhircrackr: Recreate FHIR resources"
+
+date: "`r Sys.Date()`"
+output:	rmarkdown::html_vignette
+
+
+
+vignette: >
+  %\VignetteIndexEntry{fhircrackr: Recreate FHIR resources}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#"
+)
+```
+
+This vignette covers the following topics:
+
+- Cracking and casting data
+- Modifying data
+- Recreating and POSTing a single resource
+- Recreating and POSTing a bundle of resources
+
+
+Before running any of the following code, you need to load the `fhircrackr` package:
+
+```{r}
+library(fhircrackr)
+```
+
+## Preparation
+In the other vignettes you saw how to download and flatten resources.
+Now we'll have a look at how to turn flattened tables back into FHIR resources. This allows you to extract resources from a server, manipulate their content in R and to upload them to a server again. One scenario where this might be useful is downloading data from one server, anonymizing it and uploading it to another server. If you are working with sensitive data please note that it is your responsibility alone to check that any resources you upload to a unsecure server are sufficiently anonymized. 
+
+For the rest of the vignette, we'll work with `example_bundles2` from `fhircrackr`, which can be made accessible like this:
+
+```{r}
+bundles <- fhir_unserialize(bundles = example_bundles2)
+```
+
+See `?example_bundles2` to what this bundle looks like.
+
+## Crack and cast
+Starting with the FHIR resources, the first thing you'll have to do is to crack and cast the data. For more information on the process, please see the vignette on flattening resources. Make sure that you allow `fhir_crack()` to generate the column names automatically, i.e. don't state explicit column names in the `fhir_table_description`.
+
+```{r}
+patients <- fhir_table_description(resource = "Patient", 
+                                   style = fhir_style(brackets = c("[", "]"),
+                                                      sep = " | ")
+                                   )
+
+table <- fhir_crack(bundles = bundles, design = patients, verbose = 0)
+
+cast_table <- fhir_cast(table, brackets = c("[", "]"), sep = " | ", verbose = 0)
+```
+
+The resulting table looks like this:
+
+```{r}
+cast_table
+```
+
+## Modify the data
+You can now modify the data. For example, we could remove the name and id and change all city entries to `xxx`:
+
+```{r}
+#remove name
+modified_table <- cast_table[,-c(1,14,15)]
+
+#anonymize city
+modified_table[,4:6] <- sapply(modified_table[,4:6], function(x){sub(".*", "xxx", x)})
+
+
+modified_table
+```
+
+## Recreate and POST a single resource
+To create resources from this data,  the `fhircrackr` makes use of the structure information inherent in the column names. If you want to get an overview over this structure before creating the actual xml-objects, you can use the function `fhir_show_tree()` that will print the tree structure of the first `nrow` resources in the table for you:
+
+```{r}
+cat(fhir_show_tree(modified_table, resource = "Patient", nrow = 1))
+```
+
+To create a FHIR resource out of this first row of the table, you can use the function `fhir_build_resource()`:
+
+```{r}
+new_resource <- fhir_build_resource(modified_table[1,], resource_type = "Patient")
+
+new_resource
+```
+
+This resource can now be POSTed to a server again using the function `fhir_post()`. POSTing a resource translates to newly creating this resource on a server. The url to POST a resource to has to be the base url plus the resource type:
+
+```{r, eval=FALSE}
+url <- fhir_url(url = "http://hapi.fhir.org/baseR4", resource = "Patient")
+fhir_post(url = url, body = new_resource)
+```
+```{r, echo=FALSE}
+cat("Resource sucessfully POSTed")
+```
+
+## Recreate and POST a bundle of resources
+It is also possible to bundle together several resources and post them to the server together. This is done using bundles of type transaction or batch (see https://www.hl7.org/fhir/bundle.html and https://www.hl7.org/fhir/http.html). 
+
+We can create a list of such a bundles from a cast table using the function `fhir_build_bundles`:
+
+```{r}
+bundles <- fhir_build_bundles(modified_table, 
+                              resource_type = "Patient", 
+                              bundle_type = "transaction", 
+                              bundle_size = 2,
+                              verbose = 0)
+```
+
+You can have a look at the first bundle like this:
+
+```{r}
+#Overview
+bundles[[1]]
+
+#print complete string
+cat(toString(bundles[[1]]))
+```
+
+The bundles we have just created are however not POSTable to a server, because they lack an important element, the `request`. A transaction/batch bundle must have a `request` element for each resource which holds the url and the HTTP verb (usually POST or PUT) for the respective resource, otherwise the server will throw an error.
+
+The modified table we have used so far doesn't have this information, so we have to add it like this:
+
+```{r}
+request <- data.frame(request.method = c("POST", "POST", "POST"),
+                      request.url = c("Patient", "Patient", "Patient"))
+
+request_table <- cbind(modified_table, request)
+
+request_table
+```
+
+Now when we build a transaction bundle, it has all the information we need:
+
+```{r}
+bundles <- fhir_build_bundles(request_table,
+                              resource_type = "Patient", 
+                              bundle_type = "transaction", 
+                              bundle_size = 2,
+                              verbose = 0)
+```
+
+This bundle can now be POSTed to the server. Bundles are POSTed to the base url of the server like this:
+
+```{r, eval=FALSE}
+fhir_post("http://hapi.fhir.org/baseR4", body=bundles)
+```
+```{r, echo=FALSE}
+cat("Bundle 1 sucessfully POSTed\nBundle 2 sucessfully POSTed")
+```
+
+#TODO
+- Write something about different resource/types dependencies between resources
+- Write something about html stuff in resources
+- Write something about attributes that are not `value`
