@@ -50,6 +50,9 @@ fhir_cast <- function(
 	use_brackets = F,
 	verbose = 1) {
 
+	if(is.null(indexed_df)) stop("indexed_df is NULL.")
+	if(nrow(indexed_df) < 1) stop("indexed_df contains no data.")
+
 	is_DT <- data.table::is.data.table(x = indexed_df)
 	if(!is_DT) {data.table::setDT(x = indexed_df)}
 
