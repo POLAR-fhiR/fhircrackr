@@ -138,7 +138,7 @@ fhir_search <- function(
 	}
 	#prepare body
 	if(!is.null(body)) {
-		if(0 < verbose) {message("Initializing search via POST.\n")}
+		if(0 < verbose) {message("Initializing search via POST.")}
 		#filter out bad urls
 		if(grepl("\\?", request)) {
 			stop(
@@ -200,7 +200,7 @@ fhir_search <- function(
 	cnt <- 0
 	repeat {
 		cnt <- cnt + 1
-		if(1 < verbose) {cat(paste0("bundle[", cnt, "]"))}
+		if(1 < verbose) {message("bundle[", cnt, "]", appendLF = F)}
 		bundle <- get_bundle(
 			request = addr,
 			body = body,
@@ -214,7 +214,7 @@ fhir_search <- function(
 		)
 		if(is.null(bundle)) {
 			if(0 < verbose) {
-				message("Download interrupted.\n")
+				message("Download interrupted.")
 			}
 			break
 		}
@@ -235,12 +235,12 @@ fhir_search <- function(
 					message(
 						"\nDownload completed. Number of downloaded bundles was limited to ",
 						cnt,
-						" bundles, this is less than the total number of bundles available.\n"
+						" bundles, this is less than the total number of bundles available."
 					)
 					assign(x = "last_next_link", value = bundle@next_link, envir = fhircrackr_env)
 				}
 				else {
-					message("\nDownload completed. All available bundles were downloaded.\n")
+					message("\nDownload completed. All available bundles were downloaded.")
 				}
 			}
 			break
@@ -249,7 +249,7 @@ fhir_search <- function(
 		}
 		if(length(bundle@next_link) == 0) {
 			if(0 < verbose) {
-				message("\nDownload completed. All available bundles were downloaded.\n")
+				message("\nDownload completed. All available bundles were downloaded.")
 			}
 			break
 		}
@@ -840,7 +840,7 @@ get_bundle <- function(
 
 	#download response
 	for(n in seq_len(max_attempts)) {
-		if(1 < verbose) {cat(paste0("(", n, "): ", request, "\n"))}
+		if(1 < verbose) {message("(", n, "): ", request)}
 		auth <- if(!is.null(username) && !is.null(password)) {
 			httr::authenticate(user = username, password = password)
 		}

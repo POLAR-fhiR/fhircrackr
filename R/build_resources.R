@@ -343,7 +343,7 @@ fhir_post <- function(
 					check_response(response = response, log_errors = log_errors, append = TRUE)
 
 					if(response$status_code==200 && verbose>0) {
-						cat(paste0("Bundle ", i, " sucessfully POSTed\n"))
+						message(paste0("Bundle ", i, " sucessfully POSTed\n"))
 					}
 				}
 			))
@@ -365,7 +365,7 @@ fhir_post <- function(
 		check_response(response = response, log_errors = log_errors)
 
 		if(response$status_code==201 && verbose>0) {
-			cat("Resource sucessfully POSTed")
+			message("Resource sucessfully POSTed")
 		}
 
 	}else if(is(body, "fhir_body")) {
@@ -384,7 +384,7 @@ fhir_post <- function(
 		#check for http errors
 		check_response(response = response, log_errors = log_errors)
 		if(response$status_code %in% c(200,201,202) && verbose>0) {
-			cat("Body sucessfully POSTed")
+			message("Body sucessfully POSTed")
 		}
 
 	} else {
@@ -493,7 +493,7 @@ fhir_put <- function(
 		check_response(response = response, log_errors = log_errors)
 
 		if(response$status_code==201 && verbose>0) {
-			cat("Resource sucessfully PUT")
+			message("Resource sucessfully PUT")
 		}
 
 	}else if (is(body, "fhir_body")){
@@ -512,7 +512,7 @@ fhir_put <- function(
 		#check for http errors
 		check_response(response = response, log_errors = log_errors)
 		if(response$status_code %in% c(200,201,202) && verbose>0){
-			cat("Body sucessfully PUT")
+			message("Body sucessfully PUT")
 		}
 
 	}else{

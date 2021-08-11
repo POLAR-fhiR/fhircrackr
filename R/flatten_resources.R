@@ -172,7 +172,7 @@ setMethod(
 		design <- add_attribute_to_design(design = design)
 		#crack
 		dfs <- bundles2dfs(bundles = bundles, design = design, data.table = data.table, verbose = verbose)
-		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
+		if(0 < verbose) {message("FHIR-Resources cracked.")}
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
 		dfs
 	}
@@ -232,7 +232,7 @@ setMethod(
 			df_cleaned <- df
 		}
 
-		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
+		if(0 < verbose) {message("FHIR-Resources cracked.")}
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
 		if(data.table) {df} else {data.frame(df)}
 	}
@@ -454,13 +454,13 @@ bundle2df <- function(bundle, df_desc, verbose = 2) {
 			   		cols <- df_desc@cols
 			   		res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets)
 			   		if(1 < verbose) {
-			   			if(all(sapply(res, is.na))) {cat("x")} else {cat(".")}
+			   			if(all(sapply(res, is.na))) {message("x", appendLF = F)} else {message(".", appendLF = F)}
 			   		}
 			   	} else {#if cols empty
 			   		xp <- ".//@*"
 			   		res <- xtrct_all_columns(child = child, sep = df_desc@style@sep, xpath = xp, brackets = df_desc@style@brackets)
 			   		if(1 < verbose) {
-			   			if(nrow(res) < 1) {cat("x")} else {cat(".")}
+			   			if(nrow(res) < 1) {message("x", appendLF = F)} else {message(".", appendLF = F)}
 			   		}
 			   	}
 				res
@@ -502,7 +502,7 @@ bundles2df <- function(bundles, df_desc, verbose = 2) {
 		lapply(
 			seq_along(bundles),
 			function(i) {
-				if (1 < verbose) {cat("\n", i)}
+				if (1 < verbose) {message("\n", i, appendLF = F)}
 				bundle <- bundles[[i]]
 				bundle2df(bundle = bundle, df_desc = df_desc, verbose = verbose)
 			}
@@ -510,7 +510,7 @@ bundles2df <- function(bundles, df_desc, verbose = 2) {
 		fill = TRUE
 	)
 	if(nrow(0 < ret)) {ret <- ret[0 < rowSums(!is.na(ret)), ]}
-	if(1 < verbose) {cat("\n")}
+	if(1 < verbose) {message("\n")}
 	ret
 }
 
@@ -562,11 +562,11 @@ bundles2dfs <- function(bundles, design, data.table = FALSE, verbose = 2) {
 		lst(names(design)),
 		function(n) {
 			df_desc <- design[[n]]
-		  	if(1 < verbose) {cat("\n", n)}
+		  	if(1 < verbose) {message("\n", n)}
 		  	if(is.null(df_desc)) {NULL} else {bundles2df(bundles = bundles, df_desc = df_desc, verbose = verbose)}
 		}
 	)
-	if(1 < verbose) {cat("\n")}
+	if(1 < verbose) {message("\n")}
 	#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
 	remove <- sapply(
 		design,

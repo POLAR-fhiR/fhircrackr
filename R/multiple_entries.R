@@ -66,13 +66,13 @@ fhir_cast <- function(
 		stop("Cannot find ids with the specified brackets in the table.")
 	}
 
-	if(0 < verbose) {cat("Expanding table...\n")}
+	if(0 < verbose) {message("Expanding table...\n")}
 
 	map <- sapply(
 		col_names,
 		function(name) {
 			#name <- names(indexed_df)[[6]]
-			if(1 < verbose) {cat(name, "\n")}
+			if(1 < verbose) {message(name)}
 
 			warning_given <- FALSE
 			entries <- strsplit(indexed_df[[name]], sep_)
@@ -134,16 +134,16 @@ fhir_cast <- function(
 	d <- data.table(matrix(data = rep_len(character(), nrow(indexed_df) * length(df_new_names)), nrow = nrow(indexed_df), ncol = length(df_new_names)))
 	setnames(d, df_new_names)
 
-	if(0 < verbose) {cat("\nFilling table...\n")}
+	if(0 < verbose) {message("\nFilling table...\n")}
 
 	for(name in names(map)) {
 		#name <- names(map)[[1]]
-		if(1 < verbose) {cat(paste0(name, ":\n"))}
+		if(1 < verbose) {message(name, ":")}
 
 		for(id in names(map[[name]])) {
 			#id <- names(map[[name]])[[1]]
 			sname <- map[[name]][[id]]
-			if(1 < verbose) {cat("  ", sname, "\n")}
+			if(1 < verbose) {message("   ", sname)}
 			id_str <- paste0(bra_, id, ket_)
 			row_with_id <- grep(id_str, indexed_df[[name]], perl = T)
 			entries <- strsplit(indexed_df[[name]][row_with_id], sep_)
