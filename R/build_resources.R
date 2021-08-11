@@ -272,7 +272,7 @@ fhir_build_bundles <- function(
 #'
 #' ### 2. POST single resouce
 #' #unserialize example resource
-#' resource <- fhir_unserialize(example_resource)
+#' resource <- fhir_unserialize(example_resource1)
 #'
 #' #have a look at the resource
 #' resource
@@ -323,7 +323,7 @@ fhir_post <- function(
 		bearerToken <- NULL
 	}
 
-	if (is(body, "fhir_bundle_list")){
+	if(is(body, "fhir_bundle_list")) {
 		i<-0
 		invisible(lapply(body,
 				function(bundle){
@@ -342,13 +342,13 @@ fhir_post <- function(
 					#check for http errors
 					check_response(response = response, log_errors = log_errors, append = TRUE)
 
-					if(response$status_code==200 && verbose>0){
+					if(response$status_code==200 && verbose>0) {
 						cat(paste0("Bundle ", i, " sucessfully POSTed\n"))
 					}
 				}
 			))
 
-	}else if (is(body, "fhir_resource_xml")){
+	}else if(is(body, "fhir_resource_xml")) {
 
 		response <- httr::POST(
 			url = url,
@@ -364,11 +364,11 @@ fhir_post <- function(
 		#check for http errors
 		check_response(response = response, log_errors = log_errors)
 
-		if(response$status_code==201 && verbose>0){
+		if(response$status_code==201 && verbose>0) {
 			cat("Resource sucessfully POSTed")
 		}
 
-	}else if (is(body, "fhir_body")){
+	}else if(is(body, "fhir_body")) {
 
 		response <- httr::POST(
 			url = url,
@@ -383,12 +383,140 @@ fhir_post <- function(
 
 		#check for http errors
 		check_response(response = response, log_errors = log_errors)
-		if(response$status_code %in% c(200,201,202) && verbose>0){
+		if(response$status_code %in% c(200,201,202) && verbose>0) {
 			cat("Body sucessfully POSTed")
 		}
 
-	}else{
+	} else {
 		stop("body must be of type fhir_bundle_xml, fhir_resource_xml or fhir_body")
+	}
+
+
+}
+
+#' PUT to a FHIR server
+#'
+#' This function is a convenience wrapper around [httr::PUT()].
+#'
+#' [fhir_put()] accepts two classes for the body:
+#'
+#'  1) A [fhir_resource-class] as created by [fhir_build_resource()]. This is used when just a single resource should be PUT to the server.
+#'  In this case `url` must contain the base url plus the resource type and the resource id,
+#'  e.g. http://hapi.fhir.org/baseR4/Patient/1a2b3c.
+#'
+#'  2) A [fhir_body-class] as created by [fhir_body()]. This is the most flexible approach, because within the [fhir_body-class] object you can represent
+#'  any kind of `content` as a string and set the `type` accordingly. See examples.
+#'
+#'  For examples of how to create the different body types see the respective help pages. For an example of the entire workflow around creating
+#'  and PUTing resources, see the package vignette on recreating resources.
+#'
+#' @param url An object of class [fhir_url-class] or a character vector of length one containing the url to PUT to.
+#' @param body An object of class [fhir_resource-class] or [fhir_body-class]. See details for how to generate them.
+#' @param username A character vector of length one containing the username for basic authentication.
+#' @param password A character vector of length one containing the password for basic authentication.
+#' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
+#' for how to create this.
+#' @param verbose An integer vector of length one. If 0, nothing is printed, if > 0 success message is printed. Defaults to 1.
+#' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save http errors.
+#' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`.
+#' Regardless of the value of `log_errors` the most recent http error message within the current R session is saved internally and can
+#' be accessed with [fhir_recent_http_error()].
+#'
+#' @export
+#' @examples
+#' \donttest{
+#' ### 1. PUT fhir__resource object
+#' #unserialize example resource
+#' resource <- fhir_unserialize(example_resource2)
+#'
+#' #have a look at the resource
+#' resource
+#'
+#' #put
+#' fhir_put(url = "http://hapi.fhir.org/baseR4/Patient/1a2b3c", body = resource)
+#'
+#' ### 2. PUT fhir_body object
+#' #define body
+#' body <- fhir_body(content = "<Patient> <id value='x1y2'/> <gender value='female'/> </Patient>",
+#'                   type = "xml")
+#'
+#' #put
+#' fhir_put(url = "http://hapi.fhir.org/baseR4/Patient/x1y2", body = body)
+#' }
+
+fhir_put <- function(
+	url,
+	body,
+	username = NULL,
+	password = NULL,
+	token = NULL,
+	verbose = 1,
+	log_errors = NULL){
+
+	auth <- if(!is.null(username) && !is.null(password)) {
+		httr::authenticate(user = username, password = password)
+	}
+
+	#prepare token authorization
+	if(!is.null(token)) {
+		if(!is.null(username) || is.null(password)) {
+			warning(
+				"You provided username and password as well as a token for authentication.\n",
+				"Ignoring username and password, trying to authorize with token."
+			)
+			username <- NULL
+			password <- NULL
+		}
+		if(is(token, "Token")) {
+			token <- token$credentials$access_token
+		}
+		if(1 < length(token)) {stop("token must be of length one.")}
+		bearerToken <- paste0("Bearer ", token)
+	} else {
+		bearerToken <- NULL
+	}
+
+	if(is(body, "fhir_resource_xml")) {
+
+		response <- httr::PUT(
+			url = url,
+			config = httr::add_headers(
+				Accept = "application/fhir+xml",
+				Authorization = token
+			),
+			httr::content_type(type = "xml"),
+			auth,
+			body = toString(body)
+		)
+
+		#check for http errors
+		check_response(response = response, log_errors = log_errors)
+
+		if(response$status_code==201 && verbose>0) {
+			cat("Resource sucessfully PUT")
+		}
+
+	}else if (is(body, "fhir_body")){
+
+		response <- httr::PUT(
+			url = url,
+			config = httr::add_headers(
+				Accept = "application/fhir+xml",
+				Authorization = token
+			),
+			httr::content_type(type = body@type),
+			auth,
+			body = body@content
+		)
+
+		#check for http errors
+		check_response(response = response, log_errors = log_errors)
+		if(response$status_code %in% c(200,201,202) && verbose>0){
+			cat("Body sucessfully PUT")
+		}
+
+	}else{
+		stop("body must be of type fhir_bundle_xml or fhir_body")
 	}
 
 

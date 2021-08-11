@@ -1,6 +1,7 @@
 
 resource <- xml2::read_xml(
 	"<Patient>
+		<id value = '1a2b3c'/>
 		<name>
 			<given value = 'Marie'/>
 		</name>
@@ -11,6 +12,6 @@ resource <- xml2::read_xml(
 
 resource <- fhir_resource_xml(resource)
 
-example_resource <- fhir_serialize(resource)
+example_resource2 <- fhir_serialize(resource)
 
-usethis::use_data(example_resource, overwrite = TRUE)
+usethis::use_data(example_resource2, overwrite = TRUE)

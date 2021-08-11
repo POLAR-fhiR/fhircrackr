@@ -66,7 +66,7 @@ fhir_post(url = "http://hapi.fhir.org/baseR4", body = bundles)
 
 ### 2. POST single resouce
 #unserialize example resource
-resource <- fhir_unserialize(example_resource)
+resource <- fhir_unserialize(example_resource1)
 
 #have a look at the resource
 resource

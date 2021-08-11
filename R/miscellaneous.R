@@ -104,7 +104,6 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 #' fhir_unserialize(bundles = patient_bundles)
 #' @aliases patient_bundles
 #' @rdname datasets_real
-#'
 #' @source
 #' **patient_bundles** (*Downloaded 10-05-21*)
 #'
@@ -134,7 +133,6 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 #' @examples
 #' #unserialize xml objects before doing anything else with them!
 #' fhir_unserialize(bundles = example_bundles1)
-
 #' @rdname datasets_selfmade
 #'
 #' @source
@@ -198,7 +196,6 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 #' #unserialize xml objects before doing anything else with them!
 #' fhir_unserialize(example_bundles2)
 #' @rdname datasets_selfmade
-#'
 #' @source
 #' **example_bundles2**
 #'
@@ -280,7 +277,6 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 #' #unserialize xml objects before doing anything else with them!
 #' fhir_unserialize(bundles = example_bundles2)
 #' @rdname datasets_selfmade
-#'
 #' @source
 #' **example_bundles3**
 #'
@@ -375,9 +371,9 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 
 
 ##### Documentation for transaction_bundle_example data set ######
-#' Toy examples to POST on a server
+#' Toy examples to POST/PUT on a server
 #'
-#' @description These data examples are simple examples to try out POSTing resources
+#' @description These data examples are simple examples to try out POSTing/PUTing resources
 #' to a server. See **Source** for how the xml versions look.
 #'
 #' @details
@@ -386,7 +382,6 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 #' @examples
 #' #unserialize xml objects before doing anything else with them!
 #' fhir_unserialize(bundles = transaction_bundle_example)
-
 #' @rdname datasets_for_post
 #'
 #' @source
@@ -452,82 +447,60 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 
 "transaction_bundle_example"
 
-##### Documentation for example_resource ######
+##### Documentation for example_resource1 ######
 #' Toy examples to POST on a server
 #'
-#' @description These data examples are simple examples to try out POSTing resources
-#' to a server. See **Source** for how the xml versions look.
-#'
 #' @details
-#' `example_resource` contains 1 patient resource
+#' `example_resource1` contains 1 patient resource without id for POSTing
 #'
 #' @examples
 #' #unserialize xml objects before doing anything else with them!
-#' fhir_unserialize(example_resource)
+#' fhir_unserialize(example_resource1)
 
 #' @rdname datasets_for_post
-#'
 #' @source
-#' **transaction_bundle_example**
+#' **example_resource1**
 #'
 #'```
-#' <Bundle>
-#'    <type value='transaction'/>
-#' 	  <entry>
-#' 	     <resource>
-#' 	        <Patient>
-#' 	           <address>
-#' 	              <use value='home'/>
-#' 	              <city value='Amsterdam'/>
-#' 	              <type value='physical'/>
-#' 	              <country value='Netherlands'/>
-#' 	           </address>
-#' 	           <name>
-#' 	              <given value='Marie'/>
-#' 	           </name>
-#' 	        </Patient>
-#' 	     </resource>
-#' 	     <request>
-#' 	        <method value='POST'/>
-#' 	        <url value='Patient'/>
-#' 	     </request>
-#' 	  </entry>
-#' 	  <entry>
-#' 	      <resource>
-#' 	         <Patient>
-#' 	            <address>
-#' 	               <use value='home'/>
-#' 	               <city value='Berlin'/>
-#' 	            </address>
-#' 	            <address>
-#' 	               <use value='work'/>
-#' 	               <city value='London'/>
-#' 	               <type value='postal'/>
-#' 	               <country value='England'/>
-#'              </address>
-#' 	            <address>
-#' 	               <type value='postal'/>
-#' 	               <country value='France'/>
-#' 	            </address>
-#' 	            <name>
-#' 	               <given value='Frank'/>
-#' 	            </name>
-#' 	            <name>
-#' 	               <given value='Max'/>
-#' 	            </name>
-#' 	        </Patient>
-#' 	     </resource>
-#' 	     <request>
-#' 	        <method value='POST'/>
-#' 	        <url value='Patient'/>
-#' 	     </request>
-#' 	  </entry>
-#' </Bundle>
+#' <Patient>
+#'    <name>
+#' 	     <given value = 'Marie'/>
+#' 	  </name>
+#' 	  <gender value = 'female'/>
+#' 	  <birthDate value = '1970-01-01'/>
+#' </Patient>
 #'```
 #'
 
-"example_resource"
+"example_resource1"
 
+##### Documentation for example_resource2 ######
+#' Toy examples to POST on a server
+#'
+#' @details
+#' `example_resource2` contains 1 patient resource with id for PUTing
+#'
+#' @examples
+#' #unserialize xml objects before doing anything else with them!
+#' fhir_unserialize(example_resource2)
+
+#' @rdname datasets_for_post
+#' @source
+#' **example_resource2**
+#'
+#'```
+#' <Patient>
+#'    <id value = '1a2b3c'/>
+#'    <name>
+#' 	     <given value = 'Marie'/>
+#' 	  </name>
+#' 	  <gender value = 'female'/>
+#' 	  <birthDate value = '1970-01-01'/>
+#' </Patient>
+#'```
+#'
+
+"example_resource2"
 
 
 #################################################################################
@@ -540,7 +513,6 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 #' @param suffix A a character vector of length one taken as the suffix for the names of the list elements.
 #'
 #' @return A named list, where the names are the content surrounded by a prefix and a suffix.
-#'
 #' @noRd
 #' @examples
 #' fhircrackr:::lst(letters[1:5], prefix="--", suffix="+")

@@ -50,8 +50,8 @@ fhir_cast <- function(
 	use_brackets = F,
 	verbose = 1) {
 
-	if(is.null(indexed_df)) stop("indexed_df is NULL.")
-	if(nrow(indexed_df) < 1) stop("indexed_df doesn't contain any data.")
+	if(is.null(indexed_df)) {stop("indexed_df is NULL.")}
+	if(nrow(indexed_df) < 1) {stop("indexed_df doesn't contain any data.")}
 
 	is_DT <- data.table::is.data.table(x = indexed_df)
 	if(!is_DT) {data.table::setDT(x = indexed_df)}
@@ -61,6 +61,10 @@ fhir_cast <- function(
 	bra_ <- esc(brackets[1])
 	ket_ <- esc(brackets[2])
 	regexpr_ids <- paste0(bra_, "([0-9]+(\\.[0-9]+)*)", ket_, "(.*$)")
+
+	if(!any(grepl(regexpr_ids, indexed_df[1,]))){
+		stop("Cannot find ids with the specified brackets in the table.")
+	}
 
 	if(0 < verbose) {cat("Expanding table...\n")}
 
