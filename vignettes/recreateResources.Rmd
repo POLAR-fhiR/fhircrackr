@@ -24,8 +24,8 @@ This vignette covers the following topics:
 
 - Cracking and casting data
 - Modifying data
-- Recreating and POSTing a single resource
-- Recreating and POSTing a bundle of resources
+- Recreating a single resource
+- Recreating a bundle of resources
 
 
 Before running any of the following code, you need to load the `fhircrackr` package:
@@ -80,14 +80,14 @@ modified_table[,4:6] <- sapply(modified_table[,4:6], function(x){sub(".*", "xxx"
 modified_table
 ```
 
-## Recreate and POST a single resource
-To create resources from this data,  the `fhircrackr` makes use of the structure information inherent in the column names. If you want to get an overview over this structure before creating the actual xml-objects, you can use the function `fhir_show_tree()` that will print the tree structure of the first `nrow` resources in the table for you:
+## Recreate a single resource
+To create resources from this data, the `fhircrackr` makes use of the structure information inherent in the column names. If you want to get an overview over this structure before creating the actual xml-objects, you can use the function `fhir_show_tree()` that will print the tree structure of the first `nrow` resources in the table for you:
 
 ```{r}
 cat(fhir_show_tree(modified_table, resource = "Patient", nrow = 1))
 ```
 
-To create a FHIR resource out of this first row of the table, you can use the function `fhir_build_resource()`:
+To create a FHIR resource out of this first row of the table, you can use the function `fhir_build_resource()`. This function takes a single row of a cast table and the resource type you intend to create and builds an object of class `fhir_resource`, which is essentially an xml-object:
 
 ```{r}
 new_resource <- fhir_build_resource(modified_table[1,], resource_type = "Patient")
@@ -95,20 +95,10 @@ new_resource <- fhir_build_resource(modified_table[1,], resource_type = "Patient
 new_resource
 ```
 
-This resource can now be POSTed to a server again using the function `fhir_post()`. POSTing a resource translates to newly creating this resource on a server. The url to POST a resource to has to be the base url plus the resource type:
+## Recreate a bundle of resources
+It is also possible to bundle together several resources to upload them to the server together. This is done using bundles of type transaction or batch (see https://www.hl7.org/fhir/bundle.html and https://www.hl7.org/fhir/http.html). 
 
-```{r, eval=FALSE}
-url <- fhir_url(url = "http://hapi.fhir.org/baseR4", resource = "Patient")
-fhir_post(url = url, body = new_resource)
-```
-```{r, echo=FALSE}
-cat("Resource sucessfully POSTed")
-```
-
-## Recreate and POST a bundle of resources
-It is also possible to bundle together several resources and post them to the server together. This is done using bundles of type transaction or batch (see https://www.hl7.org/fhir/bundle.html and https://www.hl7.org/fhir/http.html). 
-
-We can create a list of such a bundles from a cast table using the function `fhir_build_bundles`:
+We can create a list of such a bundles from a cast table using the function `fhir_build_bundles`, which takes a cast table and the resource type represented in the table, as well as information on the type of bundle you want to create and the number of resources (`bundle_size`) that should be bundled together:
 
 ```{r}
 bundles <- fhir_build_bundles(modified_table, 
@@ -128,7 +118,7 @@ bundles[[1]]
 cat(toString(bundles[[1]]))
 ```
 
-The bundles we have just created are however not POSTable to a server, because they lack an important element, the `request`. A transaction/batch bundle must have a `request` element for each resource which holds the url and the HTTP verb (usually POST or PUT) for the respective resource, otherwise the server will throw an error.
+If you are familiar with transaction bundles, you'll notice that this bundle is lacking some information to be posteable to a server: The `request` element. To be able to upload resources to a server, a transaction/batch bundle must have a `request` element for each resource which holds the url and the HTTP verb (usually `POST` or `PUT`) for the respective resource, otherwise the server will throw an error.
 
 The modified table we have used so far doesn't have this information, so we have to add it like this:
 
@@ -151,7 +141,57 @@ bundles <- fhir_build_bundles(request_table,
                               verbose = 0)
 ```
 
-This bundle can now be POSTed to the server. Bundles are POSTed to the base url of the server like this:
+## Upload resources to a server
+
+### Upload a single resource
+In general there are two modes of loading resources to a FHIR server. You either intend to newly *create* them on the server or you wish to *update* a resource that is already present on the server. These two modes correspond to using either `POST` (for creation) or `PUT` (for updating). When you `POST` a resource to the server, the URL you `POST` it to has the form `[base]/[resourceType]`, e.g. `http://hapi.fhir.org/baseR4/Patient`. You can for example `POST` the resource we have just created like this:
+
+```{r, eval=FALSE}
+fhir_post(url = "http://hapi.fhir.org/baseR4/Patient", body = new_resource)
+```
+```{r, echo=FALSE}
+message("Resource sucessfully POSTed")
+```
+
+When you do this, the Patient resource in `new_resource` is created under a new, server generated id (also called logical or resource id) on the server. It therefore makes sense for the POSTed resource to not have a resource id, because if it does, most servers will overwrite this id. 
+
+Things are different if you intend to update a resource that is already present on the server. In this case, you'd `PUT` a resource to an URL containing the exact address of the targeted resource on the server which has the form `[base]/[resourceType]/[resourceId]`. The resource you are sending with a `PUT` must have a resource id that is identical to the the one on the server. 
+
+Assuming that the resource `[base]/Patient/id1` exists on the server, we could for example update it like this:
+
+```{r}
+#create resource
+new_resource_with_id <- fhir_build_resource(cast_table[1,], resource_type = "Patient")
+
+new_resource_with_id
+```
+
+```{r, eval=FALSE}
+fhir_put(url = "http://hapi.fhir.org/baseR4/Patient/id1", body = new_resource_with_id)
+```
+```{r, echo=FALSE}
+message("Ressource successfully updated.")
+```
+
+If the no resource exists under the id you are trying to PUT your resource to, the FHIR server will perform something called *Update as create*, meaning the the resource you send to the server is newly created with the specified id (as opposed to a server generated id). In this case `fhir_put()` will inform you like this:
+
+```{r, eval=FALSE}
+fhir_put(url = "http://hapi.fhir.org/baseR4/Patient/id1", body = new_resource_with_id)
+```
+```{r, echo=FALSE}
+message("Ressource successfully created.")
+```
+
+### Upload a bundle of resources
+It is also possible to upload a bundle of resources together. The bundles in the `fhir_bundle_list()` we've created with `build_bundles()` are such bundles:
+
+```{r}
+bundles
+```
+
+The `request` element we've added before specifies for each resource which HTTP verb (`PUT` or `POST`) and which url to use. Note that the URL must match the HTTP action, i.e. with PUT the URL must contain a resource id, while with `POST` it cannot contain a resource id. 
+
+You can `POST` the entire list of bundles to the server like this:
 
 ```{r, eval=FALSE}
 fhir_post("http://hapi.fhir.org/baseR4", body=bundles)

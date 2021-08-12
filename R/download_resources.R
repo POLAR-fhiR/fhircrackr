@@ -161,24 +161,7 @@ fhir_search <- function(
 			stop("The body must be either of type character or of class fhir_body")
 		}
 	}
-	#prepare token authorization
-	if(!is.null(token)) {
-		if(!is.null(username) || is.null(password)) {
-			warning(
-				"You provided username and password as well as a token for authentication.\n",
-				"Ignoring username and password, trying to authorize with token."
-			)
-			username <- NULL
-			password <- NULL
-		}
-		if(is(token, "Token")) {
-			token <- token$credentials$access_token
-		}
-		if(1 < length(token)) {stop("token must be of length one.")}
-		bearerToken <- paste0("Bearer ", token)
-	} else {
-		bearerToken <- NULL
-	}
+
 	bundles <- list()
 	addr <- fhir_url(url = request)
 	#starting message
@@ -206,7 +189,7 @@ fhir_search <- function(
 			body = body,
 			username = username,
 			password = password,
-			token = bearerToken,
+			token = token,
 			verbose = verbose,
 			max_attempts = max_attempts,
 			delay_between_attempts = delay_between_attempts,
@@ -423,15 +406,13 @@ fhir_capability_statement <- function(
 	log_errors = NULL,
 	verbose = 2) {
 
-	auth <- if (!is.null(username) && !is.null(password)) {
-		httr::authenticate(username, password)
-	}
+	auth_helper(username = username, password = password, token = token)
 
 	response <- httr::GET(
 		url = paste_paths(url, "/metadata?"),
 		config = httr::add_headers(
 			Accept = "application/fhir+xml",
-			Authorization = token
+			Authorization = bearerToken
 		),
 		auth
 	)
@@ -841,9 +822,9 @@ get_bundle <- function(
 	#download response
 	for(n in seq_len(max_attempts)) {
 		if(1 < verbose) {message("(", n, "): ", request)}
-		auth <- if(!is.null(username) && !is.null(password)) {
-			httr::authenticate(user = username, password = password)
-		}
+
+		auth_helper(username = username, password = password, token = token)
+
 		#paging is implemented differently for Hapi/Vonk When initial request is POST
 		#VonK: Next-Links have to be POSTed, Hapi: Next-Links have to be GETed
 		#search via POST
@@ -852,7 +833,7 @@ get_bundle <- function(
 				url = request,
 				config = httr::add_headers(
 					Accept = "application/fhir+xml",
-					Authorization = token
+					Authorization = bearerToken
 				),
 				httr::content_type(type = body@type),
 				auth,
@@ -864,7 +845,7 @@ get_bundle <- function(
 				url = request,
 				config = httr::add_headers(
 					Accept = "application/fhir+xml",
-					Authorization = token
+					Authorization = bearerToken
 				),
 				auth
 			)

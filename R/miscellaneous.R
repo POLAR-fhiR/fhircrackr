@@ -642,3 +642,35 @@ frame_string <- function(text = "\nHello !!!\n\n\nIs\nthere\n\nA N Y O N E\n\nou
 	r <- paste0(r, hbb)
 	r
 }
+
+
+#' Prepare authentication info for fhir_search/fhir_post/fhir_put
+#' @param username The username for basic auth
+#' @param password The password for basic auth
+#' @param token The token for token based auth
+#' @noRd
+auth_helper <- function(username, password, token){
+
+	auth <<- if(!is.null(username) && !is.null(password)) {
+		httr::authenticate(user = username, password = password)
+	}
+
+	#prepare token authorization
+	if(!is.null(token)) {
+		if(!is.null(username) || is.null(password)) {
+			warning(
+				"You provided username and password as well as a token for authentication.\n",
+				"Ignoring username and password, trying to authorize with token."
+			)
+			username <<- NULL
+			password <<- NULL
+		}
+		if(is(token, "Token")) {
+			token <- token$credentials$access_token
+		}
+		if(1 < length(token)) {stop("token must be of length one.")}
+		bearerToken <<- paste0("Bearer ", token)
+	} else {
+		bearerToken <<- NULL
+	}
+}

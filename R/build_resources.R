@@ -230,22 +230,28 @@ fhir_build_bundles <- function(
 #'
 #' This function is a convenience wrapper around [httr::POST()].
 #'
-#' [fhir_post()] accepts three classes for the body:
-#'  1) A [fhir_bundle_list-class] representing a list of transaction or batch bundles as created by [fhir_build_bundles()].
+#' @details
+#' [fhir_post()] accepts four classes for the body:
+#'
+#'  1) A [fhir_resource-class] as created by [fhir_build_resource()]. This is used when just a single resource should be POSTed to the server.
+#'  In this case `url` must contain the base url plus the resource type, e.g. http://hapi.fhir.org/baseR4/Patient.
+#'
+#'  2) A [fhir_bundle_list-class] representing a list of transaction or batch bundles as created by [fhir_build_bundles()].
 #'  This is used to POST or PUT several resources to the server. When `body` is a [fhir_bundle_list-class], the `url` has to be the base
 #'  url of the server, e.g. http://hapi.fhir.org/baseR4.
 #'
-#'  2) A [fhir_resource-class] as created by [fhir_build_resource()]. This is used when just a single resource should be POSTed to the server.
-#'  In this case `url` must contain the base url plus the resource type, e.g. http://hapi.fhir.org/baseR4/Patient.
+#'  3) A [fhir_bundle_xml-class] representing a single transaction or batch bundle. This can be used to POST a single element of the
+#'  list of bundles created by [fhir_build_bundles()].
 #'
-#'  3) A [fhir_body-class] as created by [fhir_body()]. This is the most flexible approach, because within the [fhir_body-class] object you can represent
+#'  4) A [fhir_body-class] as created by [fhir_body()]. This is the most flexible approach, because within the [fhir_body-class] object you can represent
 #'  any kind of `content` as a string and set the `type` accordingly. See examples.
 #'
 #'  For examples of how to create the different body types see the respective help pages. For an example of the entire workflow around creating
 #'  and POSTing resources, see the package vignette on recreating resources.
 #'
 #' @param url An object of class [fhir_url-class] or a character vector of length one containing the url to POST to.
-#' @param body An object of class [fhir_bundle_list-class], [fhir_resource-class] or [fhir_body-class]. See details for how to generate them.
+#' @param body An object of class  [fhir_resource-class], [fhir_bundle_list-class], [fhir_bundle_xml-class] or [fhir_body-class].
+#' See details for how to generate them.
 #' @param username A character vector of length one containing the username for basic authentication.
 #' @param password A character vector of length one containing the password for basic authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
@@ -255,8 +261,11 @@ fhir_build_bundles <- function(
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`.
 #' Regardless of the value of `log_errors` the most recent http error message within the current R session is saved internally and can
 #' be accessed with [fhir_recent_http_error()].
-#'
+#' @include fhir_resource.R fhir_bundle_list.R fhir_body.R
 #' @export
+#' @rdname fhir_post-methods
+#' @docType methods
+#'
 #' @examples
 #' \donttest{
 #' ### 1. POST transaction bundles
@@ -291,70 +300,43 @@ fhir_build_bundles <- function(
 #' fhir_post(url = url, body = body)
 #' }
 
-fhir_post <- function(
-	url,
-	body,
-	username = NULL,
-	password = NULL,
-	token = NULL,
-	verbose = 1,
-	log_errors = NULL){
-
-	auth <- if(!is.null(username) && !is.null(password)) {
-		httr::authenticate(user = username, password = password)
+setGeneric(
+	name = "fhir_post",
+	def = function(
+		url,
+		body,
+		username = NULL,
+		password = NULL,
+		token = NULL,
+		verbose = 1,
+		log_errors = NULL
+	){
+		standardGeneric("fhir_post")
 	}
+)
 
-	#prepare token authorization
-	if(!is.null(token)) {
-		if(!is.null(username) || is.null(password)) {
-			warning(
-				"You provided username and password as well as a token for authentication.\n",
-				"Ignoring username and password, trying to authorize with token."
-			)
-			username <- NULL
-			password <- NULL
-		}
-		if(is(token, "Token")) {
-			token <- token$credentials$access_token
-		}
-		if(1 < length(token)) {stop("token must be of length one.")}
-		bearerToken <- paste0("Bearer ", token)
-	} else {
-		bearerToken <- NULL
-	}
+#' @rdname fhir_post-methods
+#' @aliases fhir_post,fhir_resource-method
+setMethod(
+	f= "fhir_post",
+	signature = c(body = "fhir_resource"),
+	definition = function(
+		url,
+		body,
+		username = NULL,
+		password = NULL,
+		token = NULL,
+		verbose = 1,
+		log_errors = NULL
+	){
 
-	if(is(body, "fhir_bundle_list")) {
-		i<-0
-		invisible(lapply(body,
-				function(bundle){
-					i<<-i+1
-					response <- httr::POST(
-						url = url,
-						config = httr::add_headers(
-							Accept = "application/fhir+xml",
-							Authorization = token
-						),
-						httr::content_type(type = "xml"),
-						auth,
-						body = toString(bundle)
-					)
-
-					#check for http errors
-					check_response(response = response, log_errors = log_errors, append = TRUE)
-
-					if(response$status_code==200 && verbose>0) {
-						message(paste0("Bundle ", i, " sucessfully POSTed\n"))
-					}
-				}
-			))
-
-	}else if(is(body, "fhir_resource_xml")) {
+		auth_helper(username = username, password = password, token = token)
 
 		response <- httr::POST(
 			url = url,
 			config = httr::add_headers(
 				Accept = "application/fhir+xml",
-				Authorization = token
+				Authorization = bearerToken
 			),
 			httr::content_type(type = "xml"),
 			auth,
@@ -365,16 +347,111 @@ fhir_post <- function(
 		check_response(response = response, log_errors = log_errors)
 
 		if(response$status_code==201 && verbose>0) {
-			message("Resource sucessfully POSTed")
+			message("Resource sucessfully created")
 		}
+	}
+)
 
-	}else if(is(body, "fhir_body")) {
+#' @rdname fhir_post-methods
+#' @aliases fhir_post,fhir_bundle_list-method
+setMethod(
+	f= "fhir_post",
+	signature = c(body = "fhir_bundle_list"),
+	definition = function(
+		url,
+		body,
+		username = NULL,
+		password = NULL,
+		token = NULL,
+		verbose = 1,
+		log_errors = NULL
+	){
+		auth_helper(username = username, password = password, token = token)
+
+		i<-0
+		invisible(lapply(body,
+						 function(bundle){
+						 	i<<-i+1
+						 	response <- httr::POST(
+						 		url = url,
+						 		config = httr::add_headers(
+						 			Accept = "application/fhir+xml",
+						 			Authorization = bearerToken
+						 		),
+						 		httr::content_type(type = "xml"),
+						 		auth,
+						 		body = toString(bundle)
+						 	)
+
+						 	#check for http errors
+						 	check_response(response = response, log_errors = log_errors, append = TRUE)
+
+						 	if(response$status_code==200 && verbose>0) {
+						 		message(paste0("Bundle ", i, " sucessfully POSTed\n"))
+						 	}
+						 }
+		))
+	}
+)
+
+#' @rdname fhir_post-methods
+#' @aliases fhir_post,fhir_bundle_xml-method
+setMethod(
+	f= "fhir_post",
+	signature = c(body = "fhir_bundle_xml"),
+	definition = function(
+		url,
+		body,
+		username = NULL,
+		password = NULL,
+		token = NULL,
+		verbose = 1,
+		log_errors = NULL
+	){
+		auth_helper(username = username, password = password, token = token)
+
+	 	response <- httr::POST(
+	 		url = url,
+	 		config = httr::add_headers(
+	 			Accept = "application/fhir+xml",
+	 			Authorization = bearerToken
+	 		),
+	 		httr::content_type(type = "xml"),
+	 		auth,
+	 		body = toString(body)
+	 	)
+
+	 	#check for http errors
+	 	check_response(response = response, log_errors = log_errors, append = TRUE)
+
+	 	if(response$status_code==200 && verbose>0) {
+	 		message("Bundle sucessfully POSTed")
+	 	}
+
+	}
+)
+
+#' @rdname fhir_post-methods
+#' @aliases fhir_post,fhir_body-method
+setMethod(
+	f= "fhir_post",
+	signature = c(body = "fhir_body"),
+	definition = function(
+		url,
+		body,
+		username = NULL,
+		password = NULL,
+		token = NULL,
+		verbose = 1,
+		log_errors = NULL
+	){
+		auth_helper(username = username, password = password, token = token)
 
 		response <- httr::POST(
 			url = url,
 			config = httr::add_headers(
 				Accept = "application/fhir+xml",
-				Authorization = token
+				Authorization = bearerToken
 			),
 			httr::content_type(type = body@type),
 			auth,
@@ -386,13 +463,9 @@ fhir_post <- function(
 		if(response$status_code %in% c(200,201,202) && verbose>0) {
 			message("Body sucessfully POSTed")
 		}
-
-	} else {
-		stop("body must be of type fhir_bundle_xml, fhir_resource_xml or fhir_body")
 	}
+)
 
-
-}
 
 #' PUT to a FHIR server
 #'
@@ -453,28 +526,7 @@ fhir_put <- function(
 	verbose = 1,
 	log_errors = NULL){
 
-	auth <- if(!is.null(username) && !is.null(password)) {
-		httr::authenticate(user = username, password = password)
-	}
-
-	#prepare token authorization
-	if(!is.null(token)) {
-		if(!is.null(username) || is.null(password)) {
-			warning(
-				"You provided username and password as well as a token for authentication.\n",
-				"Ignoring username and password, trying to authorize with token."
-			)
-			username <- NULL
-			password <- NULL
-		}
-		if(is(token, "Token")) {
-			token <- token$credentials$access_token
-		}
-		if(1 < length(token)) {stop("token must be of length one.")}
-		bearerToken <- paste0("Bearer ", token)
-	} else {
-		bearerToken <- NULL
-	}
+	auth_helper(username = username, password = password, token = token)
 
 	if(is(body, "fhir_resource_xml")) {
 
@@ -482,7 +534,7 @@ fhir_put <- function(
 			url = url,
 			config = httr::add_headers(
 				Accept = "application/fhir+xml",
-				Authorization = token
+				Authorization = bearerToken
 			),
 			httr::content_type(type = "xml"),
 			auth,
@@ -493,7 +545,11 @@ fhir_put <- function(
 		check_response(response = response, log_errors = log_errors)
 
 		if(response$status_code==201 && verbose>0) {
-			message("Resource sucessfully PUT")
+			message("Resource sucessfully created")
+		}
+
+		if(response$status_code==200 && verbose>0) {
+			message("Resource sucessfully updated")
 		}
 
 	}else if (is(body, "fhir_body")){
@@ -502,7 +558,7 @@ fhir_put <- function(
 			url = url,
 			config = httr::add_headers(
 				Accept = "application/fhir+xml",
-				Authorization = token
+				Authorization = bearerToken
 			),
 			httr::content_type(type = body@type),
 			auth,
