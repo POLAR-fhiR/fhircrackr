@@ -2,7 +2,7 @@
 #' Print xml-like tree from cast table
 #' This function takes a table as created by [fhir_cast()] and prints the tree structure implicit in the
 #' column names of the tables. It is useful to get an overview over the implied structure when planning to create
-#' FHIR bundles from this table using [fhir_build_bundles()].
+#' FHIR bundles from this table using [fhir_build_bundle()].
 #'
 #' By default, only the first 5 rows are converted to tree structure to prevent the output from getting too long. This
 #' can be changed by setting the argument `nrow` to the desired number.
@@ -29,7 +29,7 @@
 #' #show tree
 #' fhir_show_tree(cast_df, resource="Patient")
 #' @export
-#' @seealso [fhir_cast()], [fhir_build_bundles()]
+#' @seealso [fhir_cast()], [fhir_build_bundle()]
 #'
 fhir_show_tree <- function(cast_table, resource, nrow = 5, rm_indices=TRUE){
 	i <- 1
@@ -79,7 +79,7 @@ fhir_show_tree <- function(cast_table, resource, nrow = 5, rm_indices=TRUE){
 #' #print to console
 #' resource
 #' @export
-#' @seealso [fhir_cast()], [fhir_crack()], [fhir_build_bundles()]
+#' @seealso [fhir_cast()], [fhir_crack()], [fhir_build_bundle()]
 
 fhir_build_resource <- function(
 	cast_row,
@@ -91,9 +91,9 @@ fhir_build_resource <- function(
 
 
 
-#' Build a list of FHIR bundles
+#' Build a FHIR bundle
 #'
-#' This function takes a table as produced by [fhir_cast()] and builds a [fhir_bundle_list-class] object from it. It is primarily used
+#' This function takes a table as produced by [fhir_cast()] and builds a [fhir_bundle_xml-class] object from it. It is primarily used
 #' to create transaction/batch bundles to POST back to a FHIR server. The column names of the table must represent the XPath expression of the
 #' respective element with indices for repeating items. A table like this is produced when FHIR resources have been cracked with [fhir_crack()] without
 #' assigning explicit column names in the [fhir_design-class]/[fhir_table_description-class] and this table has in turn been cast to wide format with
@@ -103,7 +103,7 @@ fhir_build_resource <- function(
 #' 1) Download resources from a server whith [fhir_search()]
 #' 2) Crack and cast them whith [fhir_crack()] and [fhir_cast()]
 #' 3) Do something to values (e.g. some kind of anonymization)
-#' 4) Translate the data back into FHIR resources whith [fhir_build_bundles()]
+#' 4) Translate the data back into FHIR resources with [fhir_build_bundle()]
 #' 5) Post the resources to a server
 #'
 #' A FHIR bundle that can be POSTed to a server is usually of type `transaction` or `batch`. Each entry of these bundles consists of the resource itself
@@ -155,17 +155,19 @@ fhir_build_resource <- function(
 #'
 #' In the cast table, each row corresponds to one resource that is created. To add the information for the `request` element of the bundle,
 #' this table has to be augmented with two columns named `request.method` and `request.url`, which contain the respective HTTP verb and URL for the resource.
-#' If these columns are not added to the table, [fhir_build_bundles()] still builds bundles from it, but those bundles will not be POSTeable to a server. See examples.
+#' If these columns are not added to the table, [fhir_build_bundle()] still builds bundles from it, but those bundles will not be POSTable to a server. See examples.
 #'
 #'
-#' @param cast_table A cast table as produced by [fhir_cast()], possibly modified (see details).
+#' @param cast_table A cast table as produced by [fhir_cast()], possibly modified (see details) or a named list
+#' of cast tables, if different resource types have to be included in the same bundle. In this case the names of
+#' the list elements must correspond to the resource type represented in the table!
 #' @param resource_type A character vector of length one or [fhir_resource_type-class] object
-#' indicating which resource type the table is build from.
+#' indicating which resource type is represented in the table, if a single table is provided. This argument is
+#' ignored when `cast_table` is a named list of tables.
 #' @param bundle_type A character vector of length one defining the bundle type. Will usually be
 #' either `"transaction"` (the default) or `"batch"`.
-#' @param bundle_size Numeric of length one defining how many resources to put in each bundle
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if > 0 progress message is printed. Defaults to 1.
-#' @return A [fhir_bundle_list-class] object.
+#' @return A [fhir_bundle_xml-class] object.
 #' @export
 #' @examples
 #' #unserialize example
@@ -183,48 +185,113 @@ fhir_build_resource <- function(
 #'
 #' #add request info to table
 #' request <- data.frame(request.method = c("POST", "PUT"),
-#'                       request.url = c("Patient", "Patient/111"))
+#'                       request.url = c("Patient", "Patient/id3"))
 #'
 #' request_df <- cbind(cast_df, request)
 #'
-#' #build bundles
-#' bundles <- fhir_build_bundles(request_df, "Patient", bundle_type = "transaction", bundle_size=2)
+#' #build bundle
+#' bundle <- fhir_build_bundle(request_df, "Patient", bundle_type = "transaction")
 #'
 #' #print to console
-#' cat(toString(bundles[[1]]))
+#' cat(toString(bundle))
+#' @rdname fhir_build_bundle-methods
+#' @docType methods
+#'
 #' @export
 #' @seealso [fhir_cast()], [fhir_crack()], [fhir_build_resource()]
 
-fhir_build_bundles <- function(
-	cast_table,
-	resource_type,
-	bundle_type = "transaction",
-	bundle_size = 500,
-	verbose = 1) {
 
-	names(cast_table)[!grepl("^request", names(cast_table))] <- paste0("resource.", resource_type, ".", names(cast_table)[!grepl("^request", names(cast_table))])
+setGeneric(
+	name = "fhir_build_bundle",
+	def = function(
+		cast_table,
+		resource_type,
+		bundle_type = "transaction",
+		verbose = 1
+	){
+		standardGeneric("fhir_build_bundle")
+	}
+)
 
-	max_ <- nrow(cast_table)
-	i <- 1
-	b <- 0
-	bundles <- list()
-	while(i <= max_) {
+#' @rdname fhir_build_bundle-methods
+#' @aliases fhir_build_bundle,data.frame-method
+setMethod(
+	f = "fhir_build_bundle",
+	signature = c("cast_table" = "data.frame"),
+	definition =  function(
+		cast_table,
+		resource_type,
+		bundle_type = "transaction",
+		verbose = 1) {
+
+		names(cast_table)[!grepl("^request", names(cast_table))] <- paste0("resource.", resource_type, ".", names(cast_table)[!grepl("^request", names(cast_table))])
+
+		max_ <- nrow(cast_table)
+		i <- 1
 		s <- ""
-		end_ <- min(c(max_, i + bundle_size - 1))
-		j <- i
-		while(i <= end_) {
+		while(i <= max_) {
 			s <- paste0(s, tree2xml(rm_ids_from_tree(build_tree(row = cast_table[i,], "entry")), tab = "  "))
-			#s_ <- paste0(s_, xml2::as_xml_document(rm_ids_from_tree(build_tree(row = cast_table[i,], resource_name))))
 			i <- i + 1
 		}
 		s <- paste0("<Bundle>\n","   <type value='",bundle_type, "'/>\n", s, "</Bundle>")
-		b <- b + 1
-		#cat(s)
-		bundles[[paste0("Bundle", b)]] <- xml2::read_xml(s)
-		if(verbose > 0) {cat(paste0("Bundle ", b, " a ", i - j, " ", resource_type, "s  \u03A3 ", resource_type, "s = ", i - 1, "\n"))}
+
+		bundle <- xml2::read_xml(s)
+		if(verbose > 0) {
+			message("Created a  ", bundle_type, " Bundle with ", max_, " resources.")
+
+		}
+
+		fhir_bundle_xml(bundle)
 	}
-	fhir_bundle_list(bundles)
-}
+)
+
+#' @rdname fhir_build_bundle-methods
+#' @aliases fhir_build_bundle,list-method
+setMethod(
+	f = "fhir_build_bundle",
+	signature = c("cast_table" = "list"),
+	definition =  function(
+		cast_table,
+		bundle_type = "transaction",
+		verbose = 1) {
+
+		if(!all(sapply(cast_table,is.data.frame))){
+			stop("All elements of the list provided to cast_table must be data.frames/data.tables.")
+		}
+
+		if(length(names(cast_table)) != length(cast_table)){
+			stop("You have to provide a **named** list, where the names correspond to the resource type represented in the table.")
+		}
+
+		s <- ""
+		lapply(
+			X = seq_len(length(cast_table)),
+			FUN = function(i){
+				table <- cast_table[[i]]
+				resource_type <- fhir_resource_type(names(cast_table)[i])
+
+				names(table)[!grepl("^request", names(table))] <- paste0("resource.", resource_type, ".", names(table)[!grepl("^request", names(table))])
+				max_ <- nrow(table)
+				i <- 1
+				while(i <= max_) {
+					s <<- paste0(s, tree2xml(rm_ids_from_tree(build_tree(row = table[i,], "entry")), tab = "  "))
+					i <- i + 1
+				}
+			}
+
+		)
+
+		s <- paste0("<Bundle>\n","   <type value='",bundle_type, "'/>\n", s, "</Bundle>")
+
+		bundle <- xml2::read_xml(s)
+		if(verbose > 0) {
+			message("Created a  ", bundle_type, " Bundle with ", Reduce(sum, lapply(cast_table, nrow)), " resources.")
+
+		}
+
+		fhir_bundle_xml(bundle)
+	}
+)
 
 #' POST to a FHIR server
 #'
@@ -236,21 +303,16 @@ fhir_build_bundles <- function(
 #'  1) A [fhir_resource-class] as created by [fhir_build_resource()]. This is used when just a single resource should be POSTed to the server.
 #'  In this case `url` must contain the base url plus the resource type, e.g. http://hapi.fhir.org/baseR4/Patient.
 #'
-#'  2) A [fhir_bundle_list-class] representing a list of transaction or batch bundles as created by [fhir_build_bundles()].
-#'  This is used to POST or PUT several resources to the server. When `body` is a [fhir_bundle_list-class], the `url` has to be the base
-#'  url of the server, e.g. http://hapi.fhir.org/baseR4.
+#'  2) A [fhir_bundle_xml-class] representing a transaction or batch bundle as created by [fhir_build_bundle()].
 #'
-#'  3) A [fhir_bundle_xml-class] representing a single transaction or batch bundle. This can be used to POST a single element of the
-#'  list of bundles created by [fhir_build_bundles()].
-#'
-#'  4) A [fhir_body-class] as created by [fhir_body()]. This is the most flexible approach, because within the [fhir_body-class] object you can represent
+#'  3) A [fhir_body-class] as created by [fhir_body()]. This is the most flexible approach, because within the [fhir_body-class] object you can represent
 #'  any kind of `content` as a string and set the `type` accordingly. See examples.
 #'
 #'  For examples of how to create the different body types see the respective help pages. For an example of the entire workflow around creating
 #'  and POSTing resources, see the package vignette on recreating resources.
 #'
 #' @param url An object of class [fhir_url-class] or a character vector of length one containing the url to POST to.
-#' @param body An object of class  [fhir_resource-class], [fhir_bundle_list-class], [fhir_bundle_xml-class] or [fhir_body-class].
+#' @param body An object of class  [fhir_resource-class], [fhir_bundle_xml-class] or [fhir_body-class].
 #' See details for how to generate them.
 #' @param username A character vector of length one containing the username for basic authentication.
 #' @param password A character vector of length one containing the password for basic authentication.
@@ -267,16 +329,16 @@ fhir_build_bundles <- function(
 #' @docType methods
 #'
 #' @examples
-#' \donttest{
-#' ### 1. POST transaction bundles
+#' \dontrun{
+#' ### 1. POST transaction bundle
 #' #unserialize example bundles
-#' bundles <- fhir_unserialize(transaction_bundle_example)
+#' bundle <- fhir_unserialize(transaction_bundle_example)
 #'
 #' #have a look at the bundle
-#' cat(toString(bundles[[1]]))
+#' cat(toString(bundle))
 #'
 #' #post
-#' fhir_post(url = "http://hapi.fhir.org/baseR4", body = bundles)
+#' fhir_post(url = "http://hapi.fhir.org/baseR4", body = bundle)
 #'
 #'
 #' ### 2. POST single resouce
@@ -330,16 +392,16 @@ setMethod(
 		log_errors = NULL
 	){
 
-		auth_helper(username = username, password = password, token = token)
+		auth <- auth_helper(username = username, password = password, token = token)
 
 		response <- httr::POST(
 			url = url,
 			config = httr::add_headers(
 				Accept = "application/fhir+xml",
-				Authorization = bearerToken
+				Authorization = auth$token
 			),
 			httr::content_type(type = "xml"),
-			auth,
+			auth$basicAuth,
 			body = toString(body)
 		)
 
@@ -349,48 +411,6 @@ setMethod(
 		if(response$status_code==201 && verbose>0) {
 			message("Resource sucessfully created")
 		}
-	}
-)
-
-#' @rdname fhir_post-methods
-#' @aliases fhir_post,fhir_bundle_list-method
-setMethod(
-	f= "fhir_post",
-	signature = c(body = "fhir_bundle_list"),
-	definition = function(
-		url,
-		body,
-		username = NULL,
-		password = NULL,
-		token = NULL,
-		verbose = 1,
-		log_errors = NULL
-	){
-		auth_helper(username = username, password = password, token = token)
-
-		i<-0
-		invisible(lapply(body,
-						 function(bundle){
-						 	i<<-i+1
-						 	response <- httr::POST(
-						 		url = url,
-						 		config = httr::add_headers(
-						 			Accept = "application/fhir+xml",
-						 			Authorization = bearerToken
-						 		),
-						 		httr::content_type(type = "xml"),
-						 		auth,
-						 		body = toString(bundle)
-						 	)
-
-						 	#check for http errors
-						 	check_response(response = response, log_errors = log_errors, append = TRUE)
-
-						 	if(response$status_code==200 && verbose>0) {
-						 		message(paste0("Bundle ", i, " sucessfully POSTed\n"))
-						 	}
-						 }
-		))
 	}
 )
 
@@ -408,16 +428,16 @@ setMethod(
 		verbose = 1,
 		log_errors = NULL
 	){
-		auth_helper(username = username, password = password, token = token)
+		auth <- auth_helper(username = username, password = password, token = token)
 
 	 	response <- httr::POST(
 	 		url = url,
 	 		config = httr::add_headers(
 	 			Accept = "application/fhir+xml",
-	 			Authorization = bearerToken
+	 			Authorization = auth$token
 	 		),
 	 		httr::content_type(type = "xml"),
-	 		auth,
+	 		auth$basicAuth,
 	 		body = toString(body)
 	 	)
 
@@ -445,16 +465,16 @@ setMethod(
 		verbose = 1,
 		log_errors = NULL
 	){
-		auth_helper(username = username, password = password, token = token)
+		auth <- auth_helper(username = username, password = password, token = token)
 
 		response <- httr::POST(
 			url = url,
 			config = httr::add_headers(
 				Accept = "application/fhir+xml",
-				Authorization = bearerToken
+				Authorization = auth$token
 			),
 			httr::content_type(type = body@type),
-			auth,
+			auth$basicAuth,
 			body = body@content
 		)
 
@@ -497,7 +517,7 @@ setMethod(
 #'
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' ### 1. PUT fhir__resource object
 #' #unserialize example resource
 #' resource <- fhir_unserialize(example_resource2)
@@ -526,7 +546,7 @@ fhir_put <- function(
 	verbose = 1,
 	log_errors = NULL){
 
-	auth_helper(username = username, password = password, token = token)
+	auth <- auth_helper(username = username, password = password, token = token)
 
 	if(is(body, "fhir_resource_xml")) {
 
@@ -534,10 +554,10 @@ fhir_put <- function(
 			url = url,
 			config = httr::add_headers(
 				Accept = "application/fhir+xml",
-				Authorization = bearerToken
+				Authorization = auth$token
 			),
 			httr::content_type(type = "xml"),
-			auth,
+			auth$basicAuth,
 			body = toString(body)
 		)
 
@@ -558,10 +578,10 @@ fhir_put <- function(
 			url = url,
 			config = httr::add_headers(
 				Accept = "application/fhir+xml",
-				Authorization = bearerToken
+				Authorization = auth$token
 			),
 			httr::content_type(type = body@type),
-			auth,
+			auth$basicAuth,
 			body = body@content
 		)
 

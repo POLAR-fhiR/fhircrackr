@@ -7,7 +7,7 @@
 \alias{example_resource2}
 \title{Toy examples to POST/PUT on a server}
 \format{
-An object of class \code{fhir_bundle_list} of length 1.
+An object of class \code{fhir_bundle_serialized} of length 1277.
 
 An object of class \code{fhir_resource_serialized} of length 267.
 

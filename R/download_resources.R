@@ -377,7 +377,7 @@ fhir_recent_http_error <- function() {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' #without indices
 #' cap <- fhir_capability_statement("https://server.fire.ly")
 #'
@@ -406,15 +406,15 @@ fhir_capability_statement <- function(
 	log_errors = NULL,
 	verbose = 2) {
 
-	auth_helper(username = username, password = password, token = token)
+	auth <- auth_helper(username = username, password = password, token = token)
 
 	response <- httr::GET(
 		url = paste_paths(url, "/metadata?"),
 		config = httr::add_headers(
 			Accept = "application/fhir+xml",
-			Authorization = bearerToken
+			Authorization = auth$token
 		),
-		auth
+		auth$basicAuth
 	)
 
 	#check for http errors
@@ -823,7 +823,7 @@ get_bundle <- function(
 	for(n in seq_len(max_attempts)) {
 		if(1 < verbose) {message("(", n, "): ", request)}
 
-		auth_helper(username = username, password = password, token = token)
+		auth <- auth_helper(username = username, password = password, token = token)
 
 		#paging is implemented differently for Hapi/Vonk When initial request is POST
 		#VonK: Next-Links have to be POSTed, Hapi: Next-Links have to be GETed
@@ -833,10 +833,10 @@ get_bundle <- function(
 				url = request,
 				config = httr::add_headers(
 					Accept = "application/fhir+xml",
-					Authorization = bearerToken
+					Authorization = auth$token
 				),
 				httr::content_type(type = body@type),
-				auth,
+				auth$basicAuth,
 				body = body@content
 			)
 
@@ -845,9 +845,9 @@ get_bundle <- function(
 				url = request,
 				config = httr::add_headers(
 					Accept = "application/fhir+xml",
-					Authorization = bearerToken
+					Authorization = auth$token
 				),
-				auth
+				auth$basicAuth
 			)
 		}
 		#check for http errors

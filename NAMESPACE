@@ -2,7 +2,7 @@
 
 export(fhir_authenticate)
 export(fhir_body)
-export(fhir_build_bundles)
+export(fhir_build_bundle)
 export(fhir_build_resource)
 export(fhir_bundle_xml)
 export(fhir_canonical_design)

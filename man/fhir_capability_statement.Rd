@@ -54,7 +54,7 @@ they are divided by the string specified in \code{sep}. If \code{brackets} is no
 will also be assigned indices so you can melt them using \code{\link[=fhir_melt]{fhir_melt()}}.
 }
 \examples{
-\donttest{
+\dontrun{
 #without indices
 cap <- fhir_capability_statement("https://server.fire.ly")
 

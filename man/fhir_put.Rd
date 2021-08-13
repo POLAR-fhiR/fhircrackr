@@ -50,7 +50,7 @@ For examples of how to create the different body types see the respective help p
 and PUTing resources, see the package vignette on recreating resources.
 }
 \examples{
-\donttest{
+\dontrun{
 ### 1. PUT fhir__resource object
 #unserialize example resource
 resource <- fhir_unserialize(example_resource2)

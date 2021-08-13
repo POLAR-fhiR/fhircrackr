@@ -56,8 +56,6 @@ bundle <- xml2::read_xml("
 
 bundle <- fhir_bundle_xml(bundle)
 
-bundle <- fhir_serialize(bundle)
-
-transaction_bundle_example <- fhir_bundle_list(list(bundle))
+transaction_bundle_example <- fhir_serialize(bundle)
 
 usethis::use_data(transaction_bundle_example, overwrite = TRUE)

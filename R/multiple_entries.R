@@ -41,7 +41,7 @@
 #' #cast
 #' fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
 #'
-#' @seealso [fhir_crack()], [fhir_melt()], [fhir_build_bundles()]
+#' @seealso [fhir_crack()], [fhir_melt()], [fhir_build_bundle()]
 
 fhir_cast <- function(
 	indexed_df,

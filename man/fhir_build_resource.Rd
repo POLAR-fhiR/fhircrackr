@@ -42,5 +42,5 @@ resource <- fhir_build_resource(cast_df[1,], "Patient")
 resource
 }
 \seealso{
-\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_crack]{fhir_crack()}}, \code{\link[=fhir_build_bundles]{fhir_build_bundles()}}
+\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_crack]{fhir_crack()}}, \code{\link[=fhir_build_bundle]{fhir_build_bundle()}}
 }

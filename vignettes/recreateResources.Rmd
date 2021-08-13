@@ -98,27 +98,26 @@ new_resource
 ## Recreate a bundle of resources
 It is also possible to bundle together several resources to upload them to the server together. This is done using bundles of type transaction or batch (see https://www.hl7.org/fhir/bundle.html and https://www.hl7.org/fhir/http.html). 
 
-We can create a list of such a bundles from a cast table using the function `fhir_build_bundles`, which takes a cast table and the resource type represented in the table, as well as information on the type of bundle you want to create and the number of resources (`bundle_size`) that should be bundled together:
+We can create such a bundle from a cast table using the function `fhir_build_bundle`, which takes a cast table and the resource type represented in the table, as well as information on the type of bundle you want to create:
 
 ```{r}
-bundles <- fhir_build_bundles(modified_table, 
-                              resource_type = "Patient", 
-                              bundle_type = "transaction", 
-                              bundle_size = 2,
-                              verbose = 0)
+bundle <- fhir_build_bundle(modified_table, 
+                            resource_type = "Patient", 
+                            bundle_type = "transaction", 
+                            verbose = 0)
 ```
 
-You can have a look at the first bundle like this:
+You can have a look at the bundle like this:
 
 ```{r}
 #Overview
-bundles[[1]]
+bundles
 
 #print complete string
-cat(toString(bundles[[1]]))
+cat(toString(bundles))
 ```
 
-If you are familiar with transaction bundles, you'll notice that this bundle is lacking some information to be posteable to a server: The `request` element. To be able to upload resources to a server, a transaction/batch bundle must have a `request` element for each resource which holds the url and the HTTP verb (usually `POST` or `PUT`) for the respective resource, otherwise the server will throw an error.
+If you are familiar with transaction bundles, you'll notice that this bundle is lacking some information to be POSTable to a server: The `request` element. To be able to upload resources to a server, a transaction/batch bundle must have a `request` element for each resource which holds the url and the HTTP verb (usually `POST` or `PUT`) for the respective resource, otherwise the server will throw an error.
 
 The modified table we have used so far doesn't have this information, so we have to add it like this:
 
@@ -134,11 +133,10 @@ request_table
 Now when we build a transaction bundle, it has all the information we need:
 
 ```{r}
-bundles <- fhir_build_bundles(request_table,
-                              resource_type = "Patient", 
-                              bundle_type = "transaction", 
-                              bundle_size = 2,
-                              verbose = 0)
+bundle <- fhir_build_bundle(request_table,
+                            resource_type = "Patient", 
+                            bundle_type = "transaction", 
+                            verbose = 0)
 ```
 
 ## Upload resources to a server
@@ -183,10 +181,10 @@ message("Ressource successfully created.")
 ```
 
 ### Upload a bundle of resources
-It is also possible to upload a bundle of resources together. The bundles in the `fhir_bundle_list()` we've created with `build_bundles()` are such bundles:
+It is also possible to upload a bundle of resources together. The bundle in the we've created with `fhir_build_bundle()` is such a bundle:
 
 ```{r}
-bundles
+bundle
 ```
 
 The `request` element we've added before specifies for each resource which HTTP verb (`PUT` or `POST`) and which url to use. Note that the URL must match the HTTP action, i.e. with PUT the URL must contain a resource id, while with `POST` it cannot contain a resource id. 
@@ -194,11 +192,14 @@ The `request` element we've added before specifies for each resource which HTTP 
 You can `POST` the entire list of bundles to the server like this:
 
 ```{r, eval=FALSE}
-fhir_post("http://hapi.fhir.org/baseR4", body=bundles)
+fhir_post("http://hapi.fhir.org/baseR4", body=bundle)
 ```
 ```{r, echo=FALSE}
-cat("Bundle 1 sucessfully POSTed\nBundle 2 sucessfully POSTed")
+message("Bundle sucessfully POSTed")
 ```
+
+## A note on referential integrity
+Uploading resources that stand alone to a server is easy, as you've seen above. Matters get a lot more complicated, however, when resources contain references to other resources, e.g. a MedicationAdministration resource that links to a Patient resource. 
 
 #TODO
 - Write something about different resource/types dependencies between resources

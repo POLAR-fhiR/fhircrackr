@@ -52,5 +52,5 @@ fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
 
 }
 \seealso{
-\code{\link[=fhir_crack]{fhir_crack()}}, \code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_build_bundles]{fhir_build_bundles()}}
+\code{\link[=fhir_crack]{fhir_crack()}}, \code{\link[=fhir_melt]{fhir_melt()}}, \code{\link[=fhir_build_bundle]{fhir_build_bundle()}}
 }

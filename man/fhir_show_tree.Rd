@@ -5,7 +5,7 @@
 \title{Print xml-like tree from cast table
 This function takes a table as created by \code{\link[=fhir_cast]{fhir_cast()}} and prints the tree structure implicit in the
 column names of the tables. It is useful to get an overview over the implied structure when planning to create
-FHIR bundles from this table using \code{\link[=fhir_build_bundles]{fhir_build_bundles()}}.}
+FHIR bundles from this table using \code{\link[=fhir_build_bundle]{fhir_build_bundle()}}.}
 \usage{
 fhir_show_tree(cast_table, resource, nrow = 5, rm_indices = TRUE)
 }
@@ -40,5 +40,5 @@ cast_df <- fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
 fhir_show_tree(cast_df, resource="Patient")
 }
 \seealso{
-\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_build_bundles]{fhir_build_bundles()}}
+\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_build_bundle]{fhir_build_bundle()}}
 }

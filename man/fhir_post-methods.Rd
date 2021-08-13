@@ -5,8 +5,6 @@
 \alias{fhir_post}
 \alias{fhir_post,ANY,fhir_resource-method}
 \alias{fhir_post,fhir_resource-method}
-\alias{fhir_post,ANY,fhir_bundle_list-method}
-\alias{fhir_post,fhir_bundle_list-method}
 \alias{fhir_post,ANY,fhir_bundle_xml-method}
 \alias{fhir_post,fhir_bundle_xml-method}
 \alias{fhir_post,ANY,fhir_body-method}
@@ -24,16 +22,6 @@ fhir_post(
 )
 
 \S4method{fhir_post}{ANY,fhir_resource}(
-  url,
-  body,
-  username = NULL,
-  password = NULL,
-  token = NULL,
-  verbose = 1,
-  log_errors = NULL
-)
-
-\S4method{fhir_post}{ANY,fhir_bundle_list}(
   url,
   body,
   username = NULL,
@@ -66,7 +54,7 @@ fhir_post(
 \arguments{
 \item{url}{An object of class \linkS4class{fhir_url} or a character vector of length one containing the url to POST to.}
 
-\item{body}{An object of class  \linkS4class{fhir_resource}, \linkS4class{fhir_bundle_list}, \linkS4class{fhir_bundle_xml} or \linkS4class{fhir_body}.
+\item{body}{An object of class  \linkS4class{fhir_resource}, \linkS4class{fhir_bundle_xml} or \linkS4class{fhir_body}.
 See details for how to generate them.}
 
 \item{username}{A character vector of length one containing the username for basic authentication.}
@@ -91,11 +79,7 @@ This function is a convenience wrapper around \code{\link[httr:POST]{httr::POST(
 \enumerate{
 \item A \linkS4class{fhir_resource} as created by \code{\link[=fhir_build_resource]{fhir_build_resource()}}. This is used when just a single resource should be POSTed to the server.
 In this case \code{url} must contain the base url plus the resource type, e.g. http://hapi.fhir.org/baseR4/Patient.
-\item A \linkS4class{fhir_bundle_list} representing a list of transaction or batch bundles as created by \code{\link[=fhir_build_bundles]{fhir_build_bundles()}}.
-This is used to POST or PUT several resources to the server. When \code{body} is a \linkS4class{fhir_bundle_list}, the \code{url} has to be the base
-url of the server, e.g. http://hapi.fhir.org/baseR4.
-\item A \linkS4class{fhir_bundle_xml} representing a single transaction or batch bundle. This can be used to POST a single element of the
-list of bundles created by \code{\link[=fhir_build_bundles]{fhir_build_bundles()}}.
+\item A \linkS4class{fhir_bundle_xml} representing a transaction or batch bundle as created by \code{\link[=fhir_build_bundle]{fhir_build_bundle()}}.
 \item A \linkS4class{fhir_body} as created by \code{\link[=fhir_body]{fhir_body()}}. This is the most flexible approach, because within the \linkS4class{fhir_body} object you can represent
 any kind of \code{content} as a string and set the \code{type} accordingly. See examples.
 }
@@ -104,16 +88,16 @@ For examples of how to create the different body types see the respective help p
 and POSTing resources, see the package vignette on recreating resources.
 }
 \examples{
-\donttest{
-### 1. POST transaction bundles
+\dontrun{
+### 1. POST transaction bundle
 #unserialize example bundles
-bundles <- fhir_unserialize(transaction_bundle_example)
+bundle <- fhir_unserialize(transaction_bundle_example)
 
 #have a look at the bundle
-cat(toString(bundles[[1]]))
+cat(toString(bundle))
 
 #post
-fhir_post(url = "http://hapi.fhir.org/baseR4", body = bundles)
+fhir_post(url = "http://hapi.fhir.org/baseR4", body = bundle)
 
 
 ### 2. POST single resouce
