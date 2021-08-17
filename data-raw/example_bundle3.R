@@ -67,7 +67,7 @@ bundle <- xml2::read_xml(
 
 	 <entry>
 		<Observation>
-			<id value = '1'/>
+			<id value = 'obs1'/>
 			<code>
 				<coding>
 				   <system value='http://loinc.org'/>
@@ -80,6 +80,9 @@ bundle <- xml2::read_xml(
 				   <display value='Body weight'/>
 				</coding>
 			</code>
+			<subject>
+				<reference value = 'Patient/id2'/>
+			</subject>
 		</Observation>
 	 </entry>
 

@@ -347,7 +347,7 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 #'
 #'  <entry>
 #'     <Observation>
-#'        <id value = '1'/>
+#'        <id value = 'obs1'/>
 #'        <code>
 #'           <coding>
 #'              <system value='http://loinc.org'/>
@@ -360,6 +360,9 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 #'              <display value='Body weight'/>
 #'           </coding>
 #'        </code>
+#'        <subject>
+#'           <reference value='Patient/id3'/>
+#'        </subject>
 #'     </Observation>
 #'  </entry>
 #' </Bundle>"

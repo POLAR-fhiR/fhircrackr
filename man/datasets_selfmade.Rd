@@ -191,7 +191,7 @@ An object of class \code{fhir_bundle_list} of length 1.
 
  <entry>
     <Observation>
-       <id value = '1'/>
+       <id value = 'obs1'/>
        <code>
           <coding>
              <system value='http://loinc.org'/>
@@ -204,6 +204,9 @@ An object of class \code{fhir_bundle_list} of length 1.
              <display value='Body weight'/>
           </coding>
        </code>
+       <subject>
+          <reference value='Patient/id3'/>
+       </subject>
     </Observation>
  </entry>
 </Bundle>"
