@@ -444,8 +444,49 @@ xtrct_columns <- function(child, cols, sep = NULL, brackets = NULL) {
 bundle2df <- function(bundle, df_desc, verbose = 2) {
 	xpath <- paste0("//", df_desc@resource)
 	children <- xml2::xml_find_all(x = bundle, xpath = xpath)
+	nr.of.cores <- min(length(children), parallel::detectCores())
+
+	## determine operating system
+	get_os <- function(){
+		sysinf <- Sys.info()
+		if (!is.null(sysinf)){
+			os <- sysinf['sysname']
+			if (os == 'Darwin')
+				os <- "osx"
+		} else { ## mystery machine
+			os <- .Platform$OS.type
+			if (grepl("^darwin", R.version$os))
+				os <- "osx"
+			if (grepl("linux-gnu", R.version$os))
+				os <- "linux"
+		}
+		tolower(os)
+	}
+
 	df.list <- if(length(children) == 0) {
 		list()
+	} else if(get_os() %in% c("linux", "osx")) {
+		## does not work for 'Windows' because windows cannot fork
+		parallel::mclapply(
+			children,
+			function(child) {
+				if(0 < length(df_desc@cols)) {#if cols is not empty
+					cols <- df_desc@cols
+					res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets)
+					#if(1 < verbose) {
+					#		if(all(sapply(res, is.na))) {cat("x")} else {cat(".")}
+					#	}
+				} else {#if cols empty
+					xp <- ".//@*"
+					res <- xtrct_all_columns(child = child, sep = df_desc@style@sep, xpath = xp, brackets = df_desc@style@brackets)
+					#	if(1 < verbose) {
+					#		if(nrow(res) < 1) {cat("x")} else {cat(".")}
+					#	}
+				}
+				res
+			},
+			mc.cores = nr.of.cores
+		)
 	} else {
 		lapply(
 			children,

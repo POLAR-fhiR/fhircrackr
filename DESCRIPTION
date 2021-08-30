@@ -39,7 +39,8 @@ Imports:
     dplyr,
     plyr,
     data.table,
-    methods
+    methods,
+    parallel
 Suggests: 
     knitr,
     rmarkdown
