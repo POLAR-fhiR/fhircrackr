@@ -473,19 +473,19 @@ bundle2df <- function(bundle, df_desc, verbose = 2) {
 				if(0 < length(df_desc@cols)) {#if cols is not empty
 					cols <- df_desc@cols
 					res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets)
-					#if(1 < verbose) {
-					#		if(all(sapply(res, is.na))) {cat("x")} else {cat(".")}
-					#	}
+					# if(1 < verbose) {
+					# 	if(all(sapply(res, is.na))) {cat("x")} else {cat(".")}
+					# }
 				} else {#if cols empty
 					xp <- ".//@*"
 					res <- xtrct_all_columns(child = child, sep = df_desc@style@sep, xpath = xp, brackets = df_desc@style@brackets)
-					#	if(1 < verbose) {
-					#		if(nrow(res) < 1) {cat("x")} else {cat(".")}
-					#	}
+					# if(1 < verbose) {
+					# 	if(nrow(res) < 1) {cat("x")} else {cat(".")}
+					# }
 				}
 				res
 			},
-			mc.cores = nr.of.cores
+			mc.cores = nr.of.cores, mc.silent = T
 		)
 	} else {
 		lapply(
