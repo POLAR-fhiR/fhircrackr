@@ -463,9 +463,14 @@ bundle2df <- function(bundle, df_desc, verbose = 2) {
 		tolower(os)
 	}
 
+	os <- get_os()
+
 	df.list <- if(length(children) == 0) {
 		list()
-	} else if(get_os() %in% c("linux", "osx")) {
+	} else if(os %in% c("linux", "osx")) {
+		if(0 < verbose) {
+			message(paste0("Cracking under Operating System ", os, " using ", nr.of.cores, " cores to crack.\n"))
+		}
 		## does not work for 'Windows' because windows cannot fork
 		parallel::mclapply(
 			children,
@@ -485,9 +490,12 @@ bundle2df <- function(bundle, df_desc, verbose = 2) {
 				}
 				res
 			},
-			mc.cores = nr.of.cores, mc.silent = T
+			mc.cores = nr.of.cores
 		)
 	} else {
+		if(0 < verbose) {
+			message(paste0("Cracking under Operating System ", os, " using ", nr.of.cores, " cores to crack.\n"))
+		}
 		lapply(
 			children,
 			function(child) {
@@ -543,7 +551,7 @@ bundles2df <- function(bundles, df_desc, verbose = 2) {
 		lapply(
 			seq_along(bundles),
 			function(i) {
-				if (1 < verbose) {cat("\n", i)}
+				if (1 < verbose) {cat(paste0("Bundle ", i, ": "))}
 				bundle <- bundles[[i]]
 				bundle2df(bundle = bundle, df_desc = df_desc, verbose = verbose)
 			}
