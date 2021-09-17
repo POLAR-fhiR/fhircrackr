@@ -467,7 +467,7 @@ bundle2df <- function(bundle, df_desc, verbose = 2) {
 
 	df.list <- if(length(children) == 0) {
 		list()
-	} else if(os %in% c("linux", "osx")) {
+	} else if(os %in% c("linnux", "osx")) {
 		if(0 < verbose) {
 			message(paste0("Cracking under Operating System ", os, " using ", nr.of.cores, " cores to crack.\n"))
 		}
@@ -494,7 +494,7 @@ bundle2df <- function(bundle, df_desc, verbose = 2) {
 		)
 	} else {
 		if(0 < verbose) {
-			message(paste0("Cracking under Operating System ", os, " using ", nr.of.cores, " cores to crack.\n"))
+			message(paste0("Cracking under Operating System ", os, " using 1 core to crack.\n"))
 		}
 		lapply(
 			children,
