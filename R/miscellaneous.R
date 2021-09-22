@@ -656,9 +656,9 @@ auth_helper <- function(username, password, token){
 
 	#prepare token authorization
 	if(!is.null(token)) {
-		if(!is.null(username) || is.null(password)) {
+		if(!is.null(username) || !is.null(password)) {
 			warning(
-				"You provided username and password as well as a token for authentication.\n",
+				"You provided username or password as well as a token for authentication.\n",
 				"Ignoring username and password, trying to authorize with token."
 			)
 			username <- NULL
