@@ -52,40 +52,25 @@ remove_tag_from_bundle <- function(bundle, tag = "div") {
 	fhircrackr::fhir_bundle_xml(bundle = xml2::read_xml(remove_tag(string = toString(bundle), tag = tag)))
 }
 
-remove_tag_from_bundles <- function(bundles, tag = "div") {
-	nr.of.cores <- min(length(bundles), parallel::detectCores())
-	get_os <- function() {
-		sysinf <- Sys.info()
-		if(!is.null(sysinf)) {
-			os <- sysinf['sysname']
-			if(os == 'Darwin') {os <- "osx"}
-		} else { ## mystery machine
-			os <- .Platform$OS.type
-			if(grepl("^darwin", R.version$os)) {os <- "osx"}
-			if(grepl("linux-gnu", R.version$os)) {os <- "linux"}
-		}
-		tolower(os)
-	}
-
-	os <- get_os()
-
+remove_tag_from_bundle_list <- function(bundle_list, tag = "div") {
 	fhir_bundle_list(
-		if(os %in% c("linux", "osx")) {
-			message(paste0("Working on ", os, " using ", nr.of.cores, " core", if(1 < nr.of.cores) "s" else "", ".\n"))
-			parallel::mclapply(
-				bundles,
-				function(bundle) {
-					remove_tag_from_bundle(bundle = bundle, tag = tag)
-				}
-			)
-		} else {
-			message(paste0("Working on ms windows using 1 core.\n"))
-			lapply(
-				bundles,
-				function(bundle) {
-					remove_tag_from_bundle(bundle = bundle, tag = tag)
-				}
-			)
-		}
+		lapply(
+			bundle_list,
+			function(bundle) {
+				remove_tag_from_bundle(bundle = bundle, tag = tag)
+			}
+		)
 	)
+}
+
+remove_div <- function(string) {
+	remove_tag(string, "div")
+}
+
+remove_div_from_bundle <- function(bundle) {
+	remove_tag_from_bundle(bundle, "div")
+}
+
+remove_div_from_bundle_list <- function(bundle_list) {
+	remove_tag_from_bundle_list(bundle_list, "div")
 }
