@@ -746,7 +746,7 @@ print_tree <- function(tree, sign = ":") {
 #' Create string for printing of tree
 #'
 #' @param tree A tree as produced by [build_tree()]
-#' @param sign A string that is put between each element and its value
+#' @param sign A string that is put between each element and its value. Defaults to a semicolon.
 #'
 #' @examples
 #' #unserialize example
@@ -767,7 +767,7 @@ print_tree <- function(tree, sign = ":") {
 #' tree <- rm_ids_from_tree(tree)
 #' cat(tree2string(tree, sign="\u2500"))
 #' @noRd
-tree2string <- function(tree, sign = c("\u2500", ":")[1]) {
+tree2string <- function(tree, sign = c("\u2500", ":")[2]) {
 	tree2string_ <- function(tree, pre, sign) {
 		if(is.null(tree)) return(NULL)
 		rows <- list()

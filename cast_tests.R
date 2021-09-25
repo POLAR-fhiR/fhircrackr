@@ -1,6 +1,8 @@
-#rm(list = ls())
+rm(list = ls())
 
 #source("R/cast.R")
+
+devtools::load_all()
 
 endpoints <- list(
 	hapi = "https://hapi.fhir.org/baseR4",
@@ -167,8 +169,9 @@ df.patients_cast <-fhir_cast(indexed_df = df.patients,
 
 tree.patients_cast <- build_tree(row = df.patients_cast[4,], root = "Patient")
 cat(tree2text(tree = tree.patients_cast))
-cat(tree2string(tree = tree.patients_cast))
-cat(tree2text(tree = rm_ids_from_tree(tree = tree.patients_cast)))
+cat(frame_string(tree2string(tree = tree.patients_cast)))
+cat(frame_string(frame_string(tree2text(tree = rm_ids_from_tree(tree = tree.patients_cast)), pos = "left", edge = "\\//\\", hori = "|", vert = "-"), pos = "left", edge = "\\//\\", hori = "|", vert = "-"))
+cat(frame_string(frame_string(tree2text(tree = rm_ids_from_tree(tree = tree.patients_cast)), pos = "left", edge = " ", hori = "-+-", vert = "-+-"), pos = "center", edge = " ", hori = "|", vert = "-"))
 print_tree(tree = tree.patients_cast)
 print_tree(tree = rm_ids_from_tree(tree = tree.patients_cast))
 print(xml2::as_xml_document(rm_ids_from_tree(tree = tree.patients_cast)))
@@ -180,7 +183,7 @@ xml_bundles <- lapply(tree_bundles, function(b)xml2::as_xml_document(b))
 fhir_crack(bundles = xml_bundles, fhir_table_description(resource = "Patient"), verbose = 2)
 
 ###########################################################################################################################
-endpoint <- endpoints$hapi
+endpoint <- endpoints$agiop
 resource_name <- "Observation"
 bundle_size <- 500
 xml_bundles <- fhir_search(paste0(paste_paths(endpoint, resource_name), "?_count=", bundle_size), max_bundles = 10, verbose = 2)

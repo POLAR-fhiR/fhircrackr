@@ -50,10 +50,13 @@ See `?example_bundles2` to what this bundle looks like.
 Starting with the FHIR resources, the first thing you'll have to do is to crack and cast the data. For more information on the process, please see the vignette on flattening resources. Make sure that you allow `fhir_crack()` to generate the column names automatically, i.e. don't state explicit column names in the `fhir_table_description`.
 
 ```{r}
-patients <- fhir_table_description(resource = "Patient", 
-                                   style = fhir_style(brackets = c("[", "]"),
-                                                      sep = " | ")
-                                   )
+patients <- fhir_table_description(
+  resource = "Patient",
+  style    = fhir_style(
+    brackets = c("[", "]"),
+    sep      = " | "
+  )
+)
 
 table <- fhir_crack(bundles = bundles, design = patients, verbose = 0)
 
@@ -96,15 +99,17 @@ new_resource
 ```
 
 ## Recreate a bundle of resources
-It is also possible to bundle together several resources to upload them to the server together. This is done using bundles of type transaction or batch (see https://www.hl7.org/fhir/bundle.html and https://www.hl7.org/fhir/http.html). 
-
+It is also possible to bundle together several resources to upload them to the server together. This is done using bundles of type transaction or batch (see <a href="https://www.hl7.org/fhir/bundle.html" target="_blank">https://www.hl7.org/fhir/bundle.html</a> and <a href="https://www.hl7.org/fhir/http.html" target="_blank">https://www.hl7.org/fhir/http.html</a>). 
+  
 We can create such a bundle from a cast table using the function `fhir_build_bundle`, which takes a cast table and the resource type represented in the table, as well as information on the type of bundle you want to create:
 
 ```{r}
-bundle <- fhir_build_bundle(modified_table, 
-                            resource_type = "Patient", 
-                            bundle_type = "transaction", 
-                            verbose = 0)
+bundle <- fhir_build_bundle(
+  modified_table,
+  resource_type = "Patient",
+  bundle_type   = "transaction",
+  verbose       = 0
+)
 ```
 
 You can have a look at the bundle like this:
@@ -122,8 +127,10 @@ If you are familiar with transaction bundles, you'll notice that this bundle is 
 The modified table we have used so far doesn't have this information, so we have to add it like this:
 
 ```{r}
-request <- data.frame(request.method = c("POST", "POST", "POST"),
-                      request.url = c("Patient", "Patient", "Patient"))
+request <- data.frame(
+  request.method = c("POST",    "POST",    "POST"),
+  request.url    = c("Patient", "Patient", "Patient")
+)
 
 request_table <- cbind(modified_table, request)
 
@@ -133,10 +140,12 @@ request_table
 Now when we build a transaction bundle, it has all the information we need:
 
 ```{r}
-bundle <- fhir_build_bundle(request_table,
-                            resource_type = "Patient", 
-                            bundle_type = "transaction", 
-                            verbose = 0)
+bundle <- fhir_build_bundle(
+  request_table,
+  resource_type = "Patient",
+  bundle_type   = "transaction", 
+  verbose       = 0
+)
 ```
 
 ## Upload resources to a server
@@ -209,14 +218,27 @@ The details of creating valid transaction bundles is beyond the scope of this vi
 bundles <- fhir_unserialize(example_bundles3)
 
 #crack
-Patient <- fhir_table_description(resource = "Patient",
-                                  style = fhir_style(sep = ":::",
-                                                     brackets = c("[","]")))
-Observation <- fhir_table_description(resource = "Observation",
-                                      style = fhir_style(sep = ":::",
-                                                         brackets = c("[","]")))
+Patient <- fhir_table_description(
+  resource = "Patient",
+  style    = fhir_style(
+    sep      = ":::",
+    brackets = c("[","]")
+  )
+)
 
-tables <- fhir_crack(bundles = bundles, design = fhir_design(Patient, Observation), verbose = 0)
+Observation <- fhir_table_description(
+  resource = "Observation",
+  style    = fhir_style(
+    sep      = ":::",
+    brackets = c("[","]")
+  )
+)
+
+tables <- fhir_crack(
+  bundles = bundles,
+  design  = fhir_design(Patient, Observation),
+  verbose = 0
+)
 
 #cast
 cast_tables <- lapply(tables, fhir_cast, brackets = c("[","]"), sep = ":::", verbose = 0)
