@@ -64,3 +64,4 @@ Collate:
     'flatten_resources.R'
     'miscellaneous.R'
     'multiple_entries.R'
+    'remove_tag.R'
