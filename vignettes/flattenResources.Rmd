@@ -301,6 +301,8 @@ bundle <- fhir_unserialize(example_bundles2)
 This is how the xml looks:
 ```
 <Bundle>
+  <type value='searchset'/>
+  <entry>
  	<Patient>
  		<id value='id1'/>
  		<address>
@@ -313,6 +315,9 @@ This is how the xml looks:
 			<given value='Marie'/>
  		</name>
  	</Patient>
+  </entry>
+  
+  <entry>
  	<Patient>
 		<id value='id2'/>
  		<address>
@@ -331,7 +336,9 @@ This is how the xml looks:
  			<given value='Susie'/>
  		</name>
  	</Patient>
-
+  </entry>
+  
+  <entry>
  	<Patient>
  		<id value='id3'/>
  		<address>
@@ -355,6 +362,7 @@ This is how the xml looks:
  			<given value='Max'/>
  		</name>
  	</Patient>
+  </entry>
 
 </Bundle>
 ```
@@ -387,10 +395,11 @@ Now the indices display the entry the value belongs to. That way you can see tha
 
 Of course the above example is a very specific case that only occurs if your resources have multiple entries with complementary elements. In the majority of cases multiple entries in one resource will have the same structure, thus making numbering of those entries superfluous. But the indices also help to disentangle those entries and put them in separate rows, as you'll see in the next paragraph.
 
-## Process Data Frames with multiple Entries
+## Process tables with multiple entries
+If the data frame produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. fhircrackr gives you two options to do this: `fhir_melt()` and `fhir_cast()`. The former spreads the entries across rows, creating a long format, the latter spreads them across columns, creating a wide format.
 
-### Melt data frames with multiple entries
-If the data frame produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. This is where `fhir_melt()` comes into play. `fhir_melt()` takes an indexed data frame with multiple entries in one or several `columns` and spreads (aka melts) these entries over several rows:
+### Melt tables with multiple entries
+`fhir_melt()` takes an indexed data frame with multiple entries in one or several `columns` and spreads (aka melts) the entries in `columns` over several rows:
 
  ```{r}
  fhir_melt(
@@ -401,7 +410,7 @@ If the data frame produced by `fhir_crack()` contains multiple entries, you'll p
 	all_columns        = FALSE)
  ```
  
- The new variable `resource_identifier` maps which rows in the created data frame belong to which row (usually equivalent to one resource) in the original data frame.
+The new variable `resource_identifier` records which rows in the created data frame belong to which row (usually equivalent to one resource) in the original data frame.
  `brackets` and `sep` should be given the same character vectors that have been used to build the indices in `fhir_melt()`. `columns` is a character vector with the names of the variables you want to melt. You can provide more than one column here but it makes sense to only have variables from the same repeating attribute together in one call to `fhir_melt()`:
  
  ```{r}
@@ -414,13 +423,13 @@ If the data frame produced by `fhir_crack()` contains multiple entries, you'll p
 	sep	               = " | ",
 	all_columns        = FALSE)
  ```
- If the names of the variables in your data frame have been generated automatically with `fhir_crack()` you can find all variable names belonging to the same attribute with `fhir_common_columns()`:
+If the names of the variables in your data frame have been generated automatically with `fhir_crack()` you can find all variable names belonging to the same attribute with `fhir_common_columns()`:
  
  ```{r}
  cols <- fhir_common_columns(data_frame = df2, column_names_prefix = "address")
  cols
  ```
- With the argument `all_columns` you can control whether the resulting data frame contains only the molten columns or all columns of the original data frame:
+With the argument `all_columns` you can control whether the resulting data frame contains only the molten columns or all columns of the original data frame:
  
  ```{r}
  fhir_melt(
@@ -430,9 +439,9 @@ If the data frame produced by `fhir_crack()` contains multiple entries, you'll p
 	sep                = " | ",
 	all_columns        = TRUE)
  ```
- Values on the other variables will just repeat in the newly created rows.
+Values on the other variables will just repeat in the newly created rows.
  
- If you try to melt several variables that don't belong to the same attribute in one call to `fhir_melt()`, this will cause problems, because the different attributes won't be combined correctly:
+If you try to melt several variables that don't belong to the same attribute in one call to `fhir_melt()`, this will cause problems, because the different attributes won't be combined correctly:
  
  ```{r}
  cols <- c(cols, "id")
@@ -478,6 +487,15 @@ fhir_rm_indices(indexed_data_frame = molten_2, brackets = c("[", "]"))
 ```
 Again, `brackets` and `sep` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()` respectively.
 
+### Cast data frames with multiple entries
+Instead of spreading the entries across rows, you can also spread them across columns using `fhir_cast()`. This function takes a data.frame/data.table with multiple entries and the brackets and separator that have been used in `fhir_crack()` as input:
+
+```{r}
+fhir_cast(df2, brackets = c("[", "]"), sep = " | ", verbose = 0)
+```
+Contrary to `fhir_melt()` this function requires all column names to reflect the XPath expression of the respective attribute. The column containing information on `address/city` for example has to be named `adress.city` because the information of the indices is incorporated in those names to avoid duplicate column names. This column naming scheme is automatically used when you don't give explicit column names in the table_description/design for `fhir_crack()` so it makes sense to only cast tables that have automatically generated column names.
+
+The tables produced by `fhir_cast()` can also be used to recreate the resources that were cracked in the first place, as you'll the in the vignette about recreation of resources.
 
 ```{r, include=F}
 file.remove(paste0(temp_dir, "/design.xml"))

@@ -31,7 +31,7 @@ It is advisable to only melt columns simultaneously that belong to the same (rep
 A data.frame/data.table where each entry from the variables in \code{columns} appears in a separate row.
 }
 \description{
-This function divides multiple entries in an indexed data frame as produced by \code{\link[=fhir_crack]{fhir_crack()}}.
+This function divides multiple entries in an indexed data frame as produced by \code{\link[=fhir_crack]{fhir_crack()}}
 into separate rows.
 }
 \details{

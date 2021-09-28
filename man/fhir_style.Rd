@@ -4,12 +4,12 @@
 \alias{fhir_style}
 \title{Create fhir_style object}
 \usage{
-fhir_style(sep = " ", brackets = character(), rm_empty_cols = FALSE)
+fhir_style(sep = ":::", brackets = character(), rm_empty_cols = FALSE)
 }
 \arguments{
-\item{sep}{A character vector of length one to separate pasted multiple entries. Defaults to \code{" "}}
+\item{sep}{A character vector of length one to separate pasted multiple entries. Defaults to \code{":::"}}
 
-\item{brackets}{A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
+\item{brackets}{A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c("<|", "|>")}.
 If this is empty (i.e. character of length zero, the default) or 'NULL', no indices will be added to multiple entries. If it is a character
 vector of length one, it will be recycled to length two, i.e. \code{"|"} will become \code{c("|", "|")}.
 Empty strings (\code{""}) are not allowed.}
@@ -29,20 +29,20 @@ ultimately used in \code{\link[=fhir_crack]{fhir_crack()}}. A \code{fhir_style} 
 \itemize{
 \item \code{sep}: A string defining the separator used to separate multiple entries for the same element in a FHIR resource,
 e.g. multiple \code{address/city} elements in a Patient resource.
-\item \code{brackets}: A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}.
+\item \code{brackets}: A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c("<|", "|>")}.
 If this is empty (i.e. character of length 0, the default), no indices will be added to multiple entries.
 Empty strings (\code{""}) are not allowed.
 \item \code{rm_empty_cols}: A logical scalar defining whether or not to remove empty columns after cracking. Empty columns arise when you
 try to extract an element that doesn't appear in any of the resources.
 A \code{fhir_style} object looks for example like this:
-}\preformatted{sep: ' '
-brackets: '[' ']'
+}\preformatted{sep: ':::'
+brackets: '<|' '|>'
 rm_empty_cols: FALSE
 }
 }
 \examples{
-fhir_style(sep = " ",
-           brackets = c("[", "]"),
+fhir_style(sep = ":::",
+           brackets = c("<|", "|>"),
            rm_empty_cols = TRUE)
 
 }

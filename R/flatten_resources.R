@@ -13,16 +13,16 @@
 #' comprehensive examples of both.
 #'
 #' @param sep Optional. A character vector of length ones to separate pasted multiple entries which will overwrite the `sep` defined in
-#' `design`. If `sep = NULL`, it is looked up in `design`, where the default is `" "`.
+#' `design`. If `sep = NULL`, it is looked up in `design`, where the default is `":::"`.
 #'
 #' @param remove_empty_columns Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
 #' `design`. If `remove_empty_columns = NULL`, it is looked up in `design`, where the default is `FALSE`.
 #'
-#' @param brackets Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")},
+#' @param brackets Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c("<|", "|>")},
 #' which will overwrite the `brackets` defined in `design`. If `brackets = NULL`, it is looked up in `design`, where the default is `character(0)`,
 #' i.e. no indices are added to multiple entries. Empty strings (`""`) are not allowed.
 #'
-#' @param verbose An integer vector of length one.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
+#' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
 #'
 #' @param data.table A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
@@ -172,7 +172,7 @@ setMethod(
 		design <- add_attribute_to_design(design = design)
 		#crack
 		dfs <- bundles2dfs(bundles = bundles, design = design, data.table = data.table, verbose = verbose)
-		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
+		if(0 < verbose) {message("FHIR-Resources cracked.")}
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
 		dfs
 	}
@@ -232,7 +232,7 @@ setMethod(
 			df_cleaned <- df
 		}
 
-		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
+		if(0 < verbose) {message("FHIR-Resources cracked.")}
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
 		if(data.table) {df} else {data.frame(df)}
 	}
@@ -282,8 +282,8 @@ setMethod(
 #' from the resource
 #' @param sep A character vector of length one to separate pasted multiple entries.
 #' @param xpath A character vector of length one to locate data in tree via xpath.
-#' @param brackets A character vector of length one or two defining the Brackets
-#' surrounding the Indices. e.g. c( "<", ">") NULL means no brackets.
+#' @param brackets A character vector of length one or two defining the brackets
+#' surrounding the indices. e.g. c( "<", ">") NULL means no brackets.
 #' A vector of length one like c("|") means that the "|"-sign will be used as opening and closing Brackets.
 #' @noRd
 #'
@@ -454,13 +454,13 @@ bundle2df <- function(bundle, df_desc, verbose = 2) {
 			   		cols <- df_desc@cols
 			   		res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets)
 			   		if(1 < verbose) {
-			   			if(all(sapply(res, is.na))) {cat("x")} else {cat(".")}
+			   			if(all(sapply(res, is.na))) {message("x", appendLF = F)} else {message(".", appendLF = F)}
 			   		}
 			   	} else {#if cols empty
 			   		xp <- ".//@*"
 			   		res <- xtrct_all_columns(child = child, sep = df_desc@style@sep, xpath = xp, brackets = df_desc@style@brackets)
 			   		if(1 < verbose) {
-			   			if(nrow(res) < 1) {cat("x")} else {cat(".")}
+			   			if(nrow(res) < 1) {message("x", appendLF = F)} else {message(".", appendLF = F)}
 			   		}
 			   	}
 				res
@@ -502,7 +502,7 @@ bundles2df <- function(bundles, df_desc, verbose = 2) {
 		lapply(
 			seq_along(bundles),
 			function(i) {
-				if (1 < verbose) {cat("\n", i)}
+				if (1 < verbose) {message("\n", i, appendLF = F)}
 				bundle <- bundles[[i]]
 				bundle2df(bundle = bundle, df_desc = df_desc, verbose = verbose)
 			}
@@ -510,7 +510,7 @@ bundles2df <- function(bundles, df_desc, verbose = 2) {
 		fill = TRUE
 	)
 	if(nrow(0 < ret)) {ret <- ret[0 < rowSums(!is.na(ret)), ]}
-	if(1 < verbose) {cat("\n")}
+	if(1 < verbose) {message("\n")}
 	ret
 }
 
@@ -562,11 +562,11 @@ bundles2dfs <- function(bundles, design, data.table = FALSE, verbose = 2) {
 		lst(names(design)),
 		function(n) {
 			df_desc <- design[[n]]
-		  	if(1 < verbose) {cat("\n", n)}
+		  	if(1 < verbose) {message("\n", n)}
 		  	if(is.null(df_desc)) {NULL} else {bundles2df(bundles = bundles, df_desc = df_desc, verbose = verbose)}
 		}
 	)
-	if(1 < verbose) {cat("\n")}
+	if(1 < verbose) {message("\n")}
 	#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
 	remove <- sapply(
 		design,

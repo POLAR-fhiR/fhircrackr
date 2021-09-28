@@ -10,10 +10,10 @@ An S4 class to represent a design for cracking FHIR resources
 \section{Slots}{
 
 \describe{
-\item{\code{sep}}{A string to separate pasted multiple entries. Defaults to \code{" "}.}
+\item{\code{sep}}{A string to separate pasted multiple entries. Defaults to \code{":::"}.}
 
 \item{\code{brackets}}{A character vector of length two defining the brackets surrounding indices for multiple entries,
-e.g. \code{c( "<", ">")}. If this is empty (i.e. character of length 0, the default), no indices will be added to multiple entries.
+e.g. \code{c("<|", "|>")}. If this is empty (i.e. character of length 0, the default), no indices will be added to multiple entries.
 Empty strings (\code{""}) are not allowed.}
 
 \item{\code{rm_empty_cols}}{Logical scalar. Remove empty columns? Defaults to FALSE.}

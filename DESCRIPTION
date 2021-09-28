@@ -48,12 +48,14 @@ Roxygen: list(markdown = TRUE)
 Depends: 
     R (>= 4.0.0)
 Collate: 
-    'design.R'
+    'fhir_body.R'
+    'fhir_resource.R'
     'fhir_url.R'
     'fhir_bundle.R'
     'fhir_bundle_list.R'
+    'build_resources.R'
+    'design.R'
     'download_resources.R'
-    'fhir_body.R'
     'fhir_xpath_expression.R'
     'fhir_columns.R'
     'fhir_style.R'
