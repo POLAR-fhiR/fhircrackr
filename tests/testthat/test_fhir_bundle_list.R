@@ -14,7 +14,7 @@ testthat::test_that(
 		b1 <- xml2::read_xml(x = "<Bundle><Resource><item value='1'/></Resource></Bundle>")
 		b2 <- xml2::read_xml(x = "<Bundle><Resource><item value='2'/></Resource></Bundle>")
 
-		bl1 <- fhir_bundle_list(bundles = list(b1,fhir_bundle_xml(b2)))
+		bl1 <- fhir_bundle_list(bundles = list(b1, fhir_bundle_xml(b2)))
 		bl2 <- fhir_bundle_list(bundles = list(fhir_bundle_xml(b1), b2))
 
 		r1 <- xml2::xml_serialize(object = b1, connection= NULL)
@@ -23,9 +23,8 @@ testthat::test_that(
 		bl3 <- fhir_bundle_list(bundles = list(r1, r2))
 		bl4 <- fhir_bundle_list(bundles = list(fhir_bundle_serialized(bundle = r1), fhir_bundle_serialized(bundle = r2)))
 
-		testthat::expect_identical(bl1, bl2)
+		testthat::expect_equal(bl1, bl2)
 		testthat::expect_identical(bl3, bl4)
-
 	}
 )
 

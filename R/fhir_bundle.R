@@ -1,13 +1,10 @@
 #Class definition
 #' An S4 class to represent FHIR bundles
-#' @include fhir_url.R
+#' @include fhir_url.R fhir_resource.R
 setClass(
 	Class = "fhir_bundle",
 	contains = "VIRTUAL"
 )
-
-setOldClass(Classes = "xml_node")
-
 
 #' An S4 class to represent a FHIR bundle in xml form
 #'
@@ -20,7 +17,7 @@ setOldClass(Classes = "xml_node")
 #'
 setClass(
 	Class = "fhir_bundle_xml",
-	contains = c("fhir_bundle", "xml_node"),
+	contains = c("fhir_resource_xml", "fhir_bundle"),
 	slots = c(next_link = "fhir_url", self_link = "fhir_url"),
 	prototype = prototype(xml2::read_xml(x = "<Bundle></Bundle>"))
 )
@@ -55,8 +52,7 @@ setValidity(
 #' @export
 #'
 fhir_bundle_xml <- function(bundle) {
-
-	xml2::xml_ns_strip(x = bundle)
+	bundle <- fhir_ns_strip(xml = bundle)
 	links <- xml2::xml_find_all(x = bundle, xpath = "link")
 	rels.nxt <-	xml2::xml_text(x = xml2::xml_find_first(x = links, xpath = "./relation/@value")) == "next"
 	rels.self <- xml2::xml_text(x = xml2::xml_find_first(x = links,xpath = "./relation/@value")) == "self"
@@ -68,13 +64,15 @@ setMethod(
 	f = "show",
 	signature = "fhir_bundle_xml",
 	definition = function(object) {
+		entries <- length(xml2::xml_find_all(object, "entry"))
+
 		cat(
 			paste0(
 				"A fhir_bundle_xml object\n",
-				"No. of entries : ", length(xml2::xml_find_all(object, "entry")), "\n",
-				"Self Link: ", object@self_link, "\n",
-				"Next Link: ", object@next_link
-			), "\n\n"
+				if(entries>0){paste0("No. of entries : ", entries, "\n")},
+				if(length(object@self_link)>0){paste0("Self Link: ", object@self_link, "\n")},
+				if(length(object@next_link)>0){paste0("Next Link: ", object@next_link, "\n")}
+			), "\n"
 		)
 		print(object)
     }
@@ -89,7 +87,7 @@ setMethod(
 
 setClass(
 	Class = "fhir_bundle_serialized",
-	contains = c("fhir_bundle", "raw")
+	contains = c("fhir_bundle", "fhir_resource_serialized")
 )
 
 #' Create [fhir_bundle_serialized-class] object

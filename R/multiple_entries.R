@@ -2,6 +2,170 @@
 ## Exported functions are on top, internal functions below ##
 
 
+#' Cast table with multiple entries
+#' This function divides multiple entries in an indexed table as produced by [fhir_crack()] into separate columns.
+#'
+#' Every column containing multiple entries will be turned into multiple columns.
+#' The number of columns created from a single column in the original table is determined by maximum number of
+#' multiple entries occurring in this column. Rows with less than the maximally occurring number of entries will
+#' be filled with NA values.
+#'
+#' For [fhir_cast()] to work properly, column names of the input data must reflect the Xpath to the corresponding resource element
+#' with {.} as a separator, e.g. `code.coding.system`. These names are produced automatically by [fhir_crack()]
+#' when the names are not explicitly set in the `cols` element of the [fhir_table_description()]/[fhir_design()].
+#'
+#' In the names of the newly created columns the indices will be assigned to the respective elements of the column names.
+#' See examples and the corresponding package vignette for a more detailed description.
+#'
+#' @param indexed_df A data.frame/data.table with indexed multiple entries. Column names should reflect the XPath expression of the respective element.
+#' @param brackets A character vector of length two, defining the brackets used for the indices.
+#' @param sep A character vector of length one defining the separator that was used when pasting together multiple entries in [fhir_crack()].
+#' @param use_brackets Put brackets around indices in the new column names? Defaults to `TRUE`.
+#' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only general progress is printed, if > 1,
+#' progress for each variable is printed. Defaults to 1.
+#' @export
+#' @examples
+#'
+#' #unserialize example
+#' bundles <- fhir_unserialize(bundles = example_bundles1)
+#'
+#' #crack fhir resources
+#' table_desc <- fhir_table_description(resource = "Patient",
+#'                                      style = fhir_style(brackets = c("[","]"),
+#'                                                         sep = " "))
+#' df <- fhir_crack(bundles = bundles, design = table_desc)
+#'
+#' #original df
+#' df
+#'
+#' #cast
+#' fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+#'
+#' @seealso [fhir_crack()], [fhir_melt()], [fhir_build_bundle()]
+
+fhir_cast <- function(
+	indexed_df,
+	brackets,
+	sep,
+	use_brackets = F,
+	verbose = 1) {
+
+	if(is.null(indexed_df)) {stop("indexed_df is NULL.")}
+	if(nrow(indexed_df) < 1) {stop("indexed_df doesn't contain any data.")}
+
+	is_DT <- data.table::is.data.table(x = indexed_df)
+	if(!is_DT) {data.table::setDT(x = indexed_df)}
+
+	col_names <- names(indexed_df)
+	sep_ <- esc(sep)
+	bra_ <- esc(brackets[1])
+	ket_ <- esc(brackets[2])
+	regexpr_ids <- paste0(bra_, "([0-9]+(\\.[0-9]+)*)", ket_, "(.*$)")
+
+	if(!any(grepl(regexpr_ids, indexed_df[1,]))){
+		stop("Cannot find ids with the specified brackets in the table.")
+	}
+
+	if(0 < verbose) {message("Expanding table...\n")}
+
+	map <- sapply(
+		col_names,
+		function(name) {
+			#name <- names(indexed_df)[[6]]
+			if(1 < verbose) {message(name)}
+
+			warning_given <- FALSE
+			entries <- strsplit(indexed_df[[name]], sep_)
+			ids <- lapply(entries, function(entry){gsub(regexpr_ids, "\\1", entry)})
+			name_vec <- strsplit(name, "\\.")[[1]]
+
+			name_expanded <- unlist(
+				lapply(
+					ids[sapply(ids, function(i){all(!is.na(i))})],
+					function(id){
+						#id <- ids[sapply(ids, function(i) all(!is.na(i)))][[1]]
+						id_ <- strsplit(id, "\\.")
+						names(id_) <- id
+
+						if(length(id_[[1]])!=length(name_vec) && !warning_given){
+							warning("Column name '", paste0(name_vec, collapse = "."),
+									"' doesn't fit the id pattern found in this column.",
+									"The column name should be build the way ",
+									"fhir_crack() automatically builds it. See ?fhir_cast."
+							)
+							warning_given <<- TRUE
+						}
+
+						if(1 < length(name_vec)) {
+							sapply(
+								id_,
+								function(i_) {
+									i_ <- as.numeric(i_)
+									if(use_brackets) {
+										bras_ <- rep_len("[", length(i_))
+										kets_ <- rep_len("]", length(i_))
+										paste0(paste0(name_vec, bras_, i_, kets_), collapse = ".")
+									} else {
+										paste0(paste0(name_vec, i_), collapse = ".")
+									}
+								},
+								simplify = F
+							)
+						} else {
+							i <- as.numeric(id)
+							a <- if(use_brackets) {
+								paste0(name_vec, "[", i, "]")
+							} else {
+								paste0(name_vec, i)
+							}
+							names(a) <- id
+							a
+						}
+					}
+				),
+				use.names = T
+			)
+			sort(name_expanded[unique(names(name_expanded))])
+		},
+		simplify = F
+	)
+
+	df_new_names <- unlist(map, use.names = F)
+	d <- data.table(matrix(data = rep_len(character(), nrow(indexed_df) * length(df_new_names)), nrow = nrow(indexed_df), ncol = length(df_new_names)))
+	setnames(d, df_new_names)
+
+	if(0 < verbose) {message("\nFilling table...\n")}
+
+	for(name in names(map)) {
+		#name <- names(map)[[1]]
+		if(1 < verbose) {message(name, ":")}
+
+		for(id in names(map[[name]])) {
+			#id <- names(map[[name]])[[1]]
+			sname <- map[[name]][[id]]
+			if(1 < verbose) {message("   ", sname)}
+			id_str <- paste0(bra_, id, ket_)
+			row_with_id <- grep(id_str, indexed_df[[name]], perl = T)
+			entries <- strsplit(indexed_df[[name]][row_with_id], sep_)
+			values <- gsub(
+				id_str,
+				"",
+				sapply(
+					entries,
+					function(entry) {
+						entry[grep(id_str, entry, perl = T)]
+					},
+					simplify = F
+				)
+			)
+			d[row_with_id, (sname) := values]
+		}
+	}
+	if(!is_DT) {setDF(d)}
+	d[]#to avoid problems with printing
+	d
+}
+
 
 #' Find common columns
 #'
@@ -52,7 +216,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 
 #' Melt multiple entries
 #'
-#' This function divides multiple entries in an indexed data frame as produced by [fhir_crack()].
+#' This function divides multiple entries in an indexed data frame as produced by [fhir_crack()]
 #' into separate rows.
 #'
 #' Every row containing values that consist of multiple entries on the variables specified by the argument `columns`
