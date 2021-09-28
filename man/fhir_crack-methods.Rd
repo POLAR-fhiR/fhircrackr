@@ -18,7 +18,8 @@ fhir_crack(
   remove_empty_columns = NULL,
   brackets = NULL,
   verbose = 2,
-  data.table = FALSE
+  data.table = FALSE,
+  ncores = NULL
 )
 
 \S4method{fhir_crack}{ANY,fhir_design}(
@@ -28,7 +29,8 @@ fhir_crack(
   remove_empty_columns = NULL,
   brackets = NULL,
   verbose = 2,
-  data.table = FALSE
+  data.table = FALSE,
+  ncores = NULL
 )
 
 \S4method{fhir_crack}{ANY,fhir_table_description}(
@@ -38,7 +40,8 @@ fhir_crack(
   remove_empty_columns = NULL,
   brackets = NULL,
   verbose = 2,
-  data.table = FALSE
+  data.table = FALSE,
+  ncores = NULL
 )
 
 \S4method{fhir_crack}{ANY,list}(
@@ -48,7 +51,8 @@ fhir_crack(
   remove_empty_columns = NULL,
   brackets = NULL,
   verbose = 2,
-  data.table = FALSE
+  data.table = FALSE,
+  ncores = NULL
 )
 }
 \arguments{
@@ -73,6 +77,9 @@ extraction progress will be printed. Defaults to 2.}
 
 \item{data.table}{A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
 Defaults to FALSE.}
+
+\item{ncores}{Either NULL (1 core) or an integer of length 1 containing the number of
+cpu cores that should be used for cracking. Defaults to NULL.}
 }
 \value{
 If a \linkS4class{fhir_design} was used, the result is a list of data.frames, i.e. a \linkS4class{fhir_df_list} object, or a list of data.tables,
@@ -94,22 +101,22 @@ bundles <- fhir_unserialize(medication_bundles)
 #define attributes to extract
 medications <- fhir_table_description(
    resource = "MedicationStatement",
-   cols = c(
-			    	MS.ID              = "id",
-				    STATUS.TEXT        = "text/status",
-			    	STATUS             = "status",
-			    	MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-			    	MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-			    	MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-			    	DOSAGE             = "dosage/text",
-			    	PATIENT            = "subject/reference",
-			    	LAST.UPDATE        = "meta/lastUpdated"
-	    	),
-	 style = fhir_style(
- 			sep = " ",
-	        	brackets = c("[", "]"),
-    		    rm_empty_cols= FALSE
-    		)
+   cols     = c(
+   	MS.ID              = "id",
+   	STATUS.TEXT        = "text/status",
+   	STATUS             = "status",
+   	MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+   	MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+   	MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+   	DOSAGE             = "dosage/text",
+    	PATIENT            = "subject/reference",
+    	LAST.UPDATE        = "meta/lastUpdated"
+  ),
+  style     = fhir_style(
+   	sep           = " ",
+   	brackets      = c("[", "]"),
+   	rm_empty_cols = FALSE
+  )
 )
 
 med_df <- fhir_crack(bundles = bundles, design = medications)

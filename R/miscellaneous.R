@@ -383,3 +383,23 @@ lst <- function(..., prefix = NULL, suffix = NULL) {
 esc <- function(s) {
 	gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s)
 }
+
+## determine operating system
+get_os <- function() {
+	sysinf <- Sys.info()
+	if (!is.null(sysinf)) {
+		os <- sysinf[['sysname']]
+		if (os == 'Darwin') os <- "osx"
+	} else { ## mystery machine
+		os <- .Platform$OS.type
+		if (grepl("^darwin", R.version$os))
+			os <- "osx"
+		if (grepl("linux-gnu", R.version$os))
+			os <- "linux"
+	}
+	tolower(os)
+}
+
+get_ncores <- function(os) {
+	if(os %in% c("linux", "osx")) parallel::detectCores() else 1
+}
