@@ -15,18 +15,23 @@
 #' @param sep Optional. A character vector of length ones to separate pasted multiple entries which will overwrite the `sep` defined in
 #' `design`. If `sep = NULL`, it is looked up in `design`, where the default is `":::"`.
 #'
-#' @param remove_empty_columns Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
-#' `design`. If `remove_empty_columns = NULL`, it is looked up in `design`, where the default is `FALSE`.
-#'
 #' @param brackets Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c("<|", "|>")},
 #' which will overwrite the `brackets` defined in `design`. If `brackets = NULL`, it is looked up in `design`, where the default is `character(0)`,
 #' i.e. no indices are added to multiple entries. Empty strings (`""`) are not allowed.
+#'
+#' @param remove_empty_columns Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
+#' `design`. If `remove_empty_columns = NULL`, it is looked up in `design`, where the default is `FALSE`.
 #'
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
 #'
 #' @param data.table A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
 #' Defaults to FALSE.
+#'
+#' @param format A character of length 1 containing the format of the cracked table. Possible formats
+#' are "compact" and "wide". Defaults to "compact"
+#'
+#' @param keep_attr A locigcal of length 1. Should column names be extended by the attribute names? Defaults to FALSE.
 #'
 #' @param ncores Either NULL (1 core) or an integer of length 1 containing the number of
 #'  cpu cores that should be used for cracking. Defaults to NULL.
@@ -101,10 +106,12 @@ setGeneric(
 		bundles,
 		design,
 		sep = NULL,
-		remove_empty_columns = NULL,
 		brackets = NULL,
+		remove_empty_columns = NULL,
 		verbose = 2,
 		data.table = FALSE,
+		format = "compact",
+		keep_attr = FALSE,
 		ncores = NULL) {
 
 		standardGeneric("fhir_crack")
@@ -120,10 +127,12 @@ setMethod(
 		bundles,
 		design,
 		sep = NULL,
-		remove_empty_columns = NULL,
 		brackets = NULL,
+		remove_empty_columns = NULL,
 		verbose = 2,
 		data.table = FALSE,
+		format = "compact",
+		keep_attr = FALSE,
 		ncores = NULL) {
 
 		#overwrite design with function arguments
@@ -195,10 +204,12 @@ setMethod(
 		bundles,
 		design,
 		sep = NULL,
-		remove_empty_columns = NULL,
 		brackets = NULL,
+		remove_empty_columns = NULL,
 		verbose = 2,
 		data.table = FALSE,
+		format = "compact",
+		keep_attr = FALSE,
 		ncores = NULL) {
 
 		#overwrite design with function arguments
@@ -259,11 +270,15 @@ setMethod(
 	definition = function(
 		bundles,
 		design,
-		sep = NULL,
 		remove_empty_columns = NULL,
+		sep = NULL,
 		brackets = NULL,
 		verbose = 2,
 		data.table = FALSE,
+		format = "compact",
+		keep_attr = FALSE,
+		format = "compact",
+		keep_attr = FALSE,
 		ncores = NULL) {
 
 		warning(
@@ -300,6 +315,9 @@ setMethod(
 #' @param brackets A character vector of length one or two defining the brackets
 #' surrounding the indices. e.g. c( "<", ">") NULL means no brackets.
 #' A vector of length one like c("|") means that the "|"-sign will be used as opening and closing Brackets.
+#' @param format A character of length 1 containing the format of the cracked table. Possible formats
+#' are "compact" and "wide". Defaults to "compact"
+#' @param keep_attr A locigcal of length 1. Should column names be extended by the attribute names? Defaults to FALSE.
 #' @noRd
 #'
 #' @examples
@@ -314,9 +332,11 @@ setMethod(
 #'
 xtrct_all_columns <- function(
 	child,
-	sep = NULL,
 	xpath = ".//@*",
-	brackets = NULL) {
+	sep = NULL,
+	brackets = NULL,
+	format = "compact",
+	keep_attr = FALSE) {
 
 	if(length(brackets) == 0) {brackets <- NULL}
 	tree <- xml2::xml_find_all(x = child, xpath = xpath)
@@ -372,6 +392,8 @@ xtrct_all_columns <- function(
 #' @param sep A string to separate pasted multiple entries.
 #' @param brackets A character vector defining the brackets surrounding the indices. e.g. c( "<", ">").
 #' `character(0)` means no brackets.
+#' @param format A character of length 1 containing the format of the cracked table. Possible formats
+#' are "compact" and "wide". Defaults to "compact"
 #' @noRd
 #'
 #' @examples
@@ -392,7 +414,7 @@ xtrct_all_columns <- function(
 #' #Extract columns
 #' result <- fhircrackr:::xtrct_columns(child = child, cols = cols)
 
-xtrct_columns <- function(child, cols, sep = NULL, brackets = NULL) {
+xtrct_columns <- function(child, cols, sep = NULL, brackets = NULL, format = "compact") {
 	if(length(brackets) == 0) {brackets <- NULL}
 	xp <- xml2::xml_path(x = child)
 	l <- lapply(
@@ -431,6 +453,9 @@ xtrct_columns <- function(child, cols, sep = NULL, brackets = NULL) {
 #' @param bundle A xml object containing one FHIR bundle
 #' @param df_desc An object of class [fhir_table_description-class].
 #' @param verbose An integer scalar.  If > 1, extraction progress will be printed. Defaults to 2.
+#' @param format A character of length 1 containing the format of the cracked table. Possible formats
+#' are "compact" and "wide". Defaults to "compact"
+#' @param keep_attr A locigcal of length 1. Should column names be extended by the attribute names? Defaults to FALSE.
 #' @param ncores Either NULL (1 core) or an integer of length 1 containing the number of
 #'  cpu cores that should be used for cracking. Defaults to NULL.
 #' @noRd
@@ -458,7 +483,7 @@ xtrct_columns <- function(child, cols, sep = NULL, brackets = NULL) {
 #'
 #' #convert bundle to data frame
 #' result <- fhircrackr:::bundle2df(bundle = bundle, df_desc = df_desc)
-bundle2df <- function(bundle, df_desc, ncores, verbose = 2) {
+bundle2df <- function(bundle, df_desc, ncores, verbose = 2, format = "compact", keep_attr = FALSE) {
 	xpath <- paste0("//", df_desc@resource)
 	children <- xml2::xml_find_all(x = bundle, xpath = xpath)
 	ncores <- if(is.null(ncores)) 1 else min(c(ncores, length(children)))
@@ -471,16 +496,10 @@ bundle2df <- function(bundle, df_desc, ncores, verbose = 2) {
 			function(child) {
 				if(0 < length(df_desc@cols)) {#if cols is not empty
 					cols <- df_desc@cols
-					res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets)
-					# if(1 < verbose) {
-					# 	if(all(sapply(res, is.na))) {cat("x")} else {cat(".")}
-					# }
+					res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets, format = format)
 				} else {#if cols empty
 					xp <- ".//@*"
-					res <- xtrct_all_columns(child = child, sep = df_desc@style@sep, xpath = xp, brackets = df_desc@style@brackets)
-					# if(1 < verbose) {
-					# 	if(nrow(res) < 1) {cat("x")} else {cat(".")}
-					# }
+					res <- xtrct_all_columns(child = child, xpath = xp, sep = df_desc@style@sep, brackets = df_desc@style@brackets, format = format, keep_attr = keep_attr)
 				}
 				res
 			},
@@ -492,10 +511,10 @@ bundle2df <- function(bundle, df_desc, ncores, verbose = 2) {
 			function(child) {
 			   	if(0 < length(df_desc@cols)) {#if cols is not empty
 			   		cols <- df_desc@cols
-			   		res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets)
+			   		res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets, format = format)
 			   	} else {#if cols empty
 			   		xp <- ".//@*"
-			   		res <- xtrct_all_columns(child = child, sep = df_desc@style@sep, xpath = xp, brackets = df_desc@style@brackets)
+			   		res <- xtrct_all_columns(child = child, xpath = xp, sep = df_desc@style@sep, brackets = df_desc@style@brackets, format = format, keep_attr = keep_attr)
 			   	}
 				res
 			}
@@ -509,6 +528,9 @@ bundle2df <- function(bundle, df_desc, ncores, verbose = 2) {
 #' @param bundles A [fhir_bundle_list-class] object
 #' @param df_desc A [fhir_df_desc-class] object
 #' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
+#' @param format A character of length 1 containing the format of the cracked table. Possible formats
+#' are "compact" and "wide". Defaults to "compact"
+#' @param keep_attr A locigcal of length 1. Should column names be extended by the attribute names? Defaults to FALSE.
 #' @param ncores Either NULL (1 core) or an integer of length 1 containing the number of
 #'  cpu cores that should be used for cracking. Defaults to NULL.
 #' @noRd
@@ -533,14 +555,14 @@ bundle2df <- function(bundle, df_desc, ncores, verbose = 2) {
 #' #convert bundles to data frame
 #' result <- fhircrackr:::bundles2df(bundles = bundles, df_desc = df_desc)
 
-bundles2df <- function(bundles, df_desc, verbose = 2, ncores) {
+bundles2df <- function(bundles, df_desc, verbose = 2, ncores, format = "compact", keep_attr = FALSE) {
 	ret <- data.table::rbindlist(
 		lapply(
 			seq_along(bundles),
 			function(i) {
 				if (1 < verbose) {message(paste0("Bundle ", i, ": "))}
 				bundle <- bundles[[i]]
-				bundle2df(bundle = bundle, df_desc = df_desc, ncores = ncores, verbose = verbose)
+				bundle2df(bundle = bundle, df_desc = df_desc, ncores = ncores, verbose = verbose, format = format, keep_attr = keep_attr)
 			}
 		),
 		fill = TRUE
@@ -594,13 +616,13 @@ bundles2df <- function(bundles, df_desc, verbose = 2, ncores) {
 #' #convert fhir to data frames
 #' list_of_tables <- fhircrackr:::bundles2dfs(bundles = bundles, design = design)
 
-bundles2dfs <- function(bundles, design, data.table = FALSE, ncores = NULL, verbose = 2) {
+bundles2dfs <- function(bundles, design, data.table = FALSE, format = "compact", keep_attr = FALSE, ncores = NULL, verbose = 2) {
 
 	dfs <- lapply(
 		lst(names(design)),
 		function(n) {
 			df_desc <- design[[n]]
-		  	if(is.null(df_desc)) {NULL} else {bundles2df(bundles = bundles, df_desc = df_desc, ncores = ncores, verbose = verbose)}
+		  	if(is.null(df_desc)) {NULL} else {bundles2df(bundles = bundles, df_desc = df_desc, format = format, keep_attr = keep_attr, ncores = ncores, verbose = verbose)}
 		}
 	)
 	#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
