@@ -52,8 +52,7 @@ setValidity(
 #' @export
 #'
 fhir_bundle_xml <- function(bundle) {
-
-	xml2::xml_ns_strip(x = bundle)
+	bundle <- fhir_ns_strip(xml = bundle)
 	links <- xml2::xml_find_all(x = bundle, xpath = "link")
 	rels.nxt <-	xml2::xml_text(x = xml2::xml_find_first(x = links, xpath = "./relation/@value")) == "next"
 	rels.self <- xml2::xml_text(x = xml2::xml_find_first(x = links,xpath = "./relation/@value")) == "self"

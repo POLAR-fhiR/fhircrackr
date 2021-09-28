@@ -423,7 +423,8 @@ fhir_capability_statement <- function(
 	#extract payload
 	payload <- httr::content(x = response, as = "text", encoding = "UTF-8")
 	xml <- xml2::read_xml(x = payload)
-	xml2::xml_ns_strip(x = xml)
+	#xml2::xml_ns_strip(x = xml)
+	xml <- fhir_ns_strip(xml)
 
 	xml_meta <- xml2::xml_new_root(.value = xml, .copy = TRUE)
 	xml2::xml_remove(.x = xml2::xml_find_all(x = xml_meta, xpath = "/CapabilityStatement/rest"))
