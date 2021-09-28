@@ -177,7 +177,7 @@ setMethod(
 		design <- add_attribute_to_design(design = design)
 		os <- get_os()
 		ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
-		message(paste0("Cracking under OS ", os, " using ", ncores, " cores."))
+		message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
 
 		dfs <- bundles2dfs(bundles = bundles, design = design, data.table = data.table, verbose = verbose, ncores = ncores)
 		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
@@ -232,7 +232,7 @@ setMethod(
 		design <- add_attribute_to_design(design = design)
 		os <- get_os()
 		ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
-		message(paste0("Cracking under OS ", os, " using ", ncores, " cores."))
+		message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
 
 		#crack
 		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose, ncores = ncores)
