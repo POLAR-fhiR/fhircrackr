@@ -105,14 +105,14 @@ setGeneric(
 	def = function(
 		bundles,
 		design,
-		sep = NULL,
-		brackets = NULL,
+		sep                  = NULL,
+		brackets             = NULL,
 		remove_empty_columns = NULL,
-		verbose = 2,
-		data.table = FALSE,
-		format = "compact",
-		keep_attr = FALSE,
-		ncores = NULL) {
+		verbose              = 2,
+		data.table           = FALSE,
+		format               = "compact",
+		keep_attr            = FALSE,
+		ncores               = NULL) {
 
 		standardGeneric("fhir_crack")
 	}
@@ -126,14 +126,14 @@ setMethod(
 	definition = function(
 		bundles,
 		design,
-		sep = NULL,
-		brackets = NULL,
+		sep                  = NULL,
+		brackets             = NULL,
 		remove_empty_columns = NULL,
-		verbose = 2,
-		data.table = FALSE,
-		format = "compact",
-		keep_attr = FALSE,
-		ncores = NULL) {
+		verbose              = 2,
+		data.table           = FALSE,
+		format               = "compact",
+		keep_attr            = FALSE,
+		ncores               = NULL) {
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
@@ -203,14 +203,14 @@ setMethod(
 	definition = function(
 		bundles,
 		design,
-		sep = NULL,
-		brackets = NULL,
+		sep                  = NULL,
+		brackets             = NULL,
 		remove_empty_columns = NULL,
-		verbose = 2,
-		data.table = FALSE,
-		format = "compact",
-		keep_attr = FALSE,
-		ncores = NULL) {
+		verbose              = 2,
+		data.table           = FALSE,
+		format               = "compact",
+		keep_attr            = FALSE,
+		ncores               = NULL) {
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {design@style@sep <- sep}
@@ -246,7 +246,7 @@ setMethod(
 		message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
 
 		#crack
-		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose, ncores = ncores)
+		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose, format = format, keep_attr = keep_attr, ncores = ncores)
 		#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
 		remove <- design@style@rm_empty_cols
 
@@ -265,21 +265,19 @@ setMethod(
 #' @rdname fhir_crack-methods
 #' @aliases fhir_crack,list-method
 setMethod(
-	f = "fhir_crack",
-	signature = c(design = "list"),
+	f          = "fhir_crack",
+	signature  = c(design = "list"),
 	definition = function(
 		bundles,
 		design,
+		sep                  = NULL,
+		brackets             = NULL,
 		remove_empty_columns = NULL,
-		sep = NULL,
-		brackets = NULL,
-		verbose = 2,
-		data.table = FALSE,
-		format = "compact",
-		keep_attr = FALSE,
-		format = "compact",
-		keep_attr = FALSE,
-		ncores = NULL) {
+		verbose              = 2,
+		data.table           = FALSE,
+		format               = "compact",
+		keep_attr            = FALSE,
+		ncores               = NULL) {
 
 		warning(
 			"The use of an old-style design will be disallowed in the future. ",
@@ -288,14 +286,16 @@ setMethod(
 		)
 		suppressMessages(design <- fhir_design(design))
 		fhir_crack(
-			bundles = bundles,
-			design = design,
-			sep = sep,
+			bundles              = bundles,
+			design               = design,
+			sep                  = sep,
+			brackets             = brackets,
 			remove_empty_columns = remove_empty_columns,
-			brackets = brackets,
-			verbose = verbose,
-			data.table = data.table,
-			ncores = ncores
+			verbose              = verbose,
+			data.table           = data.table,
+			format               = format,
+			keep_attr            = keep_attr,
+			ncores               = ncores
 		)
 	}
 )
@@ -483,7 +483,7 @@ xtrct_columns <- function(child, cols, sep = NULL, brackets = NULL, format = "co
 #'
 #' #convert bundle to data frame
 #' result <- fhircrackr:::bundle2df(bundle = bundle, df_desc = df_desc)
-bundle2df <- function(bundle, df_desc, ncores, verbose = 2, format = "compact", keep_attr = FALSE) {
+bundle2df <- function(bundle, df_desc, verbose = 2, format = "compact", keep_attr = FALSE, ncores) {
 	xpath <- paste0("//", df_desc@resource)
 	children <- xml2::xml_find_all(x = bundle, xpath = xpath)
 	ncores <- if(is.null(ncores)) 1 else min(c(ncores, length(children)))
@@ -555,14 +555,14 @@ bundle2df <- function(bundle, df_desc, ncores, verbose = 2, format = "compact", 
 #' #convert bundles to data frame
 #' result <- fhircrackr:::bundles2df(bundles = bundles, df_desc = df_desc)
 
-bundles2df <- function(bundles, df_desc, verbose = 2, ncores, format = "compact", keep_attr = FALSE) {
+bundles2df <- function(bundles, df_desc, verbose = 2, format = "compact", keep_attr = FALSE, ncores) {
 	ret <- data.table::rbindlist(
 		lapply(
 			seq_along(bundles),
 			function(i) {
 				if (1 < verbose) {message(paste0("Bundle ", i, ": "))}
 				bundle <- bundles[[i]]
-				bundle2df(bundle = bundle, df_desc = df_desc, ncores = ncores, verbose = verbose, format = format, keep_attr = keep_attr)
+				bundle2df(bundle = bundle, df_desc = df_desc, verbose = verbose, format = format, keep_attr = keep_attr, ncores = ncores)
 			}
 		),
 		fill = TRUE
@@ -578,6 +578,9 @@ bundles2df <- function(bundles, df_desc, verbose = 2, ncores, format = "compact"
 #' @param design A [fhir_design-class] object
 #' @param data.table Logical scalar. Return list of data.tables instead of data.frames? Defaults to FALSE.
 #' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
+#' @param format A character of length 1 containing the format of the cracked table. Possible formats
+#' are "compact" and "wide". Defaults to "compact"
+#' @param keep_attr A locigcal of length 1. Should column names be extended by the attribute names? Defaults to FALSE.
 #' @param ncores Either NULL (1 core) or an integer of length 1 containing the number of
 #'  cpu cores that should be used for cracking. Defaults to NULL.
 #' @noRd
@@ -616,7 +619,7 @@ bundles2df <- function(bundles, df_desc, verbose = 2, ncores, format = "compact"
 #' #convert fhir to data frames
 #' list_of_tables <- fhircrackr:::bundles2dfs(bundles = bundles, design = design)
 
-bundles2dfs <- function(bundles, design, data.table = FALSE, format = "compact", keep_attr = FALSE, ncores = NULL, verbose = 2) {
+bundles2dfs <- function(bundles, design, data.table = FALSE, verbose = 2, format = "compact", keep_attr = FALSE, ncores = NULL) {
 
 	dfs <- lapply(
 		lst(names(design)),

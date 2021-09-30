@@ -45,9 +45,14 @@
 setClass(
 	Class = "fhir_table_description",
 	slots = c(
-		resource = "fhir_resource_type",
-		cols = "fhir_columns",
-		style = "fhir_style"
+		resource       = "fhir_resource_type",
+		cols           = "fhir_columns",
+		sep            = "character",
+		brackets       = "character",
+		rm_empty_cols  = "logical",
+		format         = "character",
+		keep_attr      = "logical",
+		style          = "fhir_style"
 	)
 )
 
@@ -131,12 +136,26 @@ setClass(
 #' @export
 fhir_table_description <- function(
 	resource,
-	cols = fhir_columns(),
-	style = fhir_style()) {
+	cols           = fhir_columns(),
+	sep            = ":::",
+	brackets       = c("<|", "|>"),
+	rm_empty_cols  = "logical",
+	format         = "character",
+	keep_attr      = "logical",
+	style          = fhir_style()) {
 
 	resource <- fhir_resource_type(string = resource)
 	if(class(cols) != "fhir_columns") {cols <- fhir_columns(xpaths = cols)}
-	new(Class = "fhir_table_description", resource = resource, cols = cols, style = style)
+	new(
+		Class         = "fhir_table_description",
+		resource      = resource,
+		cols          = cols,
+		sep           = sep,
+		brackets      = brackets,
+		rm_empty_cols = rm_empty_cols,
+		format        = format,
+		keep_attr     = keep_attr,
+		style         = style)
 }
 
 setMethod(
@@ -145,6 +164,8 @@ setMethod(
 	function(object) {
 		cat("A fhir_table_description with the following elements: \n\n")
 		cat(paste0("fhir_resource_type: ", as.character(object@resource), "\n\n"))
+		cat("fhir_columns: \n"); show(object@cols)
+		cat("fhir_columns: \n"); show(object@cols)
 		cat("fhir_columns: \n"); show(object@cols)
 		cat("\n\nfhir_style: \n");	show(object@style)
 		cat("\n")
