@@ -1,7 +1,9 @@
 ## code to prepare `example_bundles1` dataset goes here
 bundle <- xml2::read_xml(
 	"<Bundle>
+     <type value='searchset'/>
 
+	 <entry>
 		<Patient>
 			<id value='id1'/>
 			<address>
@@ -14,7 +16,9 @@ bundle <- xml2::read_xml(
 				<given value='Marie'/>
 			</name>
 		</Patient>
+	 </entry>
 
+	 <entry>
 		<Patient>
 			<id value='id2'/>
 			<address>
@@ -33,7 +37,9 @@ bundle <- xml2::read_xml(
 				<given value='Susie'/>
 			</name>
 		</Patient>
+	 </entry>
 
+	 <entry>
 		<Patient>
 			<id value='id3'/>
 			<address>
@@ -57,22 +63,29 @@ bundle <- xml2::read_xml(
 				<given value='Max'/>
 			</name>
 		</Patient>
+	 </entry>
 
+	 <entry>
 		<Observation>
-		<id value = '1'/>
-	<code>
-		<coding>
-		   <system value='http://loinc.org'/>
-		   <code value='29463-7'/>
-		   <display value='Body Weight'/>
-		</coding>
-		<coding>
-		   <system value='http://snomed.info/sct'/>
-	 	   <code value='27113001'/>
-		   <display value='Body weight'/>
-		</coding>
-	</code>
+			<id value = 'obs1'/>
+			<code>
+				<coding>
+				   <system value='http://loinc.org'/>
+				   <code value='29463-7'/>
+				   <display value='Body Weight'/>
+				</coding>
+				<coding>
+				   <system value='http://snomed.info/sct'/>
+			 	   <code value='27113001'/>
+				   <display value='Body weight'/>
+				</coding>
+			</code>
+			<subject>
+				<reference value = 'Patient/id2'/>
+			</subject>
 		</Observation>
+	 </entry>
+
 	</Bundle>"
 )
 

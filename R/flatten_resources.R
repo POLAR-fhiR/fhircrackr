@@ -13,20 +13,23 @@
 #' comprehensive examples of both.
 #'
 #' @param sep Optional. A character vector of length ones to separate pasted multiple entries which will overwrite the `sep` defined in
-#' `design`. If `sep = NULL`, it is looked up in `design`, where the default is `" "`.
+#' `design`. If `sep = NULL`, it is looked up in `design`, where the default is `":::"`.
 #'
 #' @param remove_empty_columns Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
 #' `design`. If `remove_empty_columns = NULL`, it is looked up in `design`, where the default is `FALSE`.
 #'
-#' @param brackets Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")},
+#' @param brackets Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c("<|", "|>")},
 #' which will overwrite the `brackets` defined in `design`. If `brackets = NULL`, it is looked up in `design`, where the default is `character(0)`,
 #' i.e. no indices are added to multiple entries. Empty strings (`""`) are not allowed.
 #'
-#' @param verbose An integer vector of length one.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
+#' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
 #'
 #' @param data.table A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
 #' Defaults to FALSE.
+#'
+#' @param ncores Either NULL (1 core) or an integer of length 1 containing the number of
+#'  cpu cores that should be used for cracking. Defaults to NULL.
 #'
 #' @return If a [fhir_design-class] was used, the result is a list of data.frames, i.e. a [fhir_df_list-class] object, or a list of data.tables,
 #' i.e. a [fhir_dt_list-class] object. If a [fhir_table_description-class] was used, the result is a single data.frame/data.table.
@@ -50,22 +53,22 @@
 #' #define attributes to extract
 #' medications <- fhir_table_description(
 #'    resource = "MedicationStatement",
-#'    cols = c(
-#' 			    	MS.ID              = "id",
-#' 				    STATUS.TEXT        = "text/status",
-#' 			    	STATUS             = "status",
-#' 			    	MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-#' 			    	MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-#' 			    	MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-#' 			    	DOSAGE             = "dosage/text",
-#' 			    	PATIENT            = "subject/reference",
-#' 			    	LAST.UPDATE        = "meta/lastUpdated"
-#' 	    	),
-#' 	 style = fhir_style(
-#'  			sep = " ",
-#' 	        	brackets = c("[", "]"),
-#'     		    rm_empty_cols= FALSE
-#'     		)
+#'    cols     = c(
+#'    	MS.ID              = "id",
+#'    	STATUS.TEXT        = "text/status",
+#'    	STATUS             = "status",
+#'    	MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+#'    	MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+#'    	MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+#'    	DOSAGE             = "dosage/text",
+#'     	PATIENT            = "subject/reference",
+#'     	LAST.UPDATE        = "meta/lastUpdated"
+#'   ),
+#'   style     = fhir_style(
+#'    	sep           = " ",
+#'    	brackets      = c("[", "]"),
+#'    	rm_empty_cols = FALSE
+#'   )
 #' )
 #'
 #' med_df <- fhir_crack(bundles = bundles, design = medications)
@@ -101,7 +104,8 @@ setGeneric(
 		remove_empty_columns = NULL,
 		brackets = NULL,
 		verbose = 2,
-		data.table = FALSE) {
+		data.table = FALSE,
+		ncores = NULL) {
 
 		standardGeneric("fhir_crack")
 	}
@@ -119,7 +123,8 @@ setMethod(
 		remove_empty_columns = NULL,
 		brackets = NULL,
 		verbose = 2,
-		data.table = FALSE) {
+		data.table = FALSE,
+		ncores = NULL) {
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
@@ -170,8 +175,11 @@ setMethod(
 
 		#Add attributes to design
 		design <- add_attribute_to_design(design = design)
-		#crack
-		dfs <- bundles2dfs(bundles = bundles, design = design, data.table = data.table, verbose = verbose)
+		os <- get_os()
+		ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
+		message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
+
+		dfs <- bundles2dfs(bundles = bundles, design = design, data.table = data.table, verbose = verbose, ncores = ncores)
 		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
 		dfs
@@ -190,7 +198,8 @@ setMethod(
 		remove_empty_columns = NULL,
 		brackets = NULL,
 		verbose = 2,
-		data.table = FALSE) {
+		data.table = FALSE,
+		ncores = NULL) {
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {design@style@sep <- sep}
@@ -221,8 +230,12 @@ setMethod(
 
 		#Add attributes to design
 		design <- add_attribute_to_design(design = design)
+		os <- get_os()
+		ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
+		message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
+
 		#crack
-		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose)
+		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose, ncores = ncores)
 		#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
 		remove <- design@style@rm_empty_cols
 
@@ -232,7 +245,7 @@ setMethod(
 			df_cleaned <- df
 		}
 
-		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
+		if(0 < verbose) {message("FHIR-Resources cracked.")}
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
 		if(data.table) {df} else {data.frame(df)}
 	}
@@ -250,7 +263,8 @@ setMethod(
 		remove_empty_columns = NULL,
 		brackets = NULL,
 		verbose = 2,
-		data.table = FALSE) {
+		data.table = FALSE,
+		ncores = NULL) {
 
 		warning(
 			"The use of an old-style design will be disallowed in the future. ",
@@ -265,7 +279,8 @@ setMethod(
 			remove_empty_columns = remove_empty_columns,
 			brackets = brackets,
 			verbose = verbose,
-			data.table = data.table
+			data.table = data.table,
+			ncores = ncores
 		)
 	}
 )
@@ -282,8 +297,8 @@ setMethod(
 #' from the resource
 #' @param sep A character vector of length one to separate pasted multiple entries.
 #' @param xpath A character vector of length one to locate data in tree via xpath.
-#' @param brackets A character vector of length one or two defining the Brackets
-#' surrounding the Indices. e.g. c( "<", ">") NULL means no brackets.
+#' @param brackets A character vector of length one or two defining the brackets
+#' surrounding the indices. e.g. c( "<", ">") NULL means no brackets.
 #' A vector of length one like c("|") means that the "|"-sign will be used as opening and closing Brackets.
 #' @noRd
 #'
@@ -416,6 +431,8 @@ xtrct_columns <- function(child, cols, sep = NULL, brackets = NULL) {
 #' @param bundle A xml object containing one FHIR bundle
 #' @param df_desc An object of class [fhir_table_description-class].
 #' @param verbose An integer scalar.  If > 1, extraction progress will be printed. Defaults to 2.
+#' @param ncores Either NULL (1 core) or an integer of length 1 containing the number of
+#'  cpu cores that should be used for cracking. Defaults to NULL.
 #' @noRd
 #' @examples
 #' #unserialize example bundle
@@ -441,11 +458,34 @@ xtrct_columns <- function(child, cols, sep = NULL, brackets = NULL) {
 #'
 #' #convert bundle to data frame
 #' result <- fhircrackr:::bundle2df(bundle = bundle, df_desc = df_desc)
-bundle2df <- function(bundle, df_desc, verbose = 2) {
+bundle2df <- function(bundle, df_desc, ncores, verbose = 2) {
 	xpath <- paste0("//", df_desc@resource)
 	children <- xml2::xml_find_all(x = bundle, xpath = xpath)
+	ncores <- if(is.null(ncores)) 1 else min(c(ncores, length(children)))
 	df.list <- if(length(children) == 0) {
 		list()
+	} else if(1 < ncores) {
+		## does not work for 'Windows' because windows cannot fork
+		parallel::mclapply(
+			children,
+			function(child) {
+				if(0 < length(df_desc@cols)) {#if cols is not empty
+					cols <- df_desc@cols
+					res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets)
+					# if(1 < verbose) {
+					# 	if(all(sapply(res, is.na))) {cat("x")} else {cat(".")}
+					# }
+				} else {#if cols empty
+					xp <- ".//@*"
+					res <- xtrct_all_columns(child = child, sep = df_desc@style@sep, xpath = xp, brackets = df_desc@style@brackets)
+					# if(1 < verbose) {
+					# 	if(nrow(res) < 1) {cat("x")} else {cat(".")}
+					# }
+				}
+				res
+			},
+			mc.cores = ncores
+		)
 	} else {
 		lapply(
 			children,
@@ -453,15 +493,9 @@ bundle2df <- function(bundle, df_desc, verbose = 2) {
 			   	if(0 < length(df_desc@cols)) {#if cols is not empty
 			   		cols <- df_desc@cols
 			   		res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets)
-			   		if(1 < verbose) {
-			   			if(all(sapply(res, is.na))) {cat("x")} else {cat(".")}
-			   		}
 			   	} else {#if cols empty
 			   		xp <- ".//@*"
 			   		res <- xtrct_all_columns(child = child, sep = df_desc@style@sep, xpath = xp, brackets = df_desc@style@brackets)
-			   		if(1 < verbose) {
-			   			if(nrow(res) < 1) {cat("x")} else {cat(".")}
-			   		}
 			   	}
 				res
 			}
@@ -475,6 +509,8 @@ bundle2df <- function(bundle, df_desc, verbose = 2) {
 #' @param bundles A [fhir_bundle_list-class] object
 #' @param df_desc A [fhir_df_desc-class] object
 #' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
+#' @param ncores Either NULL (1 core) or an integer of length 1 containing the number of
+#'  cpu cores that should be used for cracking. Defaults to NULL.
 #' @noRd
 #' @examples
 #' #unserialize example bundle
@@ -497,20 +533,19 @@ bundle2df <- function(bundle, df_desc, verbose = 2) {
 #' #convert bundles to data frame
 #' result <- fhircrackr:::bundles2df(bundles = bundles, df_desc = df_desc)
 
-bundles2df <- function(bundles, df_desc, verbose = 2) {
+bundles2df <- function(bundles, df_desc, verbose = 2, ncores) {
 	ret <- data.table::rbindlist(
 		lapply(
 			seq_along(bundles),
 			function(i) {
-				if (1 < verbose) {cat("\n", i)}
+				if (1 < verbose) {message(paste0("Bundle ", i, ": "))}
 				bundle <- bundles[[i]]
-				bundle2df(bundle = bundle, df_desc = df_desc, verbose = verbose)
+				bundle2df(bundle = bundle, df_desc = df_desc, ncores = ncores, verbose = verbose)
 			}
 		),
 		fill = TRUE
 	)
 	if(nrow(0 < ret)) {ret <- ret[0 < rowSums(!is.na(ret)), ]}
-	if(1 < verbose) {cat("\n")}
 	ret
 }
 
@@ -521,6 +556,8 @@ bundles2df <- function(bundles, df_desc, verbose = 2) {
 #' @param design A [fhir_design-class] object
 #' @param data.table Logical scalar. Return list of data.tables instead of data.frames? Defaults to FALSE.
 #' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
+#' @param ncores Either NULL (1 core) or an integer of length 1 containing the number of
+#'  cpu cores that should be used for cracking. Defaults to NULL.
 #' @noRd
 #' @return A [fhir_df_list-class]/[fhir_dt_list-class] object as specified by `design`.
 #'
@@ -557,16 +594,15 @@ bundles2df <- function(bundles, df_desc, verbose = 2) {
 #' #convert fhir to data frames
 #' list_of_tables <- fhircrackr:::bundles2dfs(bundles = bundles, design = design)
 
-bundles2dfs <- function(bundles, design, data.table = FALSE, verbose = 2) {
+bundles2dfs <- function(bundles, design, data.table = FALSE, ncores = NULL, verbose = 2) {
+
 	dfs <- lapply(
 		lst(names(design)),
 		function(n) {
 			df_desc <- design[[n]]
-		  	if(1 < verbose) {cat("\n", n)}
-		  	if(is.null(df_desc)) {NULL} else {bundles2df(bundles = bundles, df_desc = df_desc, verbose = verbose)}
+		  	if(is.null(df_desc)) {NULL} else {bundles2df(bundles = bundles, df_desc = df_desc, ncores = ncores, verbose = verbose)}
 		}
 	)
-	if(1 < verbose) {cat("\n")}
 	#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
 	remove <- sapply(
 		design,

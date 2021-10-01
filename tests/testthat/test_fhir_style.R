@@ -5,7 +5,7 @@ testthat::test_that(
 		style_default <- fhir_style()
 		testthat::expect_s4_class(style_default, "fhir_style")
 		testthat::expect_s4_class(style_default, "fhir_style")
-		testthat::expect_equal(style_default@sep, ' ')
+		testthat::expect_equal(style_default@sep, ':::')
 		testthat::expect_equal(style_default@brackets, character(0))
 		testthat::expect_false(style_default@rm_empty_cols)
 

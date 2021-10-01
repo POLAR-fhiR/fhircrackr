@@ -6,7 +6,9 @@
 \alias{fhir_serialize,fhir_bundle_xml-method}
 \alias{fhir_serialize,fhir_bundle_serialized-method}
 \alias{fhir_serialize,fhir_bundle_list-method}
-\title{Serialize a \linkS4class{fhir_bundle} or \linkS4class{fhir_bundle_list}}
+\alias{fhir_serialize,fhir_resource_xml-method}
+\alias{fhir_serialize,fhir_resource_serialized-method}
+\title{Serialize a \linkS4class{fhir_bundle}, \linkS4class{fhir_bundle_list} or \linkS4class{fhir_resource}}
 \usage{
 fhir_serialize(bundles)
 
@@ -15,16 +17,20 @@ fhir_serialize(bundles)
 \S4method{fhir_serialize}{fhir_bundle_serialized}(bundles)
 
 \S4method{fhir_serialize}{fhir_bundle_list}(bundles)
+
+\S4method{fhir_serialize}{fhir_resource_xml}(bundles)
+
+\S4method{fhir_serialize}{fhir_resource_serialized}(bundles)
 }
 \arguments{
-\item{bundles}{A \linkS4class{fhir_bundle} or \linkS4class{fhir_bundle_list} object.}
+\item{bundles}{A \linkS4class{fhir_bundle}, \linkS4class{fhir_bundle_list} or \linkS4class{fhir_resource} object.}
 }
 \value{
-A  \linkS4class{fhir_bundle_xml} or \linkS4class{fhir_bundle_list} object.
+A  \linkS4class{fhir_bundle_xml}, \linkS4class{fhir_bundle_list} or \linkS4class{fhir_resource_xml}  object.
 }
 \description{
-Serializes FHIR bundles to allow for saving in .rda or .RData format without losing integrity of pointers
-i.e. it turns a \linkS4class{fhir_bundle_xml} object into an \linkS4class{fhir_bundle_serialized} object.
+Serializes FHIR bundles or resources to allow for saving in .rda or .RData format without losing integrity of pointers
+i.e. it turns a \linkS4class{fhir_bundle_xml}/\linkS4class{fhir_resource_xml} object into an \linkS4class{fhir_bundle_serialized}/\linkS4class{fhir_resource_serialized} object.
 }
 \examples{
 
@@ -36,5 +42,6 @@ bundles_for_saving <- fhir_serialize(bundles)
 
 #works also on single bundles
 fhir_serialize(bundles[[1]])
+
 
 }
