@@ -19,6 +19,231 @@ assign(x = "recent_http_error", value = NULL, envir= fhircrackr_env)
 #To stop devtools::check( from warning about no visible global function definition)
 globalVariables(".")
 
+#' Remove a certain xml tag
+#'
+#' Removes a given xml tag from xml objects represented in a [fhir_bundle_xml-class], [fhir_bundle_list-class]
+#' or character vector.
+#'
+#' In the example `Hello<div>Please<p>Remove Me</p></div>World!` one could for example remove the
+#' tag `p`, resulting in `Hello<div>Please</div>World!`or remove the `div` tag resulting in
+#' `Hello World!`.
+#'
+#' @param x A [fhir_bundle_xml-class] or [fhir_bundle_list-class] object or a character vector
+#' containing xml objects.
+#' @param tag A character vector of length 1 containing the tag that should be removed, e.g. `"div"`.
+#'
+#' @return An object of the same class as `x` where all tags matching the `tag` argument are removed.
+#' @export
+#' @rdname fhir_rm_tag-methods
+#' @docType methods
+#' @include fhir_bundle.R fhir_bundle_list.R
+#' @seealso [fhir_rm_div()]
+#'
+#' @examples
+#'
+#' #Example 1: Remove tag from xmls in a character vector
+#' string <- c("Hello<div>Please<p>Remove Me</p></div> World!",
+#'             "A<div><div><p>B</p></div>C</div>D")
+#'
+#' fhir_rm_tag(x = string, tag = "p")
+#'
+#'
+#'
+#'
+#' #Example 2: Remove div tags in a single fhir bundle
+#' bundle <- fhir_unserialize(patient_bundles)[[1]]
+#'
+#' #example bundle contains html parts in div tags:
+#' cat(toString(bundle))
+#'
+#' #remove html parts
+#' bundle_cleaned <- fhir_rm_tag(x = bundle, tag = "div")
+#'
+#' #have a look at the result
+#' cat(toString(bundle_cleaned))
+#'
+#'
+#'
+#'
+#'
+#' #Example 3: Remove div tags in a list of fhir bundles
+#' bundle_list <- fhir_unserialize(patient_bundles)
+#'
+#'
+#' #remove html parts
+#' bundle_list_cleaned <- fhir_rm_tag(x = bundle_list, tag = "div")
+#'
+#' #check out how much the size of the bundle list is reduced by removing html
+#' size_with_html <- sum(sapply(bundle_list, function(x)object.size(toString(x))))
+#' size_without_html <- sum(sapply(bundle_list_cleaned, function(x)object.size(toString(x))))
+#'
+#' size_without_html/size_with_html
+#'
+setGeneric(
+	name = "fhir_rm_tag",
+	def = function(
+		x,
+		tag
+	) {
+		standardGeneric("fhir_rm_tag")
+	}
+)
+
+#' @rdname fhir_rm_tag-methods
+#' @aliases fhir_rm_tag,character-method
+
+setMethod(
+	f = "fhir_rm_tag",
+	signature = c(x = "character"),
+	definition = function(
+		x,
+		tag
+	) {
+		if(1 < length(x)) {
+			return(sapply(x, fhir_rm_tag, tag = tag, USE.NAMES = F))
+		}
+		start <- end <- s <- type <- NULL #just to shut up CRAN check about undefined global variables
+		tOn <- paste0("(<", tag, ")((>)|( +[^/]*?>))")
+		tOff <- paste0("</", tag, ">")
+		tagOn  <- as.data.table(stringr::str_locate_all(string = x, tOn)[[1]])
+		tagOff <- as.data.table(stringr::str_locate_all(string = x, tOff)[[1]])
+		tagOn[,(c("type", "id")) := .(1, seq_len(nrow(tagOn)))]
+		tagOff[,(c("type", "id")) := .(-1, seq_len(nrow(tagOff)))]
+		tags <- rbindlist(list(tagOn, tagOff))
+		data.table::setorder(tags, start)
+		if(0 < nrow(tags)) {
+			if(tags$type[1] == -1) {
+				stop("Tag closes before it opens.")
+			}
+			if(1 < tags$start[1]) {
+				tags <- data.table::rbindlist(list(data.table(start = 1, end = tags$start[1] - 1, type = 0, id = 1), tags))
+			}
+			if(tags$end[nrow(tags)] < nchar(x)) {
+				tags <- data.table::rbindlist(list(tags, data.table(start = tags$end[nrow(tags)] + 1, end = nchar(x), type = 0, id = 2)))
+			}
+			tags[,s:=sapply(seq_len(nrow(tags)),function(x) sum(type[seq_len(x)]))]
+			tags[,text:=substr(x, start, end), by = start]
+			text <- list()
+			for(i in seq_len(nrow(tags))) {
+				part <- if(tags$type[i] == 0) {
+					#tags$text[i]
+					substr(x, tags$start[i], tags$end[i])
+				} else if(tags$type[i] == -1 && tags$s[i] == 0 && i < nrow(tags)) {
+					substr(x, tags$end[i] + 1, tags$start[i + 1] - 1)
+				}
+				if(!is.null(part)) {
+					if(substr(part, 1, 1) == "\n") {
+						part <- if(nchar(part) < 2) "" else substr(part, 2, nchar(part))
+					}
+					if(part != "\n" && part != ""){
+						text <- c(text, part)
+					}
+				}
+			}
+			paste0(text, collapse = "")
+		} else {
+			x
+		}
+	}
+)
+
+
+#' @rdname fhir_rm_tag-methods
+#' @aliases fhir_rm_tag,fhir_bundle_xml-method
+
+setMethod(
+	f = "fhir_rm_tag",
+	signature = c(x = "fhir_bundle_xml"),
+	definition = function(
+		x,
+		tag
+	) {
+		fhir_bundle_xml(bundle = xml2::read_xml(fhir_rm_tag(x = toString(x), tag = tag)))
+	}
+)
+
+#' @rdname fhir_rm_tag-methods
+#' @aliases fhir_rm_tag,fhir_bundle_list-method
+
+setMethod(
+	f = "fhir_rm_tag",
+	signature = c(x = "fhir_bundle_list"),
+	definition = function(
+		x,
+		tag
+	) {
+		fhir_bundle_list(
+			lapply(
+				x,
+				function(bundle) {
+					fhir_rm_tag(x = bundle, tag = tag)
+				}
+			)
+		)
+	}
+)
+
+#' Remove html elements
+#'
+#' This function is a convenience wrapper for [fhir_rm_tag()] that removes all `<div> </div>` elements from an xml.
+#' `div` tags in FHIR resources contain html code, which is often server generated and in most cases neither relevant nor
+#' usable for data analysis.
+#'
+#' @param x A [fhir_bundle_xml-class] or [fhir_bundle_list-class] object or a character vector
+#' containing xml objects.
+#'
+#' @return An object of the same class as `x` where all tags matching the `tag` argument are removed.
+#' @export
+#' @include fhir_bundle.R fhir_bundle_list.R
+#' @seealso [fhir_rm_tag()]
+#'
+#' @examples
+#'
+#' #Example 1: Remove div tags from xmls in a character vector
+#' string <- c("Hallo<div>Please<p>Remove Me</p></div> World!",
+#'             "A<div><div><p>B</p></div>C</div>D")
+#'
+#' fhir_rm_div(x = string)
+#'
+#'
+#'
+#'
+#' #Example 2: Remove div tags in a single fhir bundle
+#' bundle <- fhir_unserialize(patient_bundles)[[1]]
+#'
+#' #example bundle contains html parts in div tags:
+#' cat(toString(bundle))
+#'
+#' #remove html parts
+#' bundle_cleaned <- fhir_rm_div(x = bundle)
+#'
+#' #have a look at the result
+#' cat(toString(bundle_cleaned))
+#'
+#'
+#'
+#'
+#'
+#' #Example 3: Remove div tags in a list of fhir bundles
+#' bundle_list <- fhir_unserialize(patient_bundles)
+#'
+#'
+#' #remove html parts
+#' bundle_list_cleaned <- fhir_rm_div(x = bundle_list)
+#'
+#' #check out how much the size of the bundle list is reduced by removing html
+#' size_with_html <- sum(sapply(bundle_list, function(x)object.size(toString(x))))
+#' size_without_html <- sum(sapply(bundle_list_cleaned, function(x)object.size(toString(x))))
+#'
+#' size_without_html/size_with_html
+#'
+
+fhir_rm_div <- function(x){
+	fhir_rm_tag(x, tag = "div")
+}
+
+
+
 
 #' Concatenate paths
 #' @description Concatenates two strings to a path string correctly.
