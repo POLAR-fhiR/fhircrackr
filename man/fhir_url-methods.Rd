@@ -24,7 +24,7 @@ fhir_url(url, resource, parameters, url_enc = TRUE)
 e.g. \code{"http://hapi.fhir.org/baseR4/Patient?gender=male&_summary=count"}, or
 the base URL to the FHIR server, e.g. \code{"http://hapi.fhir.org/baseR4"}.}
 
-\item{resource}{A character of length one of \linkS4class{fhir_resource_type} object with the resource type to be searched, e.g. \code{"Patient"}.}
+\item{resource}{A character of length one or \linkS4class{fhir_resource_type} object with the resource type to be searched, e.g. \code{"Patient"}.}
 
 \item{parameters}{Optional. Either a length 1 character containing properly formatted FHIR search parameters, e.g.
 \code{"gender=male&_summary=count"} or a named list or named character vector e.g. \code{list(gender="male", "_summary"="count")}

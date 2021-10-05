@@ -38,7 +38,7 @@ setValidity(
 #' @param url A character of length one specifying either the full search request,
 #' e.g. `"http://hapi.fhir.org/baseR4/Patient?gender=male&_summary=count"`, or
 #' the base URL to the FHIR server, e.g. `"http://hapi.fhir.org/baseR4"`.
-#' @param resource A character of length one of [fhir_resource_type-class] object with the resource type to be searched, e.g. `"Patient"`.
+#' @param resource A character of length one or [fhir_resource_type-class] object with the resource type to be searched, e.g. `"Patient"`.
 #' @param parameters Optional. Either a length 1 character containing properly formatted FHIR search parameters, e.g.
 #' `"gender=male&_summary=count"` or a named list or named character vector e.g. `list(gender="male", "_summary"="count")`
 #' or `c(gender="male", "_summary"="count")`. Note that parameter names beginning with `_` have to be put in quotation marks!
