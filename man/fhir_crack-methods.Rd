@@ -18,7 +18,8 @@ fhir_crack(
   remove_empty_columns = NULL,
   brackets = NULL,
   verbose = 2,
-  data.table = FALSE
+  data.table = FALSE,
+  ncores = NULL
 )
 
 \S4method{fhir_crack}{ANY,fhir_design}(
@@ -28,7 +29,8 @@ fhir_crack(
   remove_empty_columns = NULL,
   brackets = NULL,
   verbose = 2,
-  data.table = FALSE
+  data.table = FALSE,
+  ncores = NULL
 )
 
 \S4method{fhir_crack}{ANY,fhir_table_description}(
@@ -38,7 +40,8 @@ fhir_crack(
   remove_empty_columns = NULL,
   brackets = NULL,
   verbose = 2,
-  data.table = FALSE
+  data.table = FALSE,
+  ncores = NULL
 )
 
 \S4method{fhir_crack}{ANY,list}(
@@ -48,7 +51,8 @@ fhir_crack(
   remove_empty_columns = NULL,
   brackets = NULL,
   verbose = 2,
-  data.table = FALSE
+  data.table = FALSE,
+  ncores = NULL
 )
 }
 \arguments{
@@ -59,20 +63,23 @@ and the corresponding vignette (\code{vignette("flattenResources", package ="fhi
 comprehensive examples of both.}
 
 \item{sep}{Optional. A character vector of length ones to separate pasted multiple entries which will overwrite the \code{sep} defined in
-\code{design}. If \code{sep = NULL}, it is looked up in \code{design}, where the default is \code{" "}.}
+\code{design}. If \code{sep = NULL}, it is looked up in \code{design}, where the default is \code{":::"}.}
 
 \item{remove_empty_columns}{Optional. Remove empty columns? Logical scalar which will overwrite the \code{rm_empty_cols} defined in
 \code{design}. If \code{remove_empty_columns = NULL}, it is looked up in \code{design}, where the default is \code{FALSE}.}
 
-\item{brackets}{Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")},
+\item{brackets}{Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c("<|", "|>")},
 which will overwrite the \code{brackets} defined in \code{design}. If \code{brackets = NULL}, it is looked up in \code{design}, where the default is \code{character(0)},
 i.e. no indices are added to multiple entries. Empty strings (\code{""}) are not allowed.}
 
-\item{verbose}{An integer vector of length one.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
+\item{verbose}{An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 extraction progress will be printed. Defaults to 2.}
 
 \item{data.table}{A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
 Defaults to FALSE.}
+
+\item{ncores}{Either NULL (1 core) or an integer of length 1 containing the number of
+cpu cores that should be used for cracking. Defaults to NULL.}
 }
 \value{
 If a \linkS4class{fhir_design} was used, the result is a list of data.frames, i.e. a \linkS4class{fhir_df_list} object, or a list of data.tables,
@@ -94,22 +101,22 @@ bundles <- fhir_unserialize(medication_bundles)
 #define attributes to extract
 medications <- fhir_table_description(
    resource = "MedicationStatement",
-   cols = c(
-			    	MS.ID              = "id",
-				    STATUS.TEXT        = "text/status",
-			    	STATUS             = "status",
-			    	MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-			    	MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-			    	MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-			    	DOSAGE             = "dosage/text",
-			    	PATIENT            = "subject/reference",
-			    	LAST.UPDATE        = "meta/lastUpdated"
-	    	),
-	 style = fhir_style(
- 			sep = " ",
-	        	brackets = c("[", "]"),
-    		    rm_empty_cols= FALSE
-    		)
+   cols     = c(
+   	MS.ID              = "id",
+   	STATUS.TEXT        = "text/status",
+   	STATUS             = "status",
+   	MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+   	MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+   	MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+   	DOSAGE             = "dosage/text",
+    	PATIENT            = "subject/reference",
+    	LAST.UPDATE        = "meta/lastUpdated"
+  ),
+  style     = fhir_style(
+   	sep           = " ",
+   	brackets      = c("[", "]"),
+   	rm_empty_cols = FALSE
+  )
 )
 
 med_df <- fhir_crack(bundles = bundles, design = medications)

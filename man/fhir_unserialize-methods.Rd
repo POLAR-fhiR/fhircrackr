@@ -5,8 +5,10 @@
 \alias{fhir_unserialize}
 \alias{fhir_unserialize,fhir_bundle_xml-method}
 \alias{fhir_unserialize,fhir_bundle_serialized-method}
+\alias{fhir_unserialize,fhir_resource_xml-method}
+\alias{fhir_unserialize,fhir_resource_serialized-method}
 \alias{fhir_unserialize,fhir_bundle_list-method}
-\title{Unserialize a \linkS4class{fhir_bundle} or \linkS4class{fhir_bundle_list}}
+\title{Unserialize a \linkS4class{fhir_bundle}, \linkS4class{fhir_bundle_list} or \linkS4class{fhir_resource}}
 \usage{
 fhir_unserialize(bundles)
 
@@ -14,17 +16,21 @@ fhir_unserialize(bundles)
 
 \S4method{fhir_unserialize}{fhir_bundle_serialized}(bundles)
 
+\S4method{fhir_unserialize}{fhir_resource_xml}(bundles)
+
+\S4method{fhir_unserialize}{fhir_resource_serialized}(bundles)
+
 \S4method{fhir_unserialize}{fhir_bundle_list}(bundles)
 }
 \arguments{
-\item{bundles}{A \linkS4class{fhir_bundle} or \linkS4class{fhir_bundle_list} object.}
+\item{bundles}{A \linkS4class{fhir_bundle}, \linkS4class{fhir_bundle_list} or \linkS4class{fhir_resource} object.}
 }
 \value{
-A  \linkS4class{fhir_bundle_serialized} or \linkS4class{fhir_bundle_list} object.
+A  \linkS4class{fhir_bundle_serialized}, \linkS4class{fhir_bundle_list} or \linkS4class{fhir_resource_serialized}object.
 }
 \description{
-Unserializes FHIR bundles that have been serialized to allow for saving in .rda or .RData format,
-i.e. it turns a \linkS4class{fhir_bundle_serialized} object into an \linkS4class{fhir_bundle_xml} object.
+Unserializes FHIR resources or bundles that have been serialized to allow for saving in .rda or .RData format,
+i.e. it turns a \linkS4class{fhir_bundle_serialized}/\linkS4class{fhir_resource_serialized} object into an \linkS4class{fhir_bundle_xml}/\linkS4class{fhir_resource_xml} object.
 }
 \examples{
 

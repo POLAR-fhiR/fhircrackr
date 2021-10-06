@@ -1,7 +1,8 @@
 ## code to prepare `example_bundles1` dataset goes here
 bundle <- xml2::read_xml(
-	"<Bundle>
-
+"<Bundle>
+     <type value='searchset'/>
+     <entry>
 		<Patient>
 			<id value='id1'/>
 			<address>
@@ -14,7 +15,8 @@ bundle <- xml2::read_xml(
 				<given value='Marie'/>
 			</name>
 		</Patient>
-
+	  </entry>
+	  <entry>
 		<Patient>
 			<id value='id3'/>
 			<address>
@@ -38,8 +40,9 @@ bundle <- xml2::read_xml(
 				<given value='Max'/>
 			</name>
 		</Patient>
+	</entry>
 
-	</Bundle>"
+</Bundle>"
 )
 
 bundle <- fhir_bundle_xml(bundle)
