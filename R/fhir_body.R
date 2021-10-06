@@ -89,7 +89,8 @@ setMethod(
 	signature = c(content = "list", type = "character"),
 	definition = function(content, type) {
 
-		message("When content is a list, the type you provided will be overwritten with 'application/x-www-form-urlencoded'")
+		if(type != "application/x-www-form-urlencoded")
+			message("When content is a list, the type you provided will be overwritten with 'application/x-www-form-urlencoded'")
 
 		if(any(!sapply(content, function(x) {is.character(x)}))) {
 			stop("The provided list must have elements of type character")
