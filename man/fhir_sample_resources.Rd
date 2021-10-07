@@ -7,7 +7,10 @@
 fhir_sample_resources(
   base_url,
   resource,
-  parameters = parameters,
+  parameters = NULL,
+  username = NULL,
+  password = NULL,
+  token = NULL,
   sample_size = 20,
   seed = as.double(Sys.time()),
   verbose = 1
@@ -21,6 +24,13 @@ fhir_sample_resources(
 \item{parameters}{Optional. Either a length 1 character vectorcontaining properly formatted FHIR search parameters, e.g.
 \code{"gender=male&_summary=count"} or a named list or named character vector e.g. \code{list(gender="male", "_summary"="count")}
 or \code{c(gender="male", "_summary"="count")}. Note that parameter names beginning with \verb{_} have to be put in quotation marks!}
+
+\item{username}{A character vector of length one containing the username for basic authentication.}
+
+\item{password}{A character vector of length one containing the password for basic authentication.}
+
+\item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
+for how to create this.}
 
 \item{sample_size}{A integer of length 1 containing the number of resources to sample.}
 
@@ -50,6 +60,8 @@ The actual download of the resources is done by \code{\link[=fhir_get_resources_
 FHIR search request via POST where the IDs are part of the body. See \code{\link[=fhir_search]{fhir_search()}} for details. If this fails
 (e.g. because the server doesn't allow POST operations), the function falls back on a GET request. If the set of IDs is too long to fit
 into one GET request (i.e. if the request gets longer than 2083 characters), it will be spread across several requests.
+
+For more information on authentication options, please see the help page of \code{\link[=fhir_search]{fhir_search()}}
 }
 \examples{
 \donttest{
@@ -69,4 +81,7 @@ bundles <- fhir_sample_resources(
 
 bundles
 }
+}
+\seealso{
+\code{\link[=fhir_search]{fhir_search()}}, \code{\link[=fhir_sample_resources_by_ids]{fhir_sample_resources_by_ids()}}, \code{\link[=fhir_get_resources_by_ids]{fhir_get_resources_by_ids()}}, \code{\link[=fhir_count_resource]{fhir_count_resource()}}
 }
