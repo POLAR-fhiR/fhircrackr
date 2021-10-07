@@ -4,7 +4,15 @@
 \alias{fhir_get_resources_by_ids}
 \title{Get Resources by their IDs}
 \usage{
-fhir_get_resources_by_ids(base_url, resource, ids, verbose = 0)
+fhir_get_resources_by_ids(
+  base_url,
+  resource,
+  ids,
+  username = NULL,
+  password = NULL,
+  token = NULL,
+  verbose = 0
+)
 }
 \arguments{
 \item{base_url}{A character vector of length one specifying the base URL of the FHIR server, e.g. \code{"http://hapi.fhir.org/baseR4"}.}
@@ -12,6 +20,13 @@ fhir_get_resources_by_ids(base_url, resource, ids, verbose = 0)
 \item{resource}{A character vector of length one or \linkS4class{fhir_resource_type} object with the resource type to be searched, e.g. \code{"Patient"}.}
 
 \item{ids}{A character vector containing the resource (aka logical) IDs of the resources that should be downloaded.}
+
+\item{username}{A character vector of length one containing the username for basic authentication.}
+
+\item{password}{A character vector of length one containing the password for basic authentication.}
+
+\item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
+for how to create this.}
 
 \item{verbose}{An integer vector of length 1 containing the level of verbosity. Defaults to 0.}
 }
@@ -27,6 +42,8 @@ FHIR server (specified in \code{base_url}) and downloads the corresponding resou
 FHIR search request via POST where the IDs are part of the body. See \code{\link[=fhir_search]{fhir_search()}} for details. If this fails
 (e.g. because the server doesn't allow POST operations), the function falls back on a GET request. If the set of ids is too long to fit
 into one GET request (i.e. if the request gets longer than 2083 characters), it will be spread across several requests.
+
+For more information on authentication options, please see the help page of \code{\link[=fhir_search]{fhir_search()}}
 }
 \examples{
 \donttest{
@@ -52,4 +69,7 @@ fhir_crack(
       given   = "name/given",
       family = "name/family")))
 }
+}
+\seealso{
+\code{\link[=fhir_search]{fhir_search()}}, \code{\link[=fhir_get_resource_ids]{fhir_get_resource_ids()}}
 }

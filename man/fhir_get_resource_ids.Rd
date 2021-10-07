@@ -4,7 +4,15 @@
 \alias{fhir_get_resource_ids}
 \title{Get Resources' IDs}
 \usage{
-fhir_get_resource_ids(base_url, resource, parameters = NULL, verbose = 0)
+fhir_get_resource_ids(
+  base_url,
+  resource,
+  parameters = NULL,
+  username = NULL,
+  password = NULL,
+  token = NULL,
+  verbose = 0
+)
 }
 \arguments{
 \item{base_url}{A character vector of length one specifying the base URL of the FHIR server, e.g. \code{"http://hapi.fhir.org/baseR4"}.}
@@ -14,6 +22,13 @@ fhir_get_resource_ids(base_url, resource, parameters = NULL, verbose = 0)
 \item{parameters}{Optional. Either a length 1 character vector containing properly formatted FHIR search parameters, e.g.
 \code{"gender=male&_summary=count"} or a named list or named character vector e.g. \code{list(gender="male", "_summary"="count")}
 or \code{c(gender="male", "_summary"="count")}. Note that parameter names beginning with \verb{_} have to be put in quotation marks!}
+
+\item{username}{A character vector of length one containing the username for basic authentication.}
+
+\item{password}{A character vector of length one containing the password for basic authentication.}
+
+\item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
+for how to create this.}
 
 \item{verbose}{An integer of length 1 containing the level of verbosity. Defaults to 0.}
 }
@@ -25,6 +40,9 @@ Download the resource (aka logical) IDs of all resources matching the FHIR searc
 parameters specified in \code{resource} and \code{parameters}. This function does not download the entire resources, but only extracts their IDs
 using the \verb{_elements} parameter of FHIR Search.
 }
+\details{
+For more information on authentication options, please see the help page of \code{\link[=fhir_search]{fhir_search()}}
+}
 \examples{
 \donttest{
 fhir_get_resource_ids(
@@ -32,4 +50,7 @@ fhir_get_resource_ids(
   resource   = "Patient",
   parameters = "gender=female", verbose=1)
   }
+}
+\seealso{
+\code{\link[=fhir_search]{fhir_search()}}, \code{\link[=fhir_get_resources_by_ids]{fhir_get_resources_by_ids()}}
 }

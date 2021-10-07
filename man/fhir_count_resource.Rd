@@ -4,7 +4,14 @@
 \alias{fhir_count_resource}
 \title{Get Resources' Counts}
 \usage{
-fhir_count_resource(base_url, resource, parameters = NULL)
+fhir_count_resource(
+  base_url,
+  resource,
+  parameters = NULL,
+  username = NULL,
+  password = NULL,
+  token = NULL
+)
 }
 \arguments{
 \item{base_url}{A character vector of length one specifying the base URL of the FHIR server, e.g. \code{"http://hapi.fhir.org/baseR4"}.}
@@ -14,6 +21,13 @@ fhir_count_resource(base_url, resource, parameters = NULL)
 \item{parameters}{Optional. Either a length 1 character vector containing properly formatted FHIR search parameters, e.g.
 \code{"gender=male&_summary=count"} or a named list or named character vector e.g. \code{list(gender="male", "_summary"="count")}
 or \code{c(gender="male", "_summary"="count")}. Note that parameter names beginning with \verb{_} have to be put in quotation marks!}
+
+\item{username}{A character vector of length one containing the username for basic authentication.}
+
+\item{password}{A character vector of length one containing the password for basic authentication.}
+
+\item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
+for how to create this.}
 }
 \value{
 An integer of length 1 containing the number of resources matching the type and search parameters specified in \code{resource} and \code{parameters}.
@@ -22,6 +36,9 @@ An integer of length 1 containing the number of resources matching the type and 
 Downloads a count of resources matching the resource type and search parameters specified in \code{resource} and \code{parameters}.
 This function makes use of the \verb{_summary=count} parameter of FHIR search and is therefore able to count resources on the server
 without actually downloading them.
+}
+\details{
+For more information on authentication options, please see the help page of \code{\link[=fhir_search]{fhir_search()}}
 }
 \examples{
 \donttest{

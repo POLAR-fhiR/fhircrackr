@@ -8,6 +8,9 @@ fhir_sample_resources_by_ids(
   base_url,
   resource,
   ids,
+  username = NULL,
+  password = NULL,
+  token = NULL,
   sample_size = 20,
   seed = as.double(Sys.time()),
   verbose = 1
@@ -19,6 +22,13 @@ fhir_sample_resources_by_ids(
 \item{resource}{A character vector of length one or \linkS4class{fhir_resource_type} object with the resource type to be downloaded e.g. \code{"Patient"}.}
 
 \item{ids}{A character vector containing the IDs from which to sample.}
+
+\item{username}{A character vector of length one containing the username for basic authentication.}
+
+\item{password}{A character vector of length one containing the password for basic authentication.}
+
+\item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
+for how to create this.}
 
 \item{sample_size}{A integer of length 1 containing the number of resources to sample.}
 
@@ -40,6 +50,8 @@ Internally, the download of the resources is done by \code{\link[=fhir_get_resou
 FHIR search request via POST where the IDs are part of the body. See \code{\link[=fhir_search]{fhir_search()}} for details. If this fails
 (e.g. because the server doesn't allow POST operations), the function falls back on a GET request. If the set of IDs is too long to fit
 into one GET request (i.e. if the request gets longer than 2083 characters), it will be spread across several requests.
+
+For more information on authentication options, please see the help page of `\code{\link[=fhir_search]{fhir_search()}}
 }
 \examples{
 \donttest{
@@ -67,4 +79,7 @@ fhir_crack(
       given  = "name/given",
       family = "name/family")))
 }
+}
+\seealso{
+\code{\link[=fhir_search]{fhir_search()}}, \code{\link[=fhir_sample_resources]{fhir_sample_resources()}}, \code{\link[=fhir_get_resources_by_ids]{fhir_get_resources_by_ids()}}, \code{\link[=fhir_count_resource]{fhir_count_resource()}}
 }
