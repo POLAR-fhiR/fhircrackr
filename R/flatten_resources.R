@@ -161,7 +161,7 @@ setMethod(
 		validObject(object = design, complete = TRUE)
 		#Check for dangerous XPath expressions ins cols
 		cols <- lapply(design, function(x) {c(x@cols)})
-		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
+		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x, fixed = TRUE))})
 
 		if(any(dangerCols)) {
 			warning(
@@ -216,7 +216,7 @@ setMethod(
 		validObject(object = design, complete = TRUE)
 		#Check for dangerous XPath expressions ins cols
 		cols <- design@cols
-		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
+		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x, fixed = TRUE))})
 
 		if(any(dangerCols)) {
 			warning(
@@ -330,8 +330,10 @@ xtrct_all_columns <- function(
 		x = gsub(
 			pattern = "@",
 			replacement = "",
-			x = unique(gsub(pattern = "\\[[0-9]+\\]", replacement = "", x = xp.rel))
-		)
+			x = unique(gsub(pattern = "\\[[0-9]+\\]", replacement = "", x = xp.rel)),
+			fixed = TRUE
+		),
+		fixed = TRUE
 	)
 	d <- lapply(seq_len(length(xp.cols)), function(dummy) character(0))
 	names(d) <- xp.cols
@@ -345,7 +347,7 @@ xtrct_all_columns <- function(
 			if (any(i.f)) {s.[i.f] <- paste0(s.[i.f], "[1]")}
 			c(
 				paste0(gsub(pattern = "]$",replacement = "", x = gsub(pattern = ".*\\[",replacement = "", x = s.[-length(s.)])), collapse = "."),
-				gsub(pattern = "@", replacement = "", x = gsub(pattern = "\\[[0-9]+\\]", replacement = "", x = paste0(s., collapse = ".")))
+				gsub(pattern = "@", replacement = "", x = gsub(pattern = "\\[[0-9]+\\]", replacement = "", x = paste0(s., collapse = ".")), fixed = TRUE)
 			)
 		}
 	)
