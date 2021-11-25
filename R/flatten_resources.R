@@ -177,7 +177,8 @@ setMethod(
 		design <- add_attribute_to_design(design = design)
 		os <- get_os()
 		ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
-		message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
+		if(verbose > 0)
+			message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
 
 		dfs <- bundles2dfs(bundles = bundles, design = design, data.table = data.table, verbose = verbose, ncores = ncores)
 		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
@@ -232,7 +233,8 @@ setMethod(
 		design <- add_attribute_to_design(design = design)
 		os <- get_os()
 		ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
-		message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
+		if(verbose > 0)
+		    message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
 
 		#crack
 		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose, ncores = ncores)
@@ -466,41 +468,26 @@ bundle2df <- function(bundle, df_desc, ncores, verbose = 2) {
 	ncores <- if(is.null(ncores)) 1 else min(c(ncores, length(children)))
 	df.list <- if(length(children) == 0) {
 		list()
-	} else if(1 < ncores) {
-		## does not work for 'Windows' because windows cannot fork
+	} else {
 		parallel::mclapply(
 			children,
 			function(child) {
 				if(0 < length(df_desc@cols)) {#if cols is not empty
 					cols <- df_desc@cols
 					res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets)
-					# if(1 < verbose) {
-					# 	if(all(sapply(res, is.na))) {cat("x")} else {cat(".")}
-					# }
+					if(1 < verbose) {
+						if(all(sapply(res, is.na))) {message("x", appendLF = FALSE)} else {message(".", appendLF = FALSE)}
+					}
 				} else {#if cols empty
 					xp <- ".//@*"
 					res <- xtrct_all_columns(child = child, sep = df_desc@style@sep, xpath = xp, brackets = df_desc@style@brackets)
-					# if(1 < verbose) {
-					# 	if(nrow(res) < 1) {cat("x")} else {cat(".")}
-					# }
+					if(1 < verbose) {
+						if(nrow(res) < 1) {message("x", appendLF = FALSE)} else {message(".", appendLF = FALSE)}
+					}
 				}
 				res
 			},
 			mc.cores = ncores
-		)
-	} else {
-		lapply(
-			children,
-			function(child) {
-			   	if(0 < length(df_desc@cols)) {#if cols is not empty
-			   		cols <- df_desc@cols
-			   		res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets)
-			   	} else {#if cols empty
-			   		xp <- ".//@*"
-			   		res <- xtrct_all_columns(child = child, sep = df_desc@style@sep, xpath = xp, brackets = df_desc@style@brackets)
-			   	}
-				res
-			}
 		)
 	}
 	data.table::rbindlist(l = df.list, fill = TRUE)
