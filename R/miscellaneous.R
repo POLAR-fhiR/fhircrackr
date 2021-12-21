@@ -823,10 +823,10 @@ esc_xml <- function(s) {
 		 gsub("'", "&apos;",
 		 	 gsub("<", "&lt;",
 		 	 	 gsub(">", "&gt;",
-		 	 	 	 gsub("&", "&amp;", s)
-		 	 	 )
-		 	 )
-		 )
+		 	 	 	 gsub("&", "&amp;", s, fixed = TRUE), fixed = TRUE
+		 	 	 ), fixed = TRUE
+		 	 ), fixed = TRUE
+		 ), fixed = TRUE
 	)
 }
 
@@ -843,10 +843,10 @@ desc_xml <- function(s) {
 		 gsub("&apos;", "'",
 		 	 gsub("&lt;", "<",
 		 	 	 gsub("&gt;", ">",
-		 	 	 	 gsub("&amp;", "&", s)
-		 	 	 )
-		 	 )
-		 )
+		 	 	 	 gsub("&amp;", "&", s, fixed = TRUE), fixed = TRUE
+		 	 	 ), fixed = TRUE
+		 	 ), fixed = TRUE
+		 ), fixed = TRUE
 	)
 }
 

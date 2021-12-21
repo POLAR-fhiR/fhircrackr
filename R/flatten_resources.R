@@ -161,7 +161,7 @@ setMethod(
 		validObject(object = design, complete = TRUE)
 		#Check for dangerous XPath expressions ins cols
 		cols <- lapply(design, function(x) {c(x@cols)})
-		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x, fixed = TRUE))})
+		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
 
 		if(any(dangerCols)) {
 			warning(
@@ -217,7 +217,7 @@ setMethod(
 		validObject(object = design, complete = TRUE)
 		#Check for dangerous XPath expressions ins cols
 		cols <- design@cols
-		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x, fixed = TRUE))})
+		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
 
 		if(any(dangerCols)) {
 			warning(
@@ -346,20 +346,20 @@ xtrct_all_columns <- function(
 		function(i) {
 			s. <- s[[i]]
 			i.f <- !grepl("\\[[0-9]+\\]", s.)
-			if (any(i.f)) {s.[i.f] <- paste0(s.[i.f], "[1]")}
+			if (any(i.f)) {s.[i.f] <- stringr::str_c(s.[i.f], "[1]")}
 			c(
-				paste0(gsub(pattern = "]$",replacement = "", x = gsub(pattern = ".*\\[",replacement = "", x = s.[-length(s.)])), collapse = "."),
-				gsub(pattern = "@", replacement = "", x = gsub(pattern = "\\[[0-9]+\\]", replacement = "", x = paste0(s., collapse = ".")), fixed = TRUE)
+				stringr::str_c(gsub(pattern = "]$",replacement = "", x = gsub(pattern = ".*\\[",replacement = "", x = s.[-length(s.)])), collapse = "."),
+				gsub(pattern = "@", replacement = "", x = gsub(pattern = "\\[[0-9]+\\]", replacement = "", x = stringr::str_c(s., collapse = ".")), fixed = TRUE)
 			)
 		}
 	)
 	if(!is.null(brackets)) {
 		is_av_val <- ! is.na(val)
 		o. <- o[1, ]
-		val[is_av_val] <- paste0(brackets[1], o.[is_av_val], brackets[2], val[is_av_val])
+		val[is_av_val] <- stringr::str_c(brackets[1], o.[is_av_val], brackets[2], val[is_av_val])
 	}
 	for(col in xp.cols) {
-		d[[col]] <- paste0(val[col == o[2, ]], collapse = sep)
+		d[[col]] <- stringr::str_c(val[col == o[2, ]], collapse = sep)
 	}
 	result <- data.table::as.data.table(x = d)
 	names(result) <- gsub(pattern = "(\\.\\w+)$", replacement = "", x = names(result))
@@ -414,17 +414,17 @@ xtrct_columns <- function(child, cols, sep = NULL, brackets = NULL) {
 					function(i) {
 						s. <- s[[i]]
 						i.f <- !grepl("\\[[0-9]+\\]", s.)
-						if(any(i.f)) {s.[i.f] <- paste0(s.[i.f], "[1]")}
-						gsub(".1$", "", paste0(gsub(pattern = "[^0-9]", replacement = "", x = s.), collapse = "."))
+						if(any(i.f)) {s.[i.f] <- stringr::str_c(s.[i.f], "[1]")}
+						gsub(".1$", "", stringr::str_c(gsub(pattern = "[^0-9]", replacement = "", x = s.), collapse = "."))
 					}
 				)
 				if(0 < length(val)) {
 					is_av <- ! is.na(val)
-					paste0(brackets[1], o[is_av], brackets[2], val[is_av], collapse = sep)
+					stringr::str_c(brackets[1], o[is_av], brackets[2], val[is_av], collapse = sep)
 				}
 				else {NA}
 			} else {
-				if(0 < length(val)) {paste0(val, collapse = sep)} else {NA}
+				if(0 < length(val)) {stringr::str_c(val, collapse = sep)} else {NA}
 			}
 		}
 	)
