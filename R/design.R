@@ -1,4 +1,4 @@
-## This file contains all functions concerning the design for fhir_crack##
+## This file contains all functions concerning the design for fhir_crack ##
 ## Exported functions are on top, internal functions below ##
 
 
@@ -35,7 +35,7 @@ fhir_canonical_design <- function() {
 #'
 #' @examples
 #' #create design
-#' df_desc1 <- fhir_table_description(resource = "Patient",
+#' table_desc1 <- fhir_table_description(resource = "Patient",
 #'                     cols = c(name = "name/family",
 #'                              gender = "gender",
 #'                              id = "id"),
@@ -45,11 +45,11 @@ fhir_canonical_design <- function() {
 #'                             )
 #'              )
 #'
-#' df_desc2 <- fhir_table_description(resource = "Observation",
+#' table_desc2 <- fhir_table_description(resource = "Observation",
 #'                     cols = c("code/coding/system", "code/coding/code")
 #'             )
 #'
-#' design <- fhir_design(Patients = df_desc1, Observations = df_desc2)
+#' design <- fhir_design(Patients = table_desc1, Observations = table_desc2)
 #'
 #' fhir_save_design(design = design, file = tempfile())
 
@@ -72,7 +72,7 @@ fhir_save_design <- function(design, file = "design.xml") {
 #' @examples
 #'
 #' #create and save design
-#' df_desc1 <- fhir_table_description(resource = "Patient",
+#' table_desc1 <- fhir_table_description(resource = "Patient",
 #'                     cols = c(name = "name/family",
 #'                              gender = "gender",
 #'                              id = "id"),
@@ -82,12 +82,12 @@ fhir_save_design <- function(design, file = "design.xml") {
 #'                             )
 #'              )
 #'
-#' df_desc2 <- fhir_table_description(resource = "Observation",
+#' table_desc2 <- fhir_table_description(resource = "Observation",
 #'                     cols = c("code/coding/system", "code/coding/code")
 #'             )
 #'
 #' #create design
-#' design <- fhir_design(Patients = df_desc1, Observations = df_desc2)
+#' design <- fhir_design(Patients = table_desc1, Observations = table_desc2)
 #'
 #' temp <- tempfile()
 #'
@@ -175,7 +175,9 @@ fix <- function (list, names, defaults = NULL) {
 #'
 
 fix_brackets <- function(brackets) {
-	if(1 == length(brackets)) {
+	if(is.null(brackets) || length(brackets) < 1) {
+		character()
+	} else if(1 == length(brackets)) {
 		c(brackets[1], brackets[1])
 	} else if(2 < length(brackets)) {
 		warning("brackets has to be of length two, using only the first two elements.")
@@ -188,39 +190,39 @@ fix_brackets <- function(brackets) {
 #' fix data.frame description
 #'
 #' This function is only here to allow for old style designs to be fixed before being turned into S4.
-#' @param df_desc A data.frame description from an old-style design for fhir_crack().
+#' @param table_desc A data.frame description from an old-style design for fhir_crack().
 #' @return A fixed data.frame description with resource, cols, style, sep, brackets and rm_empty_cols.
-#' @example fix_df_desc(df_desc = list(resource="//Patient"))
+#' @example fix_table_desc(table_desc = list(resource="//Patient"))
 #' @noRd
 #'
-fix_df_desc <- function (df_desc) {
+fix_table_desc <- function (table_desc) {
 	msg <- NULL
-	fix_res <- fix(list = df_desc, names = c("resource", "cols", "style"))
+	fix_res <- fix(list = table_desc, names = c("resource", "cols", "style"))
 	if(is.null(fix_res$value)) {
 		fix_res$msg <- paste0("data.frame description ", fix_res$msg)
 		return(fix_res)
 	} else {
-		df_desc <- fix_res$value
+		table_desc <- fix_res$value
 		msg <- fix_res$msg
 	}
-	if(is.null(df_desc$style)) {
-		df_desc$style <- list(
+	if(is.null(table_desc$style)) {
+		table_desc$style <- list(
 			sep = " ",
 			brackets = NULL,
 			rm_empty_cols = FALSE
 		)
 	} else {
-		fix_res <- fix(list = df_desc$style, c("sep", "brackets", "rm_empty_cols"), defaults = list(":::", NULL, FALSE))
+		fix_res <- fix(list = table_desc$style, c("sep", "brackets", "rm_empty_cols"), defaults = list(":::", NULL, FALSE))
 		if(is.null(fix_res$value)) {
 			fix_res$msg <- paste0("style ", fix_res$msg)
 			return(fix_res)
 		} else {
-			df_desc$style <- fix_res$value
+			table_desc$style <- fix_res$value
 			if(is.null(msg)) {msg <- fix_res$msg}
 		}
 	}
-	df_desc$style["brackets"] <- list(fix_brackets(brackets = df_desc$style$brackets))
-	return(list(value = df_desc, msg = msg))
+	table_desc$style["brackets"] <- list(fix_brackets(brackets = table_desc$style$brackets))
+	return(list(value = table_desc, msg = msg))
 }
 
 #' fix design
@@ -235,13 +237,13 @@ fix_design <- function(design) {
 	fixed_design <- lapply(
 		seq_along(design),
 		function(i) {
-			fixed <- fix_df_desc(df_desc = design[[i]])
+			fixed <- fix_table_desc(table_desc = design[[i]])
 			if(is.null(fixed$value)) {
-				#warning("Something is wrong with the data.frame description named", names(design)[i], ":\n", fixed$msg , "\n Returning NULL for this data.frame description. \n")
+				#warning("Something is wrong with the table description named", names(design)[i], ":\n", fixed$msg , "\n Returning NULL for this data.frame description. \n")
 				return(NULL)
 			} else {
 				if(!is.null(fixed$msg)) {
-					warning("\n For data.frame description ", names(design)[i], ": ", fixed$msg, "\n")
+					warning("\n For table description ", names(design)[i], ": ", fixed$msg, "\n")
 				}
 				fixed$value
 			}
@@ -261,7 +263,7 @@ fix_design <- function(design) {
 #'
 add_attribute_to_design <- function(design, attrib = "value") {
 	if(is(design, "fhir_design")) {
-		for(n_d in names(design)) { #loop through df_desc
+		for(n_d in names(design)) { #loop through table_desc
 			if(0 < length(design[[n_d]]@cols)) { #Only add attrib if xpath expressions are provided
 				for(n_c in names(design[[n_d]]@cols)) { #loop through cols
 					txt <- design[[n_d]]@cols[[n_c]]
@@ -303,15 +305,15 @@ design2xml <- function (design) {
 	xml  <- xml2::xml_new_document()
 	root <- xml2::xml_add_child(.x = xml, .value = "Design")
 	for(nms in names(design)) {
-		df_desc <- design[[nms]]
+		table_desc <- design[[nms]]
 		child <- xml2::xml_add_child(.x = root, .value = nms)
 		res <- xml2::xml_add_child(.x = child, .value = "resource")
-		xml2::xml_set_attr(x = res, attr = "value", value = df_desc@resource)
+		xml2::xml_set_attr(x = res, attr = "value", value = table_desc@resource)
 		cols <- xml2::xml_add_child(.x = child, .value = "cols")
-		if(0 < length(df_desc@cols)) {
-			for(nms_col in names(df_desc@cols)) {
+		if(0 < length(table_desc@cols)) {
+			for(nms_col in names(table_desc@cols)) {
 				col <- xml2::xml_add_child(.x = cols, .value = nms_col)
-				xml2::xml_set_attr(x = col, attr = "value", value = df_desc@cols[[nms_col]])
+				xml2::xml_set_attr(x = col, attr = "value", value = table_desc@cols[[nms_col]])
 			}
 		}
 		stl <- xml2::xml_add_child(.x = child, .value = "style")
@@ -320,12 +322,12 @@ design2xml <- function (design) {
 		opn <- xml2::xml_add_child(.x = bra, .value = "open")
 		cls <- xml2::xml_add_child(.x = bra, .value = "close")
 		rme <- xml2::xml_add_child(.x = stl, .value = "rm_empty_cols")
-		xml2::xml_set_attr(x = sep, attr = "value", value = df_desc@style@sep)
-		if(0 < length(df_desc@style@brackets)) {
-			xml2::xml_set_attr(x = opn, attr = "value", value = df_desc@style@brackets[1])
-			xml2::xml_set_attr(x = cls, attr = "value", value = df_desc@style@brackets[2])
+		xml2::xml_set_attr(x = sep, attr = "value", value = table_desc@style@sep)
+		if(0 < length(table_desc@style@brackets)) {
+			xml2::xml_set_attr(x = opn, attr = "value", value = table_desc@style@brackets[1])
+			xml2::xml_set_attr(x = cls, attr = "value", value = table_desc@style@brackets[2])
 		}
-		xml2::xml_set_attr(x = rme, attr = "value", value = df_desc@style@rm_empty_cols)
+		xml2::xml_set_attr(x = rme, attr = "value", value = table_desc@style@rm_empty_cols)
 	}
 	#xml2::xml_ns_strip(x = xml2::xml_root(x = xml))
 	xml <- fhir_ns_strip(xml = xml2::xml_root(x = xml))
@@ -341,7 +343,7 @@ design2xml <- function (design) {
 #' @return An object of class [fhir_design-class].
 #' @noRd
 #' @examples
-#' df_desc1 <- fhir_table_description(resource = "Patient",
+#' table_desc1 <- fhir_table_description(resource = "Patient",
 #'                     cols = c(name = "name/family",
 #'                              gender = "gender",
 #'                              id = "id"),
@@ -351,13 +353,13 @@ design2xml <- function (design) {
 #'                             )
 #'              )
 #'
-#' df_desc2 <- fhir_table_description(resource = "Observation",
+#' table_desc2 <- fhir_table_description(resource = "Observation",
 #'                     cols = c("code/coding/system", "code/coding/code")
 #'             )
 #'
-#' df_desc3 <- fhir_table_description(resource = "Medication")
+#' table_desc3 <- fhir_table_description(resource = "Medication")
 #'
-#' design <- fhir_design(df_desc1, df_desc2, df_desc3)
+#' design <- fhir_design(table_desc1, table_desc2, table_desc3)
 #'
 #' xml <- design2xml(design = design)
 #'
@@ -395,8 +397,8 @@ xml2design <- function(xml) {
 	l <- lapply(
 		seq_along(xml_table_descriptions),
 		function(i) {
-			xml_df_desc <- xml_table_descriptions[[i]]
-			resource <- xml2::xml_attr(x = xml2::xml_find_all(x = xml_df_desc, xpath = "resource"), attr = "value")
+			xml_table_desc <- xml_table_descriptions[[i]]
+			resource <- xml2::xml_attr(x = xml2::xml_find_all(x = xml_table_desc, xpath = "resource"), attr = "value")
 			if(length(resource) < 1) {
 				stop(
 					paste0(
@@ -406,7 +408,7 @@ xml2design <- function(xml) {
 					)
 				)
 			}
-			columns <- xml2::xml_find_all(x = xml_df_desc, xpath = "cols")
+			columns <- xml2::xml_find_all(x = xml_table_desc, xpath = "cols")
 			if(length(columns) < 1) { #no cols element
 				columns <- fhir_columns()
 			} else {
@@ -419,7 +421,7 @@ xml2design <- function(xml) {
 				col_values <- xml2::xml_attr(x = columns_list, attr = "value")
 				columns <- fhir_columns(xpaths = col_values, colnames = col_names)
 			}
-			style <- xml2::xml_find_all(x = xml_df_desc, xpath = "style")
+			style <- xml2::xml_find_all(x = xml_table_desc, xpath = "style")
 			if (length(style) < 1) {#no style info
 				style <- fhir_style()
 			} else {
@@ -433,7 +435,7 @@ xml2design <- function(xml) {
 				if(length(rm_empty_cols) < 1 || all(is.na(rm_empty_cols))){rm_empty_cols <- TRUE}
 				style <- fhir_style(sep = sep, brackets = c(bra_open, bra_close), rm_empty_cols = rm_empty_cols)
 			}
-			fhir_table_description(resource = resource, cols = columns, style = style)
+			fhir_table_description(resource = resource, cols = columns)
 		}
 	)
 	names(l) <- resources_names

@@ -10,13 +10,13 @@
 #' @export
 #'
 setClass(
-	Class = "fhir_columns",
+	Class    = "fhir_columns",
 	contains = "fhir_xpath_expression",
-	slots = c(names = "character")
+	slots    = c(names = "character")
 )
 
 setValidity(
-	Class = "fhir_columns",
+	Class  = "fhir_columns",
 	method = function(object) {
 
 		messages <- c()
@@ -59,7 +59,7 @@ setValidity(
 #' @export
 setGeneric(
 	name = "fhir_columns",
-	def = function(xpaths, colnames) {
+	def  = function(xpaths, colnames) {
 		standardGeneric("fhir_columns")
 	}
 )
@@ -67,8 +67,10 @@ setGeneric(
 #' @rdname fhir_columns-methods
 #' @aliases fhir_columns,missing,missing-method
 setMethod(
-	f = "fhir_columns",
-	signature = c(xpaths = "missing", colnames = "missing"),
+	f          = "fhir_columns",
+	signature  = c(
+		xpaths   = "missing",
+		colnames = "missing"),
 	definition = function() {
 		new(Class = "fhir_columns")
 	}
@@ -78,8 +80,10 @@ setMethod(
 #' @aliases fhir_columns,NULL,missing-method
 #'
 setMethod(
-	f = "fhir_columns",
-	signature = c(xpaths = "NULL", colnames = "missing"),
+	f          = "fhir_columns",
+	signature  = c(
+		xpaths   = "NULL",
+		colnames = "missing"),
 	definition = function(xpaths) {
 		new(Class = "fhir_columns")
 	}
@@ -88,10 +92,17 @@ setMethod(
 #' @rdname fhir_columns-methods
 #' @aliases fhir_columns,character,character-method
 setMethod(
-	f = "fhir_columns",
-	signature = c(xpaths = "character", colnames = "character"),
+	f          = "fhir_columns",
+	signature  = c(
+		xpaths   = "character",
+		colnames = "character"
+	),
 	definition = function(xpaths, colnames){
-		new(Class = "fhir_columns", fhir_xpath_expression(expression = xpaths), names = colnames)
+		new(
+			Class = "fhir_columns",
+			fhir_xpath_expression(expression = xpaths),
+			names = colnames
+		)
 	}
 )
 

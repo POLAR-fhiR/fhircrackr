@@ -13,9 +13,9 @@
 #' @export
 #'
 setClass(
-	Class = "fhir_design",
+	Class    = "fhir_design",
 	contains = "list",
-	slots = c(names="character")
+	slots    = c(names = "character")
 )
 
 setValidity(
@@ -36,7 +36,7 @@ setValidity(
 			messages <- c(messages, "A fhir_design can only contain fhir_table_descriptions")
 		}
 
-		#check df descriptions
+		#check table descriptions
 	 	messages <- c(
 	 		messages,
 	 		unlist(
@@ -119,15 +119,18 @@ setValidity(
 #' ###create fhir_table_descriptions first
 #' #see ?fhir_table_description for explanation
 #'
-#' pat <- fhir_table_description(resource = "Patient",
-#'                     cols = c(name = "name/family",
-#'                              gender = "gender",
-#'                              id = "id"),
-#'                     style = fhir_style(sep = "||",
-#'                                        brackets = c("[", "]"),
-#'                                        rm_empty_cols = FALSE
-#'                             )
-#'              )
+#' pat <- fhir_table_description(
+#'     resource      = "Patient",
+#'     cols          = c(
+#'         id            = "id",
+#'         name          = "name/family",
+#'         gender        = "gender"
+#'     ),
+#'     sep           = "||",
+#'     brackets      = c("[", "]"),
+#'     rm_empty_cols = FALSE,
+#'
+#' )
 #'
 #' meds <- fhir_table_description(resource = "MedicationAdministration")
 #'
@@ -243,7 +246,7 @@ setMethod(
 
 				d <- fix_design(design = args)
 
-				df_desc <-lapply(
+				df_desc <- lapply(
 					d,
 					function(x) {
 						resource <- fhir_resource_type(string = gsub(paste0(esc("."),"|", esc("/")), "", x$resource))
