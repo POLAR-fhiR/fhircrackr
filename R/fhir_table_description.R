@@ -105,8 +105,8 @@ setClass(
 #' id          | id
 #'
 #' separator            : ':::'
-#' brackets open        : '['
-#' brackets close       : ']'
+#' bracket open         : '['
+#' bracket close        : ']'
 #' remove empty columns : TRUE
 #' ```
 #' @param resource A character vector of length one or [fhir_resource_type-class] object
@@ -192,7 +192,10 @@ fhir_table_description <- function(
 
 	brackets <- fix_brackets(brackets)
 
-	if(class(cols) != 'fhir_columns') {cols <- fhir_columns(xpaths = cols)}
+	if(class(cols) != 'fhir_columns') {
+		cols <- fhir_columns(xpaths = cols)
+	}
+
 	new(
 		Class         = 'fhir_table_description',
 		resource      = resource,
@@ -211,7 +214,8 @@ setMethod(
 	function(object) {
 		cat('A fhir_table_description with the following elements: \n\n')
 		cat(paste0('fhir_resource_type: ', as.character(object@resource), '\n\n'))
-		cat('fhir_columns: \n'); show(object@cols)
+		cat('fhir_columns: \n');
+		show(object@cols)
 		cat(paste0('\n\nsep            : \'', object@sep, '\'\n'))
 		if(length(object@brackets) < 1) {
 			cat('brackets       : no brackets\n')

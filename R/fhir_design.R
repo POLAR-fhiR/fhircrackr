@@ -33,7 +33,7 @@ setValidity(
 		}
 
 		if(any(sapply(object, function(x) {class(x) != "fhir_table_description"}))) {
-			messages <- c(messages, "A fhir_design can only contain fhir_table_descriptions")
+			messages <- c(messages, "A fhir_design musst contain only fhir_table_descriptions.")
 		}
 
 		#check table descriptions
@@ -238,27 +238,14 @@ setMethod(
 				new(Class = "fhir_design", args, names  = attr(args, "names"))
 			} else {
 
-				message(
-					"The old style design (simple named list) will be deprecated at some point. ",
+				stop(
+					"The old style design (simple named list) is no longer supported. ",
 					"Please consider building your design as shown in the documentation for fhir_design(), ",
 					"see ?fhir_design."
 				)
-
-				d <- fix_design(design = args)
-
-				df_desc <- lapply(
-					d,
-					function(x) {
-						resource <- fhir_resource_type(string = gsub(paste0(esc("."),"|", esc("/")), "", x$resource))
-						style <- fhir_style(sep = x$style$sep, brackets = x$style$brackets, rm_empty_cols = x$style$rm_empty_cols)
-						fhir_table_description(resource = resource, cols = fhir_columns(x$cols), style = style)
-					}
-				)
-
-				new(Class = "fhir_design", df_desc, names = attr(d, "names"))
 			}
 		} else {
-			stop("You can only provide one list to fhir_design()")
+			stop("You can provide only one list to fhir_design()")
 		}
 	}
 )
@@ -272,7 +259,6 @@ setMethod(
 			cat("An empty fhir_design_object")
 		} else {
 			cat(paste0("A fhir_design with ", length(object), " table_descriptions:\n"))
-
 			lapply(
 				seq_len(length(object)),
 				function(i) {
@@ -283,12 +269,24 @@ setMethod(
 					cat(paste0("Resource type: ", as.character(df_desc@resource), "\n\n"))
 					cat("Columns: \n")
 					show(df_desc@cols)
-					cat("\n\nStyle: \n")
-					show(df_desc@style)
+					cat("Sep: ")
+					show(df_desc@sep)
+					cat("Brackets: \n")
+					cat("  Open: \n")
+					show(df_desc@brackets[1])
+					cat("  Close: \n")
+					show(df_desc@brackets[2])
+					cat("rm_empty_cols: \n")
+					show(df_desc@rm_empty_cols)
+					cat("data.table: \n")
+					show(df_desc@data.table)
+					cat("format: \n")
+					show(df_desc$format)
+					cat("keep_attr: \n")
+					show(df_desc$keep_attr)
 					cat("\n")
 				}
 			)
-
 		}
 	}
 )

@@ -59,7 +59,6 @@ Collate:
     'download_resources.R'
     'fhir_xpath_expression.R'
     'fhir_columns.R'
-    'fhir_style.R'
     'fhir_resource_type.R'
     'fhir_table_description.R'
     'fhir_design.R'
