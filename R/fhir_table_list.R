@@ -6,35 +6,35 @@
 #' @noRd
 #'
 setClass(
-	Class = "fhir_table_list",
-	contains = c("VIRTUAL", "list"),
+	Class = 'fhir_table_list',
+	contains = c('VIRTUAL', 'list'),
 	slots = c(
-		names = "character",
-		design = "fhir_design"
+		names = 'character',
+		design = 'fhir_design'
 	)
 )
 
 setValidity(
-	Class = "fhir_table_list",
+	Class = 'fhir_table_list',
 	function(object) {
 
 		messages <- c()
 
 		if(length(object) != length(object)) {
-			messages <- c(messages, "Slot names has to have the same length as the list.")
+			messages <- c(messages, 'Slot names has to have the same length as the list.')
 		}
 
 		if(length(object) != length(object@design)) {
 			messages <- c(
 				messages,
-				"The number of table_descriptions in the design doesn't correspond to the number of tables."
+				'The number of table_descriptions in the design doesn\'t correspond to the number of tables.'
 			)
 		}
 
 		if(any(!names(object@design) %in% object@names)) {
 			messages <- c(
 				messages,
-				"The names in the design don't correspond to the names of the tables."
+				'The names in the design don\'t correspond to the names of the tables.'
 			)
 		}
 
@@ -53,16 +53,16 @@ setValidity(
 #' @export
 #'
 setClass(
-	Class = "fhir_df_list",
-	contains = "fhir_table_list"
+	Class = 'fhir_df_list',
+	contains = 'fhir_table_list'
 )
 
 setValidity(
-	Class = "fhir_df_list",
+	Class = 'fhir_df_list',
 	method = function(object) {
 
 		messages <- c()
-		if(!all(sapply(object, is.data.frame))){"A fhir_df_list can only contain data.frames."}
+		if(!all(sapply(object, is.data.frame))){'A fhir_df_list can only contain data.frames.'}
 		if(0 < length(messages)) {messages} else {TRUE}
 
 	}
@@ -78,15 +78,15 @@ setValidity(
 #' @slot design An object of class [fhir_design-class] that was used to create the dt_list.
 #' @export
 setClass(
-	Class = "fhir_dt_list",
-	contains = "fhir_table_list"
+	Class = 'fhir_dt_list',
+	contains = 'fhir_table_list'
 )
 
 setValidity(
-	Class = "fhir_dt_list",
+	Class = 'fhir_dt_list',
 	function(object) {
 		messages <- c()
-		if(!all(sapply(object, is.data.table))) {"A fhir_dt_list can only contain data.tables."}
+		if(!all(sapply(object, is.data.table))) {'A fhir_dt_list can only contain data.tables.'}
 		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
@@ -98,19 +98,25 @@ setValidity(
 #' @param design The design that was used to create the list.
 #' @noRd
 #' @examples
-#' df_desc1 <- fhir_table_description(resource = "Patient",
-#'                     cols = c(name = "name/family",
-#'                              gender = "gender",
-#'                              id = "id"),
-#'                     style = fhir_style(sep = "||",
-#'                                        brackets = c("[", "]"),
-#'                                        rm_empty_cols = FALSE
-#'                             )
-#'              )
+#' df_desc1 <- fhir_table_description(
+#'     resource = 'Patient',
+#'     cols = c(
+#'         id     = 'id',
+#'         name   = 'name/family',
+#'         gender = 'gender'
+#'     ),
+#'     sep           = '||',
+#'     brackets      = c('[', ']'),
+#'     rm_empty_cols = FALSE
+#' )
 #'
-#' df_desc2 <- fhir_table_description(resource = "Observation",
-#'                     cols = c("code/coding/system", "code/coding/code")
-#'             )
+#' df_desc2 <- fhir_table_description(
+#'     resource = 'Observation',
+#'     cols = c(
+#'         'code/coding/system',
+#'         'code/coding/code'
+#'     )
+#' )
 #'
 #' design <- fhir_design(list(Patients = df_desc1, Observations = df_desc2))
 #'
@@ -119,7 +125,7 @@ setValidity(
 #' fhir_df_list(df_list, design)
 #' @noRd
 fhir_df_list <- function(df_list, design) {
-	new(Class = "fhir_df_list", df_list, design = design)
+	new(Class = 'fhir_df_list', df_list, design = design)
 }
 #' create fhir_dt_list
 #'
@@ -129,19 +135,25 @@ fhir_df_list <- function(df_list, design) {
 #' @param design The design that was used to create the list.
 #'
 #' @examples
-#' df_desc1 <- fhir_table_description(resource = "Patient",
-#'                     cols = c(name = "name/family",
-#'                              gender = "gender",
-#'                              id = "id"),
-#'                     style = fhir_style(sep = "||",
-#'                                        brackets = c("[", "]"),
-#'                                        rm_empty_cols = FALSE
-#'                             )
-#'              )
+#' df_desc1 <- fhir_table_description(
+#'     resource = 'Patient',
+#'     cols = c(
+#'         id     = 'id',
+#'         name   = 'name/family',
+#'         gender = 'gender'
+#'     ),
+#'     sep           = '||',
+#'     brackets      = c('[', ']'),
+#'     rm_empty_cols = FALSE
+#' )
 #'
-#' df_desc2 <- fhir_table_description(resource = "Observation",
-#'                     cols = c("code/coding/system", "code/coding/code")
-#'             )
+#' df_desc2 <- fhir_table_description(
+#'     resource = 'Observation',
+#'     cols     = c(
+#'         'code/coding/system',
+#'         'code/coding/code'
+#'     )
+#' )
 #'
 #' design <- fhir_design(list(Patients = df_desc1, Observations = df_desc2))
 #'
@@ -150,15 +162,15 @@ fhir_df_list <- function(df_list, design) {
 #' fhir_dt_list(dt_list, design)
 #' @noRd
 fhir_dt_list <- function(dt_list, design){
-	new(Class = "fhir_dt_list", dt_list, design = design)
+	new(Class = 'fhir_dt_list', dt_list, design = design)
 }
 
 #corresponding generic in fhir_design.R
 #' @rdname fhir_design-methods
 #' @aliases fhir_design,fhir_table_list-method
 setMethod(
-	f = "fhir_design",
-	signature = c(... = "fhir_table_list"),
+	f = 'fhir_design',
+	signature = c(... = 'fhir_table_list'),
 	definition = function(...) {
 		args <- list(...)
 		tab <- args[[1]]
@@ -167,10 +179,10 @@ setMethod(
 )
 
 setMethod(
-	f = "show",
-	signature = "fhir_dt_list",
+	f = 'show',
+	signature = 'fhir_dt_list',
 	definition = function(object) {
-		cat("A fhir_dt_list:\n")
+		cat('A fhir_dt_list:\n')
 		list <- S3Part(object, strictS3 = TRUE)
 		names(list) <- names(object)
 		print(list)
@@ -178,10 +190,10 @@ setMethod(
 )
 
 setMethod(
-	f = "show",
-	signature = "fhir_df_list",
+	f = 'show',
+	signature = 'fhir_df_list',
 	definition = function(object) {
-		cat("A fhir_df_list:\n")
+		cat('A fhir_df_list:\n')
 		list <- S3Part(object, strictS3 = TRUE)
 		names(list) <- names(object)
 		print(list)

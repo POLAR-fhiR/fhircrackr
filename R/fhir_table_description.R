@@ -180,22 +180,19 @@ fhir_table_description <- function(
 	brackets      = character(),
 	rm_empty_cols = FALSE,
 	format        = 'compact',
-	keep_attr     = TRUE) {
+	keep_attr     = FALSE) {
 
 	resource <- fhir_resource_type(string = resource)
-	if(0 < length(cols)) {
+	if(0 < length(cols) && keep_attr) {
 		warning(paste0(
 			'Do you really want to add attributes to your given column names? ',
 			'If not, then leave/set keep_attr to its default value FALSE'
 		))
 	}
-
 	brackets <- fix_brackets(brackets)
-
 	if(class(cols) != 'fhir_columns') {
 		cols <- fhir_columns(xpaths = cols)
 	}
-
 	new(
 		Class         = 'fhir_table_description',
 		resource      = resource,
@@ -216,14 +213,14 @@ setMethod(
 		cat(paste0('fhir_resource_type: ', as.character(object@resource), '\n\n'))
 		cat('fhir_columns: \n');
 		show(object@cols)
-		cat(paste0('\n\nsep            : \'', object@sep, '\'\n'))
+		cat(paste0('\n\nsep:           \'', object@sep, '\'\n'))
 		if(length(object@brackets) < 1) {
-			cat('brackets       : no brackets\n')
+			cat('brackets:      no brackets\n')
 		} else {
-			cat(paste0('brackets       : \'', object@brackets[1], '\', \'', object@brackets[2], '\'\n'))
+			cat(paste0('brackets:      \'', object@brackets[1], '\', \'', object@brackets[2], '\'\n'))
 		}
-		cat(paste0('rm_empty_cols  : ', object@rm_empty_cols, '\n'))
-		cat(paste0('format         : \'', object@format, '\'\n'))
-		cat(paste0('keep_attr      : ', object@keep_attr, '\n\n'))
+		cat(paste0('rm_empty_cols: ', object@rm_empty_cols, '\n'))
+		cat(paste0('format:        \'', object@format, '\'\n'))
+		cat(paste0('keep_attr:     ', object@keep_attr, '\n\n'))
 	}
 )

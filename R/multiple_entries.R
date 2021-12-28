@@ -30,16 +30,18 @@
 #' bundles <- fhir_unserialize(bundles = example_bundles1)
 #'
 #' #crack fhir resources
-#' table_desc <- fhir_table_description(resource = "Patient",
-#'                                      style = fhir_style(brackets = c("[","]"),
-#'                                                         sep = " "))
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = c('[', ']'),
+#'     sep      = " "
+#' )
 #' df <- fhir_crack(bundles = bundles, design = table_desc)
 #'
 #' #original df
 #' df
 #'
 #' #cast
-#' fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+#' fhir_cast(df, brackets=c('[', ']'), sep = ' ', verbose = 0)
 #'
 #' @seealso [fhir_crack()], [fhir_melt()], [fhir_build_bundle()]
 
@@ -47,7 +49,7 @@ fhir_cast <- function(
 	indexed_df,
 	brackets,
 	sep,
-	use_brackets = F,
+	use_brackets = FALSE,
 	verbose = 1) {
 
 	if(is.null(indexed_df)) {stop("indexed_df is NULL.")}
@@ -243,9 +245,12 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #' bundles <- fhir_unserialize(bundles = example_bundles1)
 #'
 #' #crack fhir resources
-#' table_desc <- fhir_table_description(resource = "Patient",
-#'                                      style = fhir_style(brackets = c("[","]"),
-#'                                                         sep = " "))
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = c("[", "]"),
+#'     sep = " "
+#' )
+#'
 #' df <- fhir_crack(bundles = bundles, design = table_desc)
 #'
 #' #find all column names associated with attribute address
@@ -255,12 +260,15 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #' df
 #'
 #' #only keep address columns
-#' fhir_melt(indexed_data_frame = df, columns = col_names,
-#'           brackets = c("[","]"), sep = " ")
+#' fhir_melt(
+#'      indexed_data_frame = df,
+#'      columns            = col_names,
+#'      brackets           = c("[", "]"),
+#'      sep = " "
+#'  )
 #'
 #' #keep all columns
-#' fhir_melt(indexed_data_frame = df, columns = col_names,
-#'           brackets = c("[","]"), sep = " ", all_columns = TRUE)
+#' fhir_melt(indexed_data_frame = df, columns = col_names, brackets = c("[","]"), sep = " ", all_columns = TRUE)
 #' @export
 #' @seealso [fhir_common_columns()], [fhir_rm_indices()]
 

@@ -18,25 +18,27 @@
 #' bundles <- fhir_unserialize(bundles = example_bundles1)
 #'
 #' #crack fhir resources
-#' table_desc <- fhir_table_description(resource = "Patient",
-#'                                      style = fhir_style(brackets = c("[","]"),
-#'                                                         sep = " "))
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = c("[", "]"),
+#'     sep      = " "
+#' )
+#'
 #' df <- fhir_crack(bundles = bundles, design = table_desc)
 #'
 #' #cast
-#' cast_df <- fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+#' cast_df <- fhir_cast(df, brackets = c("[", "]"), sep = " ", verbose = 0)
 #'
 #' #show tree
 #' fhir_show_tree(cast_df, resource="Patient")
 #' @export
 #' @seealso [fhir_cast()], [fhir_build_bundle()]
 #'
-fhir_show_tree <- function(cast_table, resource, nrow = 5, rm_indices=TRUE){
+fhir_show_tree <- function(cast_table, resource, nrow = 5, rm_indices = TRUE) {
 	i <- 1
 	bundle <- list()
 	while(i <= min(nrow(cast_table), nrow)) {
 		row <- cast_table[i,]
-
 		if(rm_indices){
 			bundle <- c(bundle, rm_ids_from_tree(build_tree(row = row, root = resource, keep_nas = F)))
 		}else{
@@ -64,14 +66,16 @@ fhir_show_tree <- function(cast_table, resource, nrow = 5, rm_indices=TRUE){
 #' bundles <- fhir_unserialize(bundles = example_bundles1)
 #'
 #' #crack fhir resources
-#' Pat <- fhir_table_description(resource = "Patient",
-#'                                      style = fhir_style(brackets = c("[","]"),
-#'                                                         sep = " "))
+#' Pat <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = c("[", "]"),
+#'     sep      = " "
+#' )
 #'
 #' df <- fhir_crack(bundles = bundles, design = Pat)
 #'
 #' #cast
-#' cast_df <- fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+#' cast_df <- fhir_cast(df, brackets = c("[", "]"), sep = " ", verbose = 0)
 #'
 #' #build bundles
 #' resource <- fhir_build_resource(cast_df[1,], "Patient")
@@ -81,10 +85,7 @@ fhir_show_tree <- function(cast_table, resource, nrow = 5, rm_indices=TRUE){
 #' @export
 #' @seealso [fhir_cast()], [fhir_crack()], [fhir_build_bundle()]
 
-fhir_build_resource <- function(
-	cast_row,
-	resource_type) {
-
+fhir_build_resource <- function(cast_row, resource_type) {
 	s <- tree2xml(rm_ids_from_tree(build_tree(cast_row, root = resource_type)))
 	fhir_resource_xml(xml2::read_xml(s))
 }
@@ -174,18 +175,22 @@ fhir_build_resource <- function(
 #' bundles <- fhir_unserialize(bundles = example_bundles1)
 #'
 #' #crack fhir resources
-#' Pat <- fhir_table_description(resource = "Patient",
-#'                                      style = fhir_style(brackets = c("[","]"),
-#'                                                         sep = " "))
+#' Pat <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = c("[", "]"),
+#'     sep      = " "
+#' )
 #'
 #' df <- fhir_crack(bundles = bundles, design = Pat)
 #'
 #' #cast
-#' cast_df <- fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+#' cast_df <- fhir_cast(df, brackets=c("[", "]"), sep = " ", verbose = 0)
 #'
 #' #add request info to table
-#' request <- data.frame(request.method = c("POST", "PUT"),
-#'                       request.url = c("Patient", "Patient/id3"))
+#' request <- data.frame(
+#'     request.method = c("POST", "PUT"),
+#'     request.url    = c("Patient", "Patient/id3")
+#' )
 #'
 #' request_df <- cbind(cast_df, request)
 #'
@@ -225,7 +230,6 @@ setMethod(
 		verbose = 1) {
 
 		names(cast_table)[!grepl("^request", names(cast_table))] <- paste0("resource.", resource_type, ".", names(cast_table)[!grepl("^request", names(cast_table))])
-
 		max_ <- nrow(cast_table)
 		i <- 1
 		s <- ""
@@ -238,7 +242,6 @@ setMethod(
 		bundle <- xml2::read_xml(s)
 		if(verbose > 0) {
 			message("Created a  ", bundle_type, " Bundle with ", max_, " resources.")
-
 		}
 
 		fhir_bundle_xml(bundle)
@@ -278,11 +281,9 @@ setMethod(
 					i <- i + 1
 				}
 			}
-
 		)
 
 		s <- paste0("<Bundle>\n","   <type value='",bundle_type, "'/>\n", s, "</Bundle>")
-
 		bundle <- xml2::read_xml(s)
 		if(verbose > 0) {
 			message("Created a  ", bundle_type, " Bundle with ", Reduce(sum, lapply(cast_table, nrow)), " resources.")
@@ -613,13 +614,16 @@ fhir_put <- function(
 #' bundles <- fhir_unserialize(bundles = example_bundles1)
 #'
 #' #crack fhir resources
-#' table_desc <- fhir_table_description(resource = "Patient",
-#'                                      style = fhir_style(brackets = c("[","]"),
-#'                                                         sep = " "))
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = c("[", "]"),
+#'     sep      = " "
+#' )
+#'
 #' df <- fhir_crack(bundles = bundles, design = table_desc)
 #'
 #' #cast
-#' cast_df <- fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+#' cast_df <- fhir_cast(df, brackets = c("[", "]"), sep = " ", verbose = 0)
 #'
 #' #build tree
 #' tree <- build_tree(cast_df[1,], root="Patient")
@@ -670,16 +674,19 @@ build_tree <- function(row, root = "Bundle", keep_nas = F) {
 #' bundles <- fhir_unserialize(bundles = example_bundles1)
 #'
 #' #crack fhir resources
-#' table_desc <- fhir_table_description(resource = "Patient",
-#'                                      style = fhir_style(brackets = c("[","]"),
-#'                                                         sep = " "))
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = c("[", "]"),
+#'     sep      = " "
+#' )
+#'
 #' df <- fhir_crack(bundles = bundles, design = table_desc)
 #'
 #' #cast
-#' cast_df <- fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+#' cast_df <- fhir_cast(df, brackets = c("[", "]"), sep = " ", verbose = 0)
 #'
 #' #build tree
-#' tree <- build_tree(cast_df[1,], root="Patient")
+#' tree <- build_tree(cast_df[1,], root = "Patient")
 #'
 #' tree <- rm_ids_from_tree(tree)
 #' cat(tree2text(tree))
@@ -706,13 +713,16 @@ rm_ids_from_tree <- function(tree) {
 #' bundles <- fhir_unserialize(bundles = example_bundles1)
 #'
 #' #crack fhir resources
-#' table_desc <- fhir_table_description(resource = "Patient",
-#'                                      style = fhir_style(brackets = c("[","]"),
-#'                                                         sep = " "))
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = c("[", "]"),
+#'     sep      = " "
+#' )
+#'
 #' df <- fhir_crack(bundles = bundles, design = table_desc)
 #'
 #' #cast
-#' cast_df <- fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+#' cast_df <- fhir_cast(df, brackets = c("[", "]"), sep = " ", verbose = 0)
 #'
 #' #build tree
 #' tree <- build_tree(cast_df[1,], root="Patient")
@@ -753,13 +763,16 @@ print_tree <- function(tree, sign = ":") {
 #' bundles <- fhir_unserialize(bundles = example_bundles1)
 #'
 #' #crack fhir resources
-#' table_desc <- fhir_table_description(resource = "Patient",
-#'                                      style = fhir_style(brackets = c("[","]"),
-#'                                                         sep = " "))
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = c("[", "]"),
+#'     sep      = " "
+#' )
+#'
 #' df <- fhir_crack(bundles = bundles, design = table_desc)
 #'
 #' #cast
-#' cast_df <- fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+#' cast_df <- fhir_cast(df, brackets = c("[", "]"), sep = " ", verbose = 0)
 #'
 #' #build tree
 #' tree <- build_tree(cast_df[1,], root="Patient")
@@ -815,13 +828,16 @@ tree2string <- function(tree, sign = c("\u2500", ":")[2]) {
 #' bundles <- fhir_unserialize(bundles = example_bundles1)
 #'
 #' #crack fhir resources
-#' table_desc <- fhir_table_description(resource = "Patient",
-#'                                      style = fhir_style(brackets = c("[","]"),
-#'                                                         sep = " "))
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = c("[", "]"),
+#'     sep      = " "
+#' )
+#'
 #' df <- fhir_crack(bundles = bundles, design = table_desc)
 #'
 #' #cast
-#' cast_df <- fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+#' cast_df <- fhir_cast(df, brackets = c("[", "]"), sep = " ", verbose = 0)
 #'
 #' #build tree
 #' tree <- build_tree(cast_df[1,], root="Patient")
@@ -830,7 +846,7 @@ tree2string <- function(tree, sign = c("\u2500", ":")[2]) {
 #' cat(tree2xml(tree))
 #' @noRd
 
-tree2xml <- function(tree, escaped = T, tab = "", add = "  ") {
+tree2xml <- function(tree, escaped = TRUE, tab = "", add = "  ") {
 	str = ""
 	for(i in seq_along(tree)) {
 		s <- ""

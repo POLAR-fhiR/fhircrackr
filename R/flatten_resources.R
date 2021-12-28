@@ -69,11 +69,9 @@
 #'     	PATIENT            = "subject/reference",
 #'     	LAST.UPDATE        = "meta/lastUpdated"
 #'   ),
-#'   style     = fhir_style(
-#'    	sep           = " ",
-#'    	brackets      = c("[", "]"),
-#'    	rm_empty_cols = FALSE
-#'   )
+#'   sep           = " ",
+#'   brackets      = c("[", "]"),
+#'   rm_empty_cols = FALSE
 #' )
 #'
 #' med_df <- fhir_crack(bundles = bundles, design = medications)
@@ -182,7 +180,7 @@ setMethod(
 			)
 		}
 
-		#Add attributes to design
+		#Add attributes to design not longer necessary
 		design <- add_attribute_to_design(design = design)
 		os <- get_os()
 		ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
@@ -405,11 +403,10 @@ xtrct_all_columns <- function(
 #'
 #' #define columns
 #' cols <-fhir_columns(c(
-#' 	SYSTEM  = "medicationCodeableConcept/coding/system/@value",
-#' 	CODE    = "medicationCodeableConcept/coding/code/@value",
-#' 	DISPLAY = "medicationCodeableConcept/coding/display/@value"
-#' 	)
-#' )
+#' 	  SYSTEM  = "medicationCodeableConcept/coding/system",
+#' 	  CODE    = "medicationCodeableConcept/coding/code",
+#' 	  DISPLAY = "medicationCodeableConcept/coding/display"
+#' ))
 #'
 #' #Extract columns
 #' result <- fhircrackr:::xtrct_columns(child = child, cols = cols)
@@ -470,16 +467,14 @@ xtrct_columns <- function(child, cols, sep = NULL, brackets = NULL, format = "co
 #' df_desc <- fhir_table_description(
 #'      resource = "MedicationStatement",
 #'      cols = list(
-#' 	           SYSTEM  = "medicationCodeableConcept/coding/system/@value",
-#' 	           CODE    = "medicationCodeableConcept/coding/code/@value",
-#' 	           DISPLAY = "medicationCodeableConcept/coding/display/@value"
-#' 	          ),
-#' 	    style = fhir_style(
-#' 	          sep=" ",
-#' 	          brackets = c("[","]"),
-#' 	          rm_empty_cols =T
-#' 	    )
-#' 	 )
+#'          SYSTEM  = "medicationCodeableConcept/coding/system",
+#'          CODE    = "medicationCodeableConcept/coding/code",
+#'          DISPLAY = "medicationCodeableConcept/coding/display"
+#'      ),
+#'      sep           = " ",
+#'      brackets      = c("[","]"),
+#'      rm_empty_cols = TRUE
+#'  )
 #'
 #' #convert bundle to data frame
 #' result <- fhircrackr:::bundle2df(bundle = bundle, df_desc = df_desc)
@@ -496,10 +491,10 @@ bundle2df <- function(bundle, df_desc, verbose = 2, format = "compact", keep_att
 			function(child) {
 				if(0 < length(df_desc@cols)) {#if cols is not empty
 					cols <- df_desc@cols
-					res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets, format = format)
+					res <- xtrct_columns(child = child, cols = cols, sep = df_desc@sep, brackets = df_desc@brackets, format = format)
 				} else {#if cols empty
 					xp <- ".//@*"
-					res <- xtrct_all_columns(child = child, xpath = xp, sep = df_desc@style@sep, brackets = df_desc@style@brackets, format = format, keep_attr = keep_attr)
+					res <- xtrct_all_columns(child = child, xpath = xp, sep = df_desc@sep, brackets = df_desc@brackets, format = format, keep_attr = keep_attr)
 				}
 				res
 			},
@@ -541,16 +536,14 @@ bundle2df <- function(bundle, df_desc, verbose = 2, format = "compact", keep_att
 #' df_desc <- fhir_table_description(
 #'      resource = "MedicationStatement",
 #'      cols = list(
-#' 	           SYSTEM  = "medicationCodeableConcept/coding/system/@value",
-#' 	           CODE    = "medicationCodeableConcept/coding/code/@value",
-#' 	           DISPLAY = "medicationCodeableConcept/coding/display/@value"
-#' 	          ),
-#' 	    style = fhir_style(
-#' 	          sep=" ",
-#' 	          brackets = c("[","]"),
-#' 	          rm_empty_cols =T
-#' 	    )
-#' 	 )
+#'          SYSTEM  = "medicationCodeableConcept/coding/system",
+#'          CODE    = "medicationCodeableConcept/coding/code",
+#'          DISPLAY = "medicationCodeableConcept/coding/display"
+#'      ),
+#'      sep           = " ",
+#'      brackets      = c("[","]"),
+#'      rm_empty_cols = TRUE
+#' )
 #'
 #' #convert bundles to data frame
 #' result <- fhircrackr:::bundles2df(bundles = bundles, df_desc = df_desc)
@@ -593,27 +586,23 @@ bundles2df <- function(bundles, df_desc, verbose = 2, format = "compact", keep_a
 #'
 #' #define attributes to extract
 #' design <- fhir_design(
-#'
-#' 	 Medications = fhir_table_description(
-#'
-#' 		resource = "MedicationStatement",
-#'
-#' 		cols= list(
-#' 			MS.ID              = "id/@value",
-#' 			STATUS.TEXT        = "text/status/@value",
-#' 			STATUS             = "status/@value",
-#' 			MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system/@value",
-#' 			MEDICATION.CODE    = "medicationCodeableConcept/coding/code/@value",
-#' 			MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display/@value",
-#' 			DOSAGE             = "dosage/text/@value",
-#' 			PATIENT            = "subject/reference/@value",
-#' 			LAST.UPDATE        = "meta/lastUpdated/@value"
-#' 		)
-#' 	),
-#'  Patients = fhir_table_description(
-#'
-#' 		resource = "Patient"
-#' 	)
+#'     Medications = fhir_table_description(
+#'         resource = "MedicationStatement",
+#'         cols = list(
+#'             MS.ID              = "id",
+#'             STATUS.TEXT        = "text/status",
+#'             STATUS             = "status",
+#'             MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+#'             MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+#'             MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+#'             DOSAGE             = "dosage/text",
+#'             PATIENT            = "subject/reference",
+#'             LAST.UPDATE        = "meta/lastUpdated"
+#'         )
+#'     ),
+#'     Patients = fhir_table_description(
+#'         resource = "Patient"
+#'     )
 #' )
 #'
 #' #convert fhir to data frames

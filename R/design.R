@@ -45,7 +45,6 @@ fhir_canonical_design <- function() {
 #'     sep           = ':::',
 #'     brackets      = c('[', ']'),
 #'     rm_empty_cols = FALSE,
-#'     data.table    = TRUE
 #'     format        = 'compact',
 #'     keep_attr     = FALSE
 #' )
@@ -93,7 +92,6 @@ fhir_save_design <- function(design, file = 'design.xml') {
 #'     sep           = ':::',
 #'     brackets      = c('[', ']'),
 #'     rm_empty_cols = FALSE,
-#'     data.table    = TRUE
 #'     format        = 'compact',
 #'     keep_attr     = FALSE
 #' )
@@ -180,7 +178,6 @@ design2xml <- function (design) {
 		opn <- xml2::xml_add_child(.x = bra, .value = 'open')
 		cls <- xml2::xml_add_child(.x = bra, .value = 'close')
 		rme <- xml2::xml_add_child(.x = child, .value = 'rm_empty_cols')
-		dtb <- xml2::xml_add_child(.x = child, .value = 'data.table')
 		frm <- xml2::xml_add_child(.x = child, .value = 'format')
 		kat <- xml2::xml_add_child(.x = child, .value = 'keep_attr')
 		xml2::xml_set_attr(x = sep, attr = 'value', value = table_desc@sep)
@@ -189,7 +186,6 @@ design2xml <- function (design) {
 			xml2::xml_set_attr(x = cls, attr = 'value', value = table_desc@brackets[2])
 		}
 		xml2::xml_set_attr(x = rme, attr = 'value', value = table_desc@rm_empty_cols)
-		xml2::xml_set_attr(x = dtb, attr = 'value', value = table_desc@data.table)
 		xml2::xml_set_attr(x = frm, attr = 'value', value = table_desc@format)
 		xml2::xml_set_attr(x = kat, attr = 'value', value = table_desc@keep_attr)
 	}
@@ -207,19 +203,27 @@ design2xml <- function (design) {
 #' @return An object of class [fhir_design-class].
 #' @noRd
 #' @examples
-#' table_desc1 <- fhir_table_description(resource = 'Patient',
-#'                     cols = c(name = 'name/family',
-#'                              gender = 'gender',
-#'                              id = 'id'),
-#'                     style = fhir_style(sep = '||',
-#'                                        brackets = c('[', ']'),
-#'                                        rm_empty_cols = FALSE
-#'                             )
-#'              )
+#' table_desc1 <- fhir_table_description(
+#'     resource = 'Patient',
+#'     cols     = c(
+#'         id     = 'id',
+#'         name   = 'name/family',
+#'         gender = 'gender'
+#'     ),
+#'     sep = '||',
+#'     brackets = c('[', ']'),
+#'     rm_empty_cols = FALSE,
+#'     format        = 'compact',
+#'     keep_attr     = FALSE
+#' )
 #'
-#' table_desc2 <- fhir_table_description(resource = 'Observation',
-#'                     cols = c('code/coding/system', 'code/coding/code')
-#'             )
+#' table_desc2 <- fhir_table_description(
+#'     resource = 'Observation',
+#'     cols     = c(
+#'         'code/coding/system',
+#'         'code/coding/code'
+#'     )
+#' )
 #'
 #' table_desc3 <- fhir_table_description(resource = 'Medication')
 #'
@@ -304,9 +308,6 @@ xml2design <- function(xml) {
 			} else NULL
 
 			rec <- as.logical(xml2::xml_attr(x = xml2::xml_find_all(x = xml_table_desc, xpath = 'rm_empty_cols'), attr = 'value'))
-			if(length(rm_empty_cols) < 1 || all(is.na(rm_empty_cols))){rm_empty_cols <- TRUE}
-
-			dtb <- as.logical(xml2::xml_attr(x = xml2::xml_find_all(x = xml_table_desc, xpath = 'data.table'), attr = 'value'))
 			if(length(rm_empty_cols) < 1 || all(is.na(rm_empty_cols))){rm_empty_cols <- TRUE}
 
 			frm <- as.logical(xml2::xml_attr(x = xml2::xml_find_all(x = xml_table_desc, xpath = 'format'), attr = 'value'))

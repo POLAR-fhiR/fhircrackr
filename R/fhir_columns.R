@@ -155,15 +155,17 @@ setMethod(
 		}
 
 		pairs <- paste(names(object), object, sep = "=")
-		colwidth1 <- max(c(stringr::str_length(string = names(object)),11)) + 1
-		colwidth2 <- max(stringr::str_length(string = object)) + 1
-
-		header <- paste(
-			stringr::str_pad(string = "column name", width = colwidth1 - 1, side = "right"),
+		colwidth1 <- max(c(nchar(names(object)), nchar('column_name'))) + 1
+		colwidth2 <- max(c(nchar(object), nchar('xpath_expression'))) + 1
+		horiz_bar <- paste0(
+			paste0(rep("-", colwidth1), collapse = ""), ' ',
+			paste0(rep("-", colwidth2), collapse = ""), '\n'
+		)
+		header <- paste0(
+			horiz_bar,
+			stringr::str_pad(string = "column name", width = colwidth1 , side = "right"),
 			"| xpath expression", "\n",
-			paste(rep("-", colwidth1 + colwidth2), collapse = ""),
-			"\n",
-			collapse = ""
+			horiz_bar
 		)
 
 		cat(
@@ -172,7 +174,8 @@ setMethod(
 				paste(
 					paste0(stringr::str_pad(string = names(object), width = colwidth1, side = "right"), "| ", object),
 					collapse = "\n"
-				)
+				), '\n',
+				horiz_bar
 			)
 		)
 	}

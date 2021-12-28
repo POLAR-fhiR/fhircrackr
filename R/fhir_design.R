@@ -233,11 +233,9 @@ setMethod(
 
 		if(length(args) == 1) {
 			args <- unlist(args, recursive = FALSE)
-
 			if(all(sapply(args, is, "fhir_table_description"))) {
 				new(Class = "fhir_design", args, names  = attr(args, "names"))
 			} else {
-
 				stop(
 					"The old style design (simple named list) is no longer supported. ",
 					"Please consider building your design as shown in the documentation for fhir_design(), ",
@@ -262,29 +260,27 @@ setMethod(
 			lapply(
 				seq_len(length(object)),
 				function(i) {
-					df_desc <- object[[i]]
-					cat("=====================================================\n")
-					cat(paste0("Name: ", names(object)[i]))
-					cat("\n\n")
-					cat(paste0("Resource type: ", as.character(df_desc@resource), "\n\n"))
-					cat("Columns: \n")
-					show(df_desc@cols)
-					cat("Sep: ")
-					show(df_desc@sep)
-					cat("Brackets: \n")
-					cat("  Open: \n")
-					show(df_desc@brackets[1])
-					cat("  Close: \n")
-					show(df_desc@brackets[2])
-					cat("rm_empty_cols: \n")
-					show(df_desc@rm_empty_cols)
-					cat("data.table: \n")
-					show(df_desc@data.table)
-					cat("format: \n")
-					show(df_desc$format)
-					cat("keep_attr: \n")
-					show(df_desc$keep_attr)
-					cat("\n")
+					show(object[[i]])
+					# cat("=====================================================\n")
+					# cat(paste0("Name: ", names(object)[i]))
+					# cat("\n\n")
+					# cat(paste0("Resource type: ", as.character(df_desc@resource), "\n\n"))
+					# cat("Columns: \n")
+					# show(df_desc@cols)
+					# cat("Sep: ")
+					# show(df_desc@sep)
+					# cat("Brackets: \n")
+					# cat("  Open: \n")
+					# show(df_desc@brackets[1])
+					# cat("  Close: \n")
+					# show(df_desc@brackets[2])
+					# cat("rm_empty_cols: \n")
+					# show(df_desc@rm_empty_cols)
+					# cat("format: \n")
+					# show(df_desc$format)
+					# cat("keep_attr: \n")
+					# show(df_desc$keep_attr)
+					# cat("\n")
 				}
 			)
 		}
