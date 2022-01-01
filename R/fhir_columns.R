@@ -150,7 +150,7 @@ setMethod(
 	definition = function(object) {
 
 		if(length(object) == 0) {
-			cat("An empty fhir_columns object");
+			cat("An empty fhir_columns object\n");
 			return()
 		}
 

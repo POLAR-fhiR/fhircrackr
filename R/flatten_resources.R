@@ -138,7 +138,7 @@ setMethod(
 			design <- fhir_design(lapply(
 				design,
 				function(x) {
-					x@style@sep <- sep
+					x@sep <- sep
 					x
 				})
 			)
@@ -149,7 +149,7 @@ setMethod(
 			design <-fhir_design(lapply(
 				design,
 				function(x) {
-					x@style@brackets <- brackets
+					x@brackets <- brackets
 					x
 				}
 			))
@@ -159,7 +159,7 @@ setMethod(
 			design <- fhir_design(lapply(
 				design,
 				function(x) {
-					x@style@rm_empty_cols <- remove_empty_columns
+					x@rm_empty_cols <- remove_empty_columns
 					x
 				}
 			))
@@ -181,7 +181,7 @@ setMethod(
 		}
 
 		#Add attributes to design not longer necessary
-		design <- add_attribute_to_design(design = design)
+		#design <- add_attribute_to_design(design = design)
 		os <- get_os()
 		ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
 		message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
@@ -211,15 +211,15 @@ setMethod(
 		ncores               = NULL) {
 
 		#overwrite design with function arguments
-		if(!is.null(sep)) {design@style@sep <- sep}
+		if(!is.null(sep)) {design@sep <- sep}
 
 		if(!is.null(brackets)) {
 			brackets <- fix_brackets(brackets = brackets)
-			design@style@brackets <- brackets
+			design@brackets <- brackets
 		}
 
 		if(!is.null(remove_empty_columns)) {
-			design@style@rm_empty_cols <- remove_empty_columns
+			design@rm_empty_cols <- remove_empty_columns
 		}
 
 		validObject(object = design, complete = TRUE)
@@ -238,7 +238,7 @@ setMethod(
 		}
 
 		#Add attributes to design
-		design <- add_attribute_to_design(design = design)
+		#design <- add_attribute_to_design(design = design)
 		os <- get_os()
 		ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
 		message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
@@ -246,7 +246,7 @@ setMethod(
 		#crack
 		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose, format = format, keep_attr = keep_attr, ncores = ncores)
 		#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
-		remove <- design@style@rm_empty_cols
+		remove <- design@rm_empty_cols
 
 		if(remove && 0 < ncol(df)) {
 			df_cleaned <- df[, 0 < colSums(!is.na(df)), with = FALSE]
@@ -260,45 +260,45 @@ setMethod(
 	}
 )
 
-#' @rdname fhir_crack-methods
-#' @aliases fhir_crack,list-method
-setMethod(
-	f          = "fhir_crack",
-	signature  = c(design = "list"),
-	definition = function(
-		bundles,
-		design,
-		sep                  = NULL,
-		brackets             = NULL,
-		remove_empty_columns = NULL,
-		verbose              = 2,
-		data.table           = FALSE,
-		format               = "compact",
-		keep_attr            = FALSE,
-		ncores               = NULL) {
-
-		warning(
-			"The use of an old-style design will be disallowed in the future. ",
-			"Please consider building the design with the function fhir_design().\n",
-			"Converting design to fhir_design object."
-		)
-		suppressMessages(design <- fhir_design(design))
-		fhir_crack(
-			bundles              = bundles,
-			design               = design,
-			sep                  = sep,
-			brackets             = brackets,
-			remove_empty_columns = remove_empty_columns,
-			verbose              = verbose,
-			data.table           = data.table,
-			format               = format,
-			keep_attr            = keep_attr,
-			ncores               = ncores
-		)
-	}
-)
-
-############################################################################################
+#' #' @rdname fhir_crack-methods
+#' #' @aliases fhir_crack,list-method
+#' setMethod(
+#' 	f          = "fhir_crack",
+#' 	signature  = c(design = "list"),
+#' 	definition = function(
+#' 		bundles,
+#' 		design,
+#' 		sep                  = NULL,
+#' 		brackets             = NULL,
+#' 		remove_empty_columns = NULL,
+#' 		verbose              = 2,
+#' 		data.table           = FALSE,
+#' 		format               = "compact",
+#' 		keep_attr            = FALSE,
+#' 		ncores               = NULL) {
+#'
+#' 		warning(
+#' 			"The use of an old-style design will be disallowed in the future. ",
+#' 			"Please consider building the design with the function fhir_design().\n",
+#' 			"Converting design to fhir_design object."
+#' 		)
+#' 		suppressMessages(design <- fhir_design(design))
+#' 		fhir_crack(
+#' 			bundles              = bundles,
+#' 			design               = design,
+#' 			sep                  = sep,
+#' 			brackets             = brackets,
+#' 			remove_empty_columns = remove_empty_columns,
+#' 			verbose              = verbose,
+#' 			data.table           = data.table,
+#' 			format               = format,
+#' 			keep_attr            = keep_attr,
+#' 			ncores               = ncores
+#' 		)
+#' 	}
+#' )
+#'
+#' ############################################################################################
 ##############################################################################################
 
 
@@ -506,10 +506,10 @@ bundle2df <- function(bundle, df_desc, verbose = 2, format = "compact", keep_att
 			function(child) {
 			   	if(0 < length(df_desc@cols)) {#if cols is not empty
 			   		cols <- df_desc@cols
-			   		res <- xtrct_columns(child = child, cols = cols, sep = df_desc@style@sep, brackets = df_desc@style@brackets, format = format)
+			   		res <- xtrct_columns(child = child, cols = cols, sep = df_desc@sep, brackets = df_desc@brackets, format = format)
 			   	} else {#if cols empty
 			   		xp <- ".//@*"
-			   		res <- xtrct_all_columns(child = child, xpath = xp, sep = df_desc@style@sep, brackets = df_desc@style@brackets, format = format, keep_attr = keep_attr)
+			   		res <- xtrct_all_columns(child = child, xpath = xp, sep = df_desc@sep, brackets = df_desc@brackets, format = format, keep_attr = keep_attr)
 			   	}
 				res
 			}
@@ -620,7 +620,7 @@ bundles2dfs <- function(bundles, design, data.table = FALSE, verbose = 2, format
 	#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
 	remove <- sapply(
 		design,
-		function(x) {x@style@rm_empty_cols}
+		function(x) {x@rm_empty_cols}
 	)
 	dfs_cleaned <- lapply(
 		seq_along(dfs),

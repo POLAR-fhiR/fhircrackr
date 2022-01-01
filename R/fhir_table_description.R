@@ -98,11 +98,13 @@ setClass(
 #' fhir_resource_type: Patient
 #'
 #' fhir_columns:
+#' ------------ -----------------
 #' column name | xpath expression
-#' ------------------------
+#' ------------ -----------------
 #' name        | name/family
 #' gender      | gender
 #' id          | id
+#' ------------ -----------------
 #'
 #' separator            : ':::'
 #' bracket open         : '['
@@ -193,6 +195,7 @@ fhir_table_description <- function(
 	if(class(cols) != 'fhir_columns') {
 		cols <- fhir_columns(xpaths = cols)
 	}
+	if(format != 'wide') format <- 'compact'
 	new(
 		Class         = 'fhir_table_description',
 		resource      = resource,
@@ -213,7 +216,7 @@ setMethod(
 		cat(paste0('fhir_resource_type: ', as.character(object@resource), '\n\n'))
 		cat('fhir_columns: \n');
 		show(object@cols)
-		cat(paste0('\n\nsep:           \'', object@sep, '\'\n'))
+		cat(paste0('\nsep:           \'', object@sep, '\'\n'))
 		if(length(object@brackets) < 1) {
 			cat('brackets:      no brackets\n')
 		} else {
@@ -221,6 +224,6 @@ setMethod(
 		}
 		cat(paste0('rm_empty_cols: ', object@rm_empty_cols, '\n'))
 		cat(paste0('format:        \'', object@format, '\'\n'))
-		cat(paste0('keep_attr:     ', object@keep_attr, '\n\n'))
+		cat(paste0('keep_attr:     ', object@keep_attr, '\n'))
 	}
 )
