@@ -49,8 +49,12 @@ fhir_cast <- function(
 	indexed_df,
 	brackets,
 	sep,
-	use_brackets = FALSE,
+	use_brackets = TRUE,
 	verbose = 1) {
+	#debug
+	#indexed_df = d2
+	#brackets = BRACKETS
+	#sep = SEP
 
 	if(is.null(indexed_df)) {stop("indexed_df is NULL.")}
 	if(nrow(indexed_df) < 1) {stop("indexed_df doesn't contain any data.")}
@@ -73,14 +77,14 @@ fhir_cast <- function(
 	map <- sapply(
 		col_names,
 		function(name) {
-			#name <- names(indexed_df)[[6]]
+			#name <- col_names[[18]]
 			if(1 < verbose) {message(name)}
 
 			warning_given <- FALSE
 			entries <- strsplit(indexed_df[[name]], sep_)
 			ids <- lapply(entries, function(entry){gsub(regexpr_ids, "\\1", entry)})
-			name_vec <- strsplit(name, "\\.")[[1]]
-
+			name_vec <- strsplit(name, "[\\.@]")[[1]]
+			#name_vec <- name_vec[-length(name_vec)]
 			name_expanded <- unlist(
 				lapply(
 					ids[sapply(ids, function(i){all(!is.na(i))})],
@@ -89,7 +93,7 @@ fhir_cast <- function(
 						id_ <- strsplit(id, "\\.")
 						names(id_) <- id
 
-						if(length(id_[[1]])!=length(name_vec) && !warning_given){
+						if(length(id_[[1]])!=length(name_vec) - 1 && !warning_given){
 							warning("Column name '", paste0(name_vec, collapse = "."),
 									"' doesn't fit the id pattern found in this column.",
 									"The column name should be build the way ",
@@ -98,27 +102,28 @@ fhir_cast <- function(
 							warning_given <<- TRUE
 						}
 
-						if(1 < length(name_vec)) {
+						if(2 < length(name_vec)) {
 							sapply(
 								id_,
 								function(i_) {
+									#i_<-id_[[1]]
 									i_ <- as.numeric(i_)
 									if(use_brackets) {
 										bras_ <- rep_len("[", length(i_))
 										kets_ <- rep_len("]", length(i_))
-										paste0(paste0(name_vec, bras_, i_, kets_), collapse = ".")
+										paste0(paste0(paste0(name_vec[-length(name_vec)], bras_, i_, kets_), collapse = "."), '@', name_vec[[length(name_vec)]])
 									} else {
-										paste0(paste0(name_vec, i_), collapse = ".")
+										paste0(paste0(paste0(name_vec[-length(name_vec)], i_), collapse = "."), '@', name_vec[[length(name_vec)]])
 									}
 								},
-								simplify = F
+								simplify = FALSE
 							)
 						} else {
 							i <- as.numeric(id)
 							a <- if(use_brackets) {
-								paste0(name_vec, "[", i, "]")
+								paste0(paste0(name_vec[-length(name_vec)], "[", i, "]"), '@', name_vec[[length(name_vec)]])
 							} else {
-								paste0(name_vec, i)
+								paste0(paste0(name_vec[-length(name_vec)], i), '@', name_vec[[length(name_vec)]])
 							}
 							names(a) <- id
 							a
@@ -164,8 +169,9 @@ fhir_cast <- function(
 		}
 	}
 	if(!is_DT) {setDF(d)}
+	names(d) <- gsub('\\[', brackets[1], gsub(']', brackets[2], names(d)))
 	d[]#to avoid problems with printing
-	d
+	#d
 }
 
 
