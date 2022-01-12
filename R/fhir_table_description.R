@@ -21,9 +21,6 @@
 #' - The format element: A character of length one indicating whether the resulting table should be cracked 'wide' or 'compact'.
 #' Cracking 'wide' means multiple entries will be distributed over several columns with indexed names.
 #' Otherwise multiple entries will be pasted separated by 'sep' into one cell/column. Defaults to 'compact'.
-#' - The keep_attr element: A logical of length one indicating whether the names of the table columns end with or without the attributes' name,
-#' e.g. name.given oder name.given.value. This effects only, if no 'cols' argument is given. That means the column names are created by
-#' the xpath of their certain tags.
 #'
 #' A full `fhir_table_description` looks for example like this:
 #' ```
@@ -50,14 +47,13 @@
 #' @slot format A character of length one indicating whether the resulting table should be cracked 'wide' or 'compact'.
 #' Cracking 'wide' means multiple entries will be distributed over several columns with indexed names.
 #' Otherwise multiple entries will be pasted separated by 'sep' into one cell/column. Defaults to 'compact'.
-#' @slot keep_attr A logical of length one indicating whether the names of the table columns end with or without the attributes' name,
-#' e.g. name.given oder name.given.value. This effects only, if no 'cols' argument is given. That means the column names are created by
-#' the xpath of their certain tags.
+#' @slot keep_attr A logical of length one indicating whether the resulting column names end with `@` followed by the tags attribute, e.g. `@value`.
+#'
 #' @include fhir_resource_type.R fhir_columns.R
 #' @seealso [fhir_resource_type()],[fhir_columns()], [fhir_design()], [fhir_crack()]
 #' @export
 setClass(
-	Class = "fhir_table_description",
+	"fhir_table_description",
 	slots = c(
 		resource      = "fhir_resource_type",
 		cols          = "fhir_columns",
@@ -90,9 +86,6 @@ setClass(
 #' - The format element: A character of length one indicating whether the resulting table should be cracked 'wide' or 'compact'.
 #' Cracking 'wide' means multiple entries will be distributed over several columns with indexed names.
 #' Otherwise multiple entries will be pasted separated by 'sep' into one cell/column. Defaults to 'compact'.
-#' - The keep_attr element: A logical of length one indicating whether the names of the table columns end with or without the attributes' name,
-#' e.g. name.given oder name.given.value. This effects only, if no 'cols' argument is given. That means the column names are created by
-#' the xpath of their certain tags.
 #' A full `fhir_table_description` looks for example like this:
 #' ```
 #' fhir_resource_type: Patient
@@ -119,6 +112,11 @@ setClass(
 #' If this argument is omitted, an empty [fhir_columns-class] object will be supplied.
 #' This means that in the call to [fhir_crack()], all available elements are extracted in put
 #' in automatically named columns.
+#' @param sep  A character of length one.
+#' @param brackets A character of length one or two.
+#' @param rm_empty_cols A logical of length one.
+#' @param format A character of length one,
+#' @param keep_attr A logical of length one.
 #'
 #' @return An object of class [fhir_table_description-class].
 #'
@@ -159,19 +157,16 @@ setClass(
 #'     sep           = ':::',
 #'     brackets      = c('<|', '|>'),
 #'     rm_empty_cols = FALSE,
-#'     format        = 'compact',
 #'     format        = 'compact'
 #' )
 #'
-#' # no column arguments is given,
-#' # so we may use 'keep_attr' and set it to TRUE for later recreating bundles
+#' # no column arguments is given
 #' fhir_table_description(
 #'     resource = 'Patient',
 #'     sep           = ' <~> ',
 #'     brackets      = c('<<<', '>>>'),
 #'     rm_empty_cols = FALSE,
-#'     format        = 'wide',
-#'     keep_attr     = TRUE
+#'     format        = 'wide'
 #' )
 #'
 #' @export
@@ -182,20 +177,18 @@ fhir_table_description <- function(
 	brackets      = character(),
 	rm_empty_cols = FALSE,
 	format        = 'compact',
-	keep_attr     = FALSE) {
+	keep_attr     = TRUE) {
 
 	resource <- fhir_resource_type(string = resource)
-	if(0 < length(cols) && keep_attr) {
-		warning(paste0(
-			'Do you really want to add attributes to your given column names? ',
-			'If not, then leave/set keep_attr to its default value FALSE'
-		))
-	}
-	brackets <- fix_brackets(brackets)
+
+	if(format != 'wide') format <- 'compact'
+
+	brackets <- fix_brackets(brackets = brackets)
+
 	if(class(cols) != 'fhir_columns') {
 		cols <- fhir_columns(xpaths = cols)
 	}
-	if(format != 'wide') format <- 'compact'
+
 	new(
 		Class         = 'fhir_table_description',
 		resource      = resource,
