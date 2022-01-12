@@ -23,35 +23,26 @@ globalVariables(".")
 #' Concatenate paths
 #' @description Concatenates two strings to a path string correctly.
 #'
-#' @param path1 A a character vector of length one specifying the left hand part of the resulting path.
-#' @param path2 A a character vector of length one specifying the right hand part of the resulting path.
-#' @param os A a character vector of length one specifying the operating system you're operating on: windows or linux.
+#' @param ... A Set of Path Strings. Only works if list_of_paths is NULL
+#' @param list_of_paths Either a vector or a list of paths strings
+#' @param ext An Extension to add at the end of the path
 #'
-#' @return A a character vector of length one containing the concatenated path.
-#' @export
-#'
+#' @return A Character of length one, the combined path.
 #' @examples
-#' paste_paths(path1 = "data", path2 = "patients")
-#' paste_paths(path1 = "/data", path2 = "patients")
-#' paste_paths(path1 = "/data/", path2 = "patients")
-#' paste_paths(path1 = "/data", path2 = "/patients")
-#' paste_paths(path1 = "/data/", path2 = "/patients/")
-#' paste_paths(path1 = "data", path2 = "patients", os = "windows")
-
-paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
-	os <- tolower(substr(os, 1, 1))
-	if(os == "w") {
-		return(
-			paste0(
-				sub(pattern = "\\\\$" , replacement = "", x = path1),
-				"\\",
-				sub(pattern = "^\\\\", replacement = "", x = path2)
-			)
-		)
-	}
-	paste0(sub(pattern = "/$" , replacement = "", x = path1), "/", sub(pattern = "^/", replacement = "", x = path2))
+#' pastep('a', 'b', 'c', 'd')
+#' pastep(list_of_paths = list(paste0('/', letters, '/'), as.character(1:13)))
+#' pastep(list_of_paths = c(letters, as.character(1:13)))
+#' pastep(list_of_paths = c(letters, as.character(1:13)), ext = '.txt')
+#' pastep(list_of_paths = c(letters, as.character(1:13)), ext = '_dat.txt')
+pastep <- function(..., list_of_paths = NULL, ext = NULL) {
+	paths <- if(is.null(list_of_paths)) {list(...)} else {unlist(list_of_paths)}
+	len <- length(paths) - 1
+	if(len < 0) return(NULL)
+	ids <- seq_len(length.out = len)
+	paths[ids]     <- gsub('/$', '', paths[ids])
+	paths[ids + 1] <- gsub('^/', '', paths[ids + 1])
+	paste0(paste0(paths, collapse = '/'), ext)
 }
-
 
 fhir_ns_strip <- function(xml) {
 	# cat("\nis(xml):\n")
@@ -565,6 +556,25 @@ lst <- function(..., prefix = NULL, suffix = NULL) {
 #'
 esc <- function(s) {
 	gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s)
+}
+
+#' Duplicate brackets, if just one string is provided as brackets, truncate if more than two
+#' @param brackets A character or NULL.
+#'
+#' @return A character of length two or NULL.
+#'
+#' @example fix_brackets(brackets = '|')
+#' @noRd
+#'
+
+fix_brackets <- function(brackets) {
+	if(is.null(brackets) || length(brackets) < 1) return(character())
+	if(1 == length(brackets)) return(c(brackets[1], brackets[1]))
+	if(2 < length(brackets)) {
+		warning('brackets has to be of length two, using only the first two elements.')
+		return(brackets[1:2])
+	}
+	brackets
 }
 
 ## determine operating system
