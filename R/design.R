@@ -126,27 +126,6 @@ fhir_load_design <- function (file) {
 
 
 
-#' Duplicate brackets, if just one string is provided as brackets, truncate if more than two
-#' @param brackets A character or NULL.
-#'
-#' @return A character of length two or NULL.
-#'
-#' @example fix_brackets(brackets = '|')
-#' @noRd
-#'
-
-fix_brackets <- function(brackets) {
-	if(is.null(brackets) || length(brackets) < 1) {
-		character()
-	} else if(1 == length(brackets)) {
-		c(brackets[1], brackets[1])
-	} else if(2 < length(brackets)) {
-		warning('brackets has to be of length two, using only the first two elements.')
-		brackets[1:2]
-	} else {
-		brackets
-	}
-}
 
 
 ####save designs####
@@ -266,7 +245,7 @@ xml2design <- function(xml) {
 		seq_along(xml_table_descriptions),
 		function(i) {
 			xml_table_desc <- xml_table_descriptions[[i]]
-			res <- xml2::xml_attr(x = xml2::xml_find_all(x = xml_table_desc, xpath = 'resource'), attr = 'value')
+			res <- as.character(xml2::xml_attr(x = xml2::xml_find_all(x = xml_table_desc, xpath = 'resource'), attr = 'value'))
 			if(length(res) < 1) {
 				stop(
 					paste0(
@@ -308,15 +287,15 @@ xml2design <- function(xml) {
 			} else NULL
 
 			rec <- as.logical(xml2::xml_attr(x = xml2::xml_find_all(x = xml_table_desc, xpath = 'rm_empty_cols'), attr = 'value'))
-			if(length(rm_empty_cols) < 1 || all(is.na(rm_empty_cols))){rm_empty_cols <- TRUE}
+			if(length(rec) < 1 || all(is.na(rec))){rec <- FALSE}
 
-			frm <- as.logical(xml2::xml_attr(x = xml2::xml_find_all(x = xml_table_desc, xpath = 'format'), attr = 'value'))
-			if(length(rm_empty_cols) < 1 || all(is.na(rm_empty_cols))){rm_empty_cols <- TRUE}
+			frm <- as.character(xml2::xml_attr(x = xml2::xml_find_all(x = xml_table_desc, xpath = 'format'), attr = 'value'))
+			if(length(format) < 1 || all(is.na(format))){format <- 'compact'}
 
 			kat <- as.logical(xml2::xml_attr(x = xml2::xml_find_all(x = xml_table_desc, xpath = 'keep_attr'), attr = 'value'))
-			if(length(rm_empty_cols) < 1 || all(is.na(rm_empty_cols))){rm_empty_cols <- TRUE}
+			if(length(kat) < 1 || all(is.na(kat))){kat <- FALSE}
 
-			fhir_table_description(resource = resource, cols = columns)
+			#fhir_table_description(resource = resource, cols = columns)
 			fhir_table_description(
 				resource      = res,
 				cols          = cols,
