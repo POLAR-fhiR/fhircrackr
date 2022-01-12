@@ -207,7 +207,7 @@ fhir_search <- function(
 			}
 			xml2::write_xml(
 				x = bundle,
-				file = paste_paths(save_to_disc, paste0(cnt, ".xml"))
+				file = pastep(save_to_disc, cnt, ext = ".xml")
 			)
 		} else {
 			bundles[[length(bundles) + 1]] <- bundle
@@ -409,7 +409,7 @@ fhir_capability_statement <- function(
 	auth <- auth_helper(username = username, password = password, token = token)
 
 	response <- httr::GET(
-		url = paste_paths(url, "/metadata?"),
+		url = pastep(url, "metadata?"),
 		config = httr::add_headers(
 			Accept = "application/fhir+xml",
 			Authorization = auth$token
@@ -492,9 +492,10 @@ fhir_save <- function(bundles, directory = "result") {
 	for(n in seq_len(length(bundles))) {
 		xml2::write_xml(
 			x = bundles[[n]],
-			file = paste_paths(
+			file = pastep(
 				directory,
-				paste0(stringr::str_pad(n, width = w, pad = "0"), ".xml")
+				stringr::str_pad(n, width = w, pad = "0"),
+				ext =  ".xml"
 			)
 		)
 	}
@@ -527,7 +528,7 @@ fhir_load <- function(directory) {
 
 	list_ <- lapply(
 		lst(xml.files),
-		function(x) xml2::read_xml(paste_paths(directory, x))
+		function(x) xml2::read_xml(pastep(directory, x))
 	)
 
 	fhir_bundle_list(bundles = list_)
