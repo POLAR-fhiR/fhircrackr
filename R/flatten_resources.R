@@ -1,3 +1,326 @@
+# unloadNamespace('fhircrackr')
+# rm(list = ls())
+
+add_missing_indices <- function(names, bra, ket, sep) {
+	gsub(
+		paste0('(\\w$)'),
+		paste0('\\1', bra, '1', ket),
+		gsub(
+			paste0('(\\w)(', sep, ')'),
+			paste0('\\1', bra, '1', ket, sep),
+			names
+	))
+}
+
+# add_missing_indices <- function(names, bra, ket, sep) {
+# 	gsub(
+# 		paste0('(\\w)', sep, '(\\w)'),
+# 		paste0('\\1', bra, '1', ket, '\\.\\2'),
+# 		gsub(
+# 			'(\\w)@(\\w)',
+# 			paste0('\\1', bra, '1', ket, '@\\2'),
+# 			names
+# 		)
+# 	)
+# }
+#
+replace_brackets <- function(names, bra, ket) {
+	gsub('\\[', bra, gsub(']', ket, names))
+}
+
+bundles2table <- function(bundles, table_description, verbose = 2) {
+
+	xpath_resource <- paste0('//', table_description@resource)
+
+	d <- if(0 < length(table_description@cols)) {   # GIVEN COLUMNS
+		if(table_description@format == 'compact') { # GIVEN COLUMNS - COMPACT
+			data.table::rbindlist(
+				use.names = TRUE,
+				fill = TRUE,
+				l = lapply(
+					X   = bundles,
+					FUN = function(bundle) {
+						#bundle <- bundles[[2]]
+						resources <- xml2::xml_find_all(x = bundle, xpath = xpath_resource)
+						data.table::rbindlist(
+							use.names = TRUE,
+							fill = TRUE,
+							l = lapply(
+								X   = resources,
+								FUN = function(resource) {
+									#resource <- resources[[1]]
+									resource_xpath <- xml2::xml_path(resource)
+									d <- data.table()
+									d[,	unlist(
+										recursive = FALSE,
+										lapply(
+											X   = seq_along(table_description@cols),
+											FUN = function(column_id) {
+												#column_id <- 2
+												# resource_xpath <- gsub(
+												# 	pattern     = paste0(table_description@resource, '$'),
+												# 	replacement = '',
+												# 	x = xml2::xml_path(resource)
+												# )
+												column_name <- names(table_description@cols)[[column_id]]
+												xpath_column <- table_description@cols[[column_id]]
+												nodes <- xml2::xml_find_all(x = resource, xpath = xpath_column)
+												values <- xml2::xml_attrs(nodes)
+												paths <- xml2::xml_path(nodes)
+												paths <- gsub(
+													pattern     = esc(resource_xpath),
+													replacement = '',
+													x           = paths
+												)
+												paths_with_indices <- add_missing_indices(
+													names = paths,
+													bra   = '[',
+													ket   = ']',
+													sep =  '/'
+												)
+												# if(0 < length(table_description@brackets)) {
+												# 	replace_brackets(names = paths_with_indices, bra = '<', ket = '>')
+												# }
+												# if(table_description@keep_attr) {
+												# 	attribs <- unique(sapply(values, names))
+												# 	if(1 < length(unique(attribs))) {
+												# 		attribs <- attribs[[1]]
+												# 		warning(
+												# 			paste0(
+												# 				'The names of the attributes are not unique for tag ',
+												# 				xpath_column,
+												# 				'. Using the first one \'', attribs, '\' for Column Name Indexing.'
+												# 			)
+												# 		)
+												# 	}
+												# 	paths_with_indices, bra = '<', ket = '>')
+												# }
+
+												values_combinded <- if(0 < length(table_description@brackets)) {
+													column_indices <- gsub(
+														pattern     = '\\.$',
+														replacement =  '',
+														x           = gsub(
+															pattern     = '([^0-9\\.]+)',
+															replacement =  '',
+															x           =  gsub(
+																pattern     = '([0-9]+)',
+																replacement = '\\1\\.',
+																x           = paths_with_indices
+															)
+														)
+													)
+													paste0(
+														table_description@brackets[1],
+														column_indices,
+														table_description@brackets[2],
+														values,
+														collapse = table_description@sep
+													)
+												} else {
+													paste0(values, collapse = table_description@sep)
+												}
+												l <- list(x = values_combinded)
+												names(l) <- if(table_description@keep_attr) {
+													attribs <- unique(sapply(values, names))
+													if(1 < length(unique(attribs))) {
+														attribs <- attribs[[1]]
+														warning(
+															paste0(
+																'The names of the attributes are not unique for tag ',
+																xpath_column,
+																'. Using the first one \'', attribs, '\' for Column Name Indexing.'
+															)
+														)
+													}
+													paste0(column_name, '@', attribs)
+												} else column_name
+												l
+											}
+										)
+									)]
+								}
+							)
+						)
+					}
+				)
+			)
+		} else {                                    # GIVEN COLUMNS - WIDE
+			data.table::rbindlist(
+				use.names = TRUE,
+				fill = TRUE,
+				l = lapply(
+					X   = bundles,
+					FUN = function(bundle) {
+						#bundle <- bundles[[2]]
+						resources <- xml2::xml_find_all(x = bundle, xpath = xpath_resource)
+						data.table::rbindlist(
+							use.names = TRUE,
+							fill = TRUE,
+							l = lapply(
+								X   = resources,
+								FUN = function(resource) {
+									#resource <- resources[[1]]
+									resource_xpath <- xml2::xml_path(resource)
+									d <- data.table()
+									d[,	unlist(
+										recursive = FALSE,
+										lapply(
+											X   = seq_along(table_description@cols),
+											FUN = function(column_id) {
+												#column_id <- 2
+												# resource_xpath <- gsub(
+												# 	pattern     = paste0(table_description@resource, '$'),
+												# 	replacement = '',
+												# 	x = xml2::xml_path(resource)
+												# )
+												column_name <- names(table_description@cols)[[column_id]]
+												xpath_column <- table_description@cols[[column_id]]
+												nodes <- xml2::xml_find_all(x = resource, xpath = xpath_column)
+												values <- xml2::xml_attrs(nodes)
+												paths <- xml2::xml_path(nodes)
+												paths <- gsub(
+													pattern     = paste0(esc(resource_xpath), '/'),
+													replacement = '',
+													x           = paths
+												)
+												paths_with_indices <- add_missing_indices(
+													names = paths,
+													bra   = '[',
+													ket   = ']',
+													sep   = '/'
+												)
+												paths_with_indices <- if(0 < length(table_description@brackets)) {
+													paste0(
+														table_description@brackets[1],
+														gsub(
+															pattern     = '\\.$',
+															replacement =  '',
+															x           = gsub(
+																pattern     = '([^0-9\\.]+)',
+																replacement =  '',
+																x           =  gsub(
+																	pattern     = '([0-9]+)',
+																	replacement = '\\1\\.',
+																	x           = paths_with_indices
+																)
+															)
+														),
+														table_description@brackets[2],
+														column_name
+													)
+												}
+												paths_with_indices <- gsub(
+													pattern     = '/',
+													replacement = '\\.',
+													x           = paths_with_indices
+												)
+
+												if(table_description@keep_attr) {
+													attribs <- unique(sapply(values, names))
+													if(1 < length(unique(attribs))) {
+														attribs <- attribs[[1]]
+														warning(
+															paste0(
+																'The names of the attributes are not unique for tag ',
+																xpath_column,
+																'. Using the first one \'', attribs, '\' for Column Name Indexing.'
+															)
+														)
+													}
+													paths_with_indices <- paste0(paths_with_indices, '@', attribs)
+												}
+
+												names(values) <- paths_with_indices
+												values
+											}
+										)
+									)]
+								}
+							)
+						)
+					}
+				)
+			)
+		}
+	} else {                                        # ALL COLUMNS
+		if(table_description@format == 'compact') { # ALL COLUMNS - COMPACT
+			data.table::rbindlist(
+				lapply(
+					X   = bundles,
+					FUN = function(bundle, table_description, vebose = verbose) {
+
+					}
+				)
+			)
+		} else {                                    # ALL COLUMNS - WIDE
+			data.table::rbindlist(
+				lapply(
+					X   = bundles,
+					FUN = function(bundle, table_description, vebose = verbose) {
+
+					}
+				)
+			)
+		}
+	}
+	if(table_description@rm_empty_cols) {
+		d <- d[, 0 < colSums(!is.na(d)), with = FALSE]
+	}
+	d[]
+}
+
+bundles2tables <- function(bundles, design, ncores = 1, verbose = 2) {
+
+	#######################################################################
+	if(length(bundles) < 1) {
+		warning('No bundles present in bundles list \'bundles\'. NULL will be returned.')
+		return(NULL)
+	}
+
+	if(length(design) < 1) {
+		warning('No table descriptions present in design \'design\'. NULL will be returned.')
+		return(NULL)
+	}
+
+	os <- get_os()
+	if(is.null(ncores) || is.na(ncores) || ncores < 1) ncores <- 1
+	ncores <- min(c(get_ncores(os), ncores))
+	message(paste0("Cracking under OS ", os, " using ", ncores, if(1 != ncores) " cores." else " core."))
+
+	data.table::rbindlist(
+		use.names = TRUE,
+		fill = TRUE,
+		l = if(ncores == 1) { # single thread
+			lapply(
+				X   = design,
+				FUN = function(table_description) {
+					bundles2table(bundles = bundles, table_description = table_description, verbose = verbose)
+				}
+			)
+		} else { # multi thread
+			ncores_ <- if(is.null(ncores)) 1 else min(c(ncores, length(design)))
+			if(ncores_ != ncores) {
+				message(
+					paste0(
+						"Cracking only ",
+						length(design),
+						"tables. So using for that ",
+						ncores_,
+						if(1 != ncores_) " cores." else " core."
+					)
+				)
+			}
+			parallel::mclapply(
+				X   = lst(names(design)),
+				FUN = function(table_description) {
+					bundles2table(bundles = bundles, table_description = table_description, verbose = verbose)
+				}
+			)
+		}
+	)
+}
+
 ## This file contains all functions needed for flattening ##
 ## Exported functions are on top, internal functions below ##
 
@@ -117,6 +440,85 @@ setGeneric(
 )
 
 #' @rdname fhir_crack-methods
+#' @aliases fhir_crack,fhir_table_description-method
+setMethod(
+	f = "fhir_crack",
+	signature = c(design = "fhir_table_description"),
+	definition = function(
+		bundles,
+		design,
+		sep                  = NULL,
+		brackets             = NULL,
+		remove_empty_columns = NULL,
+		verbose              = 2,
+		data.table           = FALSE,
+		format               = "compact",
+		keep_attr            = FALSE,
+		ncores               = NULL) {
+
+		#overwrite design with function arguments
+		if(!is.null(sep)) {
+			design@sep <- sep
+		}
+
+		if(!is.null(brackets)) {
+			brackets <- fix_brackets(brackets = brackets)
+			design@brackets <- brackets
+		}
+
+		if(!is.null(remove_empty_columns)) {
+			design@rm_empty_cols <- remove_empty_columns
+		}
+
+		if(!is.null(format)) {
+			design@format <- format
+		}
+
+		if(!is.null(keep_attr)) {
+			design@keep_attr <- keep_attr
+		}
+
+		validObject(object = design, complete = TRUE)
+		#Check for dangerous XPath expressions ins cols
+		cols <- design@cols
+		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
+
+		if(any(dangerCols)) {
+			warning(
+				"In the cols element of the table description, you specified XPath expressions containing '//' which point to an ",
+				"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
+				"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
+				"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
+				"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse = ", ")
+			)
+		}
+
+		#Add attributes to design
+		#design <- add_attribute_to_design(design = design)
+		os <- get_os()
+		ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
+		message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
+
+		#crack
+		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose, format = format, ncores = ncores)
+		#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
+		remove <- design@rm_empty_cols
+
+		if(remove && 0 < ncol(df)) {
+			df_cleaned <- df[, 0 < colSums(!is.na(df)), with = FALSE]
+		} else {
+			df_cleaned <- df
+		}
+
+		if(0 < verbose) {message("FHIR-Resources cracked.")}
+		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
+		if(data.table) {df} else {data.frame(df)}
+	}
+)
+
+
+
+#' @rdname fhir_crack-methods
 #' @aliases fhir_crack,fhir_design-method
 setMethod(
 	f = "fhir_crack",
@@ -186,456 +588,9 @@ setMethod(
 		ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
 		message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
 
-		dfs <- bundles2dfs(bundles = bundles, design = design, data.table = data.table, verbose = verbose, ncores = ncores)
+		dfs <- bundles2tables(bundles = bundles, design = design, data.table = data.table, verbose = verbose, ncores = ncores)
 		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
 		dfs
 	}
 )
-
-#' @rdname fhir_crack-methods
-#' @aliases fhir_crack,fhir_table_description-method
-setMethod(
-	f = "fhir_crack",
-	signature = c(design = "fhir_table_description"),
-	definition = function(
-		bundles,
-		design,
-		sep                  = NULL,
-		brackets             = NULL,
-		remove_empty_columns = NULL,
-		verbose              = 2,
-		data.table           = FALSE,
-		format               = "compact",
-		keep_attr            = FALSE,
-		ncores               = NULL) {
-
-		#overwrite design with function arguments
-		if(!is.null(sep)) {design@sep <- sep}
-
-		if(!is.null(brackets)) {
-			brackets <- fix_brackets(brackets = brackets)
-			design@brackets <- brackets
-		}
-
-		if(!is.null(remove_empty_columns)) {
-			design@rm_empty_cols <- remove_empty_columns
-		}
-
-		validObject(object = design, complete = TRUE)
-		#Check for dangerous XPath expressions ins cols
-		cols <- design@cols
-		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
-
-		if(any(dangerCols)) {
-			warning(
-				"In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
-				"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
-				"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
-				"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
-				"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse = ", ")
-			)
-		}
-
-		#Add attributes to design
-		#design <- add_attribute_to_design(design = design)
-		os <- get_os()
-		ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
-		message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
-
-		#crack
-		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose, format = format, keep_attr = keep_attr, ncores = ncores)
-		#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
-		remove <- design@rm_empty_cols
-
-		if(remove && 0 < ncol(df)) {
-			df_cleaned <- df[, 0 < colSums(!is.na(df)), with = FALSE]
-		} else {
-			df_cleaned <- df
-		}
-
-		if(0 < verbose) {message("FHIR-Resources cracked.")}
-		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
-		if(data.table) {df} else {data.frame(df)}
-	}
-)
-
-#' #' @rdname fhir_crack-methods
-#' #' @aliases fhir_crack,list-method
-#' setMethod(
-#' 	f          = "fhir_crack",
-#' 	signature  = c(design = "list"),
-#' 	definition = function(
-#' 		bundles,
-#' 		design,
-#' 		sep                  = NULL,
-#' 		brackets             = NULL,
-#' 		remove_empty_columns = NULL,
-#' 		verbose              = 2,
-#' 		data.table           = FALSE,
-#' 		format               = "compact",
-#' 		keep_attr            = FALSE,
-#' 		ncores               = NULL) {
-#'
-#' 		warning(
-#' 			"The use of an old-style design will be disallowed in the future. ",
-#' 			"Please consider building the design with the function fhir_design().\n",
-#' 			"Converting design to fhir_design object."
-#' 		)
-#' 		suppressMessages(design <- fhir_design(design))
-#' 		fhir_crack(
-#' 			bundles              = bundles,
-#' 			design               = design,
-#' 			sep                  = sep,
-#' 			brackets             = brackets,
-#' 			remove_empty_columns = remove_empty_columns,
-#' 			verbose              = verbose,
-#' 			data.table           = data.table,
-#' 			format               = format,
-#' 			keep_attr            = keep_attr,
-#' 			ncores               = ncores
-#' 		)
-#' 	}
-#' )
-#'
-#' ############################################################################################
-##############################################################################################
-
-
-#' Extract all columns
-#'
-#' Extracts all available values from a single resource
-#'
-#' @param child A xml child object, representing one FHIR resource
-#' from the resource
-#' @param sep A character vector of length one to separate pasted multiple entries.
-#' @param xpath A character vector of length one to locate data in tree via xpath.
-#' @param brackets A character vector of length one or two defining the brackets
-#' surrounding the indices. e.g. c( "<", ">") NULL means no brackets.
-#' A vector of length one like c("|") means that the "|"-sign will be used as opening and closing Brackets.
-#' @param format A character of length 1 containing the format of the cracked table. Possible formats
-#' are "compact" and "wide". Defaults to "compact"
-#' @param keep_attr A locigcal of length 1. Should column names be extended by the attribute names? Defaults to FALSE.
-#' @noRd
-#'
-#' @examples
-#' #unserialize example bundle
-#' bundles <- fhir_unserialize(bundles = medication_bundles)
-#'
-#' #extract child
-#' child <- xml2::xml_find_first(x = bundles[[1]], xpath = ".//MedicationStatement")
-#'
-#' #Extract all columns
-#' result <- fhircrackr:::xtrct_all_columns(child = child)
-#'
-xtrct_all_columns <- function(
-	child,
-	xpath = ".//@*",
-	sep = NULL,
-	brackets = NULL,
-	format = "compact",
-	keep_attr = FALSE) {
-
-	if(length(brackets) == 0) {brackets <- NULL}
-	tree <- xml2::xml_find_all(x = child, xpath = xpath)
-	if(length(tree) < 1) {return(data.table::data.table())}
-	xp.child  <- xml2::xml_path(x = child)
-	xp.remain <- xml2::xml_path(x = tree)
-	xp.rel    <- substr(x = xp.remain, start = nchar(xp.child) + 2, stop = nchar(xp.remain))
-	xp.cols   <- gsub(
-		pattern = "/",
-		replacement = ".",
-		x = gsub(
-			pattern = "@",
-			replacement = "",
-			x = unique(gsub(pattern = "\\[[0-9]+\\]", replacement = "", x = xp.rel))
-		)
-	)
-	d <- lapply(seq_len(length(xp.cols)), function(dummy) character(0))
-	names(d) <- xp.cols
-	val <- xml2::xml_text(x = tree)
-	s <- stringr::str_split(string = xp.rel, pattern = "/")
-	o <- sapply(
-		seq_along(s),
-		function(i) {
-			s. <- s[[i]]
-			i.f <- !grepl("\\[[0-9]+\\]", s.)
-			if (any(i.f)) {s.[i.f] <- paste0(s.[i.f], "[1]")}
-			c(
-				paste0(gsub(pattern = "]$",replacement = "", x = gsub(pattern = ".*\\[",replacement = "", x = s.[-length(s.)])), collapse = "."),
-				gsub(pattern = "@", replacement = "", x = gsub(pattern = "\\[[0-9]+\\]", replacement = "", x = paste0(s., collapse = ".")))
-			)
-		}
-	)
-	if(!is.null(brackets)) {
-		is_av_val <- ! is.na(val)
-		o. <- o[1, ]
-		val[is_av_val] <- paste0(brackets[1], o.[is_av_val], brackets[2], val[is_av_val])
-	}
-	for(col in xp.cols) {
-		d[[col]] <- paste0(val[col == o[2, ]], collapse = sep)
-	}
-	result <- data.table::as.data.table(x = d)
-	names(result) <- gsub(pattern = "(\\.\\w+)$", replacement = "", x = names(result))
-	result
-}
-
-#' Extract columns
-#'
-#' Extracts defined values from a single resource
-#'
-#' @param child A xml child object, representing one FHIR resource.
-#' @param df.columns A [fhir_columns-class] object describing which elements to extract
-#' from the resource.
-#' @param sep A string to separate pasted multiple entries.
-#' @param brackets A character vector defining the brackets surrounding the indices. e.g. c( "<", ">").
-#' `character(0)` means no brackets.
-#' @param format A character of length 1 containing the format of the cracked table. Possible formats
-#' are "compact" and "wide". Defaults to "compact"
-#' @noRd
-#'
-#' @examples
-#' #unserialize example bundle
-#' bundles <- fhir_unserialize(medication_bundles)
-#'
-#' #extract child
-#' child <- xml2::xml_find_first(bundles[[1]], ".//MedicationStatement")
-#'
-#' #define columns
-#' cols <-fhir_columns(c(
-#' 	  SYSTEM  = "medicationCodeableConcept/coding/system",
-#' 	  CODE    = "medicationCodeableConcept/coding/code",
-#' 	  DISPLAY = "medicationCodeableConcept/coding/display"
-#' ))
-#'
-#' #Extract columns
-#' result <- fhircrackr:::xtrct_columns(child = child, cols = cols)
-
-xtrct_columns <- function(child, cols, sep = NULL, brackets = NULL, format = "compact") {
-	if(length(brackets) == 0) {brackets <- NULL}
-	xp <- xml2::xml_path(x = child)
-	l <- lapply(
-		lst(names(cols)),
-		function(column.name) {
-			i.srch <- cols[[column.name]]
-			loc <- xml2::xml_find_all(x = child, xpath = i.srch)
-			val <- xml2::xml_text(x = loc)
-			if(!is.null(brackets)) {
-				loc.xp <- xml2::xml_path(x = loc)
-				loc.xp.rel <- substr(loc.xp, nchar(xp) + 2, nchar(loc.xp))
-				s <- stringr::str_split(string = loc.xp.rel, pattern = "/")
-				o <- sapply(
-					seq_along(s),
-					function(i) {
-						s. <- s[[i]]
-						i.f <- !grepl("\\[[0-9]+\\]", s.)
-						if(any(i.f)) {s.[i.f] <- paste0(s.[i.f], "[1]")}
-						gsub(".1$", "", paste0(gsub(pattern = "[^0-9]", replacement = "", x = s.), collapse = "."))
-					}
-				)
-				if(0 < length(val)) {
-					is_av <- ! is.na(val)
-					paste0(brackets[1], o[is_av], brackets[2], val[is_av], collapse = sep)
-				}
-				else {NA}
-			} else {
-				if(0 < length(val)) {paste0(val, collapse = sep)} else {NA}
-			}
-		}
-	)
-	data.table::as.data.table(x = l)
-}
-
-#' Extracts one data frame out of one bundle
-#' @param bundle A xml object containing one FHIR bundle
-#' @param df_desc An object of class [fhir_table_description-class].
-#' @param verbose An integer scalar.  If > 1, extraction progress will be printed. Defaults to 2.
-#' @param format A character of length 1 containing the format of the cracked table. Possible formats
-#' are "compact" and "wide". Defaults to "compact"
-#' @param keep_attr A locigcal of length 1. Should column names be extended by the attribute names? Defaults to FALSE.
-#' @param ncores Either NULL (1 core) or an integer of length 1 containing the number of
-#'  cpu cores that should be used for cracking. Defaults to NULL.
-#' @noRd
-#' @examples
-#' #unserialize example bundle
-#' bundles <- fhir_unserialize(bundles = medication_bundles)
-#'
-#' #extract first bundle
-#' bundle <- bundles[[1]]
-#'
-#' #define table_description
-#' df_desc <- fhir_table_description(
-#'      resource = "MedicationStatement",
-#'      cols = list(
-#'          SYSTEM  = "medicationCodeableConcept/coding/system",
-#'          CODE    = "medicationCodeableConcept/coding/code",
-#'          DISPLAY = "medicationCodeableConcept/coding/display"
-#'      ),
-#'      sep           = " ",
-#'      brackets      = c("[","]"),
-#'      rm_empty_cols = TRUE
-#'  )
-#'
-#' #convert bundle to data frame
-#' result <- fhircrackr:::bundle2df(bundle = bundle, df_desc = df_desc)
-bundle2df <- function(bundle, df_desc, verbose = 2, format = "compact", keep_attr = FALSE, ncores) {
-	xpath <- paste0("//", df_desc@resource)
-	children <- xml2::xml_find_all(x = bundle, xpath = xpath)
-	ncores <- if(is.null(ncores)) 1 else min(c(ncores, length(children)))
-	df.list <- if(length(children) == 0) {
-		list()
-	} else if(1 < ncores) {
-		## does not work for 'Windows' because windows cannot fork
-		parallel::mclapply(
-			children,
-			function(child) {
-				if(0 < length(df_desc@cols)) {#if cols is not empty
-					cols <- df_desc@cols
-					res <- xtrct_columns(child = child, cols = cols, sep = df_desc@sep, brackets = df_desc@brackets, format = format)
-				} else {#if cols empty
-					xp <- ".//@*"
-					res <- xtrct_all_columns(child = child, xpath = xp, sep = df_desc@sep, brackets = df_desc@brackets, format = format, keep_attr = keep_attr)
-				}
-				res
-			},
-			mc.cores = ncores
-		)
-	} else {
-		lapply(
-			children,
-			function(child) {
-			   	if(0 < length(df_desc@cols)) {#if cols is not empty
-			   		cols <- df_desc@cols
-			   		res <- xtrct_columns(child = child, cols = cols, sep = df_desc@sep, brackets = df_desc@brackets, format = format)
-			   	} else {#if cols empty
-			   		xp <- ".//@*"
-			   		res <- xtrct_all_columns(child = child, xpath = xp, sep = df_desc@sep, brackets = df_desc@brackets, format = format, keep_attr = keep_attr)
-			   	}
-				res
-			}
-		)
-	}
-	data.table::rbindlist(l = df.list, fill = TRUE)
-}
-
-#' Convert several bundles to one data frame
-#'
-#' @param bundles A [fhir_bundle_list-class] object
-#' @param df_desc A [fhir_df_desc-class] object
-#' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
-#' @param format A character of length 1 containing the format of the cracked table. Possible formats
-#' are "compact" and "wide". Defaults to "compact"
-#' @param keep_attr A locigcal of length 1. Should column names be extended by the attribute names? Defaults to FALSE.
-#' @param ncores Either NULL (1 core) or an integer of length 1 containing the number of
-#'  cpu cores that should be used for cracking. Defaults to NULL.
-#' @noRd
-#' @examples
-#' #unserialize example bundle
-#' bundles <- fhir_unserialize(medication_bundles)
-#'
-#' df_desc <- fhir_table_description(
-#'      resource = "MedicationStatement",
-#'      cols = list(
-#'          SYSTEM  = "medicationCodeableConcept/coding/system",
-#'          CODE    = "medicationCodeableConcept/coding/code",
-#'          DISPLAY = "medicationCodeableConcept/coding/display"
-#'      ),
-#'      sep           = " ",
-#'      brackets      = c("[","]"),
-#'      rm_empty_cols = TRUE
-#' )
-#'
-#' #convert bundles to data frame
-#' result <- fhircrackr:::bundles2df(bundles = bundles, df_desc = df_desc)
-
-bundles2df <- function(bundles, df_desc, verbose = 2, format = "compact", keep_attr = FALSE, ncores) {
-	ret <- data.table::rbindlist(
-		lapply(
-			seq_along(bundles),
-			function(i) {
-				if (1 < verbose) {message(paste0("Bundle ", i, ": "))}
-				bundle <- bundles[[i]]
-				bundle2df(bundle = bundle, df_desc = df_desc, verbose = verbose, format = format, keep_attr = keep_attr, ncores = ncores)
-			}
-		),
-		fill = TRUE
-	)
-	if(nrow(0 < ret)) {ret <- ret[0 < rowSums(!is.na(ret)), ]}
-	ret
-}
-
-#' Flatten list of FHIR bundles
-#' @description Converts all FHIR bundles (the result of `fhir_search`) to a list of data frames.
-#'
-#' @param bundles A [fhir_bundle_list-class] object
-#' @param design A [fhir_design-class] object
-#' @param data.table Logical scalar. Return list of data.tables instead of data.frames? Defaults to FALSE.
-#' @param verbose An Integer Scalar.  If > 1, extraction progress will be printed. Defaults to 2.
-#' @param format A character of length 1 containing the format of the cracked table. Possible formats
-#' are "compact" and "wide". Defaults to "compact"
-#' @param keep_attr A locigcal of length 1. Should column names be extended by the attribute names? Defaults to FALSE.
-#' @param ncores Either NULL (1 core) or an integer of length 1 containing the number of
-#'  cpu cores that should be used for cracking. Defaults to NULL.
-#' @noRd
-#' @return A [fhir_df_list-class]/[fhir_dt_list-class] object as specified by `design`.
-#'
-#'
-#' @examples
-#' #unserialize example bundle
-#' bundles <- fhir_unserialize(bundles = medication_bundles)
-#'
-#' #define attributes to extract
-#' design <- fhir_design(
-#'     Medications = fhir_table_description(
-#'         resource = "MedicationStatement",
-#'         cols = list(
-#'             MS.ID              = "id",
-#'             STATUS.TEXT        = "text/status",
-#'             STATUS             = "status",
-#'             MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-#'             MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-#'             MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-#'             DOSAGE             = "dosage/text",
-#'             PATIENT            = "subject/reference",
-#'             LAST.UPDATE        = "meta/lastUpdated"
-#'         )
-#'     ),
-#'     Patients = fhir_table_description(
-#'         resource = "Patient"
-#'     )
-#' )
-#'
-#' #convert fhir to data frames
-#' list_of_tables <- fhircrackr:::bundles2dfs(bundles = bundles, design = design)
-
-bundles2dfs <- function(bundles, design, data.table = FALSE, verbose = 2, format = "compact", keep_attr = FALSE, ncores = NULL) {
-
-	dfs <- lapply(
-		lst(names(design)),
-		function(n) {
-			df_desc <- design[[n]]
-		  	if(is.null(df_desc)) {NULL} else {bundles2df(bundles = bundles, df_desc = df_desc, format = format, keep_attr = keep_attr, ncores = ncores, verbose = verbose)}
-		}
-	)
-	#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
-	remove <- sapply(
-		design,
-		function(x) {x@rm_empty_cols}
-	)
-	dfs_cleaned <- lapply(
-		seq_along(dfs),
-		function(i) {
-			if(remove[i] && 0 < ncol(dfs[[i]])) {
-				dfs[[i]][, 0 < colSums(!is.na(dfs[[i]])), with = FALSE]
-			} else {
-				dfs[[i]]
-			}
-		}
-	)
-	names(dfs_cleaned) <- names(dfs)
-	if(data.table) {
-		fhir_dt_list(dt_list = dfs_cleaned, design = design)
-	} else {
-		fhir_df_list(lapply(dfs_cleaned, data.frame), design)
-	}
-}
