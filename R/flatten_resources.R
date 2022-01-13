@@ -50,7 +50,7 @@ bundles2table <- function(bundles, table_description, verbose = 2) {
 								FUN = function(resource) {
 									#resource <- resources[[1]]
 									resource_xpath <- xml2::xml_path(resource)
-									d <- data.table()
+									d <- data.table::data.table()
 									d[,	unlist(
 										recursive = FALSE,
 										lapply(
@@ -148,21 +148,21 @@ bundles2table <- function(bundles, table_description, verbose = 2) {
 		} else {                                    # GIVEN COLUMNS - WIDE
 			data.table::rbindlist(
 				use.names = TRUE,
-				fill = TRUE,
-				l = lapply(
+				fill      = TRUE,
+				l         = lapply(
 					X   = bundles,
 					FUN = function(bundle) {
 						#bundle <- bundles[[2]]
 						resources <- xml2::xml_find_all(x = bundle, xpath = xpath_resource)
 						data.table::rbindlist(
 							use.names = TRUE,
-							fill = TRUE,
-							l = lapply(
+							fill      = TRUE,
+							l         = lapply(
 								X   = resources,
 								FUN = function(resource) {
 									#resource <- resources[[1]]
 									resource_xpath <- xml2::xml_path(resource)
-									d <- data.table()
+									d <- data.table::data.table()
 									d[,	unlist(
 										recursive = FALSE,
 										lapply(
@@ -288,37 +288,35 @@ bundles2tables <- function(bundles, design, ncores = 1, verbose = 2) {
 	ncores <- min(c(get_ncores(os), ncores))
 	message(paste0("Cracking under OS ", os, " using ", ncores, if(1 != ncores) " cores." else " core."))
 
-	data.table::rbindlist(
-		use.names = TRUE,
-		fill = TRUE,
-		l = if(ncores == 1) { # single thread
-			lapply(
-				X   = design,
-				FUN = function(table_description) {
-					bundles2table(bundles = bundles, table_description = table_description, verbose = verbose)
-				}
-			)
-		} else { # multi thread
-			ncores_ <- if(is.null(ncores)) 1 else min(c(ncores, length(design)))
-			if(ncores_ != ncores) {
-				message(
-					paste0(
-						"Cracking only ",
-						length(design),
-						"tables. So using for that ",
-						ncores_,
-						if(1 != ncores_) " cores." else " core."
-					)
-				)
+	if(ncores == 1) { # single thread
+		lapply(
+			X   = design,
+			FUN = function(table_description) {
+				#table_description <- design[[2]]
+				bundles2table(bundles = bundles, table_description = table_description, verbose = verbose)
 			}
-			parallel::mclapply(
-				X   = lst(names(design)),
-				FUN = function(table_description) {
-					bundles2table(bundles = bundles, table_description = table_description, verbose = verbose)
-				}
+		)
+	} else { # multi thread
+		ncores_ <- if(is.null(ncores)) 1 else min(c(ncores, length(design)))
+		if(ncores_ != ncores) {
+			message(
+				paste0(
+					'Cracking only ',
+					length(design),
+					if(1 == length(design)) ' tables' else ' table',
+					'. So using for that ',
+					ncores_,
+					if(1 != ncores_) " cores." else " core."
+				)
 			)
 		}
-	)
+		parallel::mclapply(
+			X   = design,
+			FUN = function(table_description) {
+				bundles2table(bundles = bundles, table_description = table_description, verbose = verbose)
+			}
+		)
+	}
 }
 
 ## This file contains all functions needed for flattening ##
@@ -502,12 +500,8 @@ setMethod(
 		#crack
 		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose, format = format, ncores = ncores)
 		#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
-		remove <- design@rm_empty_cols
-
-		if(remove && 0 < ncol(df)) {
-			df_cleaned <- df[, 0 < colSums(!is.na(df)), with = FALSE]
-		} else {
-			df_cleaned <- df
+		if(design@rm_empty_cols && 0 < ncol(df)) {
+			df <- df[, 0 < colSums(!is.na(df)), with = FALSE]
 		}
 
 		if(0 < verbose) {message("FHIR-Resources cracked.")}
@@ -548,28 +542,35 @@ setMethod(
 
 		if(!is.null(brackets)) {
 			brackets <- fix_brackets(brackets = brackets)
-			design <-fhir_design(lapply(
-				design,
-				function(x) {
-					x@brackets <- brackets
-					x
-				}
-			))
+			design <- fhir_design(
+				lapply(
+					design,
+					function(x) {
+						x@brackets <- brackets
+						x
+					}
+				)
+			)
 		}
 
 		if(!is.null(remove_empty_columns)) {
-			design <- fhir_design(lapply(
-				design,
-				function(x) {
-					x@rm_empty_cols <- remove_empty_columns
-					x
-				}
-			))
+			design <- fhir_design(
+				lapply(
+					design,
+					function(x) {
+						x@rm_empty_cols <- remove_empty_columns
+						x
+					}
+				)
+			)
 		}
 
 		validObject(object = design, complete = TRUE)
 		#Check for dangerous XPath expressions ins cols
-		cols <- lapply(design, function(x) {c(x@cols)})
+		cols <- lapply(
+			X   = design,
+			FUN = function(x) {c(x@cols)}
+		)
 		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
 
 		if(any(dangerCols)) {
@@ -584,11 +585,11 @@ setMethod(
 
 		#Add attributes to design not longer necessary
 		#design <- add_attribute_to_design(design = design)
-		os <- get_os()
-		ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
-		message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
+		# os <- get_os()
+		# ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
+		# message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
 
-		dfs <- bundles2tables(bundles = bundles, design = design, data.table = data.table, verbose = verbose, ncores = ncores)
+		dfs <- bundles2tables(bundles = bundles, design = design, verbose = verbose, ncores = ncores)
 		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
 		dfs
