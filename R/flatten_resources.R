@@ -28,239 +28,281 @@ replace_brackets <- function(names, bra, ket) {
 	gsub('\\[', bra, gsub(']', ket, names))
 }
 
-bundles2table <- function(bundles, table_description, verbose = 2) {
+bundles2table <- function(bundles, table_description, ncores = 1, verbose = 2) {
 
 	xpath_resource <- paste0('//', table_description@resource)
+
+	extract_compact_with_given_columns <- function(bundle) {
+		#bundle <- bundles[[1]]
+		resources <- xml2::xml_find_all(x = bundle, xpath = xpath_resource)
+		data.table::rbindlist(
+			use.names = TRUE,
+			fill = TRUE,
+			l = lapply(
+				X   = resources,
+				FUN = function(resource) {
+					#resource <- resources[[1]]
+					resource_xpath <- xml2::xml_path(resource)
+					d <- data.table::data.table()
+					d[,	unlist(
+						recursive = FALSE,
+						lapply(
+							X   = seq_along(table_description@cols),
+							FUN = function(column_id) {
+								#column_id <- 2
+								# resource_xpath <- gsub(
+								# 	pattern     = paste0(table_description@resource, '$'),
+								# 	replacement = '',
+								# 	x = xml2::xml_path(resource)
+								# )
+								column_name <- names(table_description@cols)[[column_id]]
+								nodes <- xml2::xml_find_all(x = resource, xpath = table_description@cols[[column_id]])
+								values <- xml2::xml_attrs(nodes)
+								paths <- xml2::xml_path(nodes)
+								paths <- gsub(
+									pattern     = esc(resource_xpath),
+									replacement = '',
+									x           = paths
+								)
+
+								# if(0 < length(table_description@brackets)) {
+								# 	replace_brackets(names = paths_with_indices, bra = '<', ket = '>')
+								# }
+								# if(table_description@keep_attr) {
+								# 	attribs <- unique(sapply(values, names))
+								# 	if(1 < length(unique(attribs))) {
+								# 		attribs <- attribs[[1]]
+								# 		warning(
+								# 			paste0(
+								# 				'The names of the attributes are not unique for tag ',
+								# 				table_description@cols[[column_id]],
+								# 				'. Using the first one \'', attribs, '\' for Column Name Indexing.'
+								# 			)
+								# 		)
+								# 	}
+								# 	paths_with_indices, bra = '<', ket = '>')
+								# }
+
+								values_combinded <- if(0 < length(table_description@brackets)) {
+									column_indices <- gsub(
+										pattern     = '\\.$',
+										replacement =  '',
+										x           = gsub(
+											pattern     = '([^0-9\\.]+)',
+											replacement =  '',
+											x           =  gsub(
+												pattern     = '([0-9]+)',
+												replacement = '\\1\\.',
+												x           = add_missing_indices(
+													names = paths,
+													bra   = '[',
+													ket   = ']',
+													sep   =  '/'
+												)
+											)
+										)
+									)
+									paste0(
+										table_description@brackets[1],
+										column_indices,
+										table_description@brackets[2],
+										values,
+										collapse = table_description@sep
+									)
+								} else {
+									paste0(values, collapse = table_description@sep)
+								}
+								l <- list(x = values_combinded)
+								names(l) <- if(table_description@keep_attr) {
+									attribs <- unique(sapply(values, names))
+									if(1 < length(unique(attribs))) {
+										attribs <- attribs[[1]]
+										warning(
+											paste0(
+												'The names of the attributes are not unique for tag ',
+												table_description@cols[[column_id]],
+												'. Using the first one \'', attribs, '\' for Column Name Indexing.'
+											)
+										)
+									}
+									paste0(column_name, '@', attribs)
+								} else column_name
+								l
+							}
+						)
+					)]
+				}
+			)
+		)
+	}
+
+	extract_wide_with_given_columns <- function(bundle) {
+		#bundle <- bundles[[2]]
+		resources <- xml2::xml_find_all(x = bundle, xpath = xpath_resource)
+		data.table::rbindlist(
+			use.names = TRUE,
+			fill      = TRUE,
+			l         = lapply(
+				X   = resources,
+				FUN = function(resource) {
+					#resource <- resources[[1]]
+					resource_xpath <- xml2::xml_path(resource)
+					d <- data.table::data.table()
+					d[,	unlist(
+						recursive = FALSE,
+						lapply(
+							X   = seq_along(table_description@cols),
+							FUN = function(column_id) {
+								#column_id <- 2
+								# resource_xpath <- gsub(
+								# 	pattern     = paste0(table_description@resource, '$'),
+								# 	replacement = '',
+								# 	x = xml2::xml_path(resource)
+								# )
+								column_name <- names(table_description@cols)[[column_id]]
+								nodes <- xml2::xml_find_all(x = resource, xpath = table_description@cols[[column_id]])
+								values <- xml2::xml_attrs(nodes)
+								paths <- xml2::xml_path(nodes)
+								paths <- gsub(
+									pattern     = paste0(esc(resource_xpath), '/'),
+									replacement = '',
+									x           = paths
+								)
+								paths_with_indices <- add_missing_indices(
+									names = paths,
+									bra   = '[',
+									ket   = ']',
+									sep   = '/'
+								)
+								paths_with_indices <- if(0 < length(table_description@brackets)) {
+									paste0(
+										table_description@brackets[1],
+										gsub(
+											pattern     = '\\.$',
+											replacement =  '',
+											x           = gsub(
+												pattern     = '([^0-9\\.]+)',
+												replacement =  '',
+												x           =  gsub(
+													pattern     = '([0-9]+)',
+													replacement = '\\1\\.',
+													x           = paths_with_indices
+												)
+											)
+										),
+										table_description@brackets[2],
+										column_name
+									)
+								}
+								paths_with_indices <- gsub(
+									pattern     = '/',
+									replacement = '\\.',
+									x           = paths_with_indices
+								)
+
+								if(table_description@keep_attr) {
+									attribs <- unique(sapply(values, names))
+									if(1 < length(unique(attribs))) {
+										attribs <- attribs[[1]]
+										warning(
+											paste0(
+												'The names of the attributes are not unique for tag ',
+												table_description@cols[[column_id]],
+												'. Using the first one \'', attribs, '\' for Column Name Indexing.'
+											)
+										)
+									}
+									paths_with_indices <- paste0(paths_with_indices, '@', attribs)
+								}
+
+								names(values) <- paths_with_indices
+								values
+							}
+						)
+					)]
+				}
+			)
+		)
+	}
 
 	d <- if(0 < length(table_description@cols)) {   # GIVEN COLUMNS
 		if(table_description@format == 'compact') { # GIVEN COLUMNS - COMPACT
 			data.table::rbindlist(
 				use.names = TRUE,
-				fill = TRUE,
-				l = lapply(
-					X   = bundles,
-					FUN = function(bundle) {
-						#bundle <- bundles[[2]]
-						resources <- xml2::xml_find_all(x = bundle, xpath = xpath_resource)
-						data.table::rbindlist(
-							use.names = TRUE,
-							fill = TRUE,
-							l = lapply(
-								X   = resources,
-								FUN = function(resource) {
-									#resource <- resources[[1]]
-									resource_xpath <- xml2::xml_path(resource)
-									d <- data.table::data.table()
-									d[,	unlist(
-										recursive = FALSE,
-										lapply(
-											X   = seq_along(table_description@cols),
-											FUN = function(column_id) {
-												#column_id <- 2
-												# resource_xpath <- gsub(
-												# 	pattern     = paste0(table_description@resource, '$'),
-												# 	replacement = '',
-												# 	x = xml2::xml_path(resource)
-												# )
-												column_name <- names(table_description@cols)[[column_id]]
-												xpath_column <- table_description@cols[[column_id]]
-												nodes <- xml2::xml_find_all(x = resource, xpath = xpath_column)
-												values <- xml2::xml_attrs(nodes)
-												paths <- xml2::xml_path(nodes)
-												paths <- gsub(
-													pattern     = esc(resource_xpath),
-													replacement = '',
-													x           = paths
-												)
-												paths_with_indices <- add_missing_indices(
-													names = paths,
-													bra   = '[',
-													ket   = ']',
-													sep =  '/'
-												)
-												# if(0 < length(table_description@brackets)) {
-												# 	replace_brackets(names = paths_with_indices, bra = '<', ket = '>')
-												# }
-												# if(table_description@keep_attr) {
-												# 	attribs <- unique(sapply(values, names))
-												# 	if(1 < length(unique(attribs))) {
-												# 		attribs <- attribs[[1]]
-												# 		warning(
-												# 			paste0(
-												# 				'The names of the attributes are not unique for tag ',
-												# 				xpath_column,
-												# 				'. Using the first one \'', attribs, '\' for Column Name Indexing.'
-												# 			)
-												# 		)
-												# 	}
-												# 	paths_with_indices, bra = '<', ket = '>')
-												# }
-
-												values_combinded <- if(0 < length(table_description@brackets)) {
-													column_indices <- gsub(
-														pattern     = '\\.$',
-														replacement =  '',
-														x           = gsub(
-															pattern     = '([^0-9\\.]+)',
-															replacement =  '',
-															x           =  gsub(
-																pattern     = '([0-9]+)',
-																replacement = '\\1\\.',
-																x           = paths_with_indices
-															)
-														)
-													)
-													paste0(
-														table_description@brackets[1],
-														column_indices,
-														table_description@brackets[2],
-														values,
-														collapse = table_description@sep
-													)
-												} else {
-													paste0(values, collapse = table_description@sep)
-												}
-												l <- list(x = values_combinded)
-												names(l) <- if(table_description@keep_attr) {
-													attribs <- unique(sapply(values, names))
-													if(1 < length(unique(attribs))) {
-														attribs <- attribs[[1]]
-														warning(
-															paste0(
-																'The names of the attributes are not unique for tag ',
-																xpath_column,
-																'. Using the first one \'', attribs, '\' for Column Name Indexing.'
-															)
-														)
-													}
-													paste0(column_name, '@', attribs)
-												} else column_name
-												l
-											}
-										)
-									)]
-								}
-							)
-						)
-					}
-				)
+				fill      = TRUE,
+				l         = if(ncores == 1) {
+					lapply(
+						X   = bundles,
+						FUN = extract_compact_with_given_columns
+					)
+				} else {
+					parallel::mclapply(
+						mc.cores = ncores,
+						X        = bundles,
+						FUN      = extract_compact_with_given_columns
+					)
+				}
 			)
 		} else {                                    # GIVEN COLUMNS - WIDE
 			data.table::rbindlist(
 				use.names = TRUE,
 				fill      = TRUE,
-				l         = lapply(
-					X   = bundles,
-					FUN = function(bundle) {
-						#bundle <- bundles[[2]]
-						resources <- xml2::xml_find_all(x = bundle, xpath = xpath_resource)
-						data.table::rbindlist(
-							use.names = TRUE,
-							fill      = TRUE,
-							l         = lapply(
-								X   = resources,
-								FUN = function(resource) {
-									#resource <- resources[[1]]
-									resource_xpath <- xml2::xml_path(resource)
-									d <- data.table::data.table()
-									d[,	unlist(
-										recursive = FALSE,
-										lapply(
-											X   = seq_along(table_description@cols),
-											FUN = function(column_id) {
-												#column_id <- 2
-												# resource_xpath <- gsub(
-												# 	pattern     = paste0(table_description@resource, '$'),
-												# 	replacement = '',
-												# 	x = xml2::xml_path(resource)
-												# )
-												column_name <- names(table_description@cols)[[column_id]]
-												xpath_column <- table_description@cols[[column_id]]
-												nodes <- xml2::xml_find_all(x = resource, xpath = xpath_column)
-												values <- xml2::xml_attrs(nodes)
-												paths <- xml2::xml_path(nodes)
-												paths <- gsub(
-													pattern     = paste0(esc(resource_xpath), '/'),
-													replacement = '',
-													x           = paths
-												)
-												paths_with_indices <- add_missing_indices(
-													names = paths,
-													bra   = '[',
-													ket   = ']',
-													sep   = '/'
-												)
-												paths_with_indices <- if(0 < length(table_description@brackets)) {
-													paste0(
-														table_description@brackets[1],
-														gsub(
-															pattern     = '\\.$',
-															replacement =  '',
-															x           = gsub(
-																pattern     = '([^0-9\\.]+)',
-																replacement =  '',
-																x           =  gsub(
-																	pattern     = '([0-9]+)',
-																	replacement = '\\1\\.',
-																	x           = paths_with_indices
-																)
-															)
-														),
-														table_description@brackets[2],
-														column_name
-													)
-												}
-												paths_with_indices <- gsub(
-													pattern     = '/',
-													replacement = '\\.',
-													x           = paths_with_indices
-												)
-
-												if(table_description@keep_attr) {
-													attribs <- unique(sapply(values, names))
-													if(1 < length(unique(attribs))) {
-														attribs <- attribs[[1]]
-														warning(
-															paste0(
-																'The names of the attributes are not unique for tag ',
-																xpath_column,
-																'. Using the first one \'', attribs, '\' for Column Name Indexing.'
-															)
-														)
-													}
-													paths_with_indices <- paste0(paths_with_indices, '@', attribs)
-												}
-
-												names(values) <- paths_with_indices
-												values
-											}
-										)
-									)]
-								}
-							)
-						)
-					}
-				)
+				l         = if(ncores == 1) {
+					lapply(
+						X   = bundles,
+						FUN = extract_wide_with_given_columns
+					)
+				} else {
+					parallel::mclapply(
+						mc.cores = ncores,
+						X        = bundles,
+						FUN = extract_wide_with_given_columns
+					)
+				}
 			)
 		}
 	} else {                                        # ALL COLUMNS
 		if(table_description@format == 'compact') { # ALL COLUMNS - COMPACT
 			data.table::rbindlist(
-				lapply(
-					X   = bundles,
-					FUN = function(bundle, table_description, vebose = verbose) {
+				use.names = TRUE,
+				fill      = TRUE,
+				l         = if(ncores == 1) {
+					lapply(
+						X   = bundles,
+						FUN = function(bundle, table_description, vebose = verbose) {
 
-					}
-				)
+						}
+					)
+				} else {
+					parallel::mclapply(
+						mc.cores = ncores,
+						X        = bundles,
+						FUN      = function(bundle, table_description, vebose = verbose) {
+
+						}
+					)
+				}
 			)
 		} else {                                    # ALL COLUMNS - WIDE
 			data.table::rbindlist(
-				lapply(
-					X   = bundles,
-					FUN = function(bundle, table_description, vebose = verbose) {
+				use.names = TRUE,
+				fill      = TRUE,
+				l         = if(ncores == 1) {
+					lapply(
+						X   = bundles,
+						FUN = function(bundle, table_description, vebose = verbose) {
 
-					}
-				)
+						}
+					)
+				} else {
+					parallel::mclapply(
+						mc.cores = ncores,
+						X        = bundles,
+						FUN      = function(bundle, table_description, vebose = verbose) {
+
+						}
+					)
+				}
 			)
 		}
 	}
@@ -270,54 +312,42 @@ bundles2table <- function(bundles, table_description, verbose = 2) {
 	d[]
 }
 
-bundles2tables <- function(bundles, design, ncores = 1, verbose = 2) {
-
-	#######################################################################
-	if(length(bundles) < 1) {
-		warning('No bundles present in bundles list \'bundles\'. NULL will be returned.')
-		return(NULL)
-	}
-
-	if(length(design) < 1) {
-		warning('No table descriptions present in design \'design\'. NULL will be returned.')
-		return(NULL)
-	}
-
-	os <- get_os()
-	if(is.null(ncores) || is.na(ncores) || ncores < 1) ncores <- 1
-	ncores <- min(c(get_ncores(os), ncores))
-	message(paste0("Cracking under OS ", os, " using ", ncores, if(1 != ncores) " cores." else " core."))
-
-	if(ncores == 1) { # single thread
-		lapply(
-			X   = design,
-			FUN = function(table_description) {
-				#table_description <- design[[2]]
-				bundles2table(bundles = bundles, table_description = table_description, verbose = verbose)
-			}
-		)
-	} else { # multi thread
-		ncores_ <- if(is.null(ncores)) 1 else min(c(ncores, length(design)))
-		if(ncores_ != ncores) {
-			message(
-				paste0(
-					'Cracking only ',
-					length(design),
-					if(1 == length(design)) ' tables' else ' table',
-					'. So using for that ',
-					ncores_,
-					if(1 != ncores_) " cores." else " core."
-				)
-			)
-		}
-		parallel::mclapply(
-			X   = design,
-			FUN = function(table_description) {
-				bundles2table(bundles = bundles, table_description = table_description, verbose = verbose)
-			}
-		)
-	}
-}
+# bundles2tables <- function(bundles, design, ncores = 1, split_threads_on_bundle = TRUE, verbose = 2) {
+#
+# 	#######################################################################
+# 	if(length(bundles) < 1) {
+# 		warning('No bundles present in bundles list \'bundles\'. NULL will be returned.')
+# 		return(NULL)
+# 	}
+#
+# 	if(length(design) < 1) {
+# 		warning('No table descriptions present in design \'design\'. NULL will be returned.')
+# 		return(NULL)
+# 	}
+#
+# 	if(is.null(ncores) || is.na(ncores) || ncores < 1) ncores <- 1
+# 	os <- get_os()
+# 	available_cores <- get_ncores(os)
+# 	ncores <- min(c(available_cores, ncores))
+# 	message(
+# 		paste0(
+# 			'Cracking under OS ',
+# 			os,
+# 			' having ',
+# 			available_cores,
+# 			if(1 < available_cores) " cores" else " core",
+# 			' available using ', ncores, if(1 < ncores) ' cores.' else ' core.'
+# 		)
+# 	)
+#
+# 	lapply(
+# 		X   = design,
+# 		FUN = function(table_description) {
+# 			#table_description <- design[[2]]
+# 			bundles2table(bundles = bundles, table_description = table_description, ncores = ncores, verbose = verbose)
+# 		}
+# 	)
+# }
 
 ## This file contains all functions needed for flattening ##
 ## Exported functions are on top, internal functions below ##
@@ -424,14 +454,14 @@ setGeneric(
 	def = function(
 		bundles,
 		design,
-		sep                  = NULL,
-		brackets             = NULL,
-		remove_empty_columns = NULL,
-		verbose              = 2,
-		data.table           = FALSE,
-		format               = "compact",
-		keep_attr            = FALSE,
-		ncores               = NULL) {
+		sep                     = NULL,
+		brackets                = NULL,
+		remove_empty_columns    = NULL,
+		verbose                 = 2,
+		data.table              = FALSE,
+		format                  = "compact",
+		keep_attr               = FALSE,
+		ncores                  = NULL) {
 
 		standardGeneric("fhir_crack")
 	}
@@ -491,21 +521,28 @@ setMethod(
 			)
 		}
 
-		#Add attributes to design
-		#design <- add_attribute_to_design(design = design)
 		os <- get_os()
-		ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
-		message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
+		available_cores <- get_ncores(os)
+		ncores <- if(is.null(ncores)) 1 else min(c(available_cores, ncores))
+		message(
+			paste0(
+				'Cracking under OS ',
+				os,
+				' having ',
+				available_cores,
+				if(1 < available_cores) " cores" else " core",
+				' available using ', ncores, if(1 < ncores) ' cores.' else ' core.'))
 
-		#crack
-		df <- bundles2df(bundles = bundles, df_desc = design, verbose = verbose, format = format, ncores = ncores)
-		#remove empty columns for all data.frames with rm_empty_cols=TRUE, keep others as is
+		df <- bundles2table(bundles = bundles, table_description = design, verbose = verbose, ncores = ncores)
+
 		if(design@rm_empty_cols && 0 < ncol(df)) {
 			df <- df[, 0 < colSums(!is.na(df)), with = FALSE]
 		}
 
 		if(0 < verbose) {message("FHIR-Resources cracked.")}
+
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
+
 		if(data.table) {df} else {data.frame(df)}
 	}
 )
@@ -520,14 +557,14 @@ setMethod(
 	definition = function(
 		bundles,
 		design,
-		sep                  = NULL,
-		brackets             = NULL,
-		remove_empty_columns = NULL,
-		verbose              = 2,
-		data.table           = FALSE,
-		format               = "compact",
-		keep_attr            = FALSE,
-		ncores               = NULL) {
+		sep                     = NULL,
+		brackets                = NULL,
+		remove_empty_columns    = NULL,
+		verbose                 = 2,
+		data.table              = FALSE,
+		format                  = "compact",
+		keep_attr               = FALSE,
+		ncores                  = NULL) {
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
@@ -583,13 +620,40 @@ setMethod(
 			)
 		}
 
-		#Add attributes to design not longer necessary
-		#design <- add_attribute_to_design(design = design)
-		# os <- get_os()
-		# ncores <- if(is.null(ncores)) 1 else min(c(get_ncores(os), ncores))
-		# message(paste0("Cracking under OS ", os, " using ", ncores, if(1 < ncores) " cores." else " core."))
+		#######################################################################
+		if(length(bundles) < 1) {
+			warning('No bundles present in bundles list \'bundles\'. NULL will be returned.')
+			return(NULL)
+		}
 
-		dfs <- bundles2tables(bundles = bundles, design = design, verbose = verbose, ncores = ncores)
+		if(length(design) < 1) {
+			warning('No table descriptions present in design \'design\'. NULL will be returned.')
+			return(NULL)
+		}
+
+		if(is.null(ncores) || is.na(ncores) || ncores < 1) ncores <- 1
+		os <- get_os()
+		available_cores <- get_ncores(os)
+		ncores <- min(c(available_cores, ncores))
+		message(
+			paste0(
+				'Cracking under OS ',
+				os,
+				' having ',
+				available_cores,
+				if(1 < available_cores) " cores" else " core",
+				' available using ', ncores, if(1 < ncores) ' cores.' else ' core.'
+			)
+		)
+
+		dfs <- lapply(
+			X   = design,
+			FUN = function(table_description) {
+				#table_description <- design[[2]]
+				fhir_crack(bundles = bundles, design = table_description, ncores = ncores, verbose = verbose)
+			}
+		)
+
 		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
 		dfs
