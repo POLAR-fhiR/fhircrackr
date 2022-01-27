@@ -1,353 +1,171 @@
-# unloadNamespace('fhircrackr')
-# rm(list = ls())
-
-add_missing_indices <- function(names, bra, ket, sep) {
-	gsub(
-		paste0('(\\w$)'),
-		paste0('\\1', bra, '1', ket),
-		gsub(
-			paste0('(\\w)(', sep, ')'),
-			paste0('\\1', bra, '1', ket, sep),
-			names
-	))
+crack_wide_all_columns <- function(bundles, table_description, ncores = 1) {
+	#ncores <- limit_ncores(ncores)
+	data.table::rbindlist(
+		parallel::mclapply(
+			seq_along(bundles),
+			function(bundle_id) {
+				#bundle_id <- 1
+				(data.table(
+					bundle = as.integer(bundle_id), #enumerate bundles
+					node   = xml2::xml_find_all(
+						bundles[[bundle_id]],
+						paste0('./entry/resource/', table_description@resource, '//@*')
+					) # intermediate save entries
+				)
+				[, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
+				[, value    := xml2::xml_text(node)] # get value
+				[, attrib   := path |> busg('.*@', '')] # get attribute
+				[, path     := path |> busg('@.*', '')] # remove attribute from path
+				[, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
+				[, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
+				[, id       := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')] # extract ids
+				[, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')] # remove ids
+				[, column   := paste0('[', id, ']', xpath) |>
+						busg('/', '.') |>
+						paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
+				] # create column name
+				[, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary colums
+				) |> dcast(bundle + entry ~ column) # cast columns by bundle and entry
+			},
+			mc.cores = ncores
+		),
+		use.names = TRUE,
+		fill = TRUE
+	)
 }
-
-# add_missing_indices <- function(names, bra, ket, sep) {
-# 	gsub(
-# 		paste0('(\\w)', sep, '(\\w)'),
-# 		paste0('\\1', bra, '1', ket, '\\.\\2'),
-# 		gsub(
-# 			'(\\w)@(\\w)',
-# 			paste0('\\1', bra, '1', ket, '@\\2'),
-# 			names
-# 		)
-# 	)
-# }
-#
-replace_brackets <- function(names, bra, ket) {
-	gsub('\\[', bra, gsub(']', ket, names))
-}
-
-bundles2table <- function(bundles, table_description, ncores = 1, verbose = 2) {
-
-	xpath_resource <- paste0('//', table_description@resource)
-
-	extract_compact_with_given_columns <- function(bundle) {
-		#bundle <- bundles[[1]]
-		resources <- xml2::xml_find_all(x = bundle, xpath = xpath_resource)
-		data.table::rbindlist(
-			use.names = TRUE,
-			fill = TRUE,
-			l = lapply(
-				X   = resources,
-				FUN = function(resource) {
-					#resource <- resources[[1]]
-					resource_xpath <- xml2::xml_path(resource)
-					d <- data.table::data.table()
-					d[,	unlist(
-						recursive = FALSE,
+crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
+	data.table::rbindlist(
+		parallel::mclapply(
+			seq_along(bundles),
+			function(bundle_id) {
+				#bundle_id <- 260
+				nodes <- xml2:::xml_nodeset(
+					unlist(
+						recursive = F,
 						lapply(
-							X   = seq_along(table_description@cols),
-							FUN = function(column_id) {
-								#column_id <- 2
-								# resource_xpath <- gsub(
-								# 	pattern     = paste0(table_description@resource, '$'),
-								# 	replacement = '',
-								# 	x = xml2::xml_path(resource)
-								# )
-								column_name <- names(table_description@cols)[[column_id]]
-								nodes <- xml2::xml_find_all(x = resource, xpath = table_description@cols[[column_id]])
-								values <- xml2::xml_attrs(nodes)
-								paths <- xml2::xml_path(nodes)
-								paths <- gsub(
-									pattern     = esc(resource_xpath),
-									replacement = '',
-									x           = paths
+							table_description@cols,
+							function(xpath) {
+								#col <- table_description@cols[[1]]
+								xml2::xml_find_all(
+									bundles[[bundle_id]],
+									paste0('./entry/resource/', table_description@resource, '/', xpath, '/@*')
 								)
-
-								# if(0 < length(table_description@brackets)) {
-								# 	replace_brackets(names = paths_with_indices, bra = '<', ket = '>')
-								# }
-								# if(table_description@keep_attr) {
-								# 	attribs <- unique(sapply(values, names))
-								# 	if(1 < length(unique(attribs))) {
-								# 		attribs <- attribs[[1]]
-								# 		warning(
-								# 			paste0(
-								# 				'The names of the attributes are not unique for tag ',
-								# 				table_description@cols[[column_id]],
-								# 				'. Using the first one \'', attribs, '\' for Column Name Indexing.'
-								# 			)
-								# 		)
-								# 	}
-								# 	paths_with_indices, bra = '<', ket = '>')
-								# }
-
-								values_combinded <- if(0 < length(table_description@brackets)) {
-									column_indices <- gsub(
-										pattern     = '\\.$',
-										replacement =  '',
-										x           = gsub(
-											pattern     = '([^0-9\\.]+)',
-											replacement =  '',
-											x           =  gsub(
-												pattern     = '([0-9]+)',
-												replacement = '\\1\\.',
-												x           = add_missing_indices(
-													names = paths,
-													bra   = '[',
-													ket   = ']',
-													sep   =  '/'
-												)
-											)
-										)
-									)
-									paste0(
-										table_description@brackets[1],
-										column_indices,
-										table_description@brackets[2],
-										values,
-										collapse = table_description@sep
-									)
-								} else {
-									paste0(values, collapse = table_description@sep)
-								}
-								l <- list(x = values_combinded)
-								names(l) <- if(table_description@keep_attr) {
-									attribs <- unique(sapply(values, names))
-									if(1 < length(unique(attribs))) {
-										attribs <- attribs[[1]]
-										warning(
-											paste0(
-												'The names of the attributes are not unique for tag ',
-												table_description@cols[[column_id]],
-												'. Using the first one \'', attribs, '\' for Column Name Indexing.'
-											)
-										)
-									}
-									paste0(column_name, '@', attribs)
-								} else column_name
-								l
 							}
 						)
-					)]
-				}
-			)
-		)
-	}
-
-	extract_wide_with_given_columns <- function(bundle) {
-		#bundle <- bundles[[2]]
-		resources <- xml2::xml_find_all(x = bundle, xpath = xpath_resource)
-		data.table::rbindlist(
-			use.names = TRUE,
-			fill      = TRUE,
-			l         = lapply(
-				X   = resources,
-				FUN = function(resource) {
-					#resource <- resources[[1]]
-					resource_xpath <- xml2::xml_path(resource)
-					d <- data.table::data.table()
-					d[,	unlist(
-						recursive = FALSE,
-						lapply(
-							X   = seq_along(table_description@cols),
-							FUN = function(column_id) {
-								#column_id <- 2
-								# resource_xpath <- gsub(
-								# 	pattern     = paste0(table_description@resource, '$'),
-								# 	replacement = '',
-								# 	x = xml2::xml_path(resource)
-								# )
-								column_name <- names(table_description@cols)[[column_id]]
-								nodes <- xml2::xml_find_all(x = resource, xpath = table_description@cols[[column_id]])
-								values <- xml2::xml_attrs(nodes)
-								paths <- xml2::xml_path(nodes)
-								paths <- gsub(
-									pattern     = paste0(esc(resource_xpath), '/'),
-									replacement = '',
-									x           = paths
-								)
-								paths_with_indices <- add_missing_indices(
-									names = paths,
-									bra   = '[',
-									ket   = ']',
-									sep   = '/'
-								)
-								paths_with_indices <- if(0 < length(table_description@brackets)) {
-									paste0(
-										table_description@brackets[1],
-										gsub(
-											pattern     = '\\.$',
-											replacement =  '',
-											x           = gsub(
-												pattern     = '([^0-9\\.]+)',
-												replacement =  '',
-												x           =  gsub(
-													pattern     = '([0-9]+)',
-													replacement = '\\1\\.',
-													x           = paths_with_indices
-												)
-											)
-										),
-										table_description@brackets[2],
-										column_name
-									)
-								}
-								paths_with_indices <- gsub(
-									pattern     = '/',
-									replacement = '\\.',
-									x           = paths_with_indices
-								)
-
-								if(table_description@keep_attr) {
-									attribs <- unique(sapply(values, names))
-									if(1 < length(unique(attribs))) {
-										attribs <- attribs[[1]]
-										warning(
-											paste0(
-												'The names of the attributes are not unique for tag ',
-												table_description@cols[[column_id]],
-												'. Using the first one \'', attribs, '\' for Column Name Indexing.'
-											)
-										)
-									}
-									paths_with_indices <- paste0(paths_with_indices, '@', attribs)
-								}
-
-								names(values) <- paths_with_indices
-								values
-							}
-						)
-					)]
-				}
-			)
-		)
-	}
-
-	d <- if(0 < length(table_description@cols)) {   # GIVEN COLUMNS
-		if(table_description@format == 'compact') { # GIVEN COLUMNS - COMPACT
-			data.table::rbindlist(
-				use.names = TRUE,
-				fill      = TRUE,
-				l         = if(ncores == 1) {
-					lapply(
-						X   = bundles,
-						FUN = extract_compact_with_given_columns
 					)
-				} else {
-					parallel::mclapply(
-						mc.cores = ncores,
-						X        = bundles,
-						FUN      = extract_compact_with_given_columns
-					)
-				}
-			)
-		} else {                                    # GIVEN COLUMNS - WIDE
-			data.table::rbindlist(
-				use.names = TRUE,
-				fill      = TRUE,
-				l         = if(ncores == 1) {
-					lapply(
-						X   = bundles,
-						FUN = extract_wide_with_given_columns
-					)
-				} else {
-					parallel::mclapply(
-						mc.cores = ncores,
-						X        = bundles,
-						FUN = extract_wide_with_given_columns
-					)
-				}
-			)
-		}
-	} else {                                        # ALL COLUMNS
-		if(table_description@format == 'compact') { # ALL COLUMNS - COMPACT
-			data.table::rbindlist(
-				use.names = TRUE,
-				fill      = TRUE,
-				l         = if(ncores == 1) {
-					lapply(
-						X   = bundles,
-						FUN = function(bundle, table_description, vebose = verbose) {
-
-						}
-					)
-				} else {
-					parallel::mclapply(
-						mc.cores = ncores,
-						X        = bundles,
-						FUN      = function(bundle, table_description, vebose = verbose) {
-
-						}
-					)
-				}
-			)
-		} else {                                    # ALL COLUMNS - WIDE
-			data.table::rbindlist(
-				use.names = TRUE,
-				fill      = TRUE,
-				l         = if(ncores == 1) {
-					lapply(
-						X   = bundles,
-						FUN = function(bundle, table_description, vebose = verbose) {
-
-						}
-					)
-				} else {
-					parallel::mclapply(
-						mc.cores = ncores,
-						X        = bundles,
-						FUN      = function(bundle, table_description, vebose = verbose) {
-
-						}
-					)
-				}
-			)
-		}
-	}
-	if(table_description@rm_empty_cols) {
-		d <- d[, 0 < colSums(!is.na(d)), with = FALSE]
-	}
-	d[]
+				)
+				(data.table(
+					bundle = as.integer(bundle_id), #enumerate bundles
+					node   = nodes # intermediate save entries
+				)
+					[, path     := xml2::xml_path(node) |> busg('/Bundle/', '') |> busg('([^]])/', '\\1[1]/')] # add missing indices
+					[, value    := xml2::xml_text(node)] # get value
+					[, attrib   := path |> busg('.*@', '')] # get attribute
+					[, path     := path |> busg('@.*', '')] # remove attribute from path
+					[, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
+					[, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
+					[, id       := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')] # extract ids
+					[, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')] # remove ids
+					[, column   := paste0('[', id, ']', names(table_description@cols)[match(xpath, table_description@cols)]) |>
+							busg('/', '.') |>
+							paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
+					] # create column name
+					[, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary colums
+				) |> dcast(bundle + entry ~ column) # cast columns by bundle and entry
+			},
+			mc.cores = ncores
+		),
+		use.names = TRUE,
+		fill = TRUE
+	)
 }
-
-# bundles2tables <- function(bundles, design, ncores = 1, split_threads_on_bundle = TRUE, verbose = 2) {
-#
-# 	#######################################################################
-# 	if(length(bundles) < 1) {
-# 		warning('No bundles present in bundles list \'bundles\'. NULL will be returned.')
-# 		return(NULL)
-# 	}
-#
-# 	if(length(design) < 1) {
-# 		warning('No table descriptions present in design \'design\'. NULL will be returned.')
-# 		return(NULL)
-# 	}
-#
-# 	if(is.null(ncores) || is.na(ncores) || ncores < 1) ncores <- 1
-# 	os <- get_os()
-# 	available_cores <- get_ncores(os)
-# 	ncores <- min(c(available_cores, ncores))
-# 	message(
-# 		paste0(
-# 			'Cracking under OS ',
-# 			os,
-# 			' having ',
-# 			available_cores,
-# 			if(1 < available_cores) " cores" else " core",
-# 			' available using ', ncores, if(1 < ncores) ' cores.' else ' core.'
-# 		)
-# 	)
-#
-# 	lapply(
-# 		X   = design,
-# 		FUN = function(table_description) {
-# 			#table_description <- design[[2]]
-# 			bundles2table(bundles = bundles, table_description = table_description, ncores = ncores, verbose = verbose)
-# 		}
-# 	)
-# }
+convert_wide_table_to_a_compact_one <- function(wide, table_description, ncores = 1) {
+	pastl <- function(l, pre = '[', ids, suf = ']', sep = ' ~ ') {
+		pastv <- function(v, pre = '[', ids, suf = ']', sep = ' ~ ') {
+			len <- length(v)
+			pre <- rep_len(pre, len)
+			ids <- rep_len(ids, len)
+			suf <- rep_len(suf, len)
+			flt <- !is.na(v)
+			paste0(pre[flt], ids[flt], suf[flt], v[flt], collapse = sep)
+		}
+		apply(
+			X      = l,
+			MARGIN = 1,
+			FUN    = pastv,
+			pre    = pre,
+			ids    = ids,
+			suf    = suf,
+			sep    = sep
+		)
+	}
+	#ncores <- limit_ncores(ncores)
+	w <- wide[,-c('bundle', 'entry')]
+	names <- names(w)
+	ids <- names |> busg('(^\\[)|(].+$)|(bundle|entry)', '')
+	short_names <- names |> busg('^.+]', '')
+	unique_short_names <- unique(short_names)
+	sep <- table_description@sep
+	if(0 < length(table_description@brackets)) {
+		bra <- table_description@brackets[[1]]
+		ket <- table_description@brackets[[2]]
+	} else {
+		bra <- ''
+		ket <- ''
+		ids <- ''
+	}
+	d <- parallel::mclapply(
+		X        = lst(unique_short_names),
+		FUN      = function(unique_short_name) {
+			#unique_short_name <- lst(unique_short_names)[[2]]
+			i <- which(unique_short_name == short_names)
+			pastl(l = w[,..i,with=TRUE], pre = bra, ids = ids, suf = ket, sep = sep)
+		},
+		mc.cores = ncores
+	)
+	cbind(wide[,c('bundle', 'entry')], as.data.table(d))
+}
+convert_wide_tables_to_compact_ones <- function(wide, design, ncores = Inf) {
+	ncores <- limit_ncores(ncores)
+	lapply(
+		X   = design,
+		FUN = function(d) {
+			convert_wide_table_to_a_compact_one(
+				wide              = wide[[paste0(d@resource, 's')]],
+				table_description = d,
+				ncores            = ncores
+			)
+		}
+	)
+}
+crack_bundles_to_one_table <- function(bundles, table_description, ncores = 1) {
+	table <- if(0 < length(table_description@cols)) {
+		crack_wide_given_columns(bundles = bundles, table_description = table_description, ncores = ncores)
+	} else {
+		crack_wide_all_columns(bundles = bundles, table_description = table_description, ncores = ncores)
+	}
+	if(table_description@format == 'compact') {
+		table <- convert_wide_table_to_a_compact_one(
+			wide              = table,
+			table_description = table_description,
+			ncores            = ncores
+		)
+	}
+	unique(table[,lapply(.SD, function(x)x[[1]]), by = setdiff(names(table), c('bundle', 'entry'))])
+}
+crack_bundles_to_tables <- function(bundles, design, ncores = Inf) {
+	ncores <- limit_ncores(ncores)
+	lapply(
+		X   = design,
+		FUN = function(table_description) {
+			crack_bundles_to_one_table(
+				bundles           = bundles,
+				table_description = table_description,
+				ncores            = ncores
+			)
+		}
+	)
+}
 
 ## This file contains all functions needed for flattening ##
 ## Exported functions are on top, internal functions below ##
@@ -459,8 +277,8 @@ setGeneric(
 		remove_empty_columns    = NULL,
 		verbose                 = 2,
 		data.table              = FALSE,
-		format                  = "compact",
-		keep_attr               = FALSE,
+		format                  = NULL,
+		keep_attr               = NULL,
 		ncores                  = NULL) {
 
 		standardGeneric("fhir_crack")
@@ -480,8 +298,8 @@ setMethod(
 		remove_empty_columns = NULL,
 		verbose              = 2,
 		data.table           = FALSE,
-		format               = "compact",
-		keep_attr            = FALSE,
+		format               = NULL,
+		keep_attr            = NULL,
 		ncores               = NULL) {
 
 		#overwrite design with function arguments
@@ -523,27 +341,43 @@ setMethod(
 
 		os <- get_os()
 		available_cores <- get_ncores(os)
-		ncores <- if(is.null(ncores)) 1 else min(c(available_cores, ncores))
-		message(
+		ncores <- limit_ncores(available_cores)
+		if(0 < verbose) cat(
 			paste0(
-				'Cracking under OS ',
-				os,
-				' having ',
+				'Cracking ',
+				length(bundles),
+				' ',
+				design@resource,
+				's\' ',
+				if(1 == length(bundles)) 'Bundle' else 'Bundles',
+				' on a ',
+				toupper(os),
+				'-Mashine using ',
+				ncores,
+				'/',
 				available_cores,
-				if(1 < available_cores) " cores" else " core",
-				' available using ', ncores, if(1 < ncores) ' cores.' else ' core.'))
+				if(1 == available_cores) ' CPU' else ' CPUs',
+				' ... '
+			)
+		)
 
-		df <- bundles2table(bundles = bundles, table_description = design, verbose = verbose, ncores = ncores)
+		df <- crack_bundles_to_one_table(bundles = bundles, table_description = design, ncores = ncores)
+		#df <- bundles2table(bundles = bundles, table_description = design, ncores = ncores, verbose = verbose)
 
 		if(design@rm_empty_cols && 0 < ncol(df)) {
 			df <- df[, 0 < colSums(!is.na(df)), with = FALSE]
 		}
 
-		if(0 < verbose) {message("FHIR-Resources cracked.")}
+		#df <- unique(df[,lapply(.SD, function(x)x[[1]]),by=setdiff(names(df), c('bundle', 'entry'))])
+
+		if(0 < verbose) {cat('finished.\n')}
 
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
 
-		if(data.table) {df} else {data.frame(df)}
+		if(data.table) {
+			data.table::setDF(df)
+		}
+		df
 	}
 )
 
@@ -562,8 +396,8 @@ setMethod(
 		remove_empty_columns    = NULL,
 		verbose                 = 2,
 		data.table              = FALSE,
-		format                  = "compact",
-		keep_attr               = FALSE,
+		format                  = NULL,
+		keep_attr               = NULL,
 		ncores                  = NULL) {
 
 		#overwrite design with function arguments
@@ -602,6 +436,27 @@ setMethod(
 			)
 		}
 
+		if(!is.null(format)) {
+			design <- fhir_design(lapply(
+				design,
+				function(x) {
+					x@format <- format
+					x
+				})
+			)
+		}
+
+		if(!is.null(keep_attr)) {
+			design <- fhir_design(lapply(
+				design,
+				function(x) {
+					x@keep_attr <- keep_attr
+					x
+				})
+			)
+		}
+
+
 		validObject(object = design, complete = TRUE)
 		#Check for dangerous XPath expressions ins cols
 		cols <- lapply(
@@ -632,29 +487,38 @@ setMethod(
 		}
 
 		if(is.null(ncores) || is.na(ncores) || ncores < 1) ncores <- 1
-		os <- get_os()
-		available_cores <- get_ncores(os)
-		ncores <- min(c(available_cores, ncores))
-		message(
-			paste0(
-				'Cracking under OS ',
-				os,
-				' having ',
-				available_cores,
-				if(1 < available_cores) " cores" else " core",
-				' available using ', ncores, if(1 < ncores) ' cores.' else ' core.'
-			)
-		)
+		# os <- get_os()
+		# available_cores <- get_ncores(os)
+		# ncores <- min(c(available_cores, ncores))
+		# if(0 < verbose) message(
+		# 	paste0(
+		# 		'Cracking ',
+		# 		length(bundles),
+		# 		if(1 < length(bundles)) ' bundles.' else ' bundle.'
+		# 	)
+		# )
 
-		dfs <- lapply(
-			X   = design,
-			FUN = function(table_description) {
-				#table_description <- design[[2]]
-				fhir_crack(bundles = bundles, design = table_description, ncores = ncores, verbose = verbose)
-			}
-		)
+		# dfs <- lapply(
+		# 	X   = design,
+		# 	FUN = function(table_description) {
+		# 		#table_description <- design[[2]]
+		# 		fhir_crack(
+		# 			bundles              = bundles,
+		# 			design               = table_description,
+		# 			ncores               = ncores,
+		# 			sep                  = sep,
+		# 			brackets             = brackets,
+		# 			remove_empty_columns = remove_empty_columns,
+		# 			verbose              = verbose,
+		# 			data.table           = data.table,
+		# 			format               = format,
+		# 			keep_attr            = keep_attr
+		# 		)
+		# 	}
+		# )
+		dfs <- crack_bundles_to_tables(bundles = bundles, design = design, ncores = ncores)
 
-		if(0 < verbose) {message("FHIR-Resources cracked. \n")}
+		#if(0 < verbose) {message("FHIR-Resources cracked. \n")}
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
 		dfs
 	}
