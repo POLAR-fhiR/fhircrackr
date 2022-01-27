@@ -75,15 +75,18 @@ extract the design that was used to create the respective list.
 ###create fhir_table_descriptions first
 #see ?fhir_table_description for explanation
 
-pat <- fhir_table_description(resource = "Patient",
-                    cols = c(name = "name/family",
-                             gender = "gender",
-                             id = "id"),
-                    style = fhir_style(sep = "||",
-                                       brackets = c("[", "]"),
-                                       rm_empty_cols = FALSE
-                            )
-             )
+pat <- fhir_table_description(
+    resource      = "Patient",
+    cols          = c(
+        id            = "id",
+        name          = "name/family",
+        gender        = "gender"
+    ),
+    sep           = "||",
+    brackets      = c("[", "]"),
+    rm_empty_cols = FALSE,
+
+)
 
 meds <- fhir_table_description(resource = "MedicationAdministration")
 

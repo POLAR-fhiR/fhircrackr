@@ -9,29 +9,40 @@ fhir_save_design(design, file = "design.xml")
 \arguments{
 \item{design}{A \linkS4class{fhir_design} object. See \code{\link[=fhir_design]{fhir_design()}}.}
 
-\item{file}{A string specifying the file to write to, defaults to writing "design.xml"
+\item{file}{A string specifying the file to write to, defaults to writing 'design.xml'
 into the current working directory.}
 }
 \description{
 Writes a \linkS4class{fhir_design} for use with \code{\link[=fhir_crack]{fhir_crack()}} to an xml file.
 }
 \examples{
-#create design
-df_desc1 <- fhir_table_description(resource = "Patient",
-                    cols = c(name = "name/family",
-                             gender = "gender",
-                             id = "id"),
-                    style = fhir_style(sep = "||",
-                                       brackets = c("[", "]"),
-                                       rm_empty_cols = FALSE
-                            )
-             )
+#create and save design
+table_desc1 <- fhir_table_description(
+    resource = 'Patient',
+    cols     = c(
+        id     = 'id',           # column names with xpaths
+        name   = 'name/family',
+        gender = 'gender'
+    ),
+    sep           = ':::',
+    brackets      = c('[', ']'),
+    rm_empty_cols = FALSE,
+    format        = 'compact',
+    keep_attr     = FALSE
+)
 
-df_desc2 <- fhir_table_description(resource = "Observation",
-                    cols = c("code/coding/system", "code/coding/code")
-            )
+table_desc2 <- fhir_table_description(
+    resource = 'Observation',
+    cols     = c(
+        'code/coding/system', # only xpaths
+        'code/coding/code'
+    )
+)
 
-design <- fhir_design(Patients = df_desc1, Observations = df_desc2)
+design <- fhir_design(
+    Patients     = table_desc1,
+    Observations = table_desc2
+)
 
 fhir_save_design(design = design, file = tempfile())
 }

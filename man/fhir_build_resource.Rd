@@ -26,14 +26,16 @@ been cast to wide format with \code{\link[=fhir_cast]{fhir_cast()}}.
 bundles <- fhir_unserialize(bundles = example_bundles1)
 
 #crack fhir resources
-Pat <- fhir_table_description(resource = "Patient",
-                                     style = fhir_style(brackets = c("[","]"),
-                                                        sep = " "))
+Pat <- fhir_table_description(
+    resource = "Patient",
+    brackets = c("[", "]"),
+    sep      = " "
+)
 
 df <- fhir_crack(bundles = bundles, design = Pat)
 
 #cast
-cast_df <- fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+cast_df <- fhir_cast(df, brackets = c("[", "]"), sep = " ", verbose = 0)
 
 #build bundles
 resource <- fhir_build_resource(cast_df[1,], "Patient")

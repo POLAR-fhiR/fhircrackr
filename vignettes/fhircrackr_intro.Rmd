@@ -176,16 +176,18 @@ table_description <- fhir_table_description(
 		gender      = "gender",
 		birthday    = "birthDate"
 	),
-	style    = fhir_style(
-		sep           = "|",
-		brackets      = c("[", "]"),
-		rm_empty_cols = FALSE))
+	sep           = "|",
+	brackets      = c("[", "]"),
+	rm_empty_cols = FALSE,
+	format        = 'compact',
+	keep_attr     = FALSE
+)
 
 #have a look
 table_description
 ```
 
-All three elements of `style` can also be controlled directly by the `fhir_crack()` arguments `sep`, `brackets` and `remove_empty_columns`. If the function arguments are `NULL` (their default), the values provided in `style` are used, if they are not NULL, they will overwrite any values in `style`. If both the function arguments and the `style` component of the `fhir_table_description` are NULL, default values(`sep = " "`, `brackets = NULL`, `rm_empty_cols = TRUE`) will be assumed. 
+All five style elements of can also be controlled directly by the `fhir_crack()` arguments `sep`, `brackets`, `remove_empty_columns`, `format` and `keep_attr`. If the function arguments are `NULL` (their default), the values provided as style arguments are used, if they are not NULL, they will overwrite any values in `fhir_table_description`. If both the function arguments and the `fhir_table_description` components are NULL, default values(`sep = " "`, `brackets = NULL`, `rm_empty_cols = TRUE`, `format` = 'compact', `keep_attr` = FALSE) will be assumed. 
 
 After it is defined, the `fhir_table_description` can be used in `fhir_crack()` like this:
 
@@ -239,10 +241,12 @@ MedicationStatements <- fhir_table_description(
 		PATIENT            = "subject/reference",
 		LAST.UPDATE        = "meta/lastUpdated"
 	),
-	style    = fhir_style(
-		sep           = "|",
-		brackets      = NULL, 
-		rm_empty_cols = FALSE))
+	sep           = "|",
+	brackets      = NULL,
+	rm_empty_cols = FALSE,
+	format        = "compact",
+	keep_attr     = FALSE
+)
 
 Patients <- fhir_table_description(resource = "Patient")
 
@@ -324,15 +328,17 @@ They represent a very simple bundle of just two Patient resources which looks li
 ```
 The first resource has just one entry for the address attribute. The second Patient resource has an address attribute with three entries containing different elements and also two entries for the name attribute.
 
-This is where the `style` element of the `table_description` comes into play:
+This is where the style elements of the `table_description` comes into play:
 
 ```{r}
 table_description <- fhir_table_description(
 	resource = "Patient",
-	style    = fhir_style(
-		brackets      = c("[", "]"),
-		sep           = " | ",
-		rm_empty_cols = FALSE))
+	brackets      = c("[", "]"),
+	sep           = " | ",
+	rm_empty_cols = FALSE,
+	format        = 'compact',
+	keep_attr     = TRUE
+)
 
 df <- fhir_crack(bundles = bundles, design = table_description, verbose = 0)
 
@@ -351,7 +357,8 @@ fhir_melt(
 	columns            = "address.city",
 	brackets           = c("[", "]"),
 	sep                = " | ",
-	all_columns        = FALSE)
+	all_columns        = FALSE
+)
 ```
 
 The new variable `resource_identifier` maps which rows in the created data frame belong to which row (usually equivalent to one resource) in the original data frame.
@@ -365,7 +372,8 @@ fhir_melt(
 	columns            = cols,
 	brackets           = c("[", "]"),
 	sep                = " | ",
-	all_columns        = FALSE)
+	all_columns        = FALSE
+)
 ```
 
 With the argument `all_columns` you can control whether the resulting data frame contains only the molten columns or all columns of the original data frame:
@@ -376,7 +384,8 @@ molten <- fhir_melt(
 	columns            = cols,
 	brackets           = c("[", "]"),
 	sep                = " | ",
-	all_columns        = TRUE)
+	all_columns        = TRUE
+)
 
 molten
 ```
@@ -517,5 +526,12 @@ This work was carried out by the SMITH consortium and the cross-consortium use c
 file.remove(
 	paste0(
 		temp_dir,
-		c("/bundles.rda", "/design.xml", "/1.xml", "/2.xml")))
+		c(
+			"/bundles.rda",
+			"/design.xml",
+			"/1.xml",
+			"/2.xml"
+		)
+	)
+)
 ``` 

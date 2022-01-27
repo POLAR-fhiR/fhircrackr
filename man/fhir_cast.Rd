@@ -5,7 +5,7 @@
 \title{Cast table with multiple entries
 This function divides multiple entries in an indexed table as produced by \code{\link[=fhir_crack]{fhir_crack()}} into separate columns.}
 \usage{
-fhir_cast(indexed_df, brackets, sep, use_brackets = F, verbose = 1)
+fhir_cast(indexed_df, brackets, sep, use_brackets = FALSE, verbose = 1)
 }
 \arguments{
 \item{indexed_df}{A data.frame/data.table with indexed multiple entries. Column names should reflect the XPath expression of the respective element.}
@@ -39,16 +39,18 @@ See examples and the corresponding package vignette for a more detailed descript
 bundles <- fhir_unserialize(bundles = example_bundles1)
 
 #crack fhir resources
-table_desc <- fhir_table_description(resource = "Patient",
-                                     style = fhir_style(brackets = c("[","]"),
-                                                        sep = " "))
+table_desc <- fhir_table_description(
+    resource = "Patient",
+    brackets = c('[', ']'),
+    sep      = " "
+)
 df <- fhir_crack(bundles = bundles, design = table_desc)
 
 #original df
 df
 
 #cast
-fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+fhir_cast(df, brackets=c('[', ']'), sep = ' ', verbose = 0)
 
 }
 \seealso{

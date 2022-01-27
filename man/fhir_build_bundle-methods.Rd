@@ -111,18 +111,22 @@ If these columns are not added to the table, \code{\link[=fhir_build_bundle]{fhi
 bundles <- fhir_unserialize(bundles = example_bundles1)
 
 #crack fhir resources
-Pat <- fhir_table_description(resource = "Patient",
-                                     style = fhir_style(brackets = c("[","]"),
-                                                        sep = " "))
+Pat <- fhir_table_description(
+    resource = "Patient",
+    brackets = c("[", "]"),
+    sep      = " "
+)
 
 df <- fhir_crack(bundles = bundles, design = Pat)
 
 #cast
-cast_df <- fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+cast_df <- fhir_cast(df, brackets=c("[", "]"), sep = " ", verbose = 0)
 
 #add request info to table
-request <- data.frame(request.method = c("POST", "PUT"),
-                      request.url = c("Patient", "Patient/id3"))
+request <- data.frame(
+    request.method = c("POST", "PUT"),
+    request.url    = c("Patient", "Patient/id3")
+)
 
 request_df <- cbind(cast_df, request)
 

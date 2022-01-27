@@ -28,13 +28,16 @@ can be changed by setting the argument \code{nrow} to the desired number.
 bundles <- fhir_unserialize(bundles = example_bundles1)
 
 #crack fhir resources
-table_desc <- fhir_table_description(resource = "Patient",
-                                     style = fhir_style(brackets = c("[","]"),
-                                                        sep = " "))
+table_desc <- fhir_table_description(
+    resource = "Patient",
+    brackets = c("[", "]"),
+    sep      = " "
+)
+
 df <- fhir_crack(bundles = bundles, design = table_desc)
 
 #cast
-cast_df <- fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+cast_df <- fhir_cast(df, brackets = c("[", "]"), sep = " ", verbose = 0)
 
 #show tree
 fhir_show_tree(cast_df, resource="Patient")

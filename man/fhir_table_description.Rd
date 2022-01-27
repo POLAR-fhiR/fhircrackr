@@ -4,7 +4,15 @@
 \alias{fhir_table_description}
 \title{Create \linkS4class{fhir_table_description} object}
 \usage{
-fhir_table_description(resource, cols = fhir_columns(), style = fhir_style())
+fhir_table_description(
+  resource,
+  cols = fhir_columns(),
+  sep = ":::",
+  brackets = character(),
+  rm_empty_cols = FALSE,
+  format = "compact",
+  keep_attr = FALSE
+)
 }
 \arguments{
 \item{resource}{A character vector of length one or \linkS4class{fhir_resource_type} object
@@ -16,9 +24,6 @@ or a \linkS4class{fhir_xpath_expression} object. See \code{\link[=fhir_columns]{
 If this argument is omitted, an empty \linkS4class{fhir_columns} object will be supplied.
 This means that in the call to \code{\link[=fhir_crack]{fhir_crack()}}, all available elements are extracted in put
 in automatically named columns.}
-
-\item{style}{Optional. A \linkS4class{fhir_style} object, as created by \code{\link[=fhir_style]{fhir_style()}}.
-If this argument is omitted, default values will be assumed, see \code{\link[=fhir_style]{fhir_style()}}.}
 }
 \value{
 An object of class \linkS4class{fhir_table_description}.
@@ -36,54 +41,84 @@ the following elements:
 \item The cols element: Contains the column names and XPath expressions defining the columns to extract.
 If this element is empty, \code{\link[=fhir_crack]{fhir_crack()}} will extract all available elements of the resource and name the
 columns automatically. See \code{?fhir_columns}.
-\item The style element: Defines how to deal with multiple entries to the same element and whether empty columns are
-removed. See \code{?fhir_style}
-}
-
-A full \code{fhir_table_description} looks for example like this:\preformatted{fhir_resource_type: Patient
+\item The sep element: A character of length one containing the separator string used for separating multiple entries in cells.
+\item The brackets element: A characters of length one or two used for separating multiple entries in cells. The first one is the opening bracket
+and the second one the closing bracket. If only one is given, both are assumed opening and closing brackets are equal.
+\item The rm_empty_cols element: A logical of length one indicating whether empty columns should be removed of the resulting table or not.
+\item The format element: A character of length one indicating whether the resulting table should be cracked 'wide' or 'compact'.
+Cracking 'wide' means multiple entries will be distributed over several columns with indexed names.
+Otherwise multiple entries will be pasted separated by 'sep' into one cell/column. Defaults to 'compact'.
+\item The keep_attr element: A logical of length one indicating whether the names of the table columns end with or without the attributes' name,
+e.g. name.given oder name.given.value. This effects only, if no 'cols' argument is given. That means the column names are created by
+the xpath of their certain tags.
+A full \code{fhir_table_description} looks for example like this:
+}\preformatted{fhir_resource_type: Patient
 
 fhir_columns:
+------------ -----------------
 column name | xpath expression
-------------------------
+------------ -----------------
 name        | name/family
 gender      | gender
 id          | id
+------------ -----------------
 
-fhir_style:
-sep: ||
-brackets: '[' ']'
-rm_empty_cols: FALSE
+separator            : ':::'
+bracket open         : '['
+bracket close        : ']'
+remove empty columns : TRUE
 }
 }
 \examples{
-#named character for cols
-fhir_table_description(resource = "Patient",
-                       cols = c(name = "name/family",
-                                gender = "gender",
-                                id = "id"),
-                       style = fhir_style(sep = "||",
-                                          brackets = c("[", "]"),
-                                          rm_empty_cols = FALSE)
+# a minimal table description
+fhir_table_description(
+    resource = 'Patient'
 )
 
-#If style is ommitted, default values are assumed
-fhir_table_description(resource = "Patient",
-                       cols = c(name = "name/family",
-                                gender = "gender",
-                                id = "id")
-)
-
-#named list for cols
-fhir_table_description(resource = "Patient",
-                       cols = list(name = "name/family",
-                                   gender = "gender",
-                                   id = "id")
+# named list for cols
+fhir_table_description(
+    resource = "Patient",
+    cols     = list(
+        id     = "id",
+        name   = "name/family",
+        gender = "gender"
+    )
 )
 
 #unnamed character for cols, colnames are generated automatically
-fhir_table_description(resource = "Patient",
-                       cols = c("name/family",
-                                "gender",
-                                "id")
+fhir_table_description(
+    resource = "Patient",
+    cols     = c(
+        "id",
+        "name/family",
+        "gender"
+    )
 )
+
+# named character for cols, and redundantly given defaults for all arguments
+fhir_table_description(
+    resource = 'Patient',
+    cols = c(
+        id            = 'id',
+        name          = 'name/family',
+        gender        = 'gender'
+    ),
+    sep           = ':::',
+    brackets      = c('<|', '|>'),
+    rm_empty_cols = FALSE,
+    format        = 'compact',
+    format        = 'compact'
+)
+
+# no column arguments is given,
+# so we may use 'keep_attr' and set it to TRUE for later recreating bundles
+fhir_table_description(
+    resource = 'Patient',
+    sep           = ' <~> ',
+    brackets      = c('<<<', '>>>'),
+    rm_empty_cols = FALSE,
+    format        = 'wide',
+    keep_attr     = TRUE
+)
+
 }

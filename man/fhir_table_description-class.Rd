@@ -14,12 +14,21 @@ per resource type. See Details.
 A \code{fhir_table_description} consists of
 the following elements:
 \itemize{
-\item The resource element: Defines the resource type (e.g. \code{Patient} or \code{Observation}). See \code{\link[=fhir_resource_type]{fhir_resource_type()}}.
+\item The resource element: Defines the resource type (e.g. \code{Patient} or \code{Observation}). See [fhir_resource_type()].
 \item The cols element: Contains the column names and XPath expressions defining the columns to extract.
-If this element is empty, \code{\link[=fhir_crack]{fhir_crack()}} will extract all available elements of the resource and name the
-columns automatically. See \code{\link[=fhir_columns]{fhir_columns()}}.
-\item The style element: Defines how to deal with multiple entries to the same element and whether empty columns are
-removed. See \code{\link[=fhir_style]{fhir_style()}}.
+If this element is empty, [fhir_crack()] will extract all available elements of the resource and name the
+columns automatically. See [fhir_columns()].
+\item The sep element: A character of length one containing the separator string used for separating multiple entries in cells.
+\item The brackets element: A characters of length one or two used for separating multiple entries in cells. The first one is the opening bracket
+and the second one the closing bracket. If only one is given, both are assumed opening and closing brackets are equal.
+Defaults to character(0). If, as in this case, no brackets are given, then no indexing will applied on multiple entries.
+\item The rm_empty_cols element: A logical of length one indicating whether empty columns should be removed of the resulting table or not. Defaults to FALSE.
+\item The format element: A character of length one indicating whether the resulting table should be cracked 'wide' or 'compact'.
+Cracking 'wide' means multiple entries will be distributed over several columns with indexed names.
+Otherwise multiple entries will be pasted separated by 'sep' into one cell/column. Defaults to 'compact'.
+\item The keep_attr element: A logical of length one indicating whether the names of the table columns end with or without the attributes' name,
+e.g. name.given oder name.given.value. This effects only, if no 'cols' argument is given. That means the column names are created by
+the xpath of their certain tags.
 }
 
 A full \code{fhir_table_description} looks for example like this:\preformatted{fhir_resource_type: Patient
@@ -31,10 +40,11 @@ name        | name/family
 gender      | gender
 id          | id
 
-fhir_style:
-sep: ||
-brackets: '[' ']'
-rm_empty_cols: FALSE
+
+
+[fhir_resource_type()]: R:fhir_resource_type()
+[fhir_crack()]: R:fhir_crack()
+[fhir_columns()]: R:fhir_columns()
 }
 }
 \section{Slots}{
@@ -47,9 +57,23 @@ should be extracted.}
 If this is an empty \linkS4class{fhir_columns} object, the call to \code{\link[=fhir_crack]{fhir_crack()}} will extract all available
 elements and put them in automatically named columns.}
 
-\item{\code{style}}{An object of class \linkS4class{fhir_style} describing how to deal with multiple entries and emtpy columns.}
+\item{\code{sep}}{An character of length one containing the separator string used for separating multiple entries in cells.}
+
+\item{\code{brackets}}{A characters of length one or two used for separating multiple entries in cells. The first one is the opening bracket
+and the second one the closing bracket. If only one is given, both are assumed opening and closing brackets are equal.
+Defaults to NULL. NULL means no indexing for multiple entries.}
+
+\item{\code{rm_empty_cols}}{A logical of length one indicating whether empty columns should be removed of the resulting table or not. Defaults to FALSE.}
+
+\item{\code{format}}{A character of length one indicating whether the resulting table should be cracked 'wide' or 'compact'.
+Cracking 'wide' means multiple entries will be distributed over several columns with indexed names.
+Otherwise multiple entries will be pasted separated by 'sep' into one cell/column. Defaults to 'compact'.}
+
+\item{\code{keep_attr}}{A logical of length one indicating whether the names of the table columns end with or without the attributes' name,
+e.g. name.given oder name.given.value. This effects only, if no 'cols' argument is given. That means the column names are created by
+the xpath of their certain tags.}
 }}
 
 \seealso{
-\code{\link[=fhir_resource_type]{fhir_resource_type()}},\code{\link[=fhir_columns]{fhir_columns()}},\code{\link[=fhir_style]{fhir_style()}}, \code{\link[=fhir_design]{fhir_design()}}, \code{\link[=fhir_crack]{fhir_crack()}}
+\code{\link[=fhir_resource_type]{fhir_resource_type()}},\code{\link[=fhir_columns]{fhir_columns()}}, \code{\link[=fhir_design]{fhir_design()}}, \code{\link[=fhir_crack]{fhir_crack()}}
 }
