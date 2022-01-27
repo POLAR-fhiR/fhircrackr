@@ -44,6 +44,20 @@ pastep <- function(..., list_of_paths = NULL, ext = NULL) {
 	paste0(paste0(paths, collapse = '/'), ext)
 }
 
+#' gsub with different order signature for use with `|>`
+#'
+#' @param x A character.
+#' @param pattern A character of length one.
+#' @param replacement A character of length one.
+#'
+#' @return A character.
+#'
+#' @examples
+#' 'ABC' |> busg('A', 'b') |> busg('B', 'c') |> busg('C', 'a')
+busg <- function(x, pattern, replacement) {
+	gsub(pattern = pattern, replacement = replacement, x = x)
+}
+
 fhir_ns_strip <- function(xml) {
 	# cat("\nis(xml):\n")
 	# print(is(xml))
@@ -593,8 +607,16 @@ get_os <- function() {
 	tolower(os)
 }
 
+# get number of available cpus
 get_ncores <- function(os) {
 	if(os %in% c("linux", "osx")) parallel::detectCores() else 1
+}
+
+# limit number of cpus to available ones
+limit_ncores <- function(ncores) {
+	os <- get_os()
+	available_cores <- get_ncores(os)
+	if(is.null(ncores)) 1 else min(c(available_cores, ncores))
 }
 
 #' Escape characters reserved in xml
@@ -744,3 +766,60 @@ auth_helper <- function(username, password, token){
 
 	list(basicAuth = auth, token = bearerToken)
 }
+
+#' Order Strings with Numbers correctly
+#'
+#' @param s A character containing the strings to be ordered.
+#'
+#' @return A character containing the order of the given strings.
+#' @export
+#'
+#' @examples
+#' s <- c('[1.0]', '[10.1]', '[2.0]')
+#' order(s)
+#' order_strings_with_numbers_correctly(s = s)
+order_strings_with_numbers_correctly <- function(s) {
+	sc <- as.character(s)
+	ss <- stringr::str_extract_all(sc, "[0-9]+")
+	i  <- 1
+	max_char <- max(sapply(ss, function(x) {if(0 < length(x) && !is.na(x)) max(nchar(x), na.rm = T) else 0}))
+	s_numbers <- strsplit(sc, "[^0-9]+")
+	s_letters <- strsplit(sc, "[0-9]+")
+	order(
+		sapply(
+			seq_along(ss),
+			function(i) {
+				sn <- s_numbers[[i]]
+				sl <- s_letters[[i]]
+				if(length(sn) < length(sl)) {
+					sn <- c(sn, "")
+				} else if(length(sl) < length(sn)) {
+					sl <- c(sl, "")
+				}
+				sn <- ifelse(!is.na(sn) & sn != "", stringr::str_pad(sn, max_char, "left", "0"), "")
+				if(sn[1] != "") paste0(sl, sn, collapse = "") else paste0(sn, sl, collapse = "")
+			}
+		)
+	)
+}
+
+
+#' Order Strings with Numbers correctly
+#'
+#' @param s A character containing the strings to be sorted.
+#'
+#' @return A character containing the the given strings sorted.
+#' @export
+#'
+#' @examples
+#' s <- c('[1.0]', '[10.1]', '[2.0]')
+#' sort(s)
+#' sort_strings_with_numbers_correctly(s = s)
+sort_strings_with_numbers_correctly <- function(s) {
+	if(is.null(s)){
+		return(s)
+	}
+	sc <- as.character(s)
+	s[order_strings_with_numbers_correctly(s)]
+}
+
