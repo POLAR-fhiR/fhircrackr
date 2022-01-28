@@ -1,64 +1,19 @@
 crack_wide_all_columns <- function(bundles, table_description, ncores = 1) {
 	#ncores <- limit_ncores(ncores)
-	data.table::rbindlist(
-		parallel::mclapply(
-			seq_along(bundles),
-			function(bundle_id) {
-				#bundle_id <- 1
-				(data.table(
-					bundle = as.integer(bundle_id), #enumerate bundles
-					node   = xml2::xml_find_all(
-						bundles[[bundle_id]],
-						paste0('./entry/resource/', table_description@resource, '//@*')
-					) # intermediate save entries
-				)
-				[, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
-				[, value    := xml2::xml_text(node)] # get value
-				[, attrib   := path |> busg('.*@', '')] # get attribute
-				[, path     := path |> busg('@.*', '')] # remove attribute from path
-				[, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
-				[, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
-				[, id       := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')] # extract ids
-				[, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')] # remove ids
-				[, column   := paste0('[', id, ']', xpath) |>
-						busg('/', '.') |>
-						paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
-				] # create column name
-				[, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary colums
-				) |> dcast(bundle + entry ~ column) # cast columns by bundle and entry
-			},
-			mc.cores = ncores
-		),
-		use.names = TRUE,
-		fill = TRUE
-	)
-}
-crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
-	data.table::rbindlist(
-		parallel::mclapply(
-			seq_along(bundles),
-			function(bundle_id) {
-				#bundle_id <- 260
-				nodes <- xml2:::xml_nodeset(
-					unlist(
-						recursive = F,
-						lapply(
-							table_description@cols,
-							function(xpath) {
-								#col <- table_description@cols[[1]]
-								xml2::xml_find_all(
-									bundles[[bundle_id]],
-									paste0('./entry/resource/', table_description@resource, '/', xpath, '/@*')
-								)
-							}
-						)
+	unique(
+		data.table::rbindlist(
+			parallel::mclapply(
+				seq_along(bundles),
+				function(bundle_id) {
+					#bundle_id <- 1
+					(data.table(
+						bundle = as.integer(bundle_id), #enumerate bundles
+						node   = xml2::xml_find_all(
+							bundles[[bundle_id]],
+							paste0('./entry/resource/', table_description@resource, '//@*')
+						) # intermediate save entries
 					)
-				)
-				(data.table(
-					bundle = as.integer(bundle_id), #enumerate bundles
-					node   = nodes # intermediate save entries
-				)
-					[, path     := xml2::xml_path(node) |> busg('/Bundle/', '') |> busg('([^]])/', '\\1[1]/')] # add missing indices
+					[, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
 					[, value    := xml2::xml_text(node)] # get value
 					[, attrib   := path |> busg('.*@', '')] # get attribute
 					[, path     := path |> busg('@.*', '')] # remove attribute from path
@@ -66,20 +21,70 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 					[, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
 					[, id       := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')] # extract ids
 					[, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')] # remove ids
-					[, column   := paste0('[', id, ']', names(table_description@cols)[match(xpath, table_description@cols)]) |>
+					[, column   := paste0('[', id, ']', xpath) |>
 							busg('/', '.') |>
 							paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
 					] # create column name
 					[, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary colums
-				) |> dcast(bundle + entry ~ column) # cast columns by bundle and entry
-			},
-			mc.cores = ncores
-		),
-		use.names = TRUE,
-		fill = TRUE
+					) |> dcast(bundle + entry ~ column) # cast columns by bundle and entry
+				},
+				mc.cores = ncores
+			),
+			use.names = TRUE,
+			fill = TRUE
+		)[, -c('bundle', 'entry')]
 	)
 }
-convert_wide_table_to_a_compact_one <- function(wide, table_description, ncores = 1) {
+crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
+	unique(
+		data.table::rbindlist(
+			parallel::mclapply(
+				seq_along(bundles),
+				function(bundle_id) {
+					#bundle_id <- 260
+					nodes <- xml2:::xml_nodeset(
+						unlist(
+							recursive = F,
+							lapply(
+								table_description@cols,
+								function(xpath) {
+									#col <- table_description@cols[[1]]
+									xml2::xml_find_all(
+										bundles[[bundle_id]],
+										paste0('./entry/resource/', table_description@resource, '/', xpath, '/@*')
+									)
+								}
+							)
+						)
+					)
+					(data.table(
+						bundle = as.integer(bundle_id), #enumerate bundles
+						node   = nodes # intermediate save entries
+					)
+						[, path     := xml2::xml_path(node) |> busg('/Bundle/', '') |> busg('([^]])/', '\\1[1]/')] # add missing indices
+						[, value    := xml2::xml_text(node)] # get value
+						[, attrib   := path |> busg('.*@', '')] # get attribute
+						[, path     := path |> busg('@.*', '')] # remove attribute from path
+						[, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
+						[, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
+						[, id       := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')] # extract ids
+						[, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')] # remove ids
+						[, column   := paste0('[', id, ']', names(table_description@cols)[match(xpath, table_description@cols)]) |>
+								busg('/', '.') |>
+								paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
+						] # create column name
+						[, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary colums
+					) |> dcast(bundle + entry ~ column) # cast columns by bundle and entry
+				},
+				mc.cores = ncores
+			),
+			use.names = TRUE,
+			fill = TRUE
+		)[, -c('bundle', 'entry')]
+	)
+}
+convert_wide_table_to_a_compact_one <- function(wide, table_description, ncores = Inf) {
+	ncores <- limit_ncores(ncores)
 	pastl <- function(l, pre = '[', ids, suf = ']', sep = ' ~ ') {
 		pastv <- function(v, pre = '[', ids, suf = ']', sep = ' ~ ') {
 			len <- length(v)
@@ -100,9 +105,8 @@ convert_wide_table_to_a_compact_one <- function(wide, table_description, ncores 
 		)
 	}
 	#ncores <- limit_ncores(ncores)
-	w <- wide[,-c('bundle', 'entry')]
-	names <- names(w)
-	ids <- names |> busg('(^\\[)|(].+$)|(bundle|entry)', '')
+	names <- names(wide)
+	ids <- names |> busg('(^\\[)|(].+$)', '')
 	short_names <- names |> busg('^.+]', '')
 	unique_short_names <- unique(short_names)
 	sep <- table_description@sep
@@ -119,11 +123,12 @@ convert_wide_table_to_a_compact_one <- function(wide, table_description, ncores 
 		FUN      = function(unique_short_name) {
 			#unique_short_name <- lst(unique_short_names)[[2]]
 			i <- which(unique_short_name == short_names)
-			pastl(l = w[,..i,with=TRUE], pre = bra, ids = ids, suf = ket, sep = sep)
+			pastl(l = wide[,..i,with=TRUE], pre = bra, ids = ids, suf = ket, sep = sep)
 		},
 		mc.cores = ncores
 	)
-	cbind(wide[,c('bundle', 'entry')], as.data.table(d))
+	as.data.table(d)
+	#cbind(wide[,c('bundle', 'entry')], as.data.table(d))
 }
 convert_wide_tables_to_compact_ones <- function(wide, design, ncores = Inf) {
 	ncores <- limit_ncores(ncores)
@@ -138,7 +143,29 @@ convert_wide_tables_to_compact_ones <- function(wide, design, ncores = Inf) {
 		}
 	)
 }
-crack_bundles_to_one_table <- function(bundles, table_description, ncores = 1) {
+crack_bundles_to_one_table <- function(bundles, table_description, ncores = Inf, verbose = 0) {
+	os <- get_os()
+	available_cores <- get_ncores(os)
+	ncores <- limit_ncores(ncores)
+	if(0 < verbose) cat(
+		paste0(
+			'Cracking ',
+			length(bundles),
+			' ',
+			table_description@resource,
+			's\' ',
+			if(1 == length(bundles)) 'Bundle' else 'Bundles',
+			' on a ',
+			toupper(os),
+			'-Mashine using ',
+			ncores,
+			'/',
+			available_cores,
+			if(1 == available_cores) ' CPU' else ' CPUs',
+			' ... \n'
+		)
+	)
+
 	table <- if(0 < length(table_description@cols)) {
 		crack_wide_given_columns(bundles = bundles, table_description = table_description, ncores = ncores)
 	} else {
@@ -151,9 +178,10 @@ crack_bundles_to_one_table <- function(bundles, table_description, ncores = 1) {
 			ncores            = ncores
 		)
 	}
-	unique(table[,lapply(.SD, function(x)x[[1]]), by = setdiff(names(table), c('bundle', 'entry'))])
+	#unique(table[,lapply(.SD, function(x)x[[1]]), by = setdiff(names(table), c('bundle', 'entry'))])
+	table
 }
-crack_bundles_to_tables <- function(bundles, design, ncores = Inf) {
+crack_bundles_to_tables <- function(bundles, design, ncores = Inf, verbose = 0) {
 	ncores <- limit_ncores(ncores)
 	lapply(
 		X   = design,
@@ -161,7 +189,8 @@ crack_bundles_to_tables <- function(bundles, design, ncores = Inf) {
 			crack_bundles_to_one_table(
 				bundles           = bundles,
 				table_description = table_description,
-				ncores            = ncores
+				ncores            = ncores,
+				verbose           = verbose
 			)
 		}
 	)
@@ -339,29 +368,7 @@ setMethod(
 			)
 		}
 
-		os <- get_os()
-		available_cores <- get_ncores(os)
-		ncores <- limit_ncores(available_cores)
-		if(0 < verbose) cat(
-			paste0(
-				'Cracking ',
-				length(bundles),
-				' ',
-				design@resource,
-				's\' ',
-				if(1 == length(bundles)) 'Bundle' else 'Bundles',
-				' on a ',
-				toupper(os),
-				'-Mashine using ',
-				ncores,
-				'/',
-				available_cores,
-				if(1 == available_cores) ' CPU' else ' CPUs',
-				' ... '
-			)
-		)
-
-		df <- crack_bundles_to_one_table(bundles = bundles, table_description = design, ncores = ncores)
+		df <- crack_bundles_to_one_table(bundles = bundles, table_description = design, ncores = ncores, verbose = verbose)
 		#df <- bundles2table(bundles = bundles, table_description = design, ncores = ncores, verbose = verbose)
 
 		if(design@rm_empty_cols && 0 < ncol(df)) {
@@ -516,7 +523,7 @@ setMethod(
 		# 		)
 		# 	}
 		# )
-		dfs <- crack_bundles_to_tables(bundles = bundles, design = design, ncores = ncores)
+		dfs <- crack_bundles_to_tables(bundles = bundles, design = design, ncores = ncores, verbose = verbose)
 
 		#if(0 < verbose) {message("FHIR-Resources cracked. \n")}
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
