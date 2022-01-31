@@ -188,7 +188,7 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 		)
 	)
 }
-convert_wide_table_to_a_compact_one <- function(wide, bra, ket, sep, rm_ids = FALSE, ncores = Inf) {
+convert_wide_table_to_a_compact_one <- function(wide, bra, ket, sep, rm_ids = FALSE, ncores = 1) {
 	ncores <- limit_ncores(ncores)
 	pastl <- function(l, ids, sep = ' ~ ') {
 		pastv <- function(v, ids, sep = ' ~ ') {
@@ -223,7 +223,7 @@ convert_wide_table_to_a_compact_one <- function(wide, bra, ket, sep, rm_ids = FA
 	data.table::setDT(d)
 	d
 }
-convert_wide_tables_to_compact_ones <- function(wide, design, rm_ids = FALSE, ncores = Inf) {
+convert_wide_tables_to_compact_ones <- function(wide, design, rm_ids = FALSE, ncores = 1) {
 	ncores <- limit_ncores(ncores)
 	lapply(
 		X   = design,
@@ -239,7 +239,7 @@ convert_wide_tables_to_compact_ones <- function(wide, design, rm_ids = FALSE, nc
 		}
 	)
 }
-crack_bundles_to_one_table <- function(bundles, table_description, ncores = Inf, verbose = 0) {
+crack_bundles_to_one_table <- function(bundles, table_description, ncores = 1, verbose = 0) {
 	os <- get_os()
 	available_cores <- get_ncores(os)
 	ncores <- limit_ncores(ncores)
@@ -278,7 +278,7 @@ crack_bundles_to_one_table <- function(bundles, table_description, ncores = Inf,
 	}
 	table
 }
-crack_bundles_to_tables <- function(bundles, design, ncores = Inf, verbose = 0) {
+crack_bundles_to_tables <- function(bundles, design, ncores = 1, verbose = 0) {
 	ncores <- limit_ncores(ncores)
 	lapply(
 		X   = design,
@@ -405,7 +405,7 @@ setGeneric(
 		data.table              = FALSE,
 		format                  = NULL,
 		keep_attr               = NULL,
-		ncores                  = Inf) {
+		ncores                  = 1) {
 
 		standardGeneric("fhir_crack")
 	}
@@ -426,7 +426,7 @@ setMethod(
 		data.table           = FALSE,
 		format               = NULL,
 		keep_attr            = NULL,
-		ncores               = Inf) {
+		ncores               = 1) {
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
@@ -499,7 +499,7 @@ setMethod(
 		data.table              = FALSE,
 		format                  = NULL,
 		keep_attr               = NULL,
-		ncores                  = Inf) {
+		ncores                  = 1) {
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
