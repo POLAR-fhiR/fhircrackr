@@ -405,7 +405,7 @@ setGeneric(
 		data.table              = FALSE,
 		format                  = NULL,
 		keep_attr               = NULL,
-		ncores                  = NULL) {
+		ncores                  = Inf) {
 
 		standardGeneric("fhir_crack")
 	}
@@ -426,7 +426,7 @@ setMethod(
 		data.table           = FALSE,
 		format               = NULL,
 		keep_attr            = NULL,
-		ncores               = NULL) {
+		ncores               = Inf) {
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
@@ -499,7 +499,7 @@ setMethod(
 		data.table              = FALSE,
 		format                  = NULL,
 		keep_attr               = NULL,
-		ncores                  = NULL) {
+		ncores                  = Inf) {
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
@@ -587,7 +587,7 @@ setMethod(
 			return(NULL)
 		}
 
-		if(is.null(ncores) || is.na(ncores) || ncores < 1) ncores <- 1
+		#if(is.null(ncores) || is.na(ncores) || ncores < 1) ncores <- 1
 		# os <- get_os()
 		# available_cores <- get_ncores(os)
 		# ncores <- min(c(available_cores, ncores))
