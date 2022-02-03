@@ -1,4 +1,4 @@
-#' A S4 class describing the form of data.frame produced by [fhir_crack()]
+#' A S4 class describing the form of a table produced by [fhir_crack()]
 #'
 #' A `fhir_table_description` is part of a `fhir_design` and holds the information [fhir_crack()] needs to flatten (aka crack)
 #' FHIR resources from a FHIR bundle and is created with [fhir_table_description()].
@@ -14,13 +14,15 @@
 #' If this element is empty, [fhir_crack()] will extract all available elements of the resource and name the
 #' columns automatically. See [fhir_columns()].
 #' - The sep element: A character of length one containing the separator string used for separating multiple entries in cells.
-#' - The brackets element: A characters of length one or two used for separating multiple entries in cells. The first one is the opening bracket
-#' and the second one the closing bracket. If only one is given, both are assumed opening and closing brackets are equal.
-#' Defaults to character(0). If, as in this case, no brackets are given, then no indexing will applied on multiple entries.
-#' - The rm_empty_cols element: A logical of length one indicating whether empty columns should be removed of the resulting table or not. Defaults to FALSE.
-#' - The format element: A character of length one indicating whether the resulting table should be cracked 'wide' or 'compact'.
-#' Cracking 'wide' means multiple entries will be distributed over several columns with indexed names.
-#' Otherwise multiple entries will be pasted separated by 'sep' into one cell/column. Defaults to 'compact'.
+#' - The brackets element: A character of length one or two used for the indices of multiple entries. The first one is the opening bracket
+#' and the second one the closing bracket. Vectors of length one will be recycled.
+#' Defaults to `character(0)`, i.e. no brackets, meaning that multiple entries won't be indexed.
+#' - The rm_empty_cols element: A logical of length one indicating whether empty columns should be removed in the resulting table or not. Defaults to `FALSE`.
+#' - The format element: A character of length one indicating whether the resulting table should be cracked to a `wide` or `compact` format.
+#' `wide` means multiple entries will be distributed over several columns with indexed names. `compact` means multiple entries will be pasted into one cell/column separated by `sep` .
+#' Defaults to `compact`.
+#' - The keep_attr element: A logical of length one indicating whether the attribute name of the respective element (`@value` in most cases)
+#' should be attached to the name of the variable in the resulting table. Defaults to `FALSE`.
 #'
 #' A full `fhir_table_description` looks for example like this:
 #' ```
@@ -33,21 +35,29 @@
 #' gender      | gender
 #' id          | id
 #'
+#'sep:           ':::'
+#'brackets:      '[', ']'
+#'rm_empty_cols: FALSE
+#'format:        'compact'
+#'keep_attr:     FALSE
+#'```
 #'
 #' @slot resource An object of class [fhir_resource_type-class] defining the resource type that
 #' should be extracted.
 #' @slot cols An object of class [fhir_columns-class] describing which columns should be created and how.
 #' If this is an empty [fhir_columns-class] object, the call to [fhir_crack()] will extract all available
 #' elements and put them in automatically named columns.
-#' @slot sep An character of length one containing the separator string used for separating multiple entries in cells.
-#' @slot brackets A characters of length one or two used for separating multiple entries in cells. The first one is the opening bracket
-#' and the second one the closing bracket. If only one is given, both are assumed opening and closing brackets are equal.
-#' Defaults to NULL. NULL means no indexing for multiple entries.
-#' @slot rm_empty_cols A logical of length one indicating whether empty columns should be removed of the resulting table or not. Defaults to FALSE.
-#' @slot format A character of length one indicating whether the resulting table should be cracked 'wide' or 'compact'.
-#' Cracking 'wide' means multiple entries will be distributed over several columns with indexed names.
-#' Otherwise multiple entries will be pasted separated by 'sep' into one cell/column. Defaults to 'compact'.
-#' @slot keep_attr A logical of length one indicating whether the resulting column names end with `@` followed by the tags attribute, e.g. `@value`.
+#' @slot sep A character of length one containing the separator string used for separating multiple entries in cells when `format = "compact"`.
+#' ignored when `format = "wide"`.
+#' @slot brackets A character of length one or two used for the indices of multiple entries. The first one is the opening bracket
+#' and the second one the closing bracket. Vectors of length one will be recycled.
+#' Defaults to `character(0)`, i.e. no brackets, meaning that multiple entries won't be indexed.
+#' @slot rm_empty_cols A logical of length one indicating whether empty columns should be removed from the resulting table or not. Defaults to FALSE.
+#' @slot format A character of length one indicating whether the resulting table should be cracked to a `wide` or `compact` format.
+#' `wide` means multiple entries will be distributed over several columns with indexed names. `compact` means multiple entries will be pasted into one cell/column separated by `sep` .
+#' Defaults to `compact`.
+#' @slot keep_attr A logical of length one indicating whether the attribute name of the respective element (`@value` in most cases)
+#' should be attached to the name of the variable in the resulting table. Defaults to `FALSE`
 #'
 #' @include fhir_resource_type.R fhir_columns.R
 #' @seealso [fhir_resource_type()],[fhir_columns()], [fhir_design()], [fhir_crack()]
@@ -65,6 +75,22 @@ setClass(
 	)
 )
 
+setValidity(
+	Class  = "fhir_table_description",
+	method = function(object) {
+
+		messages <- c()
+		if(1 < length(object@sep)) {messages <- c(messages, "sep must be character of length one.")}
+		if(!length(object@brackets) %in% c(0, 2)) {messages <- c(messages, "brackets must be character of length two or empty.")}
+		if("" %in% object@brackets) {messages <- c(messages, "You cannot use \"\" for brackets.")}
+		if(1 < length(object@rm_empty_cols)) {messages <- c(messages, "rm_empty_cols must be logical of length one.")}
+		if(!object@format %in% c("wide", "compact")) {messages <- c(messages, "format must be either 'compact' or 'wide'.")}
+		if(1 < length(object@keep_attr)) {messages <- c(messages, "keep_attr must be logical of length one.")}
+
+		if(0 < length(messages)) {messages} else {TRUE}
+	}
+)
+
 #' Create [fhir_table_description-class] object
 #'
 #' A `fhir_table_description` is part of a `fhir_design` and holds the information [fhir_crack()] needs to flatten (aka crack)
@@ -75,35 +101,40 @@ setClass(
 #' A `fhir_table_description` consists of
 #' the following elements:
 #'
-#' - The resource element: Defines the resource type (e.g. `Patient` or `Observation`). See `?fhir_resource`.
+#' - The resource element: Defines the resource type (e.g. `Patient` or `Observation`). See [fhir_resource_type()].
 #' - The cols element: Contains the column names and XPath expressions defining the columns to extract.
 #' If this element is empty, [fhir_crack()] will extract all available elements of the resource and name the
-#' columns automatically. See `?fhir_columns`.
+#' columns automatically. See [fhir_columns()].
 #' - The sep element: A character of length one containing the separator string used for separating multiple entries in cells.
-#' - The brackets element: A characters of length one or two used for separating multiple entries in cells. The first one is the opening bracket
-#' and the second one the closing bracket. If only one is given, both are assumed opening and closing brackets are equal.
-#' - The rm_empty_cols element: A logical of length one indicating whether empty columns should be removed of the resulting table or not.
-#' - The format element: A character of length one indicating whether the resulting table should be cracked 'wide' or 'compact'.
-#' Cracking 'wide' means multiple entries will be distributed over several columns with indexed names.
-#' Otherwise multiple entries will be pasted separated by 'sep' into one cell/column. Defaults to 'compact'.
+#' - The brackets element: A character of length one or two used for the indices of multiple entries. The first one is the opening bracket
+#' and the second one the closing bracket. Vectors of length one will be recycled.
+#' Defaults to `character(0)`, i.e. no brackets, meaning that multiple entries won't be indexed.
+#' - The rm_empty_cols element: A logical of length one indicating whether empty columns should be removed in the resulting table or not. Defaults to `FALSE`.
+#' - The format element: A character of length one indicating whether the resulting table should be cracked to a `wide` or `compact` format.
+#' `wide` means multiple entries will be distributed over several columns with indexed names. `compact` means multiple entries will be pasted into one cell/column separated by `sep` .
+#' Defaults to `compact`.
+#' - The keep_attr element: A logical of length one indicating whether the attribute name of the respective element (`@value` in most cases)
+#' should be attached to the name of the variable in the resulting table. Defaults to `FALSE`.
+#'
+#'
 #' A full `fhir_table_description` looks for example like this:
 #' ```
 #' fhir_resource_type: Patient
 #'
 #' fhir_columns:
-#' ------------ -----------------
 #' column name | xpath expression
-#' ------------ -----------------
+#' ------------------------
 #' name        | name/family
 #' gender      | gender
 #' id          | id
-#' ------------ -----------------
 #'
-#' separator            : ':::'
-#' bracket open         : '['
-#' bracket close        : ']'
-#' remove empty columns : TRUE
-#' ```
+#'sep:           ':::'
+#'brackets:      '[', ']'
+#'rm_empty_cols: FALSE
+#'format:        'compact'
+#'keep_attr:     FALSE
+#'```
+#'
 #' @param resource A character vector of length one or [fhir_resource_type-class] object
 #' indicating which resource type should be extracted.
 #' @param cols Optional. A [fhir_columns-class] object or something that can be coerced to one,
@@ -112,18 +143,24 @@ setClass(
 #' If this argument is omitted, an empty [fhir_columns-class] object will be supplied.
 #' This means that in the call to [fhir_crack()], all available elements are extracted in put
 #' in automatically named columns.
-#' @param sep  A character of length one.
-#' @param brackets A character of length one or two.
-#' @param rm_empty_cols A logical of length one.
-#' @param format A character of length one,
-#' @param keep_attr A logical of length one.
-#'
+#' @param sep  A character of length one containing the separator string used for separating multiple entries in cells when `format = "compact"`.
+#' ignored when `format = "wide"`. Defaults to `":::"`.
+#' @param brackets A character of length one or two used for the indices of multiple entries. The first one is the opening bracket
+#' and the second one the closing bracket. Vectors of length one will be recycled.
+#' Defaults to `character(0)`, i.e. no brackets, meaning that multiple entries won't be indexed.
+#' @param rm_empty_cols A logical of length one indicating whether empty columns should be removed from the resulting table or not. Defaults to `FALSE`.
+#' @param format  A character of length one indicating whether the resulting table should be cracked to a `wide` or `compact` format.
+#' `wide` means multiple entries will be distributed over several columns with indexed names. `compact` means multiple entries will be pasted into one cell/column separated by `sep` .
+#' Defaults to `compact`.
+#' @param keep_attr A logical of length one indicating whether the attribute name of the respective element (`@value` in most cases)
+#' should be attached to the name of the variable in the resulting table. Defaults to `FALSE`.
+#' @param style Deprecated since fhircrackr 2.0.0. Can at the moment still be used for backwards compatibility but will throw an warning.
 #' @return An object of class [fhir_table_description-class].
 #'
 #' @examples
 #' # a minimal table description
 #' fhir_table_description(
-#'     resource = 'Patient'
+#'     resource = "Patient"
 #' )
 #'
 #' # named list for cols
@@ -146,27 +183,26 @@ setClass(
 #'     )
 #' )
 #'
-#' # named character for cols, and redundantly given defaults for all arguments
+#' # named character for cols, and overwritten default for other arguments
 #' fhir_table_description(
-#'     resource = 'Patient',
+#'     resource = "Patient",
 #'     cols = c(
-#'         id            = 'id',
-#'         name          = 'name/family',
-#'         gender        = 'gender'
+#'         id            = "id",
+#'         name          = "name/family",
+#'         gender        = "gender"
 #'     ),
-#'     sep           = ':::',
-#'     brackets      = c('<|', '|>'),
-#'     rm_empty_cols = FALSE,
-#'     format        = 'compact'
+#'     brackets      = c("[", "]"),
+#'     rm_empty_cols = TRUE,
+#'     format        = "wide"
 #' )
 #'
-#' # no column arguments is given
+#' # no column arguments is given -> would create a column for all available elements
 #' fhir_table_description(
-#'     resource = 'Patient',
-#'     sep           = ' <~> ',
-#'     brackets      = c('<<<', '>>>'),
+#'     resource = "Patient",
+#'     sep           = " <~> ",
+#'     brackets      = c("<<<", ">>>"),
 #'     rm_empty_cols = FALSE,
-#'     format        = 'wide'
+#'     format        = "wide"
 #' )
 #'
 #' @export
@@ -177,11 +213,18 @@ fhir_table_description <- function(
 	brackets      = character(),
 	rm_empty_cols = FALSE,
 	format        = 'compact',
-	keep_attr     = TRUE) {
+	keep_attr     = FALSE,
+	style = NULL
+	) {
+
+	if(!is.null(style)){
+		warning("Have to overwrite fhir_table_description arguments because deprecated fhir_style is used.\n")
+		sep <- style@sep
+		brackets <- style@brackets
+		rm_empty_cols <- style@rm_empty_cols
+	}
 
 	resource <- fhir_resource_type(string = resource)
-
-	if(format != 'wide') format <- 'compact'
 
 	brackets <- fix_brackets(brackets = brackets)
 
