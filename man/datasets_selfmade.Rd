@@ -17,6 +17,7 @@ An object of class \code{fhir_bundle_list} of length 1.
 \strong{example_bundles1}\preformatted{<Bundle>
  <type value='searchset'/>
  <entry>
+  <resource>
     <Patient>
        <id value='id1'/>
 	      <address>
@@ -29,9 +30,11 @@ An object of class \code{fhir_bundle_list} of length 1.
 	         <given value='Marie'/>
 	      </name>
     </Patient>
+  </resource>
  </entry>
 
  <entry>
+  <resource>
     <Patient>
        <id value='id3'/>
 	      <address>
@@ -55,6 +58,7 @@ An object of class \code{fhir_bundle_list} of length 1.
           <given value='Max'/>
        </name>
     </Patient>
+  </resource>
  </entry>
 </Bundle>
 }
@@ -62,6 +66,7 @@ An object of class \code{fhir_bundle_list} of length 1.
 \strong{example_bundles2}\preformatted{<Bundle>
  <type value='searchset'/>
  <entry>
+  <resource>
      <Patient>
         <id value='id1'/>
         <address>
@@ -74,9 +79,11 @@ An object of class \code{fhir_bundle_list} of length 1.
            <given value='Marie'/>
         </name>
      </Patient>
+   </resource>
  </entry>
 
  <entry>
+  <resource>
     <Patient>
         <id value='id2'/>
         <address>
@@ -95,9 +102,11 @@ An object of class \code{fhir_bundle_list} of length 1.
            <given value='Susie'/>
        </name>
     </Patient>
+  </resource>
  </entry>
 
  <entry>
+  <resource>
     <Patient>
        <id value='id3'/>
        <address>
@@ -121,6 +130,7 @@ An object of class \code{fhir_bundle_list} of length 1.
           <given value='Max'/>
        </name>
     </Patient>
+  </resource>
  </entry>
 </Bundle>
 }
@@ -128,6 +138,7 @@ An object of class \code{fhir_bundle_list} of length 1.
 \strong{example_bundles3}\preformatted{<Bundle>
  <type value='searchset'/>
  <entry>
+  <resource>
     <Patient>
        <id value='id1'/>
        <address>
@@ -140,9 +151,11 @@ An object of class \code{fhir_bundle_list} of length 1.
           <given value='Marie'/>
        </name>
     </Patient>
+  </resource>
  </entry>
 
  <entry>
+  <resource>
     <Patient>
        <id value='id2'/>
        <address>
@@ -161,9 +174,11 @@ An object of class \code{fhir_bundle_list} of length 1.
           <given value='Susie'/>
        </name>
     </Patient>
+  </resource>
  </entry>
 
  <entry>
+  <resource>
     <Patient>
        <id value='id3'/>
        <address>
@@ -187,9 +202,11 @@ An object of class \code{fhir_bundle_list} of length 1.
           <given value='Max'/>
        </name>
     </Patient>
+  <resource/>
  </entry>
 
  <entry>
+  <resource>
     <Observation>
        <id value = 'obs1'/>
        <code>
@@ -208,6 +225,7 @@ An object of class \code{fhir_bundle_list} of length 1.
           <reference value='Patient/id3'/>
        </subject>
     </Observation>
+  </resource>
  </entry>
 </Bundle>"
 

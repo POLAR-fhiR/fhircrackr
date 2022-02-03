@@ -178,6 +178,7 @@ fhir_ns_strip <- function(xml) {
 #'<Bundle>
 #'  <type value='searchset'/>
 #'  <entry>
+#'   <resource>
 #'     <Patient>
 #'        <id value='id1'/>
 #' 	      <address>
@@ -190,9 +191,11 @@ fhir_ns_strip <- function(xml) {
 #' 	         <given value='Marie'/>
 #' 	      </name>
 #'     </Patient>
+#'   </resource>
 #'  </entry>
 #'
 #'  <entry>
+#'   <resource>
 #'     <Patient>
 #'        <id value='id3'/>
 #' 	      <address>
@@ -216,6 +219,7 @@ fhir_ns_strip <- function(xml) {
 #'           <given value='Max'/>
 #'        </name>
 #'     </Patient>
+#'   </resource>
 #'  </entry>
 #'</Bundle>
 #'```
@@ -239,6 +243,7 @@ fhir_ns_strip <- function(xml) {
 #'<Bundle>
 #'  <type value='searchset'/>
 #'  <entry>
+#'   <resource>
 #'      <Patient>
 #'         <id value='id1'/>
 #'         <address>
@@ -251,9 +256,11 @@ fhir_ns_strip <- function(xml) {
 #'            <given value='Marie'/>
 #'         </name>
 #'      </Patient>
+#'    </resource>
 #'  </entry>
 #'
 #'  <entry>
+#'   <resource>
 #'     <Patient>
 #'         <id value='id2'/>
 #'         <address>
@@ -272,9 +279,11 @@ fhir_ns_strip <- function(xml) {
 #'            <given value='Susie'/>
 #'        </name>
 #'     </Patient>
+#'   </resource>
 #'  </entry>
 #'
 #'  <entry>
+#'   <resource>
 #'     <Patient>
 #'        <id value='id3'/>
 #'        <address>
@@ -298,6 +307,7 @@ fhir_ns_strip <- function(xml) {
 #'           <given value='Max'/>
 #'        </name>
 #'     </Patient>
+#'   </resource>
 #'  </entry>
 #'</Bundle>
 #'```
@@ -320,6 +330,7 @@ fhir_ns_strip <- function(xml) {
 #' <Bundle>
 #'  <type value='searchset'/>
 #'  <entry>
+#'   <resource>
 #'     <Patient>
 #'        <id value='id1'/>
 #'        <address>
@@ -332,9 +343,11 @@ fhir_ns_strip <- function(xml) {
 #'           <given value='Marie'/>
 #'        </name>
 #'     </Patient>
+#'   </resource>
 #'  </entry>
 #'
 #'  <entry>
+#'   <resource>
 #'     <Patient>
 #'        <id value='id2'/>
 #'        <address>
@@ -353,9 +366,11 @@ fhir_ns_strip <- function(xml) {
 #'           <given value='Susie'/>
 #'        </name>
 #'     </Patient>
+#'   </resource>
 #'  </entry>
 #'
 #'  <entry>
+#'   <resource>
 #'     <Patient>
 #'        <id value='id3'/>
 #'        <address>
@@ -379,9 +394,11 @@ fhir_ns_strip <- function(xml) {
 #'           <given value='Max'/>
 #'        </name>
 #'     </Patient>
+#'   <resource/>
 #'  </entry>
 #'
 #'  <entry>
+#'   <resource>
 #'     <Observation>
 #'        <id value = 'obs1'/>
 #'        <code>
@@ -400,6 +417,7 @@ fhir_ns_strip <- function(xml) {
 #'           <reference value='Patient/id3'/>
 #'        </subject>
 #'     </Observation>
+#'   </resource>
 #'  </entry>
 #' </Bundle>"
 #'
