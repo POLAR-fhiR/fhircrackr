@@ -26,7 +26,7 @@ globalVariables(".")
 #' @param ... A Set of Path Strings. Only works if list_of_paths is NULL
 #' @param list_of_paths Either a vector or a list of paths strings
 #' @param ext An Extension to add at the end of the path
-#'
+#' @noRd
 #' @return A Character of length one, the combined path.
 #' @examples
 #' pastep('a', 'b', 'c', 'd')
@@ -51,7 +51,7 @@ pastep <- function(..., list_of_paths = NULL, ext = NULL) {
 #' @param replacement A character of length one.
 #'
 #' @return A character.
-#'
+#' @noRd
 #' @examples
 #' 'ABC' |> busg('A', 'b') |> busg('B', 'c') |> busg('C', 'a')
 busg <- function(x, pattern, replacement) {
@@ -544,6 +544,61 @@ fhir_ns_strip <- function(xml) {
 
 #################################################################################
 #################################################################################
+convert_wide_table_to_a_compact_one <- function(wide, bra, ket, sep, rm_ids = FALSE, ncores = 1) {
+	ncores <- limit_ncores(ncores)
+	pastl <- function(l, ids, sep = ' ~ ') {
+		pastv <- function(v, ids, sep = ' ~ ') {
+			len <- length(v)
+			ids <- rep_len(ids, len)
+			flt <- !is.na(v)
+			paste0(ids[flt], v[flt], collapse = sep)
+		}
+		apply(
+			X      = l,
+			MARGIN = 1,
+			FUN    = pastv,
+			ids    = ids,
+			sep    = sep
+		)
+	}
+	#ncores <- limit_ncores(ncores)
+	names <- names(wide)
+	short_names <- names |> busg(paste0('^.+', ket), '')
+	unique_short_names <- unique(short_names)
+	sep <- table_description@sep
+	ids <- if(rm_ids) {names |> busg(paste0('(^', esc(bra), '([0-9]+\\.*)+', ket, ')(.*)'),  '\\1')} else {''}
+	d <- parallel::mclapply(
+		X        = lst(unique_short_names),
+		FUN      = function(unique_short_name) {
+			#unique_short_name <- lst(unique_short_names)[[2]]
+			i <- which(unique_short_name == short_names)
+			pastl(l = wide[,..i,with=TRUE], ids = ids, sep = sep)
+		},
+		mc.cores = ncores
+	)
+	data.table::setDT(d)
+	d
+}
+convert_wide_tables_to_compact_ones <- function(wide, design, rm_ids = FALSE, ncores = 1) {
+	ncores <- limit_ncores(ncores)
+	lapply(
+		X   = design,
+		FUN = function(d) {
+			convert_wide_table_to_a_compact_one(
+				wide   = wide[[paste0(d@resource, 's')]],
+				bra    = table_description@brackets[1],
+				ket    = table_description@brackets[2],
+				sep    = table_description@sep,
+				rm_ids = rm_ids,
+				ncores = ncores
+			)
+		}
+	)
+}
+
+
+
+
 #' Transform vector to named list
 #' @description Transforms a vector of items to a named list. The names are created with a prefix and a suffix surrounding the items.
 #'
@@ -769,9 +824,9 @@ auth_helper <- function(username, password, token){
 
 #' Order Strings with Numbers correctly
 #'
-#' @param s A character containing the strings to be ordered.
+#' @param s A character vector containing the strings to be ordered.
 #'
-#' @return A character containing the order of the given strings.
+#' @return A character vector containing the order of the given strings.
 #' @export
 #'
 #' @examples
@@ -804,11 +859,11 @@ order_strings_with_numbers_correctly <- function(s) {
 }
 
 
-#' Order Strings with Numbers correctly
+#' Sort Strings with Numbers correctly
 #'
-#' @param s A character containing the strings to be sorted.
+#' @param s A character vector containing the strings to be sorted.
 #'
-#' @return A character containing the the given strings sorted.
+#' @return A character vector containing the the given strings sorted.
 #' @export
 #'
 #' @examples

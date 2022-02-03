@@ -1,9 +1,18 @@
+## This file contains all functions needed for flattening ##
+## Exported functions are on top, internal functions below ##
+
+#' Convert Bundles to a wide table when all elements should be extracted
+#' @param bundles A fhir_bundle_list
+#' @param table_description A fhir_table_description with an empty cols element
+#' @param ncores The number of cores for parallelisation
+#' @noRd
+#'
 crack_wide_all_columns <- function(bundles, table_description, ncores = 1) {
 	if(2 == length(table_description@brackets)) {
 		bra <- table_description@brackets[[1]]
 		ket <- table_description@brackets[[2]]
 	} else {
-		stop('Wide Cracking needs given brackets.')
+		stop("You need to provide brackets if you want to crack to format 'wide'")
 	}
 	unique(
 		data.table::rbindlist(
@@ -29,7 +38,7 @@ crack_wide_all_columns <- function(bundles, table_description, ncores = 1) {
 							busg('/', '.') |>
 							paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
 					] # create column name
-					[, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary colums
+					[, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary columns
 					) |> dcast(entry ~ column) # cast columns by bundle and entry
 				},
 				mc.cores = ncores
@@ -39,6 +48,13 @@ crack_wide_all_columns <- function(bundles, table_description, ncores = 1) {
 		)[, -c('entry')]
 	)
 }
+
+#' Convert Bundles to a compact table when all elements should be extracted
+#' @param bundles A fhir_bundle_list
+#' @param table_description A fhir_table_description with an empty cols element
+#' @param ncores The number of cores for parallelisation
+#' @noRd
+#'
 crack_compact_all_columns <- function(bundles, table_description, ncores = 1) {
 	use_indices <- FALSE
 	if(2 == length(table_description@brackets)) {
@@ -81,12 +97,19 @@ crack_compact_all_columns <- function(bundles, table_description, ncores = 1) {
 		)
 	)
 }
+
+#' Convert Bundles to a wide table when only some elements should be extracted
+#' @param bundles A fhir_bundle_list
+#' @param table_description A fhir_table_description with a non-empty cols element
+#' @param ncores The number of cores for parallelisation
+#' @noRd
+#'
 crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 	if(2 == length(table_description@brackets)) {
 		bra <- table_description@brackets[[1]]
 		ket <- table_description@brackets[[2]]
 	} else {
-		stop('Wide Cracking needs given brackets.')
+		stop("You need to provide brackets if you want to crack to format 'wide'")
 	}
 	unique(
 		data.table::rbindlist(
@@ -122,7 +145,7 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 								busg('/', '.') |>
 								paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
 						] # create column name
-						[, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary colums
+						[, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary columns
 					) |> dcast(entry ~ column) # cast columns by bundle and entry
 				},
 				mc.cores = ncores
@@ -132,6 +155,13 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 		)[, -c('entry')]
 	)
 }
+
+#' Convert Bundles to a compact table when only some elements should be extracted
+#' @param bundles A fhir_bundle_list
+#' @param table_description A fhir_table_description with a non-empty cols element
+#' @param ncores The number of cores for parallelisation
+#' @noRd
+#'
 crack_compact_given_columns <- function(bundles, table_description, ncores = 1) {
 	use_indices <- FALSE
 	bra <- ket <- ''
@@ -188,57 +218,8 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 		)
 	)
 }
-convert_wide_table_to_a_compact_one <- function(wide, bra, ket, sep, rm_ids = FALSE, ncores = 1) {
-	ncores <- limit_ncores(ncores)
-	pastl <- function(l, ids, sep = ' ~ ') {
-		pastv <- function(v, ids, sep = ' ~ ') {
-			len <- length(v)
-			ids <- rep_len(ids, len)
-			flt <- !is.na(v)
-			paste0(ids[flt], v[flt], collapse = sep)
-		}
-		apply(
-			X      = l,
-			MARGIN = 1,
-			FUN    = pastv,
-			ids    = ids,
-			sep    = sep
-		)
-	}
-	#ncores <- limit_ncores(ncores)
-	names <- names(wide)
-	short_names <- names |> busg(paste0('^.+', ket), '')
-	unique_short_names <- unique(short_names)
-	sep <- table_description@sep
-	ids <- if(rm_ids) {names |> busg(paste0('(^', esc(bra), '([0-9]+\\.*)+', ket, ')(.*)'),  '\\1')} else {''}
-	d <- parallel::mclapply(
-		X        = lst(unique_short_names),
-		FUN      = function(unique_short_name) {
-			#unique_short_name <- lst(unique_short_names)[[2]]
-			i <- which(unique_short_name == short_names)
-			pastl(l = wide[,..i,with=TRUE], ids = ids, sep = sep)
-		},
-		mc.cores = ncores
-	)
-	data.table::setDT(d)
-	d
-}
-convert_wide_tables_to_compact_ones <- function(wide, design, rm_ids = FALSE, ncores = 1) {
-	ncores <- limit_ncores(ncores)
-	lapply(
-		X   = design,
-		FUN = function(d) {
-			convert_wide_table_to_a_compact_one(
-				wide   = wide[[paste0(d@resource, 's')]],
-				bra    = table_description@brackets[1],
-				ket    = table_description@brackets[2],
-				sep    = table_description@sep,
-				rm_ids = rm_ids,
-				ncores = ncores
-			)
-		}
-	)
-}
+
+
 crack_bundles_to_one_table <- function(bundles, table_description, ncores = 1, verbose = 0) {
 	os <- get_os()
 	available_cores <- get_ncores(os)
@@ -293,8 +274,7 @@ crack_bundles_to_tables <- function(bundles, design, ncores = 1, verbose = 0) {
 	)
 }
 
-## This file contains all functions needed for flattening ##
-## Exported functions are on top, internal functions below ##
+
 
 
 #' Flatten list of FHIR bundles
@@ -302,17 +282,25 @@ crack_bundles_to_tables <- function(bundles, design, ncores = 1, verbose = 0) {
 #' i.e. a [fhir_df_list-class]/[fhir_dt_list-class] if a [fhir_design-class] is given in the argument `design`.
 #' Creates a single data.frame/data.table, if only a [fhir_table_description-class] is given in the argument `design`.
 #'
+#' There are two main output formats for the table: compact and wide. They differ regarding their handling of multiple entries for
+#' the same FHIR element (e.g. `Patient.adress`). In the compact format multiple entries are pasted together into one cell/column,
+#' in the wide format multiple entries are distributed over several (indexed) columns. If none of the resources contains any multiple
+#' values on the extracted elements, the two formats will result in the same basic structure.
+#'
+#' To increase speed with larger amounts of data the cracking process can be parallelised over a number of cores defined in the
+#' `ncores` argument.
+#'
 #' @param bundles A FHIR search result as returned by [fhir_search()].
 #' @param design A [fhir_design-class] or [fhir_table_description-class] object. See [fhir_design()]/[fhir_table_description()]
 #' and the corresponding vignette (`vignette("flattenResources", package ="fhircrackr")`) for a more detailed explanation and
 #' comprehensive examples of both.
 #'
-#' @param sep Optional. A character vector of length ones to separate pasted multiple entries which will overwrite the `sep` defined in
-#' `design`. If `sep = NULL`, it is looked up in `design`, where the default is `":::"`.
+#' @param sep Optional. A character of length one containing the separator string used for separating multiple entries in cells when `format = "compact"`.
+#' Will overwrite the `sep` defined in `design`. If `sep = NULL`, it is looked up in `design`, where the default is `":::"`.
 #'
-#' @param brackets Optional. A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c("<|", "|>")},
-#' which will overwrite the `brackets` defined in `design`. If `brackets = NULL`, it is looked up in `design`, where the default is `character(0)`,
-#' i.e. no indices are added to multiple entries. Empty strings (`""`) are not allowed.
+#' @param brackets Optional. A character of length one or two used for the indices of multiple entries, which will overwrite the `brackets` defined in `design`.
+#' If `brackets = NULL`, it is looked up in `design`, where the default is `character(0)`,i.e. no indices are added to multiple entries.
+#' Empty strings (`""`) are not allowed.
 #'
 #' @param remove_empty_columns Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
 #' `design`. If `remove_empty_columns = NULL`, it is looked up in `design`, where the default is `FALSE`.
@@ -323,13 +311,14 @@ crack_bundles_to_tables <- function(bundles, design, ncores = 1, verbose = 0) {
 #' @param data.table A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
 #' Defaults to FALSE.
 #'
-#' @param format A character of length 1 containing the format of the cracked table. Possible formats
-#' are "compact" and "wide". Defaults to "compact"
+#' @param format Optional. A character of length one indicating whether the resulting table should be cracked to a `wide` or `compact` format. Will overwrite the `format` defined
+#' in `design` which defaults to `compact`. `wide` means multiple entries will be distributed over several columns with indexed names. `compact` means multiple entries will be pasted into one cell/column separated by `sep`.
 #'
-#' @param keep_attr A locigcal of length 1. Should column names be extended by the attribute names? Defaults to FALSE.
+#' @param keep_attr Optional. A logical of length one indicating whether the attribute name of the respective element (`@value` in most cases)
+#' should be attached to the name of the variable in the resulting table. Will overwrite `keep_attr` in `design` which defaults to `FALSE`.
 #'
-#' @param ncores Either NULL (1 core) or an integer of length 1 containing the number of
-#'  cpu cores that should be used for cracking. Defaults to NULL.
+#' @param ncores Either NULL (no parallelisation) or an integer of length 1 containing the number of
+#'  cpu cores that should be used for parallelised cracking. Defaults to NULL.
 #'
 #' @return If a [fhir_design-class] was used, the result is a list of data.frames, i.e. a [fhir_df_list-class] object, or a list of data.tables,
 #' i.e. a [fhir_dt_list-class] object. If a [fhir_table_description-class] was used, the result is a single data.frame/data.table.
@@ -341,7 +330,7 @@ crack_bundles_to_tables <- function(bundles, design, ncores = 1, verbose = 0) {
 #' @seealso
 #' - Downloading bundles from a FHIR server: [fhir_search()]
 #' - Creating designs/table_descriptions: [fhir_table_description()] and [fhir_design()]
-#' - Dealing with multiple entries: [fhir_melt()],  [fhir_rm_indices()]
+#' - Dealing with multiple entries: [fhir_melt()], [fhir_cast()], [fhir_rm_indices()]
 #' @examples
 #' #unserialize example bundle
 #' bundles <- fhir_unserialize(medication_bundles)
@@ -576,7 +565,6 @@ setMethod(
 			)
 		}
 
-		#######################################################################
 		if(length(bundles) < 1) {
 			warning('No bundles present in bundles list \'bundles\'. NULL will be returned.')
 			return(NULL)
@@ -587,36 +575,6 @@ setMethod(
 			return(NULL)
 		}
 
-		#if(is.null(ncores) || is.na(ncores) || ncores < 1) ncores <- 1
-		# os <- get_os()
-		# available_cores <- get_ncores(os)
-		# ncores <- min(c(available_cores, ncores))
-		# if(0 < verbose) message(
-		# 	paste0(
-		# 		'Cracking ',
-		# 		length(bundles),
-		# 		if(1 < length(bundles)) ' bundles.' else ' bundle.'
-		# 	)
-		# )
-
-		# dfs <- lapply(
-		# 	X   = design,
-		# 	FUN = function(table_description) {
-		# 		#table_description <- design[[2]]
-		# 		fhir_crack(
-		# 			bundles              = bundles,
-		# 			design               = table_description,
-		# 			ncores               = ncores,
-		# 			sep                  = sep,
-		# 			brackets             = brackets,
-		# 			remove_empty_columns = remove_empty_columns,
-		# 			verbose              = verbose,
-		# 			data.table           = data.table,
-		# 			format               = format,
-		# 			keep_attr            = keep_attr
-		# 		)
-		# 	}
-		# )
 		dfs <- crack_bundles_to_tables(bundles = bundles, design = design, ncores = ncores, verbose = verbose)
 
 		#if(0 < verbose) {message("FHIR-Resources cracked. \n")}

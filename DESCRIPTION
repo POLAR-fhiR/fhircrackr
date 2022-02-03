@@ -62,6 +62,7 @@ Collate:
     'fhir_resource_type.R'
     'fhir_table_description.R'
     'fhir_design.R'
+    'fhir_style.R'
     'fhir_table_list.R'
     'flatten_resources.R'
     'miscellaneous.R'

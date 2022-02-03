@@ -67,34 +67,37 @@ setValidity(
 #'
 #' ```
 #' A fhir_design with 2 table_descriptions:
-#' =====================================================
-#' Name: Patients
+#'	A fhir_table_description with the following elements:
 #'
-#' Resource type: Patient
+#' 	fhir_resource_type: Patient
 #'
-#' Columns:
-#' column name | xpath expression
-#' ------------------------
+#' fhir_columns:
+#' 	------------ -----------------
+#' 	column name | xpath expression
+#' ------------ -----------------
+#' 	id          | id
 #' name        | name/family
 #' gender      | gender
-#' id          | id
+#' ------------ -----------------
 #'
-#' Style:
-#' sep: ||
-#' brackets: '[' ']'
+#' 	sep:           '||'
+#' brackets:      '[', ']'
 #' rm_empty_cols: FALSE
-#' =====================================================
-#' Name: MedicationAdministrations
+#' format:        'compact'
+#' keep_attr:     TRUE
 #'
-#' Resource type: MedicationAdministration
+#' A fhir_table_description with the following elements:
 #'
-#' Columns:
-#' An empty fhir_columns object
+#' 	fhir_resource_type: MedicationAdministration
 #'
-#' Style:
-#' sep: ' '
-#' brackets: character(0)
-#' rm_empty_cols: TRUE
+#' fhir_columns:
+#' 	An empty fhir_columns object
+#'
+#' sep:           ':::'
+#' brackets:      no brackets
+#' rm_empty_cols: FALSE
+#' format:        'wide'
+#' keep_attr:     TRUE
 #' ```
 #' The names of the table_descriptions are taken from the names of the arguments. If the table_descriptions are
 #' created within the call to `fhir_design` and therefore have no names, the names will be created from the respective
@@ -106,7 +109,7 @@ setValidity(
 #' If this function is given an object of class [fhir_df_list-class] or [fhir_dt_list-class], it will
 #' extract the design that was used to create the respective list.
 #'
-#' @param ... One ore more `fhir_table_description` objects or a named list containing
+#' @param ... One or more `fhir_table_description` objects or a named list containing
 #' `fhir_table_description` objects, or an object of class [fhir_df_list-class]/[fhir_dt_list-class].
 #' See [fhir_table_description()].
 #' @docType methods
@@ -128,7 +131,7 @@ setValidity(
 #'     ),
 #'     sep           = "||",
 #'     brackets      = c("[", "]"),
-#'     rm_empty_cols = FALSE,
+#'     rm_empty_cols = FALSE
 #'
 #' )
 #'
@@ -159,32 +162,7 @@ setValidity(
 #' print(design3)
 #'
 #'
-#' ####Example 2####
-#' #This option will be deprecated at some point
-#'
-#' #old style design
-#' old_design <- list(
-#'                  Patients = list(
-#'                     resource = "//Patient",
-#'                     cols = list(
-#'                        name = "name/family",
-#'                        gender = "gender",
-#'                        id = "id"),
-#'                     style = list(
-#'                        sep = "||",
-#'                        brackets = c("[", "]"),
-#'                        rm_empty_cols = FALSE
-#'                     )
-#'                  ),
-#'                  Medications = list(
-#'                     resource = "//Medication"
-#'                  )
-#'               )
-#'
-#' new_design <- fhir_design(old_design)
-#' print(new_design)
-#'
-#' ###Example 3###
+#' ###Example 2###
 #' ###Extract design from fhir_df_list/fhir_dt_list
 #'
 #' #unserialize and crack example bundles
@@ -229,22 +207,8 @@ setMethod(
 	signature = c(... = "list"),
 	definition = function(...) {
 
-		args <- list(...)
-
-		if(length(args) == 1) {
-			args <- unlist(args, recursive = FALSE)
-			if(all(sapply(args, is, "fhir_table_description"))) {
-				new(Class = "fhir_design", args, names  = attr(args, "names"))
-			} else {
-				stop(
-					"The old style design (simple named list) is no longer supported. ",
-					"Please consider building your design as shown in the documentation for fhir_design(), ",
-					"see ?fhir_design."
-				)
-			}
-		} else {
-			stop("You can provide only one list to fhir_design()")
-		}
+	stop("It looks like you are trying to use an old design from fhircrackr < 1.0.0, which is now deprecated.\n",
+		  "Please create a design from fhir_table_descriptions (see ?fhir_table_description).")
 	}
 )
 

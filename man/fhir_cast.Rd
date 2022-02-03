@@ -5,7 +5,7 @@
 \title{Cast table with multiple entries
 This function divides multiple entries in an indexed table as produced by \code{\link[=fhir_crack]{fhir_crack()}} into separate columns.}
 \usage{
-fhir_cast(indexed_df, brackets, sep, use_brackets = FALSE, verbose = 1)
+fhir_cast(indexed_df, brackets, sep, use_brackets = TRUE, verbose = 1)
 }
 \arguments{
 \item{indexed_df}{A data.frame/data.table with indexed multiple entries. Column names should reflect the XPath expression of the respective element.}
