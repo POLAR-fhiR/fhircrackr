@@ -3,10 +3,10 @@
 
 
 #' Cast table with multiple entries
-#' This function divides multiple entries in an indexed table as produced by [fhir_crack()] into separate columns.
+#' This function divides multiple entries in a compact indexed table as produced by [fhir_crack()] into separate columns.
 #'
-#' Every column containing multiple entries will be turned into multiple columns.
-#' The number of columns created from a single column in the original table is determined by maximum number of
+#' This function turns a table from compact format into wide format. Every column containing multiple entries will be turned into multiple columns.
+#' The number of columns created from a single column in the original table is determined by the maximum number of
 #' multiple entries occurring in this column. Rows with less than the maximally occurring number of entries will
 #' be filled with NA values.
 #'
@@ -14,15 +14,15 @@
 #' with {.} as a separator, e.g. `code.coding.system`. These names are produced automatically by [fhir_crack()]
 #' when the names are not explicitly set in the `cols` element of the [fhir_table_description()]/[fhir_design()].
 #'
-#' In the names of the newly created columns the indices will be assigned to the respective elements of the column names.
-#' See examples and the corresponding package vignette for a more detailed description.
+#' In the names of the newly created columns the indices will be added in front of the column names, similar to the result of [fhir_crack()] with
+#' `format="wide"`. See examples and the corresponding package vignette for a more detailed description.
 #'
-#' @param indexed_df A data.frame/data.table with indexed multiple entries. Column names should reflect the XPath expression of the respective element.
+#' @param indexed_df A compact data.frame/data.table with indexed multiple entries. Column names should reflect the XPath expression of the respective element.
 #' @param brackets A character vector of length two, defining the brackets used for the indices.
 #' @param sep A character vector of length one defining the separator that was used when pasting together multiple entries in [fhir_crack()].
-#' @param use_brackets Put brackets around indices in the new column names? Defaults to `TRUE`.
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only general progress is printed, if > 1,
 #' progress for each variable is printed. Defaults to 1.
+#' @param use_brackets Deprecated.
 #' @export
 #' @examples
 #'
@@ -33,9 +33,10 @@
 #' table_desc <- fhir_table_description(
 #'     resource = "Patient",
 #'     brackets = c('[', ']'),
-#'     sep      = " "
+#'     sep      = " ",
+#'     keep_attr=T
 #' )
-#' df <- fhir_crack(bundles = bundles, design = table_desc)
+#' df <- fhir_crack(bundles = bundles, design = table_desc, format="wide")
 #'
 #' #original df
 #' df
@@ -44,17 +45,15 @@
 #' fhir_cast(df, brackets=c('[', ']'), sep = ' ', verbose = 0)
 #'
 #' @seealso [fhir_crack()], [fhir_melt()], [fhir_build_bundle()]
-
 fhir_cast <- function(
 	indexed_df,
 	brackets,
 	sep,
-	use_brackets = TRUE,
-	verbose = 1) {
-	#debug
-	#indexed_df = d2
-	#brackets = BRACKETS
-	#sep = SEP
+	verbose = 1,
+	use_brackets = NULL) {
+
+	if(!is.null(use_brackets)){warning("Argument use_brackets is deprecated since fhircrackr 2.0.0 and will be ignored.\n",
+									   "The column names will be created the same way as in the wide format of fhir_crack.\n")}
 
 	if(is.null(indexed_df)) {stop("indexed_df is NULL.")}
 	if(nrow(indexed_df) < 1) {stop("indexed_df doesn't contain any data.")}
@@ -64,6 +63,7 @@ fhir_cast <- function(
 
 	col_names <- names(indexed_df)
 	sep_ <- esc(sep)
+	brackets <- fix_brackets(brackets)
 	bra_ <- esc(brackets[1])
 	ket_ <- esc(brackets[2])
 	regexpr_ids <- paste0(bra_, "([0-9]+(\\.[0-9]+)*)", ket_, "(.*$)")
@@ -77,14 +77,14 @@ fhir_cast <- function(
 	map <- sapply(
 		col_names,
 		function(name) {
-			#name <- col_names[[18]]
+			#name <- names(indexed_df)[[6]]
 			if(1 < verbose) {message(name)}
 
 			warning_given <- FALSE
 			entries <- strsplit(indexed_df[[name]], sep_)
 			ids <- lapply(entries, function(entry){gsub(regexpr_ids, "\\1", entry)})
-			name_vec <- strsplit(name, "[\\.@]")[[1]]
-			#name_vec <- name_vec[-length(name_vec)]
+			name_vec <- strsplit(name, "\\.")[[1]]
+
 			name_expanded <- unlist(
 				lapply(
 					ids[sapply(ids, function(i){all(!is.na(i))})],
@@ -93,7 +93,7 @@ fhir_cast <- function(
 						id_ <- strsplit(id, "\\.")
 						names(id_) <- id
 
-						if(length(id_[[1]])!=length(name_vec) - 1 && !warning_given){
+						if(length(id_[[1]])!=length(name_vec) && !warning_given){
 							warning("Column name '", paste0(name_vec, collapse = "."),
 									"' doesn't fit the id pattern found in this column.",
 									"The column name should be build the way ",
@@ -102,29 +102,19 @@ fhir_cast <- function(
 							warning_given <<- TRUE
 						}
 
-						if(2 < length(name_vec)) {
+						if(1 < length(name_vec)) {
 							sapply(
 								id_,
 								function(i_) {
-									#i_<-id_[[1]]
 									i_ <- as.numeric(i_)
-									if(use_brackets) {
-										bras_ <- rep_len("[", length(i_))
-										kets_ <- rep_len("]", length(i_))
-										paste0(paste0(paste0(name_vec[-length(name_vec)], bras_, i_, kets_), collapse = "."), '@', name_vec[[length(name_vec)]])
-									} else {
-										paste0(paste0(paste0(name_vec[-length(name_vec)], i_), collapse = "."), '@', name_vec[[length(name_vec)]])
-									}
+									paste0(paste0(brackets[1],paste(i_, collapse="."), brackets[2]), paste(name_vec, collapse = "."))
+
 								},
-								simplify = FALSE
+								simplify = F
 							)
 						} else {
 							i <- as.numeric(id)
-							a <- if(use_brackets) {
-								paste0(paste0(name_vec[-length(name_vec)], "[", i, "]"), '@', name_vec[[length(name_vec)]])
-							} else {
-								paste0(paste0(name_vec[-length(name_vec)], i), '@', name_vec[[length(name_vec)]])
-							}
+							a <- paste0(brackets[1], i, brackets[2], name_vec)
 							names(a) <- id
 							a
 						}
@@ -169,10 +159,137 @@ fhir_cast <- function(
 		}
 	}
 	if(!is_DT) {setDF(d)}
-	names(d) <- gsub('\\[', brackets[1], gsub(']', brackets[2], names(d)))
 	d[]#to avoid problems with printing
-	#d
+	d
 }
+# fhir_cast <- function(
+# 	indexed_df,
+# 	brackets,
+# 	sep,
+# 	use_brackets = TRUE,
+# 	verbose = 1) {
+# 	#debug
+# 	#indexed_df = d2
+# 	#brackets = BRACKETS
+# 	#sep = SEP
+#
+# 	if(is.null(indexed_df)) {stop("indexed_df is NULL.")}
+# 	if(nrow(indexed_df) < 1) {stop("indexed_df doesn't contain any data.")}
+#
+# 	is_DT <- data.table::is.data.table(x = indexed_df)
+# 	if(!is_DT) {data.table::setDT(x = indexed_df)}
+#
+# 	col_names <- names(indexed_df)
+# 	sep_ <- esc(sep)
+# 	bra_ <- esc(brackets[1])
+# 	ket_ <- esc(brackets[2])
+# 	regexpr_ids <- paste0(bra_, "([0-9]+(\\.[0-9]+)*)", ket_, "(.*$)")
+#
+# 	if(!any(grepl(regexpr_ids, indexed_df[1,]))){
+# 		stop("Cannot find ids with the specified brackets in the table.")
+# 	}
+#
+# 	if(0 < verbose) {message("Expanding table...\n")}
+#
+# 	map <- sapply(
+# 		col_names,
+# 		function(name) {
+# 			#name <- col_names[[18]]
+# 			if(1 < verbose) {message(name)}
+#
+# 			warning_given <- FALSE
+# 			entries <- strsplit(indexed_df[[name]], sep_)
+# 			ids <- lapply(entries, function(entry){gsub(regexpr_ids, "\\1", entry)})
+# 			name_vec <- strsplit(name, "[\\.@]")[[1]]
+# 			#name_vec <- name_vec[-length(name_vec)]
+# 			name_expanded <- unlist(
+# 				lapply(
+# 					ids[sapply(ids, function(i){all(!is.na(i))})],
+# 					function(id){
+# 						#id <- ids[sapply(ids, function(i) all(!is.na(i)))][[1]]
+# 						id_ <- strsplit(id, "\\.")
+# 						names(id_) <- id
+#
+# 						if(length(id_[[1]])!=length(name_vec) - 1 && !warning_given){
+# 							warning("Column name '", paste0(name_vec, collapse = "."),
+# 									"' doesn't fit the id pattern found in this column.",
+# 									"The column name should be build the way ",
+# 									"fhir_crack() automatically builds it. See ?fhir_cast."
+# 							)
+# 							warning_given <<- TRUE
+# 						}
+#
+# 						if(2 < length(name_vec)) {
+# 							sapply(
+# 								id_,
+# 								function(i_) {
+# 									#i_<-id_[[1]]
+# 									i_ <- as.numeric(i_)
+# 									if(use_brackets) {
+# 										bras_ <- rep_len("[", length(i_))
+# 										kets_ <- rep_len("]", length(i_))
+# 										paste0(paste0(paste0(name_vec[-length(name_vec)], bras_, i_, kets_), collapse = "."), '@', name_vec[[length(name_vec)]])
+# 									} else {
+# 										paste0(paste0(paste0(name_vec[-length(name_vec)], i_), collapse = "."), '@', name_vec[[length(name_vec)]])
+# 									}
+# 								},
+# 								simplify = FALSE
+# 							)
+# 						} else {
+# 							i <- as.numeric(id)
+# 							a <- if(use_brackets) {
+# 								paste0(paste0(name_vec[-length(name_vec)], "[", i, "]"), '@', name_vec[[length(name_vec)]])
+# 							} else {
+# 								paste0(paste0(name_vec[-length(name_vec)], i), '@', name_vec[[length(name_vec)]])
+# 							}
+# 							names(a) <- id
+# 							a
+# 						}
+# 					}
+# 				),
+# 				use.names = T
+# 			)
+# 			sort(name_expanded[unique(names(name_expanded))])
+# 		},
+# 		simplify = F
+# 	)
+#
+# 	df_new_names <- unlist(map, use.names = F)
+# 	d <- data.table(matrix(data = rep_len(character(), nrow(indexed_df) * length(df_new_names)), nrow = nrow(indexed_df), ncol = length(df_new_names)))
+# 	setnames(d, df_new_names)
+#
+# 	if(0 < verbose) {message("\nFilling table...\n")}
+#
+# 	for(name in names(map)) {
+# 		#name <- names(map)[[1]]
+# 		if(1 < verbose) {message(name, ":")}
+#
+# 		for(id in names(map[[name]])) {
+# 			#id <- names(map[[name]])[[1]]
+# 			sname <- map[[name]][[id]]
+# 			if(1 < verbose) {message("   ", sname)}
+# 			id_str <- paste0(bra_, id, ket_)
+# 			row_with_id <- grep(id_str, indexed_df[[name]], perl = T)
+# 			entries <- strsplit(indexed_df[[name]][row_with_id], sep_)
+# 			values <- gsub(
+# 				id_str,
+# 				"",
+# 				sapply(
+# 					entries,
+# 					function(entry) {
+# 						entry[grep(id_str, entry, perl = T)]
+# 					},
+# 					simplify = F
+# 				)
+# 			)
+# 			d[row_with_id, (sname) := values]
+# 		}
+# 	}
+# 	if(!is_DT) {setDF(d)}
+# 	names(d) <- gsub('\\[', brackets[1], gsub(']', brackets[2], names(d)))
+# 	d[]#to avoid problems with printing
+# 	#d
+# }
 
 
 #' Find common columns
