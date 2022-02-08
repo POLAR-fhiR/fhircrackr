@@ -199,7 +199,6 @@ setMethod(
 		new(Class = "fhir_design", args, names = names)
 	}
 )
-
 #' @rdname fhir_design-methods
 #' @aliases fhir_design,list-method
 setMethod(
@@ -207,10 +206,25 @@ setMethod(
 	signature = c(... = "list"),
 	definition = function(...) {
 
-	stop("It looks like you are trying to use an old design from fhircrackr < 1.0.0, which is now deprecated.\n",
-		  "Please create a design from fhir_table_descriptions (see ?fhir_table_description).")
+		args <- list(...)
+
+		if(length(args) == 1) {
+			args <- unlist(args, recursive = FALSE)
+
+			if(all(sapply(args, is, "fhir_table_description"))) {
+				new(Class = "fhir_design", args, names  = attr(args, "names"))
+			} else {
+
+				stop("It looks like you are trying to use an old design from fhircrackr < 1.0.0, which is now deprecated.\n",
+					 "Please create a design from fhir_table_descriptions (see ?fhir_table_description).")
+
+			}
+		} else {
+			stop("You can only provide one list to fhir_design()")
+		}
 	}
 )
+
 
 setMethod(
 	f = "show",

@@ -290,7 +290,7 @@ xml2design <- function(xml) {
 			if(length(rec) < 1 || all(is.na(rec))){rec <- FALSE}
 
 			frm <- as.character(xml2::xml_attr(x = xml2::xml_find_all(x = xml_table_desc, xpath = 'format'), attr = 'value'))
-			if(length(format) < 1 || all(is.na(format))){format <- 'compact'}
+			if(length(frm) < 1 || all(is.na(frm))){frm <- 'compact'}
 
 			kat <- as.logical(xml2::xml_attr(x = xml2::xml_find_all(x = xml_table_desc, xpath = 'keep_attr'), attr = 'value'))
 			if(length(kat) < 1 || all(is.na(kat))){kat <- FALSE}

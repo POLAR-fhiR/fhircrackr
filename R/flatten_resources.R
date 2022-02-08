@@ -1,6 +1,409 @@
 ## This file contains all functions needed for flattening ##
 ## Exported functions are on top, internal functions below ##
 
+
+
+
+
+
+#' Flatten list of FHIR bundles
+#' @description Converts a [fhir_bundle_list-class] (the result of [fhir_search()] to a list of data.frames/data.tables,
+#' i.e. a [fhir_df_list-class]/[fhir_dt_list-class] if a [fhir_design-class] is given in the argument `design`.
+#' Creates a single data.frame/data.table, if only a [fhir_table_description-class] is given in the argument `design`.
+#'
+#' There are two main output formats for the table: compact and wide. They differ regarding their handling of multiple entries for
+#' the same FHIR element (e.g. `Patient.adress`). In the compact format multiple entries are pasted together into one cell/column,
+#' in the wide format multiple entries are distributed over several (indexed) columns. If none of the resources contains any multiple
+#' values on the extracted elements, the two formats will result in the same basic structure.
+#'
+#' To increase speed with larger amounts of data the cracking process can be parallelised over a number of cores defined in the
+#' `ncores` argument.
+#'
+#' @param bundles A FHIR search result as returned by [fhir_search()].
+#' @param design A [fhir_design-class] or [fhir_table_description-class] object. See [fhir_design()]/[fhir_table_description()]
+#' and the corresponding vignette (`vignette("flattenResources", package ="fhircrackr")`) for a more detailed explanation and
+#' comprehensive examples of both.
+#'
+#' @param sep Optional. A character of length one containing the separator string used for separating multiple entries in cells when `format = "compact"`.
+#' Will overwrite the `sep` defined in `design`. If `sep = NULL`, it is looked up in `design`, where the default is `":::"`.
+#'
+#' @param brackets Optional. A character of length one or two used for the indices of multiple entries, which will overwrite the `brackets` defined in `design`.
+#' If `brackets = NULL`, it is looked up in `design`, where the default is `character(0)`,i.e. no indices are added to multiple entries.
+#' Empty strings (`""`) are not allowed.
+#'
+#' @param remove_empty_columns Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
+#' `design`. If `remove_empty_columns = NULL`, it is looked up in `design`, where the default is `FALSE`.
+#'
+#' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
+#' extraction progress will be printed. Defaults to 2.
+#'
+#' @param data.table A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
+#' Defaults to FALSE.
+#'
+#' @param format Optional. A character of length one indicating whether the resulting table should be cracked to a `wide` or `compact` format. Will overwrite the `format` defined
+#' in `design` which defaults to `compact`. `wide` means multiple entries will be distributed over several columns with indexed names. `compact` means multiple entries will be pasted into one cell/column separated by `sep`.
+#'
+#' @param keep_attr Optional. A logical of length one indicating whether the attribute name of the respective element (`@value` in most cases)
+#' should be attached to the name of the variable in the resulting table. Will overwrite `keep_attr` in `design` which defaults to `FALSE`.
+#'
+#' @param ncores Either NULL (no parallelisation) or an integer of length 1 containing the number of
+#'  cpu cores that should be used for parallelised cracking. Defaults to NULL.
+#'
+#' @return If a [fhir_design-class] was used, the result is a list of data.frames, i.e. a [fhir_df_list-class] object, or a list of data.tables,
+#' i.e. a [fhir_dt_list-class] object. If a [fhir_table_description-class] was used, the result is a single data.frame/data.table.
+#'
+#' @export
+#' @rdname fhir_crack-methods
+#' @docType methods
+#' @include fhir_design.R fhir_bundle_list.R fhir_table_list.R
+#' @seealso
+#' - Downloading bundles from a FHIR server: [fhir_search()]
+#' - Creating designs/table_descriptions: [fhir_table_description()] and [fhir_design()]
+#' - Dealing with multiple entries: [fhir_melt()], [fhir_cast()], [fhir_rm_indices()]
+#' @examples
+#' #unserialize example bundle
+#' bundles <- fhir_unserialize(medication_bundles)
+#'
+#'
+#' ###Example 1###
+#' #Extract just one resource type
+#'
+#' #define attributes to extract
+#' medications <- fhir_table_description(
+#'    resource = "MedicationStatement",
+#'    cols     = c(
+#'    	MS.ID              = "id",
+#'    	STATUS.TEXT        = "text/status",
+#'    	STATUS             = "status",
+#'    	MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
+#'    	MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
+#'    	MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
+#'    	DOSAGE             = "dosage/text",
+#'     	PATIENT            = "subject/reference",
+#'     	LAST.UPDATE        = "meta/lastUpdated"
+#'   ),
+#'   sep           = " ",
+#'   brackets      = c("[", "]"),
+#'   rm_empty_cols = FALSE
+#' )
+#'
+#' med_df <- fhir_crack(bundles = bundles, design = medications)
+#'
+#' head(med_df) #data.frame
+#'
+#'
+#' ###Example 2###
+#' #extract more resource types
+#'
+#' patients <- fhir_table_description(
+#'    resource = "Patient"
+#' )
+#'
+#' design <- fhir_design(medications, patients)
+#'
+#' df_list <- fhir_crack(bundles = bundles, design = design)
+#'
+#' #list of data.frames/fhir_df_list
+#' head(df_list$medications)
+#' head(df_list$patients)
+#'
+#' #The design that was used can be extracted from a fhir_df_list
+#' fhir_design(df_list)
+#'
+
+setGeneric(
+	name = "fhir_crack",
+	def = function(
+		bundles,
+		design,
+		sep                     = NULL,
+		brackets                = NULL,
+		remove_empty_columns    = NULL,
+		verbose                 = 2,
+		data.table              = FALSE,
+		format                  = NULL,
+		keep_attr               = NULL,
+		ncores                  = 1) {
+
+		standardGeneric("fhir_crack")
+	}
+)
+
+#' @rdname fhir_crack-methods
+#' @aliases fhir_crack,fhir_table_description-method
+setMethod(
+	f = "fhir_crack",
+	signature = c(design = "fhir_table_description"),
+	definition = function(
+		bundles,
+		design,
+		sep                  = NULL,
+		brackets             = NULL,
+		remove_empty_columns = NULL,
+		verbose              = 2,
+		data.table           = FALSE,
+		format               = NULL,
+		keep_attr            = NULL,
+		ncores               = 1) {
+
+		#overwrite design with function arguments
+		if(!is.null(sep)) {
+			design@sep <- sep
+		}
+
+		if(!is.null(brackets)) {
+			brackets <- fix_brackets(brackets = brackets)
+			design@brackets <- brackets
+		}
+
+		if(!is.null(remove_empty_columns)) {
+			design@rm_empty_cols <- remove_empty_columns
+		}
+
+		if(!is.null(format)) {
+			design@format <- format
+		}
+
+		if(!is.null(keep_attr)) {
+			design@keep_attr <- keep_attr
+		}
+
+		validObject(object = design, complete = TRUE)
+		#Check for dangerous XPath expressions ins cols
+		cols <- design@cols
+		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
+
+		if(any(dangerCols)) {
+			warning(
+				"In the cols element of the table description, you specified XPath expressions containing '//' which point to an ",
+				"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
+				"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
+				"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
+				"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse = ", ")
+			)
+		}
+
+		df <- crack_bundles_to_one_table(bundles = bundles, table_description = design, data.table = data.table, ncores = ncores, verbose = verbose)
+
+		if(design@rm_empty_cols && 0 < ncol(df)) {
+			df <- df[, 0 < colSums(!is.na(df)), with = FALSE]
+		}
+
+		if(0 < verbose) {cat('finished.\n')}
+
+		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
+
+		df
+	}
+)
+
+
+
+#' @rdname fhir_crack-methods
+#' @aliases fhir_crack,fhir_design-method
+setMethod(
+	f = "fhir_crack",
+	signature = c(design = "fhir_design"),
+	definition = function(
+		bundles,
+		design,
+		sep                     = NULL,
+		brackets                = NULL,
+		remove_empty_columns    = NULL,
+		verbose                 = 2,
+		data.table              = FALSE,
+		format                  = NULL,
+		keep_attr               = NULL,
+		ncores                  = 1) {
+
+		#overwrite design with function arguments
+		if(!is.null(sep)) {
+			design <- fhir_design(lapply(
+				design,
+				function(x) {
+					x@sep <- sep
+					x
+				})
+			)
+		}
+
+		if(!is.null(brackets)) {
+			brackets <- fix_brackets(brackets = brackets)
+			design <- fhir_design(
+				lapply(
+					design,
+					function(x) {
+						x@brackets <- brackets
+						x
+					}
+				)
+			)
+		}
+
+		if(!is.null(remove_empty_columns)) {
+			design <- fhir_design(
+				lapply(
+					design,
+					function(x) {
+						x@rm_empty_cols <- remove_empty_columns
+						x
+					}
+				)
+			)
+		}
+
+		if(!is.null(format)) {
+			design <- fhir_design(lapply(
+				design,
+				function(x) {
+					x@format <- format
+					x
+				})
+			)
+		}
+
+		if(!is.null(keep_attr)) {
+			design <- fhir_design(lapply(
+				design,
+				function(x) {
+					x@keep_attr <- keep_attr
+					x
+				})
+			)
+		}
+
+
+		validObject(object = design, complete = TRUE)
+		#Check for dangerous XPath expressions ins cols
+		cols <- lapply(
+			X   = design,
+			FUN = function(x) {c(x@cols)}
+		)
+		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
+
+		if(any(dangerCols)) {
+			warning(
+				"In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
+				"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
+				"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
+				"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
+				"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse = ", ")
+			)
+		}
+
+		if(length(bundles) < 1) {
+			warning('No bundles present in bundles list \'bundles\'. NULL will be returned.')
+			return(NULL)
+		}
+
+		if(length(design) < 1) {
+			warning('No table descriptions present in design \'design\'. NULL will be returned.')
+			return(NULL)
+		}
+
+		dfs <- crack_bundles_to_tables(bundles = bundles, design = design, data.table = data.table, ncores = ncores, verbose = verbose)
+
+		#if(0 < verbose) {message("FHIR-Resources cracked. \n")}
+		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
+		dfs
+	}
+)
+
+##################################################################################################################################################
+
+#' Create fhir_table_list from bundles and design
+#' @param bundles A FHIR search result as returned by [fhir_search()].
+#' @param design A [fhir_design-class] object. See [fhir_table_description()]
+#' and the corresponding vignette (`vignette("flattenResources", package ="fhircrackr")`) for a more detailed explanation and
+#' comprehensive examples of both.
+#' @param data.table A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
+#' Defaults to FALSE.
+#' @param ncores Either NULL (no parallelisation) or an integer of length 1 containing the number of
+#'  cpu cores that should be used for parallelised cracking. Defaults to NULL.
+#' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
+#' extraction progress will be printed. Defaults to 2.
+#' @noRd
+
+crack_bundles_to_tables <- function(bundles, design, data.table = F, ncores = 1, verbose = 0) {
+	ncores <- limit_ncores(ncores)
+	tables <- lapply(
+		X   = design,
+		FUN = function(table_description) {
+			crack_bundles_to_one_table(
+				bundles           = bundles,
+				table_description = table_description,
+				ncores            = ncores,
+				verbose           = verbose
+			)
+		}
+	)
+
+	if(data.table) {
+		fhir_dt_list(dt_list = tables, design = design)
+	} else {
+		fhir_df_list(df_list = tables, design = design)
+	}
+}
+
+
+#' Create DF/DT from bundles and fhir_table_description
+#' @param bundles A FHIR search result as returned by [fhir_search()].
+#' @param table_description A [fhir_table_description-class] object. See [fhir_table_description()]
+#' and the corresponding vignette (`vignette("flattenResources", package ="fhircrackr")`) for a more detailed explanation and
+#' comprehensive examples of both.
+#' @param data.table A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
+#' Defaults to FALSE.
+#' @param ncores Either NULL (no parallelisation) or an integer of length 1 containing the number of
+#'  cpu cores that should be used for parallelised cracking. Defaults to NULL.
+#' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
+#' extraction progress will be printed. Defaults to 2.
+#' @noRd
+crack_bundles_to_one_table <- function(bundles, table_description, data.table = F, ncores = 1, verbose = 0) {
+	os <- get_os()
+	available_cores <- get_ncores(os)
+	ncores <- limit_ncores(ncores)
+	if(0 < verbose) cat(
+		paste0(
+			'Cracking ',
+			length(bundles),
+			' ',
+			table_description@resource,
+			's\' ',
+			if(1 == length(bundles)) 'Bundle' else 'Bundles',
+			' on a ',
+			toupper(os),
+			'-Mashine using ',
+			ncores,
+			'/',
+			available_cores,
+			if(1 == available_cores) ' CPU' else ' CPUs',
+			' ... \n'
+		)
+	)
+
+	table <- if(0 < length(table_description@cols)) {
+		if(table_description@format == 'wide') {
+			crack_wide_given_columns(bundles = bundles, table_description = table_description, ncores = ncores)
+		} else {
+			crack_compact_given_columns(bundles = bundles, table_description = table_description, ncores = ncores)
+		}
+	} else {
+		if(table_description@format == 'wide') {
+			crack_wide_all_columns(bundles = bundles, table_description = table_description, ncores = ncores)
+		}
+		else {
+			crack_compact_all_columns(bundles = bundles, table_description = table_description, ncores = ncores)
+		}
+	}
+
+	if(!data.table) {
+		data.table::setDF(table)
+	}
+
+	table
+}
+
+
 #' Convert Bundles to a wide table when all elements should be extracted
 #' @param bundles A fhir_bundle_list
 #' @param table_description A fhir_table_description with an empty cols element
@@ -220,365 +623,3 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 }
 
 
-crack_bundles_to_one_table <- function(bundles, table_description, ncores = 1, verbose = 0) {
-	os <- get_os()
-	available_cores <- get_ncores(os)
-	ncores <- limit_ncores(ncores)
-	if(0 < verbose) cat(
-		paste0(
-			'Cracking ',
-			length(bundles),
-			' ',
-			table_description@resource,
-			's\' ',
-			if(1 == length(bundles)) 'Bundle' else 'Bundles',
-			' on a ',
-			toupper(os),
-			'-Mashine using ',
-			ncores,
-			'/',
-			available_cores,
-			if(1 == available_cores) ' CPU' else ' CPUs',
-			' ... \n'
-		)
-	)
-
-	table <- if(0 < length(table_description@cols)) {
-		if(table_description@format == 'wide') {
-			crack_wide_given_columns(bundles = bundles, table_description = table_description, ncores = ncores)
-		} else {
-			crack_compact_given_columns(bundles = bundles, table_description = table_description, ncores = ncores)
-		}
-	} else {
-		if(table_description@format == 'wide') {
-			crack_wide_all_columns(bundles = bundles, table_description = table_description, ncores = ncores)
-		}
-		else {
-			crack_compact_all_columns(bundles = bundles, table_description = table_description, ncores = ncores)
-		}
-	}
-	table
-}
-crack_bundles_to_tables <- function(bundles, design, ncores = 1, verbose = 0) {
-	ncores <- limit_ncores(ncores)
-	lapply(
-		X   = design,
-		FUN = function(table_description) {
-			crack_bundles_to_one_table(
-				bundles           = bundles,
-				table_description = table_description,
-				ncores            = ncores,
-				verbose           = verbose
-			)
-		}
-	)
-}
-
-
-
-
-#' Flatten list of FHIR bundles
-#' @description Converts a [fhir_bundle_list-class] (the result of [fhir_search()] to a list of data.frames/data.tables,
-#' i.e. a [fhir_df_list-class]/[fhir_dt_list-class] if a [fhir_design-class] is given in the argument `design`.
-#' Creates a single data.frame/data.table, if only a [fhir_table_description-class] is given in the argument `design`.
-#'
-#' There are two main output formats for the table: compact and wide. They differ regarding their handling of multiple entries for
-#' the same FHIR element (e.g. `Patient.adress`). In the compact format multiple entries are pasted together into one cell/column,
-#' in the wide format multiple entries are distributed over several (indexed) columns. If none of the resources contains any multiple
-#' values on the extracted elements, the two formats will result in the same basic structure.
-#'
-#' To increase speed with larger amounts of data the cracking process can be parallelised over a number of cores defined in the
-#' `ncores` argument.
-#'
-#' @param bundles A FHIR search result as returned by [fhir_search()].
-#' @param design A [fhir_design-class] or [fhir_table_description-class] object. See [fhir_design()]/[fhir_table_description()]
-#' and the corresponding vignette (`vignette("flattenResources", package ="fhircrackr")`) for a more detailed explanation and
-#' comprehensive examples of both.
-#'
-#' @param sep Optional. A character of length one containing the separator string used for separating multiple entries in cells when `format = "compact"`.
-#' Will overwrite the `sep` defined in `design`. If `sep = NULL`, it is looked up in `design`, where the default is `":::"`.
-#'
-#' @param brackets Optional. A character of length one or two used for the indices of multiple entries, which will overwrite the `brackets` defined in `design`.
-#' If `brackets = NULL`, it is looked up in `design`, where the default is `character(0)`,i.e. no indices are added to multiple entries.
-#' Empty strings (`""`) are not allowed.
-#'
-#' @param remove_empty_columns Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
-#' `design`. If `remove_empty_columns = NULL`, it is looked up in `design`, where the default is `FALSE`.
-#'
-#' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
-#' extraction progress will be printed. Defaults to 2.
-#'
-#' @param data.table A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
-#' Defaults to FALSE.
-#'
-#' @param format Optional. A character of length one indicating whether the resulting table should be cracked to a `wide` or `compact` format. Will overwrite the `format` defined
-#' in `design` which defaults to `compact`. `wide` means multiple entries will be distributed over several columns with indexed names. `compact` means multiple entries will be pasted into one cell/column separated by `sep`.
-#'
-#' @param keep_attr Optional. A logical of length one indicating whether the attribute name of the respective element (`@value` in most cases)
-#' should be attached to the name of the variable in the resulting table. Will overwrite `keep_attr` in `design` which defaults to `FALSE`.
-#'
-#' @param ncores Either NULL (no parallelisation) or an integer of length 1 containing the number of
-#'  cpu cores that should be used for parallelised cracking. Defaults to NULL.
-#'
-#' @return If a [fhir_design-class] was used, the result is a list of data.frames, i.e. a [fhir_df_list-class] object, or a list of data.tables,
-#' i.e. a [fhir_dt_list-class] object. If a [fhir_table_description-class] was used, the result is a single data.frame/data.table.
-#'
-#' @export
-#' @rdname fhir_crack-methods
-#' @docType methods
-#' @include fhir_design.R fhir_bundle_list.R fhir_table_list.R
-#' @seealso
-#' - Downloading bundles from a FHIR server: [fhir_search()]
-#' - Creating designs/table_descriptions: [fhir_table_description()] and [fhir_design()]
-#' - Dealing with multiple entries: [fhir_melt()], [fhir_cast()], [fhir_rm_indices()]
-#' @examples
-#' #unserialize example bundle
-#' bundles <- fhir_unserialize(medication_bundles)
-#'
-#'
-#' ###Example 1###
-#' #Extract just one resource type
-#'
-#' #define attributes to extract
-#' medications <- fhir_table_description(
-#'    resource = "MedicationStatement",
-#'    cols     = c(
-#'    	MS.ID              = "id",
-#'    	STATUS.TEXT        = "text/status",
-#'    	STATUS             = "status",
-#'    	MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-#'    	MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-#'    	MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-#'    	DOSAGE             = "dosage/text",
-#'     	PATIENT            = "subject/reference",
-#'     	LAST.UPDATE        = "meta/lastUpdated"
-#'   ),
-#'   sep           = " ",
-#'   brackets      = c("[", "]"),
-#'   rm_empty_cols = FALSE
-#' )
-#'
-#' med_df <- fhir_crack(bundles = bundles, design = medications)
-#'
-#' head(med_df) #data.frame
-#'
-#'
-#' ###Example 2###
-#' #extract more resource types
-#'
-#' patients <- fhir_table_description(
-#'    resource = "Patient"
-#' )
-#'
-#' design <- fhir_design(medications, patients)
-#'
-#' df_list <- fhir_crack(bundles = bundles, design = design)
-#'
-#' #list of data.frames/fhir_df_list
-#' head(df_list$medications)
-#' head(df_list$patients)
-#'
-#' #The design that was used can be extracted from a fhir_df_list
-#' fhir_design(df_list)
-#'
-
-setGeneric(
-	name = "fhir_crack",
-	def = function(
-		bundles,
-		design,
-		sep                     = NULL,
-		brackets                = NULL,
-		remove_empty_columns    = NULL,
-		verbose                 = 2,
-		data.table              = FALSE,
-		format                  = NULL,
-		keep_attr               = NULL,
-		ncores                  = 1) {
-
-		standardGeneric("fhir_crack")
-	}
-)
-
-#' @rdname fhir_crack-methods
-#' @aliases fhir_crack,fhir_table_description-method
-setMethod(
-	f = "fhir_crack",
-	signature = c(design = "fhir_table_description"),
-	definition = function(
-		bundles,
-		design,
-		sep                  = NULL,
-		brackets             = NULL,
-		remove_empty_columns = NULL,
-		verbose              = 2,
-		data.table           = FALSE,
-		format               = NULL,
-		keep_attr            = NULL,
-		ncores               = 1) {
-
-		#overwrite design with function arguments
-		if(!is.null(sep)) {
-			design@sep <- sep
-		}
-
-		if(!is.null(brackets)) {
-			brackets <- fix_brackets(brackets = brackets)
-			design@brackets <- brackets
-		}
-
-		if(!is.null(remove_empty_columns)) {
-			design@rm_empty_cols <- remove_empty_columns
-		}
-
-		if(!is.null(format)) {
-			design@format <- format
-		}
-
-		if(!is.null(keep_attr)) {
-			design@keep_attr <- keep_attr
-		}
-
-		validObject(object = design, complete = TRUE)
-		#Check for dangerous XPath expressions ins cols
-		cols <- design@cols
-		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
-
-		if(any(dangerCols)) {
-			warning(
-				"In the cols element of the table description, you specified XPath expressions containing '//' which point to an ",
-				"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
-				"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
-				"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
-				"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse = ", ")
-			)
-		}
-
-		df <- crack_bundles_to_one_table(bundles = bundles, table_description = design, ncores = ncores, verbose = verbose)
-
-		if(design@rm_empty_cols && 0 < ncol(df)) {
-			df <- df[, 0 < colSums(!is.na(df)), with = FALSE]
-		}
-
-		if(0 < verbose) {cat('finished.\n')}
-
-		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
-
-		if(data.table) {
-			data.table::setDF(df)
-		}
-		df
-	}
-)
-
-
-
-#' @rdname fhir_crack-methods
-#' @aliases fhir_crack,fhir_design-method
-setMethod(
-	f = "fhir_crack",
-	signature = c(design = "fhir_design"),
-	definition = function(
-		bundles,
-		design,
-		sep                     = NULL,
-		brackets                = NULL,
-		remove_empty_columns    = NULL,
-		verbose                 = 2,
-		data.table              = FALSE,
-		format                  = NULL,
-		keep_attr               = NULL,
-		ncores                  = 1) {
-
-		#overwrite design with function arguments
-		if(!is.null(sep)) {
-			design <- fhir_design(lapply(
-				design,
-				function(x) {
-					x@sep <- sep
-					x
-				})
-			)
-		}
-
-		if(!is.null(brackets)) {
-			brackets <- fix_brackets(brackets = brackets)
-			design <- fhir_design(
-				lapply(
-					design,
-					function(x) {
-						x@brackets <- brackets
-						x
-					}
-				)
-			)
-		}
-
-		if(!is.null(remove_empty_columns)) {
-			design <- fhir_design(
-				lapply(
-					design,
-					function(x) {
-						x@rm_empty_cols <- remove_empty_columns
-						x
-					}
-				)
-			)
-		}
-
-		if(!is.null(format)) {
-			design <- fhir_design(lapply(
-				design,
-				function(x) {
-					x@format <- format
-					x
-				})
-			)
-		}
-
-		if(!is.null(keep_attr)) {
-			design <- fhir_design(lapply(
-				design,
-				function(x) {
-					x@keep_attr <- keep_attr
-					x
-				})
-			)
-		}
-
-
-		validObject(object = design, complete = TRUE)
-		#Check for dangerous XPath expressions ins cols
-		cols <- lapply(
-			X   = design,
-			FUN = function(x) {c(x@cols)}
-		)
-		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
-
-		if(any(dangerCols)) {
-			warning(
-				"In the cols element of the design, you specified XPath expressions containing '//' which point to an ",
-				"arbitrary level in the resource. \nThis can result in unexpected behaviour, e.g. when the searched element appears ",
-				"on different levels of the resource. \n", "We strongly advise to only use the fully specified relative XPath in the cols ",
-				"element, e.g. 'ingredient/strength/numerator/code' instead of search paths like '//code'. \n",
-				"This warning is thrown for the following data.frame descriptions: ", paste(names(cols)[dangerCols], collapse = ", ")
-			)
-		}
-
-		if(length(bundles) < 1) {
-			warning('No bundles present in bundles list \'bundles\'. NULL will be returned.')
-			return(NULL)
-		}
-
-		if(length(design) < 1) {
-			warning('No table descriptions present in design \'design\'. NULL will be returned.')
-			return(NULL)
-		}
-
-		dfs <- crack_bundles_to_tables(bundles = bundles, design = design, ncores = ncores, verbose = verbose)
-
-		#if(0 < verbose) {message("FHIR-Resources cracked. \n")}
-		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
-		dfs
-	}
-)
