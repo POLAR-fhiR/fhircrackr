@@ -533,7 +533,7 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 							)
 						)
 					)
-					(data.table(
+					d <- (data.table(
 						node   = nodes # intermediate save entries
 					)
 						[, path     := xml2::xml_path(node) |> busg('/Bundle/', '') |> busg('([^]])/', '\\1[1]/')] # add missing indices
@@ -549,7 +549,11 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 								paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
 						] # create column name
 						[, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary columns
-					) |> dcast(entry ~ column) # cast columns by bundle and entry
+					)
+					cols <- unique(d$column)
+					d <- dcast(d, entry ~ column) # cast columns by bundle and entry
+					data.table::setcolorder(x = d, neworder = cols)
+					d
 				},
 				mc.cores = ncores
 			),
@@ -608,11 +612,13 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 						] # create column name
 					)
 					if(use_indices) {
-						(d[, id := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')][, paste0(bra, id, ket, value, collapse = table_description@sep), by=c('entry', 'column')] |>
+						res <- (d[, id := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')][, paste0(bra, id, ket, value, collapse = table_description@sep), by=c('entry', 'column')] |>
 						 	dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
 					} else {
-						(d[, paste0(value, collapse = table_description@sep), by=c('entry', 'column')] |> dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
+						res <- (d[, paste0(value, collapse = table_description@sep), by=c('entry', 'column')] |> dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
 					}
+					data.table::setcolorder(x = res, neworder = names(table_description@cols))
+					res
 				},
 				mc.cores = ncores
 			),
