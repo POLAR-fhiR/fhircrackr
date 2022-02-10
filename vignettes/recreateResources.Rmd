@@ -36,7 +36,7 @@ library(fhircrackr)
 
 ## Preparation
 In the other vignettes you saw how to download and flatten resources.
-Now we'll have a look at how to turn flattened tables back into FHIR resources. This allows you to extract resources from a server, manipulate their content in R and to upload them to a server again. One scenario where this might be useful is downloading data from one server, anonymizing it and uploading it to another server. If you are working with sensitive data please note that it is your responsibility alone to check that any resources you upload to a unsecure server are sufficiently anonymized. 
+Now we'll have a look at how to turn flattened tables back into FHIR resources. This allows you to extract resources from a server, manipulate their content in R and to upload them to a server again. One scenario where this might be useful is downloading data from one server, anonymizing it and uploading it to another server. If you are working with sensitive data please note that it is your responsibility alone to check that any resources you upload to a insecure server are sufficiently anonymized. 
 
 For the rest of the vignette, we'll work with `example_bundles2` from `fhircrackr`, which can be made accessible like this:
 
@@ -46,38 +46,36 @@ bundles <- fhir_unserialize(bundles = example_bundles2)
 
 See `?example_bundles2` to what this bundle looks like.
 
-## Crack and cast
-Starting with the FHIR resources, the first thing you'll have to do is to crack and cast the data. For more information on the process, please see the vignette on flattening resources. Make sure that you allow `fhir_crack()` to generate the column names automatically, i.e. don't state explicit column names in the `fhir_table_description`.
+## Crack to wide format
+Starting with the FHIR resources, the first thing you'll have to do is to crack the data to a wide format. For more information on the process, please see the vignette on flattening resources. Make sure that you allow `fhir_crack()` to generate the column names automatically, i.e. don't state explicit column names in the `fhir_table_description`.
 
 ```{r}
 patients <- fhir_table_description(
   resource = "Patient",
-  style    = fhir_style(
-    brackets = c("[", "]"),
-    sep      = " | "
-  )
+  brackets = c("[", "]"),
+  sep      = " | ",
+  format = "wide"
 )
 
 table <- fhir_crack(bundles = bundles, design = patients, verbose = 0)
 
-cast_table <- fhir_cast(table, brackets = c("[", "]"), sep = " | ", verbose = 0)
 ```
 
 The resulting table looks like this:
 
 ```{r}
-cast_table
+table
 ```
 
 ## Modify the data
 You can now modify the data. For example, we could remove the name and id and change all city entries to `xxx`:
 
 ```{r}
-#remove name
-modified_table <- cast_table[,-c(1,14,15)]
+#remove name and id
+modified_table <- subset(table, select = -c(`[1.1]name.given`, `[2.1]name.given`, `[1]id`))
 
 #anonymize city
-modified_table[,4:6] <- sapply(modified_table[,4:6], function(x){sub(".*", "xxx", x)})
+modified_table[,c(1,5,9)] <- sapply(modified_table[,c(1,5,9)], function(x){sub(".*", "xxx", x)})
 
 
 modified_table
@@ -116,10 +114,10 @@ You can have a look at the bundle like this:
 
 ```{r}
 #Overview
-bundles
+bundle
 
 #print complete string
-cat(toString(bundles))
+cat(toString(bundle))
 ```
 
 If you are familiar with transaction bundles, you'll notice that this bundle is lacking some information to be POSTable to a server: The `request` element. To be able to upload resources to a server, a transaction/batch bundle must have a `request` element for each resource which holds the url and the HTTP verb (usually `POST` or `PUT`) for the respective resource, otherwise the server will throw an error.
@@ -157,7 +155,7 @@ In general there are two modes of loading resources to a FHIR server. You either
 fhir_post(url = "http://hapi.fhir.org/baseR4/Patient", body = new_resource)
 ```
 ```{r, echo=FALSE}
-message("Resource sucessfully POSTed")
+message("Resource sucessfully created")
 ```
 
 When you do this, the Patient resource in `new_resource` is created under a new, server generated id (also called logical or resource id) on the server. It therefore makes sense for the POSTed resource to not have a resource id, because if it does, most servers will overwrite this id. 
@@ -168,7 +166,7 @@ Assuming that the resource `[base]/Patient/id1` exists on the server, we could f
 
 ```{r}
 #create resource
-new_resource_with_id <- fhir_build_resource(cast_table[1,], resource_type = "Patient")
+new_resource_with_id <- fhir_build_resource(table[1,], resource_type = "Patient")
 
 new_resource_with_id
 ```
@@ -220,18 +218,16 @@ bundles <- fhir_unserialize(example_bundles3)
 #crack
 Patient <- fhir_table_description(
   resource = "Patient",
-  style    = fhir_style(
-    sep      = ":::",
-    brackets = c("[","]")
-  )
+  sep      = ":::",
+  brackets = c("[","]"),
+  format   = "wide"
 )
 
 Observation <- fhir_table_description(
   resource = "Observation",
-  style    = fhir_style(
-    sep      = ":::",
-    brackets = c("[","]")
-  )
+  sep      = ":::",
+  brackets = c("[","]"),
+  format   = "wide"
 )
 
 tables <- fhir_crack(
@@ -240,48 +236,35 @@ tables <- fhir_crack(
   verbose = 0
 )
 
-#cast
-cast_tables <- lapply(tables, fhir_cast, brackets = c("[","]"), sep = ":::", verbose = 0)
-
-```
-The cast tables look like this:
-
-```{r}
-cast_tables$Patient
-```
-
-
-```{r}
-cast_tables$Observation
 ```
 
 Now we need to add the request information. We use PUT for all resources to have control over their ids.
 
 ```{r}
 #add request info to Patients
-cast_tables$Patient$request.method <- "PUT"
-cast_tables$Patient$request.url <- paste0("Patient/", cast_tables$Patient$id1)
+tables$Patient$request.method <- "PUT"
+tables$Patient$request.url <- paste0("Patient/", tables$Patient$`[1]id`)
 
 #add request info to Observation
-cast_tables$Observation$request.method <- "PUT"
-cast_tables$Observation$request.url <- paste0("Observation/", cast_tables$Observation$id1)
+tables$Observation$request.method <- "PUT"
+tables$Observation$request.url <- paste0("Observation/", tables$Observation$`[1]id`)
 ```
 
 The augmented tables look like this:
 
 ```{r}
-cast_tables$Patient
+tables$Patient
 ```
 
 
 ```{r}
-cast_tables$Observation
+tables$Observation
 ```
 
 You can build a bundle from them by giving this list to `fhir_build_bundle()`:
 
 ```{r}
-bundle <- fhir_build_bundle(cast_table = cast_tables)
+bundle <- fhir_build_bundle(table = tables)
 ```
 
 The bundle looks like this:

@@ -79,10 +79,10 @@ head(table)
 
 ### The table_description
 
-A `fhir_table_description` holds all the information `fhir_crack()` needs to create a table from resources of a certain type. It is created with `fhir_table_description()` and generally consists of the three elements that can be provided in the three following arguments:
+A `fhir_table_description` holds all the information `fhir_crack()` needs to create a table from resources of a certain type. It is created with `fhir_table_description()` by providing the following arguments:
 
 #### The `resource` argument 
-This is basically a string that defines the resource type (e.g. Patient or Observation) to extract. You set it like this:
+This is basically a string that defines the resource type (e.g. Patient or Observation) to extract. It is the only argument that you must provide and you set it like this:
 
 ```{r}
 fhir_table_description(resource = "Patient")
@@ -90,7 +90,7 @@ fhir_table_description(resource = "Patient")
 
 Internally, `fhir_table_description()` calls `fhir_resource_type()` which checks the type you provided against list of all currently available resource types can be found at <a href="https://hl7.org/FHIR/resourcelist.html" target="_blank">https://hl7.org/FHIR/resourcelist.html</a>. Case errors are corrected automatically and the function throws a warning, if the resource type doesn't match the list under hl7.org.
 
-As you can see in the above output, there are two more elements in a `fhir_table_description` which are filled automatically by `fhir_table_description()`.
+As you can see in the above output, there are more elements in a `fhir_table_description` which are filled automatically by `fhir_table_description()`.
 
 #### The cols argument
 The `cols` argument takes the column names and XPath (1.0) expressions defining the columns to create from the FHIR resources. The XPath expression has to be built relatively to the root of the resource tree. If the `cols` element is empty, `fhir_crack()` will extract all available elements of the resource and name the columns automatically. To explicitly define columns, you can provide a (named) character or a (named) list with XPath expressions like this:
@@ -106,7 +106,7 @@ fhir_table_description(
 )
 ```
 
-In this case a table with three columns called gender, name and city will be created. They will be filled with the value attribute that can be found under the respective xpath expressions in the resource. In the rare cases where you want to extract another attribute (besides *value* FHIR currently only allows *id* and *url* attributes), you have to add the attribute to the xpath expression like this: `"node/node/@id"`. Note that this happens extremely rarely. 
+In this case a table with three columns called gender, name and city will be created. They will be filled with the element that can be found under the respective xpath expression in the resource. The element will be extracted regardless of the attribute that is used (in fhir this is mostly `@value` but can also be `@id` or `@url` in rare cases). If you are interested in keeping the attribute information, you can set `keep_attr = TRUE`, in which case the attribute will be attached to the column name.
 
 Internally, `fhir_table_description()` calls `fhir_columns()` to check the validity of the XPath expressions and assign column names. You can provide the XPath expressions in a named or unnamed character vector or a named or unnamed list. If you choose the unnamed version, the names will be set automatically and reflect the respective XPath expression:
 
@@ -126,20 +126,20 @@ fhir_columns(xpaths = c("gender", "name/family", "address/city"))
 A `fhir_columns` object that is created explicitly like this can of course also be used in the `columns` argument of `fhir_table_description`. 
 We strongly advise to only use fully specified relative XPath expressions here, e.g. `"ingredient/strength/numerator/code"` and not search paths like `"//code"`, as those can generate unexpected results especially if the searched element appears on different levels of the resource.
 
-#### The style arguments
-The remaining elements of a `fhir_table_description` are more or less style parameters. These elements control how `fhir_crack()` deals with multiple entries to the same element and with columns that are completely empty, i.e. have only `NA` values. Furthermore you can select the shape of the output tables by a format argument and control automatically build column names. In the outputs above you can see, that the style takes some default values if you skip it in `fhir_table_description()`.
+#### Other arguments
+While the `resource` and `cols` control *what* is extracted from the bundles, the remaining elements of a `fhir_table_description` control *how* the resulting table looks. These elements for example control how `fhir_crack()` deals with multiple entries for the same element and with columns that are completely empty, i.e. have only `NA` values. Furthermore you can select the shape of the output tables and how column names are generated:
 
   - The `sep` element is a string defining the separator used when multiple entries to the same attribute are pasted together. This could for example happen if there is more than one address entry in a Patient resource. Examples of this are shown further down under the heading **Multiple entries**.
-  - The `brackets` element is either an empty character (of length 0) or a character vector of length 2. If it is empty, multiple entries will be pasted together without indices. If it is of length 2, the two strings provided here are used as brackets for automatically generated indices to sort out multiple entries (see paragraph Multiple Entries). `brackets = c("[", "]")` e.g. will lead to indices like `[1.1]`.  
+  - The `brackets` element is either an empty character vector (of length 0) or a character vector of length 2. If it is empty, multiple entries will be pasted together without indices. If it is of length 2, the two strings provided here are used as brackets for automatically generated indices to sort out multiple entries (see paragraph Multiple Entries). `brackets = c("[", "]")` e.g. will lead to indices like `[1.1]`.  
   - The `rm_empty_cols` flag can be `TRUE` or `FALSE`. If `TRUE`, columns containing only `NA` values will be removed, if `FALSE`, these columns will be kept.  
-  - The `format` element is a character either `compact` or `wide` that specifies the shape of the output table. For `compact` multiple entries are written in one cell separated by the separator `sep`. In the `wide` case for every entry a singel column will be created.  
-  - The `keep_attr` flag is a logical the ask for keeping XML-Tag-Attributes as ending of the column names or not. e.g. `name/given@value` would result either in `name.given` or `name.given.value`.  
+  - The `format` element takes values `compact` or `wide` that specify the shape of the output table. In a `compact` table multiple entries are written into the same cell/column separated by `sep`. In a `wide` table multiple entries are spread over several indexed columns. See the paragraph on multiple entries for more information.
+  - The `keep_attr` flag controls whether the xml tag attributes of the FHIR element should be attached to the end of the column name or not. For the column extracted by `name/given`, the name would result in `name.given` if `keep_attr = FALSE` and `name.given@value` if `keep_attr = TRUE`.  
 
 All five style elements can also be controlled directly by the `fhir_crack()` arguments `sep`, `brackets`, `remove_empty_columns`, `format` and `keep_attr`. If the function arguments are `NULL` (their default), the values provided in `fhir_table_description` are used, if they are not NULL, they will overwrite any values in `fhir_table_description`. 
   
-A fully default set of a `Patient` table description would be like this:  
+A fully defined set of a `Patient` table description would be like this:  
 ```{r}
-ftd <- fhir_table_description(
+table_description <- fhir_table_description(
 	resource = "Patient",
 	cols     = list(
 		gender = "gender",
@@ -159,7 +159,7 @@ We will now work through examples using `fhir_table_descriptions` of different c
 ### Examples
 
 #### Extract all available attributes
-Lets start with an example where we only provide the (mandatory) `resource` component of the table_description.  In this case, `fhir_crack()` will extract all available attributes and use default values for the `style` component:
+Lets start with an example where we only provide the (mandatory) `resource` component of the table_description.  In this case, `fhir_crack()` will extract all available attributes and use default values for the other elements:
 
 ```{r}
 #define a table_description
@@ -173,10 +173,10 @@ table <- fhir_crack(bundles = pat_bundles, design = table_description1, verbose 
 table[1:5,1:5]
 ```
 
-As you can see, this can easily become a rather wide and sparse data frame. This is due to the fact that every attribute appearing in at least one of the resources will be turned into a variable (i.e. column), even if none of the other resources contain this attribute. For those resources, the value on that attribute will be set to `NA`. Depending on the variability of the resources, the resulting data frame can contain a lot of `NA` values. If a resource has multiple entries for an attribute (e.g. several addresses in a Patient resource), these entries will pasted together using the string provided in `sep` as a separator. The column names in this option are automatically generated by pasting together the path to the respective attribute, e.g. `name.given`.
+As you can see, this can easily become a rather wide and sparse data frame. This is due to the fact that every every element appearing in at least one of the resources will be turned into a variable (i.e. column), even if none of the other resources contain this element. For those resources, the value on that element will be set to `NA`. Depending on the variability of the resources, the resulting table can contain a lot of `NA` values. If a resource has multiple entries for an element (e.g. several addresses in a Patient resource), these entries will pasted together using the string provided in `sep` as a separator. The column names in this option are automatically generated by pasting together the path to the respective element, e.g. `name.given`.
 
-#### Extract specific attributes
-If we know which attributes we want to extract, we can specify them in a named list and provide it in the `cols` component of the data.frame description:
+#### Extract specific elements
+If we know which elements we want to extract, we can specify them in a named list and provide it in the `cols` component of the table description:
 
 ```{r}
 #define a table_description
@@ -193,7 +193,6 @@ table_description2 <- fhir_table_description(
 )
 
 #convert resources
-#again pass table_description2 to the design argument
 table <- fhir_crack(bundles = pat_bundles, design = table_description2, verbose = 0)
 
 #have look at the results
@@ -201,15 +200,13 @@ head(table)
 ```
 This option will return more tidy and clear data frames, because you have full control over the extracted columns including their name in the resulting table. You should always extract the resource id, because this is used to link to other resources you might also extract. 
 
-If you are not sure which attributes are available or where they are located in the resource, it can be helpful to start by extracting all available attributes. If you are more comfortable with xml, you can also use `xml2::xml_structure` on one of the bundles from your bundle list, this will print the complete xml structure into your console. Then you can get an overview over the available attributes and their location and continue by doing a second, more targeted extraction to get your final data frame.
+If you are not sure which elements are available or where they are located in the resource, it can be helpful to start by extracting all available elements. If you are more comfortable with xml, you can also use `xml2::xml_structure` on one of the bundles from your bundle list, this will print the complete xml structure into your console. Then you can get an overview over the available element and their location and continue by doing a second, more targeted extraction to get your final data frame.
 
 If you want to have a look at how the design looked that was actually used in the last call to `fhir_crack()` you can retrieve it with `fhir_canonical_design()`. 
 
 ```{r}
 fhir_canonical_design()
 ```
-
-As you can see the value attributes have been amended by `fhir_crack()`. This will be done automatically, whenever the XPath expressions don't state the attribute explicitly, so you don't have to mind that part.
 
 
 ## Extracting more than one resource type
@@ -274,7 +271,7 @@ head(list_of_tables$Medications)
 head(list_of_tables$Patients)
 ```
 
-As you can see, the result is a list of two data frames, one for Patient resources and one for MedicationStatement resources. When you use `fhir_crack()` with a `fhir_desgn()` instead of a `fhir_table_description`, the result is an object of class `fhir_df_list` or `fhir_dt_list` that also has the design attached. You can extract the design from a list like this using `fhir_design()`:
+As you can see, the result is a list of tables, one for Patient resources and one for MedicationStatement resources. When you use `fhir_crack()` with a `fhir_desgn()` instead of a `fhir_table_description`, the result is an object of class `fhir_df_list` or `fhir_dt_list` that also has the design attached. You can extract the design from a list like this using `fhir_design()`:
 
 ```{r}
 fhir_design(list_of_tables)
@@ -299,7 +296,7 @@ fhir_load_design(paste0(temp_dir, "/design.xml"))
 
 
 ## Multiple entries
-A particularly complicated problem in flattening FHIR resources is caused by the fact that there can be multiple entries to an attribute. The profile according to which your FHIR resources have been built defines how often a particular attribute can appear in a resource. This is called the *cardinality* of the attribute. For example the Patient resource defined <a href="https://www.hl7.org/fhir/patient.html#resource" target="_blank">here</a> can have zero or one birthdates but arbitrarily many addresses. In general, `fhir_crack()` will paste multiple entries for the same attribute together in the data frame, using the separator provided by the `sep` argument. In most cases this will work just fine, but there are some special cases that require a little more attention.
+A particularly complicated problem in flattening FHIR resources is caused by the fact that there can be multiple entries to an element. The profile according to which your FHIR resources have been built defines how often a particular element can appear in a resource. This is called the *cardinality* of the element. For example the Patient resource defined <a href="https://www.hl7.org/fhir/patient.html#resource" target="_blank">here</a> can have zero or one birthdates but arbitrarily many addresses. In the default setting, `fhir_crack()` will paste multiple entries for the same element together in the table, using the separator provided by the `sep` argument. In most cases this will work just fine, but there are some special cases that require a little more attention.
 
 Let's have a look at an example bundle containing just three Patient resources. You can make it available in your workspace like this:
 
@@ -313,65 +310,71 @@ This is how the xml looks:
 <Bundle>
   <type value='searchset'/>
   <entry>
- 	<Patient>
- 		<id value='id1'/>
- 		<address>
- 			<use value='home'/>
- 			<city value='Amsterdam'/>
- 			<type value='physical'/>
- 			<country value='Netherlands'/>
- 		</address>
- 		<name>
-			<given value='Marie'/>
- 		</name>
- 	</Patient>
+	<resource>
+	 	<Patient>
+	 		<id value='id1'/>
+	 		<address>
+	 			<use value='home'/>
+	 			<city value='Amsterdam'/>
+	 			<type value='physical'/>
+	 			<country value='Netherlands'/>
+	 		</address>
+	 		<name>
+				<given value='Marie'/>
+	 		</name>
+	 	</Patient>
+	</resource>
   </entry>
   
   <entry>
- 	<Patient>
-		<id value='id2'/>
- 		<address>
- 			<use value='home'/>
- 			<city value='Rome'/>
- 			<type value='physical'/>
- 			<country value='Italy'/>
- 		</address>
- 		<address>
- 			<use value='work'/>
- 			<city value='Stockholm'/>
- 			<type value='postal'/>
- 			<country value='Sweden'/>
- 		</address>
- 		<name>
- 			<given value='Susie'/>
- 		</name>
- 	</Patient>
+	<resource>
+	 	<Patient>
+			<id value='id2'/>
+	 		<address>
+	 			<use value='home'/>
+	 			<city value='Rome'/>
+	 			<type value='physical'/>
+	 			<country value='Italy'/>
+	 		</address>
+	 		<address>
+	 			<use value='work'/>
+	 			<city value='Stockholm'/>
+	 			<type value='postal'/>
+	 			<country value='Sweden'/>
+	 		</address>
+	 		<name>
+	 			<given value='Susie'/>
+	 		</name>
+	 	</Patient>
+ 	</resource>
   </entry>
   
   <entry>
- 	<Patient>
- 		<id value='id3'/>
- 		<address>
- 			<use value='home'/>
- 			<city value='Berlin'/>
-		</address>
- 		<address>
- 			<type value='postal'/>
- 			<country value='France'/>
- 		</address>
- 		<address>
- 			<use value='work'/>
- 			<city value='London'/>
- 			<type value='postal'/>
- 			<country value='England'/>
- 		</address>
- 		<name>
- 			<given value='Frank'/>
- 		</name>
- 		<name>
- 			<given value='Max'/>
- 		</name>
- 	</Patient>
+	<resource>
+ 		<Patient>
+ 			<id value='id3'/>
+ 			<address>
+ 				<use value='home'/>
+ 				<city value='Berlin'/>
+			</address>
+ 			<address>
+ 				<type value='postal'/>
+ 				<country value='France'/>
+ 			</address>
+ 			<address>
+ 				<use value='work'/>
+ 				<city value='London'/>
+ 				<type value='postal'/>
+ 				<country value='England'/>
+ 			</address>
+ 			<name>
+ 				<given value='Frank'/>
+ 			</name>
+ 			<name>
+ 				<given value='Max'/>
+ 			</name>
+		</Patient>
+ 	</resource>
   </entry>
 
 </Bundle>
@@ -403,100 +406,109 @@ df2
 ```
 Now the indices display the entry the value belongs to. That way you can see that Patient resource 3 had three entries for the attribute `address` and you can also see which attributes belong to which entry.
 
+If you set the `format` argument to `wide`, the entries are spread over multiple columns and the indices are attached to column name:
+
+
+```{r}
+df3 <- fhir_crack(bundles = bundle, design = desc2, format = "wide", verbose = 0)
+
+df3
+```
+
 Of course the above example is a very specific case that only occurs if your resources have multiple entries with complementary elements. In the majority of cases multiple entries in one resource will have the same structure, thus making numbering of those entries superfluous. But the indices also help to disentangle those entries and put them in separate rows, as you'll see in the next paragraph.
 
 ## Process tables with multiple entries
-If the data frame produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. fhircrackr gives you two options to do this: `fhir_melt()` and `fhir_cast()`. The former spreads the entries across rows, creating a long format, the latter spreads them across columns, creating a wide format.
+If the table produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. Apart from directly spreading those values over multiple columns by using a `wide` cracking format, the fhircrackr gives you two options to get from a compact table to either a long or a wide format: `fhir_melt()` and `fhir_cast()`. The former spreads the entries across rows, creating a long format, the latter spreads them across columns, creating a wide format.
 
 ### Melt tables with multiple entries
 `fhir_melt()` takes an indexed data frame with multiple entries in one or several `columns` and spreads (aka melts) the entries in `columns` over several rows:
 
- ```{r}
+```{r}
  fhir_melt(
 	indexed_data_frame = df2,
 	columns            = "address.city",
 	brackets           = c("[", "]"),
 	sep                = " | ",
-	all_columns        = FALSE
+	all_columns        = TRUE
  )
- ```
+```
  
 The new variable `resource_identifier` records which rows in the created data frame belong to which row (usually equivalent to one resource) in the original data frame.
- `brackets` and `sep` should be given the same character vectors that have been used to build the indices in `fhir_melt()`. `columns` is a character vector with the names of the variables you want to melt. You can provide more than one column here but it makes sense to only have variables from the same repeating attribute together in one call to `fhir_melt()`:
+ `brackets` and `sep` should be given the same character vectors that have been used to build the indices in `fhir_crack()`. `columns` is a character vector with the names of the variables you want to melt. You can provide more than one column here but it makes sense to only have variables from the same repeating attribute together in one call to `fhir_melt()`:
  
- ```{r}
- cols <- c("address.city", "address.use", "address.type", "address.country")
+```{r}
+cols <- c("address.city", "address.use", "address.type", "address.country")
  
- fhir_melt(
+fhir_melt(
 	indexed_data_frame = df2,
 	columns            = cols,
 	brackets           = c("[", "]"), 
 	sep	               = " | ",
-	all_columns        = FALSE
- )
- ```
+	all_columns        = TRUE
+)
+```
 
 If the names of the variables in your data frame have been generated automatically with `fhir_crack()` you can find all variable names belonging to the same attribute with `fhir_common_columns()`:
  
- ```{r}
- cols <- fhir_common_columns(data_frame = df2, column_names_prefix = "address")
- cols
- ```
+```{r}
+cols <- fhir_common_columns(data_frame = df2, column_names_prefix = "address")
+cols
+```
 With the argument `all_columns` you can control whether the resulting data frame contains only the molten columns or all columns of the original data frame:
  
- ```{r}
- fhir_melt(
+```{r}
+fhir_melt(
 	indexed_data_frame = df2,
 	columns            = cols,
 	brackets           = c("[", "]"), 
 	sep                = " | ",
-	all_columns        = TRUE
- )
- ```
+	all_columns        = FALSE
+)
+```
 Values on the other variables will just repeat in the newly created rows.
  
-If you try to melt several variables that don't belong to the same attribute in one call to `fhir_melt()`, this will cause problems, because the different attributes won't be combined correctly:
+If you try to melt several variables that don't belong to the same element in one call to `fhir_melt()`, this will cause problems, because the different elements won't be combined correctly:
  
- ```{r}
- cols <- c(cols, "id")
- fhir_melt(
+```{r}
+cols <- c(cols, "name.given")
+fhir_melt(
 	indexed_data_frame = df2,
 	columns            = cols,
 	brackets           = c("[", "]"), 
 	sep                = " | ",
 	all_columns        = TRUE
- )
- ```
+)
+```
  
 Instead, melt the attributes one after another:
 
- ```{r}
- cols <- fhir_common_columns(data_frame = df2, column_names_prefix = "address")
+```{r}
+cols <- fhir_common_columns(data_frame = df2, column_names_prefix = "address")
 
- molten_1 <- fhir_melt(
+molten_1 <- fhir_melt(
 	indexed_data_frame = df2,
 	columns            = cols,
 	brackets           = c("[", "]"),
 	sep                = " | ",
 	all_columns        = TRUE
- )
+)
 
- molten_1
+molten_1
 
- molten_2 <- fhir_melt(
+molten_2 <- fhir_melt(
 	indexed_data_frame = molten_1,
 	columns            = "name.given",
 	brackets           = c("[", "]"),
 	sep                = " | ",
 	all_columns        = TRUE
- )
+)
 
- molten_2
- ```
+molten_2
+```
 This will give you the appropriate product of all multiple entries.
 
 ### Remove indices
-Once you have sorted out the multiple entries, you might want to get rid of the indices in your data.frame. This can be achieved using `fhir_rm_indices()`:
+Once you have sorted out the multiple entries, you might want to get rid of the indices in your table. This can be achieved using `fhir_rm_indices()`:
 
 ```{r}
 fhir_rm_indices(indexed_data_frame = molten_2, brackets = c("[", "]"))
@@ -504,14 +516,14 @@ fhir_rm_indices(indexed_data_frame = molten_2, brackets = c("[", "]"))
 Again, `brackets` and `sep` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()` respectively.
 
 ### Cast data frames with multiple entries
-Instead of spreading the entries across rows, you can also spread them across columns using `fhir_cast()`. This function takes a data.frame/data.table with multiple entries and the brackets and separator that have been used in `fhir_crack()` as input:
+Instead of spreading the entries across rows, you can also spread them across columns using `fhir_cast()`. As you've seen above this can be achieved by setting `format = "wide"` in `fhir_crack()`. There is, however, a function that turns a `compact` table into a `wide` table and this funtion is `fhir_cast()`. It takes a compact table with multiple entries and the brackets and separator that have been used in `fhir_crack()` as input:
 
 ```{r}
 fhir_cast(df2, brackets = c("[", "]"), sep = " | ", verbose = 0)
 ```
 Contrary to `fhir_melt()` this function requires all column names to reflect the XPath expression of the respective attribute. The column containing information on `address/city` for example has to be named `adress.city` because the information of the indices is incorporated in those names to avoid duplicate column names. This column naming scheme is automatically used when you don't give explicit column names in the table_description/design for `fhir_crack()` so it makes sense to only cast tables that have automatically generated column names.
 
-The tables produced by `fhir_cast()` can also be used to recreate the resources that were cracked in the first place, as you'll the in the vignette about recreation of resources.
+The tables produced by `fhir_crack(..., format = "wide")` and `fhir_cast()` can also be used to recreate the resources that were cracked in the first place, as you'll the in the vignette about recreation of resources.
 
 ```{r, include=F}
 file.remove(paste0(temp_dir, "/design.xml"))
