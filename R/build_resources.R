@@ -1,13 +1,13 @@
 
 #' Print xml-like tree from cast table
-#' This function takes a table as created by [fhir_cast()] and prints the tree structure implicit in the
+#' This function takes a wide table as created by [fhir_crack()] with `format="wide"`and prints the tree structure implicit in the
 #' column names of the tables. It is useful to get an overview over the implied structure when planning to create
 #' FHIR bundles from this table using [fhir_build_bundle()].
 #'
 #' By default, only the first 5 rows are converted to tree structure to prevent the output from getting too long. This
 #' can be changed by setting the argument `nrow` to the desired number.
 #'
-#' @param cast_table A data.frame or data.table as produced by [fhir_cast()]
+#' @param table A data.frame or data.table as produced by [fhir_crack()] with `format="wide"` or [fhir_cast()]
 #' @param resource A character vector of length one or [fhir_resource_type-class] object
 #' indicating which resource type the table is build from.
 #' @param nrow A numeric of length 1 indicating how many rows to convert to tree structures.
@@ -21,24 +21,23 @@
 #' table_desc <- fhir_table_description(
 #'     resource = "Patient",
 #'     brackets = c("[", "]"),
-#'     sep      = " "
+#'     sep      = " ",
+#'     format   = "wide"
 #' )
 #'
 #' df <- fhir_crack(bundles = bundles, design = table_desc)
 #'
-#' #cast
-#' cast_df <- fhir_cast(df, brackets = c("[", "]"), sep = " ", verbose = 0)
 #'
 #' #show tree
-#' fhir_show_tree(cast_df, resource="Patient")
+#' fhir_show_tree(df, resource="Patient")
 #' @export
 #' @seealso [fhir_cast()], [fhir_build_bundle()]
 #'
-fhir_show_tree <- function(cast_table, resource, nrow = 5, rm_indices = TRUE) {
+fhir_show_tree <- function(table, resource, nrow = 5, rm_indices = TRUE) {
 	i <- 1
 	bundle <- list()
-	while(i <= min(nrow(cast_table), nrow)) {
-		row <- cast_table[i,]
+	while(i <= min(nrow(table), nrow)) {
+		row <- table[i,]
 		if(rm_indices){
 			bundle <- c(bundle, rm_ids_from_tree(build_tree(row = row, root = resource, keep_nas = F)))
 		}else{
@@ -51,12 +50,11 @@ fhir_show_tree <- function(cast_table, resource, nrow = 5, rm_indices = TRUE) {
 
 #' Build a single FHIR resource
 #'
-#' This function takes a single row from a table as produced by [fhir_cast()] and builds a [fhir_resource_xml-class] object from it. The column names of the table
+#' This function takes a single row from a wide table as produced by [fhir_crack()] and builds a [fhir_resource_xml-class] object from it. The column names of the table
 #' must represent the XPath expression of the respective element with indices for repeating items. A table like this is produced when FHIR resources have
-#' been cracked with [fhir_crack()] without assigning explicit column names in the [fhir_design-class]/[fhir_table_description-class] and this table has in turn
-#' been cast to wide format with [fhir_cast()].
+#' been cracked with [fhir_crack()] without assigning explicit column names in the [fhir_design-class]/[fhir_table_description-class] and with `format` set to `"wide"`.
 #'
-#' @param cast_row Single row from a cast table as produced by [fhir_cast()]
+#' @param row Single row from a wide table as produced by [fhir_crack()] with `format="wide"`
 #' @param resource_type A character vector of length one or [fhir_resource_type-class] object
 #' indicating which resource type the table is build from.
 #' @return A [fhir_resource_xml-class] object.
@@ -69,24 +67,23 @@ fhir_show_tree <- function(cast_table, resource, nrow = 5, rm_indices = TRUE) {
 #' Pat <- fhir_table_description(
 #'     resource = "Patient",
 #'     brackets = c("[", "]"),
-#'     sep      = " "
+#'     sep      = " ",
+#'     format   = "wide"
 #' )
 #'
 #' df <- fhir_crack(bundles = bundles, design = Pat)
 #'
-#' #cast
-#' cast_df <- fhir_cast(df, brackets = c("[", "]"), sep = " ", verbose = 0)
 #'
 #' #build bundles
-#' resource <- fhir_build_resource(cast_df[1,], "Patient")
+#' resource <- fhir_build_resource(df[1,], "Patient")
 #'
 #' #print to console
 #' resource
 #' @export
 #' @seealso [fhir_cast()], [fhir_crack()], [fhir_build_bundle()]
 
-fhir_build_resource <- function(cast_row, resource_type) {
-	s <- tree2xml(rm_ids_from_tree(build_tree(cast_row, root = resource_type)))
+fhir_build_resource <- function(row, resource_type) {
+	s <- tree2xml(rm_ids_from_tree(build_tree(row, root = resource_type)))
 	fhir_resource_xml(xml2::read_xml(s))
 }
 
@@ -94,15 +91,14 @@ fhir_build_resource <- function(cast_row, resource_type) {
 
 #' Build a FHIR bundle
 #'
-#' This function takes a table as produced by [fhir_cast()] and builds a [fhir_bundle_xml-class] object from it. It is primarily used
+#' This function takes a table as produced by [fhir_crack()] with `format="wide"` and builds a [fhir_bundle_xml-class] object from it. It is primarily used
 #' to create transaction/batch bundles to POST back to a FHIR server. The column names of the table must represent the XPath expression of the
 #' respective element with indices for repeating items. A table like this is produced when FHIR resources have been cracked with [fhir_crack()] without
-#' assigning explicit column names in the [fhir_design-class]/[fhir_table_description-class] and this table has in turn been cast to wide format with
-#' [fhir_cast()].
+#' assigning explicit column names in the [fhir_design-class]/[fhir_table_description-class] and the format has been set  to `"wide"`.
 #'
 #' The typical use case would look like this:
 #' 1) Download resources from a server whith [fhir_search()]
-#' 2) Crack and cast them whith [fhir_crack()] and [fhir_cast()]
+#' 2) Crack to wide format them with [fhir_crack()]
 #' 3) Do something to values (e.g. some kind of anonymization)
 #' 4) Translate the data back into FHIR resources with [fhir_build_bundle()]
 #' 5) Post the resources to a server
@@ -154,17 +150,17 @@ fhir_build_resource <- function(cast_row, resource_type) {
 #' In this example the bundle contains two Patient resources that are sent to server with a POST. For more information the structure of transaction/batch bundles,
 #' please see the FHIR documentation at https://www.hl7.org/fhir/http.html and https://www.hl7.org/fhir/bundle.html.
 #'
-#' In the cast table, each row corresponds to one resource that is created. To add the information for the `request` element of the bundle,
+#' In the table, each row corresponds to one resource that is created. To add the information for the `request` element of the bundle,
 #' this table has to be augmented with two columns named `request.method` and `request.url`, which contain the respective HTTP verb and URL for the resource.
 #' If these columns are not added to the table, [fhir_build_bundle()] still builds bundles from it, but those bundles will not be POSTable to a server. See examples.
 #'
 #'
-#' @param cast_table A cast table as produced by [fhir_cast()], possibly modified (see details) or a named list
-#' of cast tables, if different resource types have to be included in the same bundle. In this case the names of
+#' @param table A wide table as produced by [fhir_crack()], possibly modified (see details) or a named list
+#' of wide tables, if different resource types have to be included in the same bundle. In this case the names of
 #' the list elements must correspond to the resource type represented in the table!
 #' @param resource_type A character vector of length one or [fhir_resource_type-class] object
 #' indicating which resource type is represented in the table, if a single table is provided. This argument is
-#' ignored when `cast_table` is a named list of tables.
+#' ignored when `table` is a named list of tables.
 #' @param bundle_type A character vector of length one defining the bundle type. Will usually be
 #' either `"transaction"` (the default) or `"batch"`.
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if > 0 progress message is printed. Defaults to 1.
@@ -178,13 +174,11 @@ fhir_build_resource <- function(cast_row, resource_type) {
 #' Pat <- fhir_table_description(
 #'     resource = "Patient",
 #'     brackets = c("[", "]"),
-#'     sep      = " "
+#'     sep      = " ",
+#'     format = "wide"
 #' )
 #'
 #' df <- fhir_crack(bundles = bundles, design = Pat)
-#'
-#' #cast
-#' cast_df <- fhir_cast(df, brackets=c("[", "]"), sep = " ", verbose = 0)
 #'
 #' #add request info to table
 #' request <- data.frame(
@@ -192,7 +186,7 @@ fhir_build_resource <- function(cast_row, resource_type) {
 #'     request.url    = c("Patient", "Patient/id3")
 #' )
 #'
-#' request_df <- cbind(cast_df, request)
+#' request_df <- cbind(df, request)
 #'
 #' #build bundle
 #' bundle <- fhir_build_bundle(request_df, "Patient", bundle_type = "transaction")
@@ -203,13 +197,13 @@ fhir_build_resource <- function(cast_row, resource_type) {
 #' @docType methods
 #'
 #' @export
-#' @seealso [fhir_cast()], [fhir_crack()], [fhir_build_resource()]
+#' @seealso [fhir_crack()],[fhir_cast()], [fhir_build_resource()]
 
 
 setGeneric(
 	name = "fhir_build_bundle",
 	def = function(
-		cast_table,
+		table,
 		resource_type,
 		bundle_type = "transaction",
 		verbose = 1
@@ -222,19 +216,19 @@ setGeneric(
 #' @aliases fhir_build_bundle,data.frame-method
 setMethod(
 	f = "fhir_build_bundle",
-	signature = c("cast_table" = "data.frame"),
+	signature = c("table" = "data.frame"),
 	definition =  function(
-		cast_table,
+		table,
 		resource_type,
 		bundle_type = "transaction",
 		verbose = 1) {
 
-		names(cast_table)[!grepl("^request", names(cast_table))] <- paste0("resource.", resource_type, ".", names(cast_table)[!grepl("^request", names(cast_table))])
-		max_ <- nrow(cast_table)
+		names(table)[!grepl("^request", names(table))] <- paste0("resource.", resource_type, ".", names(table)[!grepl("^request", names(table))])
+		max_ <- nrow(table)
 		i <- 1
 		s <- ""
 		while(i <= max_) {
-			s <- paste0(s, tree2xml(rm_ids_from_tree(build_tree(row = cast_table[i,], "entry")), tab = "  "))
+			s <- paste0(s, tree2xml(rm_ids_from_tree(build_tree(row = table[i,], root = "entry")), tab = "  "))
 			i <- i + 1
 		}
 		s <- paste0("<Bundle>\n","   <type value='",bundle_type, "'/>\n", s, "</Bundle>")
@@ -252,32 +246,32 @@ setMethod(
 #' @aliases fhir_build_bundle,list-method
 setMethod(
 	f = "fhir_build_bundle",
-	signature = c("cast_table" = "list"),
+	signature = c("table" = "list"),
 	definition =  function(
-		cast_table,
+		table,
 		bundle_type = "transaction",
 		verbose = 1) {
 
-		if(!all(sapply(cast_table,is.data.frame))){
+		if(!all(sapply(table,is.data.frame))){
 			stop("All elements of the list provided to cast_table must be data.frames/data.tables.")
 		}
 
-		if(length(names(cast_table)) != length(cast_table)){
+		if(length(names(table)) != length(table)){
 			stop("You have to provide a **named** list, where the names correspond to the resource type represented in the table.")
 		}
 
 		s <- ""
 		lapply(
-			X = seq_len(length(cast_table)),
+			X = seq_len(length(table)),
 			FUN = function(i){
-				table <- cast_table[[i]]
-				resource_type <- fhir_resource_type(names(cast_table)[i])
+				single_table <- table[[i]]
+				resource_type <- fhir_resource_type(names(table)[i])
 
-				names(table)[!grepl("^request", names(table))] <- paste0("resource.", resource_type, ".", names(table)[!grepl("^request", names(table))])
-				max_ <- nrow(table)
+				names(single_table)[!grepl("^request", names(single_table))] <- paste0("resource.", resource_type, ".", names(single_table)[!grepl("^request", names(single_table))])
+				max_ <- nrow(single_table)
 				i <- 1
 				while(i <= max_) {
-					s <<- paste0(s, tree2xml(rm_ids_from_tree(build_tree(row = table[i,], "entry")), tab = "  "))
+					s <<- paste0(s, tree2xml(rm_ids_from_tree(build_tree(row = single_table[i,], root = "entry")), tab = "  "))
 					i <- i + 1
 				}
 			}
@@ -286,7 +280,7 @@ setMethod(
 		s <- paste0("<Bundle>\n","   <type value='",bundle_type, "'/>\n", s, "</Bundle>")
 		bundle <- xml2::read_xml(s)
 		if(verbose > 0) {
-			message("Created a  ", bundle_type, " Bundle with ", Reduce(sum, lapply(cast_table, nrow)), " resources.")
+			message("Created a  ", bundle_type, " Bundle with ", Reduce(sum, lapply(table, nrow)), " resources.")
 
 		}
 
@@ -617,23 +611,36 @@ fhir_put <- function(
 #' table_desc <- fhir_table_description(
 #'     resource = "Patient",
 #'     brackets = c("[", "]"),
-#'     sep      = " "
+#'     sep      = " ",
+#'     format   = "wide"
 #' )
 #'
 #' df <- fhir_crack(bundles = bundles, design = table_desc)
 #'
-#' #cast
-#' cast_df <- fhir_cast(df, brackets = c("[", "]"), sep = " ", verbose = 0)
-#'
 #' #build tree
-#' tree <- build_tree(cast_df[1,], root="Patient")
+#' tree <- build_tree(row = df[2,], root = "Patient")
 #'
 #' print_tree(tree)
 #' tree <- rm_ids_from_tree(tree)
 #' cat(toString(xml2::as_xml_document(tree)))
 #'
 #' @noRd
-build_tree <- function(row, root = "Bundle", keep_nas = F) {
+build_tree <- function(row, brackets = c('[', ']'), root = "Bundle", keep_nas = F) {
+
+	data.table::setDT(row)
+
+	#spread indices across column names
+	ids <- stringr::str_extract(names(row), "([0-9]+\\.*)+")
+	rownames <- sub(pattern = ".([0-9]+\\.*)+.", replacement = "", names(row))
+	ids_split <- strsplit(ids, "\\.")
+	rownames_split <- strsplit(rownames, "\\.")
+
+	names(row) <- sapply(seq_along(rownames_split), function(i){
+		diff <- length(rownames_split[[i]]) - length(ids_split[[i]])
+		paste0(rownames_split[[i]], c(rep("",diff), ifelse(!is.na(ids_split[[i]]),ids_split[[i]],"")), collapse=".")
+	})
+
+	data.table::setcolorder(row, neworder = sort(names(row)))
 
 	new_tree <- function(col_names, tree, value = 1) {
 		len <- length(col_names)
