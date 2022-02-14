@@ -4,10 +4,10 @@
 \alias{fhir_build_resource}
 \title{Build a single FHIR resource}
 \usage{
-fhir_build_resource(cast_row, resource_type)
+fhir_build_resource(row, resource_type)
 }
 \arguments{
-\item{cast_row}{Single row from a cast table as produced by \code{\link[=fhir_cast]{fhir_cast()}}}
+\item{row}{Single row from a wide table as produced by \code{\link[=fhir_crack]{fhir_crack()}} with \code{format="wide"}}
 
 \item{resource_type}{A character vector of length one or \linkS4class{fhir_resource_type} object
 indicating which resource type the table is build from.}
@@ -16,10 +16,9 @@ indicating which resource type the table is build from.}
 A \linkS4class{fhir_resource_xml} object.
 }
 \description{
-This function takes a single row from a table as produced by \code{\link[=fhir_cast]{fhir_cast()}} and builds a \linkS4class{fhir_resource_xml} object from it. The column names of the table
+This function takes a single row from a wide table as produced by \code{\link[=fhir_crack]{fhir_crack()}} and builds a \linkS4class{fhir_resource_xml} object from it. The column names of the table
 must represent the XPath expression of the respective element with indices for repeating items. A table like this is produced when FHIR resources have
-been cracked with \code{\link[=fhir_crack]{fhir_crack()}} without assigning explicit column names in the \linkS4class{fhir_design}/\linkS4class{fhir_table_description} and this table has in turn
-been cast to wide format with \code{\link[=fhir_cast]{fhir_cast()}}.
+been cracked with \code{\link[=fhir_crack]{fhir_crack()}} without assigning explicit column names in the \linkS4class{fhir_design}/\linkS4class{fhir_table_description} and with \code{format} set to \code{"wide"}.
 }
 \examples{
 #unserialize example
@@ -29,16 +28,15 @@ bundles <- fhir_unserialize(bundles = example_bundles1)
 Pat <- fhir_table_description(
     resource = "Patient",
     brackets = c("[", "]"),
-    sep      = " "
+    sep      = " ",
+    format   = "wide"
 )
 
 df <- fhir_crack(bundles = bundles, design = Pat)
 
-#cast
-cast_df <- fhir_cast(df, brackets = c("[", "]"), sep = " ", verbose = 0)
 
 #build bundles
-resource <- fhir_build_resource(cast_df[1,], "Patient")
+resource <- fhir_build_resource(df[1,], "Patient")
 
 #print to console
 resource

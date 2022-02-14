@@ -8,29 +8,29 @@
 \title{Build a FHIR bundle}
 \usage{
 fhir_build_bundle(
-  cast_table,
+  table,
   resource_type,
   bundle_type = "transaction",
   verbose = 1
 )
 
 \S4method{fhir_build_bundle}{data.frame}(
-  cast_table,
+  table,
   resource_type,
   bundle_type = "transaction",
   verbose = 1
 )
 
-\S4method{fhir_build_bundle}{list}(cast_table, bundle_type = "transaction", verbose = 1)
+\S4method{fhir_build_bundle}{list}(table, bundle_type = "transaction", verbose = 1)
 }
 \arguments{
-\item{cast_table}{A cast table as produced by \code{\link[=fhir_cast]{fhir_cast()}}, possibly modified (see details) or a named list
-of cast tables, if different resource types have to be included in the same bundle. In this case the names of
+\item{table}{A wide table as produced by \code{\link[=fhir_crack]{fhir_crack()}}, possibly modified (see details) or a named list
+of wide tables, if different resource types have to be included in the same bundle. In this case the names of
 the list elements must correspond to the resource type represented in the table!}
 
 \item{resource_type}{A character vector of length one or \linkS4class{fhir_resource_type} object
 indicating which resource type is represented in the table, if a single table is provided. This argument is
-ignored when \code{cast_table} is a named list of tables.}
+ignored when \code{table} is a named list of tables.}
 
 \item{bundle_type}{A character vector of length one defining the bundle type. Will usually be
 either \code{"transaction"} (the default) or \code{"batch"}.}
@@ -41,17 +41,16 @@ either \code{"transaction"} (the default) or \code{"batch"}.}
 A \linkS4class{fhir_bundle_xml} object.
 }
 \description{
-This function takes a table as produced by \code{\link[=fhir_cast]{fhir_cast()}} and builds a \linkS4class{fhir_bundle_xml} object from it. It is primarily used
+This function takes a table as produced by \code{\link[=fhir_crack]{fhir_crack()}} with \code{format="wide"} and builds a \linkS4class{fhir_bundle_xml} object from it. It is primarily used
 to create transaction/batch bundles to POST back to a FHIR server. The column names of the table must represent the XPath expression of the
 respective element with indices for repeating items. A table like this is produced when FHIR resources have been cracked with \code{\link[=fhir_crack]{fhir_crack()}} without
-assigning explicit column names in the \linkS4class{fhir_design}/\linkS4class{fhir_table_description} and this table has in turn been cast to wide format with
-\code{\link[=fhir_cast]{fhir_cast()}}.
+assigning explicit column names in the \linkS4class{fhir_design}/\linkS4class{fhir_table_description} and the format has been set  to \code{"wide"}.
 }
 \details{
 The typical use case would look like this:
 \enumerate{
 \item Download resources from a server whith \code{\link[=fhir_search]{fhir_search()}}
-\item Crack and cast them whith \code{\link[=fhir_crack]{fhir_crack()}} and \code{\link[=fhir_cast]{fhir_cast()}}
+\item Crack to wide format them with \code{\link[=fhir_crack]{fhir_crack()}}
 \item Do something to values (e.g. some kind of anonymization)
 \item Translate the data back into FHIR resources with \code{\link[=fhir_build_bundle]{fhir_build_bundle()}}
 \item Post the resources to a server
@@ -102,7 +101,7 @@ as well as an instruction for the server of what to to with the resource. A very
 In this example the bundle contains two Patient resources that are sent to server with a POST. For more information the structure of transaction/batch bundles,
 please see the FHIR documentation at https://www.hl7.org/fhir/http.html and https://www.hl7.org/fhir/bundle.html.
 
-In the cast table, each row corresponds to one resource that is created. To add the information for the \code{request} element of the bundle,
+In the table, each row corresponds to one resource that is created. To add the information for the \code{request} element of the bundle,
 this table has to be augmented with two columns named \code{request.method} and \code{request.url}, which contain the respective HTTP verb and URL for the resource.
 If these columns are not added to the table, \code{\link[=fhir_build_bundle]{fhir_build_bundle()}} still builds bundles from it, but those bundles will not be POSTable to a server. See examples.
 }
@@ -114,13 +113,11 @@ bundles <- fhir_unserialize(bundles = example_bundles1)
 Pat <- fhir_table_description(
     resource = "Patient",
     brackets = c("[", "]"),
-    sep      = " "
+    sep      = " ",
+    format = "wide"
 )
 
 df <- fhir_crack(bundles = bundles, design = Pat)
-
-#cast
-cast_df <- fhir_cast(df, brackets=c("[", "]"), sep = " ", verbose = 0)
 
 #add request info to table
 request <- data.frame(
@@ -128,7 +125,7 @@ request <- data.frame(
     request.url    = c("Patient", "Patient/id3")
 )
 
-request_df <- cbind(cast_df, request)
+request_df <- cbind(df, request)
 
 #build bundle
 bundle <- fhir_build_bundle(request_df, "Patient", bundle_type = "transaction")
@@ -137,5 +134,5 @@ bundle <- fhir_build_bundle(request_df, "Patient", bundle_type = "transaction")
 cat(toString(bundle))
 }
 \seealso{
-\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_crack]{fhir_crack()}}, \code{\link[=fhir_build_resource]{fhir_build_resource()}}
+\code{\link[=fhir_crack]{fhir_crack()}},\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_build_resource]{fhir_build_resource()}}
 }
