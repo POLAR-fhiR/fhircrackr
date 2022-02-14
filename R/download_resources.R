@@ -367,28 +367,30 @@ fhir_recent_http_error <- function() {
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
 #' @param sep A character vector of length one to separate pasted multiple entries
-#' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "<", ">")`. Defaults to `NULL`.
+#' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "[", "]")`. Defaults to `NULL`.
 #' If `NULL`, no indices will be added to multiple entries.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`
-#' @param verbose An integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
-#' extraction progress will be printed. Defaults to 2.
+#' @param verbose Deprecated since fhircrackr 2.0.0.
 #' @return A list of data frames containing the information from the statement
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #' #without indices
-#' cap <- fhir_capability_statement("https://server.fire.ly")
+#' cap <- fhir_capability_statement(url = "https://server.fire.ly")
 #'
 #' #with indices
-#' cap <- fhir_capability_statement("https://server.fire.ly", brackets = c("[","]"))
+#' cap <- fhir_capability_statement(url = "https://server.fire.ly",
+#'                                  brackets = c("[","]"),
+#'                                  sep = " || ")
 #'
 #' #melt searchInclude variable
 #' resources <- fhir_melt(cap$Resources,
 #'                        columns = "searchInclude",
-#'                        brackets = c("[", "]"), sep = " || ",
-#'                        all_columns = TRUE)
+#'                        brackets = c("[", "]"),
+#'                        sep = " || ",
+#'                        all_columns = FALSE)
 #'
 #' #remove indices
 #' resources <- fhir_rm_indices(resources, brackets = c("[", "]"))
@@ -402,9 +404,20 @@ fhir_capability_statement <- function(
 	password = NULL,
 	token = NULL,
 	brackets = NULL,
-	sep = " || ",
+	sep = " ::: ",
 	log_errors = NULL,
-	verbose = 2) {
+	verbose = NULL) {
+
+	if(!is.null(verbose)){
+		warning("The verbose argument of fhir_capability statement is deprecated since fhircrackr 2.0.0")
+	}
+
+	use_indices <- FALSE
+	if(!is.null(brackets)) {
+		bra <- brackets[1]
+		ket <- brackets[2]
+		use_indices <- TRUE
+	}
 
 	auth <- auth_helper(username = username, password = password, token = token)
 
@@ -423,47 +436,83 @@ fhir_capability_statement <- function(
 	#extract payload
 	payload <- httr::content(x = response, as = "text", encoding = "UTF-8")
 	xml <- xml2::read_xml(x = payload)
-	#xml2::xml_ns_strip(x = xml)
 	xml <- fhir_ns_strip(xml)
 
 	xml_meta <- xml2::xml_new_root(.value = xml, .copy = TRUE)
 	xml2::xml_remove(.x = xml2::xml_find_all(x = xml_meta, xpath = "/CapabilityStatement/rest"))
+
 	xml_rest <- xml2::xml_new_root(.value = xml, .copy = TRUE)
-	xml_rest <- xml2::xml_find_all(x = xml_rest, xpath = "/CapabilityStatement/rest")
 	xml2::xml_remove(.x = xml2::xml_find_all(x = xml_rest, xpath = "/CapabilityStatement/rest/resource"))
-	xml_resource <- xml2::xml_find_all(x = xml, xpath = "/CapabilityStatement/rest/resource")
 
-	suppressWarnings({
-		Meta <- fhir_table_description(resource = "/CapabilityStatement")
-		Rest <- fhir_table_description(resource = "rest")
-		Resources <- fhir_table_description(resource = "resource")
-	})
 
-	META <- fhir_crack(
-		bundles = list(xml_meta),
-		design = fhir_design(Meta),
-		sep = sep,
-		brackets = brackets,
-		verbose = verbose
+	#### META ####
+	META <- data.table(
+		node   = xml2::xml_find_all(
+			xml_meta,
+			'//@*'
+		)
 	)
-
-	REST <- fhir_crack(
-		bundles = list(xml_rest),
-		design = fhir_design(Rest),
-		sep = sep,
-		brackets = brackets,
-		verbose = verbose
+	(META[, path     := xml2::xml_path(node) |> busg('/CapabilityStatement/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
+		[, value    := xml2::xml_text(node)] # get value
+		[, path     := path |> busg('@.*', '')] # remove attribute from path
+		#[, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
+		[, xpath    := path |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')]
+		[, column   := xpath |> busg('/', '.')]
 	)
+	if(use_indices) {
+		META <- (META[, id := path |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')][, paste0(bra, id, ket, value, collapse = sep), by='column'] |>
+					 data.table::transpose(make.names = 'column'))
+	} else {
+		META <- (META[, paste0(value, collapse = sep), by='column'] |> data.table::transpose(make.names = 'column'))
+	}
+	###########
 
-	RESOURCE <- fhir_crack(
-		bundles = list(xml_resource),
-		design = fhir_design(Resources),
-		sep = sep,
-		brackets = brackets,
-		verbose = verbose
+	#### REST ####
+	REST <- data.table(
+		node   = xml2::xml_find_all(
+			xml_rest,
+			'/CapabilityStatement/rest//@*'
+		)
 	)
+	(REST[, path     := xml2::xml_path(node) |> busg('/CapabilityStatement/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
+		[, value    := xml2::xml_text(node)] # get value
+		[, path     := path |> busg('@.*', '')] # remove attribute from path
+		[, spath    := path |> busg('^[^/]+/','')] # remove 'rest' from paths
+		[, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')]
+		[, column   := xpath |> busg('/', '.')]
+	)
+	if(use_indices) {
+		REST<- (REST[, id := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')][, paste0(bra, id, ket, value, collapse = sep), by='column'] |>
+					 data.table::transpose(make.names = 'column'))
+	} else {
+		REST <- (REST[, paste0(value, collapse = sep), by='column'] |>  data.table::transpose(make.names = 'column'))
+	}
+	#########
 
-	list(Meta = META$Meta, Rest = REST$Rest, Resources = RESOURCE$Resources)
+	#### RECOURCE ####
+	RESOURCE <- data.table(
+		node   = xml2::xml_find_all(
+			xml,
+			'/CapabilityStatement/rest/resource//@*'
+		)
+	)
+	(RESOURCE[, path     := xml2::xml_path(node) |> busg('/CapabilityStatement/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
+		[, value    := xml2::xml_text(node)] # get value
+		[, path     := path |> busg('@.*', '')] # remove attribute from path
+		[, path     := path |> busg('rest\\[([0-9]+)]/', '')] #remove rest[1] from path
+		[, resource    := path |> busg('resource\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate resource
+		[, spath    := path |> busg('^[^/]+/','')] # remove 'rest/resource' from paths
+		[, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')]
+		[, column   := xpath |> busg('/', '.')]
+	)
+	if(use_indices) {
+		RESOURCE<- (RESOURCE[, id := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')][, paste0(bra, id, ket, value, collapse = sep), by=c('resource', 'column')] |>
+					dcast(resource ~ column, value.var = 'V1'))[,-c('resource')]
+	} else {
+		RESOURCE <- (RESOURCE[, paste0(value, collapse = sep), by=c('resource', 'column')] |> dcast(resource ~ column, value.var = 'V1'))[,-c('resource')]
+	}
+
+	list(Meta = META, Rest = REST, Resources = RESOURCE)
 }
 
 ####Saving Bundles####
