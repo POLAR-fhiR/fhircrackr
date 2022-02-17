@@ -24,6 +24,14 @@ setValidity(
 		if(length(names(object)) == 0) {
 			messages <- c(messages, "fhir_columns has to be a *named* character.")
 		}
+
+		with_attribute <- object[grepl("/@[[:alpha:]]*$",object)]
+
+		if(0 < length(with_attribute)){
+			messages <- c(messages,
+						  paste0("Please don't search for specific attributes like '/@value' as you did in ",
+						  	   with_attribute[1], ".\n fhir_crack() will extract all available attributes for you."))
+		}
 		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
