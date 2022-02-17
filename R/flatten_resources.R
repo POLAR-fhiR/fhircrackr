@@ -185,10 +185,6 @@ setMethod(
 
 		df <- crack_bundles_to_one_table(bundles = bundles, table_description = design, data.table = data.table, ncores = ncores, verbose = verbose)
 
-		if(design@rm_empty_cols && 0 < ncol(df)) {
-			df <- df[, 0 < colSums(!is.na(df)), with = FALSE]
-		}
-
 		if(0 < verbose) {cat('finished.\n')}
 
 		assign(x = "canonical_design", value = design, envir = fhircrackr_env)
@@ -396,6 +392,39 @@ crack_bundles_to_one_table <- function(bundles, table_description, data.table = 
 		}
 	}
 
+	###Deal with resources/elements that were not found
+	#given columns
+	if(0 < length(table_description@cols)){
+		#rm_emtpy_cols=FALSE
+		if(!table_description@rm_empty_cols){
+			#nothing was found. Return empty table with appropriate names
+			if(nrow(table)==0){
+				table <- setNames(data.table(matrix(nrow = 0, ncol = length(table_description@cols))), names(table_description@cols))
+				warning("The resource type or columns you are looking for don't seem to be present in the bundles.\n ",
+						"Returning an empty table.")
+				#some items were found: Fill missing with NA
+			}else{
+				regexpr_ids <- paste0(esc(table_description@brackets[1]), "([0-9]+(\\.[0-9]+)*)", esc(table_description@brackets[2]))
+				names <- unique(gsub(regexpr_ids, "", names(table)))
+				empty_cols <- setdiff(names(table_description@cols), names)
+				if(0 < length(empty_cols)){table[,(empty_cols):=NA]}
+			}
+			#rm_empty_cols=TRUE
+		}else{
+			if(nrow(table)==0){
+				warning("The resource type or columns you are looking for don't seem to be present in the bundles.\n ",
+						"Returning an empty table.")
+			}
+		}
+		#set column order to order stated in table_description (only works for compact table)
+		data.table::setcolorder(x = table, neworder = names(table_description@cols)[names(table_description@cols) %in% names(table)])
+
+		#all columns
+	}else{
+		if(nrow(table)==0){warning("The resource type you are looking for (",table_description@resource ,") doesn't seem to be present in the bundles.\n ",
+								   "Returning an empty table.")}
+	}
+
 	if(!data.table) {
 		data.table::setDF(table)
 	}
@@ -417,39 +446,43 @@ crack_wide_all_columns <- function(bundles, table_description, ncores = 1) {
 	} else {
 		stop("You need to provide brackets if you want to crack to format 'wide'")
 	}
-	unique(
-		data.table::rbindlist(
-			parallel::mclapply(
-				seq_along(bundles),
-				function(bundle_id) {
-					#bundle_id <- 1
-					(data.table(
-						node   = xml2::xml_find_all(
-							bundles[[bundle_id]],
-							paste0('./entry/resource/', table_description@resource, '//@*')
-						) # intermediate save entries
-					)
-					[, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
-					[, value    := xml2::xml_text(node)] # get value
-					[, attrib   := path |> busg('.*@', '')] # get attribute
-					[, path     := path |> busg('@.*', '')] # remove attribute from path
-					[, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
-					[, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
-					[, id       := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')] # extract ids
-					[, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')] # remove ids
-					[, column   := paste0(bra, id, ket, xpath) |>
-							busg('/', '.') |>
-							paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
-					] # create column name
-					[, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary columns
-					) |> dcast(entry ~ column) # cast columns by bundle and entry
-				},
-				mc.cores = ncores
-			),
-			use.names = TRUE,
-			fill = TRUE
-		)[, -c('entry')]
+	result <- data.table::rbindlist(
+		parallel::mclapply(
+			seq_along(bundles),
+			function(bundle_id) {
+				#bundle_id <- 1
+				d <- data.table(
+					node   = xml2::xml_find_all(
+						bundles[[bundle_id]],
+						paste0('./entry/resource/', table_description@resource, '//@*')
+					) # intermediate save entries
+				)
+				if(0 < nrow(d)){
+					d <-(d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
+						 [, value    := xml2::xml_text(node)] # get value
+						 [, attrib   := path |> busg('.*@', '')] # get attribute
+						 [, path     := path |> busg('@.*', '')] # remove attribute from path
+						 [, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
+						 [, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
+						 [, id       := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')] # extract ids
+						 [, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')] # remove ids
+						 [, column   := paste0(bra, id, ket, xpath) |>
+						 		busg('/', '.') |>
+						 		paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
+						 ] # create column name
+						 [, -c('node', 'xpath', 'spath', 'attrib', 'id')]) # remove unnecessary columns
+
+					d <- dcast(d, entry ~ column) # cast columns by bundle and entry
+				}
+				d
+			},
+			mc.cores = ncores
+		),
+		use.names = TRUE,
+		fill = TRUE
 	)
+	if(nrow(result)==0){result}else{unique(result[, -c('entry')])}
+
 }
 
 #' Convert Bundles to a compact table when all elements should be extracted
@@ -476,22 +509,25 @@ crack_compact_all_columns <- function(bundles, table_description, ncores = 1) {
 							paste0('./entry/resource/', table_description@resource, '//@*')
 						) # intermediate save entries
 					)
-					(d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
-					  [, value    := xml2::xml_text(node)] # get value
-					  [, attrib   := path |> busg('.*@', '')] # get attribute
-					  [, path     := path |> busg('@.*', '')] # remove attribute from path
-					  [, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
-					  [, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
-					  [, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')]
-					  [, column   := paste0(
-					  	xpath |> busg('/', '.') |> paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
-					  )])
-					if(use_indices) {
-						(d[, id := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')][, paste0(bra, id, ket, value, collapse = table_description@sep), by=c('entry', 'column')] |>
-							dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
-					} else {
-						(d[, paste0(value, collapse = table_description@sep), by=c('entry', 'column')] |> dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
+					if(0 < nrow(d)){
+						(d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
+						 [, value    := xml2::xml_text(node)] # get value
+						 [, attrib   := path |> busg('.*@', '')] # get attribute
+						 [, path     := path |> busg('@.*', '')] # remove attribute from path
+						 [, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
+						 [, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
+						 [, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')]
+						 [, column   := paste0(
+						 	xpath |> busg('/', '.') |> paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
+						 )])
+						if(use_indices) {
+							d <- (d[, id := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')][, paste0(bra, id, ket, value, collapse = table_description@sep), by=c('entry', 'column')] |>
+								  	dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
+						} else {
+							d <- (d[, paste0(value, collapse = table_description@sep), by=c('entry', 'column')] |> dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
+						}
 					}
+					d
 				},
 				mc.cores = ncores
 			),
@@ -514,53 +550,54 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 	} else {
 		stop("You need to provide brackets if you want to crack to format 'wide'")
 	}
-	unique(
-		data.table::rbindlist(
-			parallel::mclapply(
-				seq_along(bundles),
-				function(bundle_id) {# bundle_id <- 2
-					nodes <- xml2:::xml_nodeset(
-						unlist(
-							recursive = FALSE,
-							lapply(
-								table_description@cols,
-								function(xpath) {# xpath <- table_description@cols[[2]]
-									xml2::xml_find_all(
-										bundles[[bundle_id]],
-										paste0('./entry/resource/', table_description@resource, '/', xpath, '/@*')
-									)
-								}
-							)
+	result <- data.table::rbindlist(
+		parallel::mclapply(
+			seq_along(bundles),
+			function(bundle_id) {# bundle_id <- 1
+				nodes <- xml2:::xml_nodeset(
+					unlist(
+						recursive = FALSE,
+						lapply(
+							table_description@cols,
+							function(xpath) {# xpath <- table_description@cols[[2]]
+								xml2::xml_find_all(
+									bundles[[bundle_id]],
+									paste0('./entry/resource/', table_description@resource, '/', xpath, '/@*')
+								)
+							}
 						)
 					)
-					d <- (data.table(
-						node   = nodes # intermediate save entries
-					)
-						[, path     := xml2::xml_path(node) |> busg('/Bundle/', '') |> busg('([^]])/', '\\1[1]/')] # add missing indices
-						[, value    := xml2::xml_text(node)] # get value
-						[, attrib   := path |> busg('.*@', '')] # get attribute
-						[, path     := path |> busg('@.*', '')] # remove attribute from path
-						[, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
-						[, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
-						[, id       := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')] # extract ids
-						[, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')] # remove ids
-						[, column   := paste0(bra, id, ket, names(table_description@cols)[match(xpath, table_description@cols)]) |>
-								busg('/', '.') |>
-								paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
-						] # create column name
-						[, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary columns
+				)
+				d <- data.table(
+					node   = nodes # intermediate save entries
+				)
+				if(0 < nrow(d)){
+					d <- (d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '') |> busg('([^]])/', '\\1[1]/')] # add missing indices
+						  [, value    := xml2::xml_text(node)] # get value
+						  [, attrib   := path |> busg('.*@', '')] # get attribute
+						  [, path     := path |> busg('@.*', '')] # remove attribute from path
+						  [, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
+						  [, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
+						  [, id       := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')] # extract ids
+						  [, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')] # remove ids
+						  [, column   := paste0(bra, id, ket, names(table_description@cols)[match(xpath, table_description@cols)]) |>
+						  		busg('/', '.') |>
+						  		paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
+						  ] # create column name
+						  [, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary columns
 					)
 					cols <- unique(d$column)
 					d <- dcast(d, entry ~ column) # cast columns by bundle and entry
 					data.table::setcolorder(x = d, neworder = cols)
-					d
-				},
-				mc.cores = ncores
-			),
-			use.names = TRUE,
-			fill = TRUE
-		)[, -c('entry')]
+				}
+				d
+			},
+			mc.cores = ncores
+		),
+		use.names = TRUE,
+		fill = TRUE
 	)
+	if(nrow(result)==0){result}else{unique(result[, -c('entry')])}
 }
 
 #' Convert Bundles to a compact table when only some elements should be extracted
@@ -599,26 +636,27 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 					d <- data.table(
 						node   = nodes
 					)
-					(d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
-						[, value    := xml2::xml_text(node)] # get value
-						[, attrib   := path |> busg('.*@', '')] # get attribute
-						[, path     := path |> busg('@.*', '')] # remove attribute from path
-						[, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
-						[, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
-						[, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')]
-						[, column   := paste0(names(table_description@cols)[match(xpath, table_description@cols)]) |>
-								busg('/', '.') |>
-								paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
-						] # create column name
-					)
-					if(use_indices) {
-						res <- (d[, id := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')][, paste0(bra, id, ket, value, collapse = table_description@sep), by=c('entry', 'column')] |>
-						 	dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
-					} else {
-						res <- (d[, paste0(value, collapse = table_description@sep), by=c('entry', 'column')] |> dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
+					if(0 < nrow(d)){
+						(d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
+						 [, value    := xml2::xml_text(node)] # get value
+						 [, attrib   := path |> busg('.*@', '')] # get attribute
+						 [, path     := path |> busg('@.*', '')] # remove attribute from path
+						 [, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
+						 [, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
+						 [, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')]
+						 [, column   := paste0(names(table_description@cols)[match(xpath, table_description@cols)]) |>
+						 		busg('/', '.') |>
+						 		paste0(if(table_description@keep_attr) paste0('@', attrib) else '')
+						 ] # create column name
+						)
+						if(use_indices) {
+							d <- (d[, id := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')][, paste0(bra, id, ket, value, collapse = table_description@sep), by=c('entry', 'column')] |>
+								  	dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
+						} else {
+							d <- (d[, paste0(value, collapse = table_description@sep), by=c('entry', 'column')] |> dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
+						}
 					}
-					data.table::setcolorder(x = res, neworder = names(table_description@cols))
-					res
+					d
 				},
 				mc.cores = ncores
 			),
