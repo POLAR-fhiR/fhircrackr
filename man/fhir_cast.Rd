@@ -43,9 +43,9 @@ table_desc <- fhir_table_description(
     resource = "Patient",
     brackets = c('[', ']'),
     sep      = " ",
-    keep_attr=T
+    keep_attr=TRUE
 )
-df <- fhir_crack(bundles = bundles, design = table_desc, format="wide")
+df <- fhir_crack(bundles = bundles, design = table_desc)
 
 #original df
 df

@@ -11,6 +11,7 @@ assign(x = "recent_http_error", value = NULL, envir= fhircrackr_env)
 #imports
 #' @import data.table
 #' @import methods
+xml_nodeset <- utils::getFromNamespace("xml_nodeset", "xml2")
 
 #to ensure data.table version of d[] is called, even though it is not explicitly stated in
 #import section of NAMESPACE file (https://cran.r-project.org/web/packages/data.table/vignettes/datatable-importing.html)
@@ -562,6 +563,8 @@ fhir_ns_strip <- function(xml) {
 
 #################################################################################
 #################################################################################
+`..i` <- NULL #To stop "no visible binding" NOTE in check()
+
 convert_wide_table_to_a_compact_one <- function(wide, bra, ket, sep, rm_ids = FALSE, ncores = 1) {
 	ncores <- limit_ncores(ncores)
 	pastl <- function(l, ids, sep = ' ~ ') {
@@ -583,7 +586,7 @@ convert_wide_table_to_a_compact_one <- function(wide, bra, ket, sep, rm_ids = FA
 	names <- names(wide)
 	short_names <- names |> busg(paste0('^.+', ket), '')
 	unique_short_names <- unique(short_names)
-	sep <- table_description@sep
+	sep <- sep
 	ids <- if(rm_ids) {names |> busg(paste0('(^', esc(bra), '([0-9]+\\.*)+', ket, ')(.*)'),  '\\1')} else {''}
 	d <- parallel::mclapply(
 		X        = lst(unique_short_names),
@@ -597,6 +600,7 @@ convert_wide_table_to_a_compact_one <- function(wide, bra, ket, sep, rm_ids = FA
 	data.table::setDT(d)
 	d
 }
+
 convert_wide_tables_to_compact_ones <- function(wide, design, rm_ids = FALSE, ncores = 1) {
 	ncores <- limit_ncores(ncores)
 	lapply(
@@ -604,9 +608,9 @@ convert_wide_tables_to_compact_ones <- function(wide, design, rm_ids = FALSE, nc
 		FUN = function(d) {
 			convert_wide_table_to_a_compact_one(
 				wide   = wide[[paste0(d@resource, 's')]],
-				bra    = table_description@brackets[1],
-				ket    = table_description@brackets[2],
-				sep    = table_description@sep,
+				bra    = d@brackets[1],
+				ket    = d@brackets[2],
+				sep    = d@sep,
 				rm_ids = rm_ids,
 				ncores = ncores
 			)
@@ -855,7 +859,7 @@ order_strings_with_numbers_correctly <- function(s) {
 	sc <- as.character(s)
 	ss <- stringr::str_extract_all(sc, "[0-9]+")
 	i  <- 1
-	max_char <- max(sapply(ss, function(x) {if(0 < length(x) && !is.na(x)) max(nchar(x), na.rm = T) else 0}))
+	max_char <- max(sapply(ss, function(x) {if(0 < length(x) && !all(is.na(x))) {max(nchar(x), na.rm = T)} else {0}}))
 	s_numbers <- strsplit(sc, "[^0-9]+")
 	s_letters <- strsplit(sc, "[0-9]+")
 	order(

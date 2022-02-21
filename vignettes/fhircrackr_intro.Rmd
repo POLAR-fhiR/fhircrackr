@@ -337,7 +337,7 @@ table_description <- fhir_table_description(
 	sep           = " | ",
 	rm_empty_cols = FALSE,
 	format        = 'compact',
-	keep_attr     = TRUE
+	keep_attr     = FALSE
 )
 
 df <- fhir_crack(bundles = bundles, design = table_description, verbose = 0)

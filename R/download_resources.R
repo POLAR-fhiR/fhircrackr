@@ -412,6 +412,8 @@ fhir_capability_statement <- function(
 		warning("The verbose argument of fhir_capability statement is deprecated since fhircrackr 2.0.0")
 	}
 
+	resource <- NULL #To stop "no visible binding" NOTE in check()
+
 	use_indices <- FALSE
 	if(!is.null(brackets)) {
 		bra <- brackets[1]

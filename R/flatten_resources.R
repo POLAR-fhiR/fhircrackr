@@ -1,9 +1,7 @@
 ## This file contains all functions needed for flattening ##
 ## Exported functions are on top, internal functions below ##
 
-
-
-
+path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- NULL #To stop "no visible binding" NOTE in check()
 
 
 #' Flatten list of FHIR bundles
@@ -307,6 +305,7 @@ setMethod(
 
 ##################################################################################################################################################
 
+
 #' Create fhir_table_list from bundles and design
 #' @param bundles A FHIR search result as returned by [fhir_search()].
 #' @param design A [fhir_design-class] object. See [fhir_table_description()]
@@ -399,7 +398,7 @@ crack_bundles_to_one_table <- function(bundles, table_description, data.table = 
 		if(!table_description@rm_empty_cols){
 			#nothing was found. Return empty table with appropriate names
 			if(nrow(table)==0){
-				table <- setNames(data.table(matrix(nrow = 0, ncol = length(table_description@cols))), names(table_description@cols))
+				table <- data.table::setnames(data.table(matrix(nrow = 0, ncol = length(table_description@cols))), names(table_description@cols))
 				warning("The resource type or columns you are looking for don't seem to be present in the bundles.\n ",
 						"Returning an empty table.")
 				#some items were found: Fill missing with NA
@@ -554,7 +553,7 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 		parallel::mclapply(
 			seq_along(bundles),
 			function(bundle_id) {# bundle_id <- 1
-				nodes <- xml2:::xml_nodeset(
+				nodes <- xml_nodeset(
 					unlist(
 						recursive = FALSE,
 						lapply(
@@ -619,7 +618,7 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 			parallel::mclapply(
 				seq_along(bundles),
 				function(bundle_id) {# bundle_id <- 2
-					nodes <- xml2:::xml_nodeset(
+					nodes <- xml_nodeset(
 						unlist(
 							recursive = FALSE,
 							lapply(

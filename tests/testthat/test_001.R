@@ -91,7 +91,7 @@ design <- fhir_design(
 	Pat = fhir_table_description(
 		resource = "Patient",
 		cols = list(
-			name = "name/family/@value"
+			name = "name/family"
 		)
 	)
 )

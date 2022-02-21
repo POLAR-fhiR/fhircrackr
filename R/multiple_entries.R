@@ -34,9 +34,9 @@
 #'     resource = "Patient",
 #'     brackets = c('[', ']'),
 #'     sep      = " ",
-#'     keep_attr=T
+#'     keep_attr=TRUE
 #' )
-#' df <- fhir_crack(bundles = bundles, design = table_desc, format="wide")
+#' df <- fhir_crack(bundles = bundles, design = table_desc)
 #'
 #' #original df
 #' df
@@ -391,7 +391,8 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #'  )
 #'
 #' #keep all columns
-#' fhir_melt(indexed_data_frame = df, columns = col_names, brackets = c("[","]"), sep = " ", all_columns = TRUE)
+#' fhir_melt(indexed_data_frame = df, columns = col_names,
+#'           brackets = c("[","]"), sep = " ", all_columns = TRUE)
 #' @export
 #' @seealso [fhir_common_columns()], [fhir_rm_indices()]
 

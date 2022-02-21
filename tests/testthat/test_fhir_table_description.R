@@ -44,19 +44,19 @@ testthat::test_that(
 				)
 			)
 		)
-		testthat::expect_warning(
-			d6 <- fhir_table_description(
-				resource = "Patient",
-				cols     = fhir_columns(
-					list(
-						"id",
-						"name/family",
-						"gender"
-					)
-				),
-				keep_attr = TRUE
-			)
+
+		d6 <- fhir_table_description(
+			resource = "Patient",
+			cols     = fhir_columns(
+				list(
+					"id",
+					"name/family",
+					"gender"
+				)
+			),
+			keep_attr = TRUE
 		)
+
 		testthat::expect_s4_class(d1, "fhir_table_description")
 		testthat::expect_s4_class(d2, "fhir_table_description")
 		testthat::expect_s4_class(d3, "fhir_table_description")
@@ -109,3 +109,4 @@ testthat::test_that(
 		testthat::expect_identical(d1, d4)
 	}
 )
+
