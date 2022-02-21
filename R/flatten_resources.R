@@ -319,7 +319,7 @@ setMethod(
 #' extraction progress will be printed. Defaults to 2.
 #' @noRd
 
-crack_bundles_to_tables <- function(bundles, design, data.table = F, ncores = 1, verbose = 0) {
+crack_bundles_to_tables <- function(bundles, design, data.table = FALSE, ncores = 1, verbose = 0) {
 	ncores <- limit_ncores(ncores)
 	tables <- lapply(
 		X   = design,
@@ -353,7 +353,7 @@ crack_bundles_to_tables <- function(bundles, design, data.table = F, ncores = 1,
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
 #' @noRd
-crack_bundles_to_one_table <- function(bundles, table_description, data.table = F, ncores = 1, verbose = 0) {
+crack_bundles_to_one_table <- function(bundles, table_description, data.table = FALSE, ncores = 1, verbose = 0) {
 	os <- get_os()
 	available_cores <- get_ncores(os)
 	ncores <- limit_ncores(ncores)

@@ -183,7 +183,7 @@ fhir_search <- function(
 	cnt <- 0
 	repeat {
 		cnt <- cnt + 1
-		if(1 < verbose) {message("bundle[", cnt, "]", appendLF = F)}
+		if(1 < verbose) {message("bundle[", cnt, "]", appendLF = FALSE)}
 		bundle <- get_bundle(
 			request = addr,
 			body = body,
