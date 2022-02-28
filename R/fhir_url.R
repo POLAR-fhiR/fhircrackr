@@ -141,7 +141,7 @@ setMethod(
 
 		if(length(parameters) == 1 && grepl("=", parameters)) {
 			request <- paste0(request, "?", parameters)
-			if(url_enc) {utils::URLencode(URL = request)}
+			if(url_enc) {request <- utils::URLencode(URL = request)}
 			return(new(Class = "fhir_url", request))
 		}
 
