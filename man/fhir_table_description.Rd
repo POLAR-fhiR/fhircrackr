@@ -4,7 +4,16 @@
 \alias{fhir_table_description}
 \title{Create \linkS4class{fhir_table_description} object}
 \usage{
-fhir_table_description(resource, cols = fhir_columns(), style = fhir_style())
+fhir_table_description(
+  resource,
+  cols = fhir_columns(),
+  sep = ":::",
+  brackets = character(),
+  rm_empty_cols = FALSE,
+  format = "compact",
+  keep_attr = FALSE,
+  style = NULL
+)
 }
 \arguments{
 \item{resource}{A character vector of length one or \linkS4class{fhir_resource_type} object
@@ -17,8 +26,23 @@ If this argument is omitted, an empty \linkS4class{fhir_columns} object will be 
 This means that in the call to \code{\link[=fhir_crack]{fhir_crack()}}, all available elements are extracted in put
 in automatically named columns.}
 
-\item{style}{Optional. A \linkS4class{fhir_style} object, as created by \code{\link[=fhir_style]{fhir_style()}}.
-If this argument is omitted, default values will be assumed, see \code{\link[=fhir_style]{fhir_style()}}.}
+\item{sep}{A character of length one containing the separator string used for separating multiple entries in cells when \code{format = "compact"}.
+ignored when \code{format = "wide"}. Defaults to \code{":::"}.}
+
+\item{brackets}{A character of length one or two used for the indices of multiple entries. The first one is the opening bracket
+and the second one the closing bracket. Vectors of length one will be recycled.
+Defaults to \code{character(0)}, i.e. no brackets, meaning that multiple entries won't be indexed.}
+
+\item{rm_empty_cols}{A logical of length one indicating whether empty columns should be removed from the resulting table or not. Defaults to \code{FALSE}.}
+
+\item{format}{A character of length one indicating whether the resulting table should be cracked to a \code{wide} or \code{compact} format.
+\code{wide} means multiple entries will be distributed over several columns with indexed names. \code{compact} means multiple entries will be pasted into one cell/column separated by \code{sep} .
+Defaults to \code{compact}.}
+
+\item{keep_attr}{A logical of length one indicating whether the attribute name of the respective element (\verb{@value} in most cases)
+should be attached to the name of the variable in the resulting table. Defaults to \code{FALSE}.}
+
+\item{style}{Deprecated since fhircrackr 2.0.0. Can at the moment still be used for backwards compatibility but will throw an warning.}
 }
 \value{
 An object of class \linkS4class{fhir_table_description}.
@@ -32,12 +56,20 @@ FHIR resources from a FHIR bundle. There should be one \code{fhir_table_descript
 A \code{fhir_table_description} consists of
 the following elements:
 \itemize{
-\item The resource element: Defines the resource type (e.g. \code{Patient} or \code{Observation}). See \code{?fhir_resource}.
+\item The resource element: Defines the resource type (e.g. \code{Patient} or \code{Observation}). See \code{\link[=fhir_resource_type]{fhir_resource_type()}}.
 \item The cols element: Contains the column names and XPath expressions defining the columns to extract.
 If this element is empty, \code{\link[=fhir_crack]{fhir_crack()}} will extract all available elements of the resource and name the
-columns automatically. See \code{?fhir_columns}.
-\item The style element: Defines how to deal with multiple entries to the same element and whether empty columns are
-removed. See \code{?fhir_style}
+columns automatically. See \code{\link[=fhir_columns]{fhir_columns()}}.
+\item The sep element: A character of length one containing the separator string used for separating multiple entries in cells.
+\item The brackets element: A character of length one or two used for the indices of multiple entries. The first one is the opening bracket
+and the second one the closing bracket. Vectors of length one will be recycled.
+Defaults to \code{character(0)}, i.e. no brackets, meaning that multiple entries won't be indexed.
+\item The rm_empty_cols element: A logical of length one indicating whether empty columns should be removed in the resulting table or not. Defaults to \code{FALSE}.
+\item The format element: A character of length one indicating whether the resulting table should be cracked to a \code{wide} or \code{compact} format.
+\code{wide} means multiple entries will be distributed over several columns with indexed names. \code{compact} means multiple entries will be pasted into one cell/column separated by \code{sep} .
+Defaults to \code{compact}.
+\item The keep_attr element: A logical of length one indicating whether the attribute name of the respective element (\verb{@value} in most cases)
+should be attached to the name of the variable in the resulting table. Defaults to \code{FALSE}.
 }
 
 A full \code{fhir_table_description} looks for example like this:\preformatted{fhir_resource_type: Patient
@@ -49,41 +81,59 @@ name        | name/family
 gender      | gender
 id          | id
 
-fhir_style:
-sep: ||
-brackets: '[' ']'
+sep:           ':::'
+brackets:      '[', ']'
 rm_empty_cols: FALSE
+format:        'compact'
+keep_attr:     FALSE
 }
 }
 \examples{
-#named character for cols
-fhir_table_description(resource = "Patient",
-                       cols = c(name = "name/family",
-                                gender = "gender",
-                                id = "id"),
-                       style = fhir_style(sep = "||",
-                                          brackets = c("[", "]"),
-                                          rm_empty_cols = FALSE)
+# a minimal table description
+fhir_table_description(
+    resource = "Patient"
 )
 
-#If style is ommitted, default values are assumed
-fhir_table_description(resource = "Patient",
-                       cols = c(name = "name/family",
-                                gender = "gender",
-                                id = "id")
-)
-
-#named list for cols
-fhir_table_description(resource = "Patient",
-                       cols = list(name = "name/family",
-                                   gender = "gender",
-                                   id = "id")
+# named list for cols
+fhir_table_description(
+    resource = "Patient",
+    cols     = list(
+        id     = "id",
+        name   = "name/family",
+        gender = "gender"
+    )
 )
 
 #unnamed character for cols, colnames are generated automatically
-fhir_table_description(resource = "Patient",
-                       cols = c("name/family",
-                                "gender",
-                                "id")
+fhir_table_description(
+    resource = "Patient",
+    cols     = c(
+        "id",
+        "name/family",
+        "gender"
+    )
 )
+
+# named character for cols, and overwritten default for other arguments
+fhir_table_description(
+    resource = "Patient",
+    cols = c(
+        id            = "id",
+        name          = "name/family",
+        gender        = "gender"
+    ),
+    brackets      = c("[", "]"),
+    rm_empty_cols = TRUE,
+    format        = "wide"
+)
+
+# no column arguments is given -> would create a column for all available elements
+fhir_table_description(
+    resource = "Patient",
+    sep           = " <~> ",
+    brackets      = c("<<<", ">>>"),
+    rm_empty_cols = FALSE,
+    format        = "wide"
+)
+
 }

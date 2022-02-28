@@ -13,9 +13,9 @@
 #' @export
 #'
 setClass(
-	Class = "fhir_design",
+	Class    = "fhir_design",
 	contains = "list",
-	slots = c(names="character")
+	slots    = c(names = "character")
 )
 
 setValidity(
@@ -33,10 +33,10 @@ setValidity(
 		}
 
 		if(any(sapply(object, function(x) {class(x) != "fhir_table_description"}))) {
-			messages <- c(messages, "A fhir_design can only contain fhir_table_descriptions")
+			messages <- c(messages, "A fhir_design musst contain only fhir_table_descriptions.")
 		}
 
-		#check df descriptions
+		#check table descriptions
 	 	messages <- c(
 	 		messages,
 	 		unlist(
@@ -67,34 +67,37 @@ setValidity(
 #'
 #' ```
 #' A fhir_design with 2 table_descriptions:
-#' =====================================================
-#' Name: Patients
+#'	A fhir_table_description with the following elements:
 #'
-#' Resource type: Patient
+#' 	fhir_resource_type: Patient
 #'
-#' Columns:
-#' column name | xpath expression
-#' ------------------------
+#' fhir_columns:
+#' 	------------ -----------------
+#' 	column name | xpath expression
+#' ------------ -----------------
+#' 	id          | id
 #' name        | name/family
 #' gender      | gender
-#' id          | id
+#' ------------ -----------------
 #'
-#' Style:
-#' sep: ||
-#' brackets: '[' ']'
+#' 	sep:           '||'
+#' brackets:      '[', ']'
 #' rm_empty_cols: FALSE
-#' =====================================================
-#' Name: MedicationAdministrations
+#' format:        'compact'
+#' keep_attr:     TRUE
 #'
-#' Resource type: MedicationAdministration
+#' A fhir_table_description with the following elements:
 #'
-#' Columns:
-#' An empty fhir_columns object
+#' 	fhir_resource_type: MedicationAdministration
 #'
-#' Style:
-#' sep: ' '
-#' brackets: character(0)
-#' rm_empty_cols: TRUE
+#' fhir_columns:
+#' 	An empty fhir_columns object
+#'
+#' sep:           ':::'
+#' brackets:      no brackets
+#' rm_empty_cols: FALSE
+#' format:        'wide'
+#' keep_attr:     TRUE
 #' ```
 #' The names of the table_descriptions are taken from the names of the arguments. If the table_descriptions are
 #' created within the call to `fhir_design` and therefore have no names, the names will be created from the respective
@@ -106,7 +109,7 @@ setValidity(
 #' If this function is given an object of class [fhir_df_list-class] or [fhir_dt_list-class], it will
 #' extract the design that was used to create the respective list.
 #'
-#' @param ... One ore more `fhir_table_description` objects or a named list containing
+#' @param ... One or more `fhir_table_description` objects or a named list containing
 #' `fhir_table_description` objects, or an object of class [fhir_df_list-class]/[fhir_dt_list-class].
 #' See [fhir_table_description()].
 #' @docType methods
@@ -119,15 +122,18 @@ setValidity(
 #' ###create fhir_table_descriptions first
 #' #see ?fhir_table_description for explanation
 #'
-#' pat <- fhir_table_description(resource = "Patient",
-#'                     cols = c(name = "name/family",
-#'                              gender = "gender",
-#'                              id = "id"),
-#'                     style = fhir_style(sep = "||",
-#'                                        brackets = c("[", "]"),
-#'                                        rm_empty_cols = FALSE
-#'                             )
-#'              )
+#' pat <- fhir_table_description(
+#'     resource      = "Patient",
+#'     cols          = c(
+#'         id            = "id",
+#'         name          = "name/family",
+#'         gender        = "gender"
+#'     ),
+#'     sep           = "||",
+#'     brackets      = c("[", "]"),
+#'     rm_empty_cols = FALSE
+#'
+#' )
 #'
 #' meds <- fhir_table_description(resource = "MedicationAdministration")
 #'
@@ -156,32 +162,7 @@ setValidity(
 #' print(design3)
 #'
 #'
-#' ####Example 2####
-#' #This option will be deprecated at some point
-#'
-#' #old style design
-#' old_design <- list(
-#'                  Patients = list(
-#'                     resource = "//Patient",
-#'                     cols = list(
-#'                        name = "name/family",
-#'                        gender = "gender",
-#'                        id = "id"),
-#'                     style = list(
-#'                        sep = "||",
-#'                        brackets = c("[", "]"),
-#'                        rm_empty_cols = FALSE
-#'                     )
-#'                  ),
-#'                  Medications = list(
-#'                     resource = "//Medication"
-#'                  )
-#'               )
-#'
-#' new_design <- fhir_design(old_design)
-#' print(new_design)
-#'
-#' ###Example 3###
+#' ###Example 2###
 #' ###Extract design from fhir_df_list/fhir_dt_list
 #'
 #' #unserialize and crack example bundles
@@ -218,7 +199,6 @@ setMethod(
 		new(Class = "fhir_design", args, names = names)
 	}
 )
-
 #' @rdname fhir_design-methods
 #' @aliases fhir_design,list-method
 setMethod(
@@ -235,30 +215,16 @@ setMethod(
 				new(Class = "fhir_design", args, names  = attr(args, "names"))
 			} else {
 
-				message(
-					"The old style design (simple named list) will be deprecated at some point. ",
-					"Please consider building your design as shown in the documentation for fhir_design(), ",
-					"see ?fhir_design."
-				)
+				stop("It looks like you are trying to use an old design from fhircrackr < 1.0.0, which is now deprecated.\n",
+					 "Please create a design from fhir_table_descriptions (see ?fhir_table_description).")
 
-				d <- fix_design(design = args)
-
-				df_desc <-lapply(
-					d,
-					function(x) {
-						resource <- fhir_resource_type(string = gsub(paste0(esc("."),"|", esc("/")), "", x$resource))
-						style <- fhir_style(sep = x$style$sep, brackets = x$style$brackets, rm_empty_cols = x$style$rm_empty_cols)
-						fhir_table_description(resource = resource, cols = fhir_columns(x$cols), style = style)
-					}
-				)
-
-				new(Class = "fhir_design", df_desc, names = attr(d, "names"))
 			}
 		} else {
 			stop("You can only provide one list to fhir_design()")
 		}
 	}
 )
+
 
 setMethod(
 	f = "show",
@@ -269,23 +235,32 @@ setMethod(
 			cat("An empty fhir_design_object")
 		} else {
 			cat(paste0("A fhir_design with ", length(object), " table_descriptions:\n"))
-
 			lapply(
 				seq_len(length(object)),
 				function(i) {
-					df_desc <- object[[i]]
-					cat("=====================================================\n")
-					cat(paste0("Name: ", names(object)[i]))
-					cat("\n\n")
-					cat(paste0("Resource type: ", as.character(df_desc@resource), "\n\n"))
-					cat("Columns: \n")
-					show(df_desc@cols)
-					cat("\n\nStyle: \n")
-					show(df_desc@style)
-					cat("\n")
+					show(object[[i]])
+					# cat("=====================================================\n")
+					# cat(paste0("Name: ", names(object)[i]))
+					# cat("\n\n")
+					# cat(paste0("Resource type: ", as.character(df_desc@resource), "\n\n"))
+					# cat("Columns: \n")
+					# show(df_desc@cols)
+					# cat("Sep: ")
+					# show(df_desc@sep)
+					# cat("Brackets: \n")
+					# cat("  Open: \n")
+					# show(df_desc@brackets[1])
+					# cat("  Close: \n")
+					# show(df_desc@brackets[2])
+					# cat("rm_empty_cols: \n")
+					# show(df_desc@rm_empty_cols)
+					# cat("format: \n")
+					# show(df_desc$format)
+					# cat("keep_attr: \n")
+					# show(df_desc$keep_attr)
+					# cat("\n")
 				}
 			)
-
 		}
 	}
 )

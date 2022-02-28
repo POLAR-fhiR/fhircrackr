@@ -14,7 +14,8 @@ Returns the \linkS4class{fhir_design} of the last call to \code{\link[=fhir_crac
 bundles <- fhir_unserialize(bundles = patient_bundles)
 
 #define design
-patients <- fhir_table_description(resource = "Patient")
+patients <- fhir_table_description(resource = 'Patient')
+
 design <- fhir_design(patients)
 
 result <- fhir_crack(bundles = bundles, design = design)

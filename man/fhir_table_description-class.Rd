@@ -3,7 +3,7 @@
 \docType{class}
 \name{fhir_table_description-class}
 \alias{fhir_table_description-class}
-\title{A S4 class describing the form of data.frame produced by \code{\link[=fhir_crack]{fhir_crack()}}}
+\title{A S4 class describing the form of a table produced by \code{\link[=fhir_crack]{fhir_crack()}}}
 \description{
 A \code{fhir_table_description} is part of a \code{fhir_design} and holds the information \code{\link[=fhir_crack]{fhir_crack()}} needs to flatten (aka crack)
 FHIR resources from a FHIR bundle and is created with \code{\link[=fhir_table_description]{fhir_table_description()}}.
@@ -18,8 +18,16 @@ the following elements:
 \item The cols element: Contains the column names and XPath expressions defining the columns to extract.
 If this element is empty, \code{\link[=fhir_crack]{fhir_crack()}} will extract all available elements of the resource and name the
 columns automatically. See \code{\link[=fhir_columns]{fhir_columns()}}.
-\item The style element: Defines how to deal with multiple entries to the same element and whether empty columns are
-removed. See \code{\link[=fhir_style]{fhir_style()}}.
+\item The sep element: A character of length one containing the separator string used for separating multiple entries in cells.
+\item The brackets element: A character of length one or two used for the indices of multiple entries. The first one is the opening bracket
+and the second one the closing bracket. Vectors of length one will be recycled.
+Defaults to \code{character(0)}, i.e. no brackets, meaning that multiple entries won't be indexed.
+\item The rm_empty_cols element: A logical of length one indicating whether empty columns should be removed in the resulting table or not. Defaults to \code{FALSE}.
+\item The format element: A character of length one indicating whether the resulting table should be cracked to a \code{wide} or \code{compact} format.
+\code{wide} means multiple entries will be distributed over several columns with indexed names. \code{compact} means multiple entries will be pasted into one cell/column separated by \code{sep} .
+Defaults to \code{compact}.
+\item The keep_attr element: A logical of length one indicating whether the attribute name of the respective element (\verb{@value} in most cases)
+should be attached to the name of the variable in the resulting table. Defaults to \code{FALSE}.
 }
 
 A full \code{fhir_table_description} looks for example like this:\preformatted{fhir_resource_type: Patient
@@ -31,10 +39,11 @@ name        | name/family
 gender      | gender
 id          | id
 
-fhir_style:
-sep: ||
-brackets: '[' ']'
+sep:           ':::'
+brackets:      '[', ']'
 rm_empty_cols: FALSE
+format:        'compact'
+keep_attr:     FALSE
 }
 }
 \section{Slots}{
@@ -47,9 +56,23 @@ should be extracted.}
 If this is an empty \linkS4class{fhir_columns} object, the call to \code{\link[=fhir_crack]{fhir_crack()}} will extract all available
 elements and put them in automatically named columns.}
 
-\item{\code{style}}{An object of class \linkS4class{fhir_style} describing how to deal with multiple entries and emtpy columns.}
+\item{\code{sep}}{A character of length one containing the separator string used for separating multiple entries in cells when \code{format = "compact"}.
+ignored when \code{format = "wide"}.}
+
+\item{\code{brackets}}{A character of length one or two used for the indices of multiple entries. The first one is the opening bracket
+and the second one the closing bracket. Vectors of length one will be recycled.
+Defaults to \code{character(0)}, i.e. no brackets, meaning that multiple entries won't be indexed.}
+
+\item{\code{rm_empty_cols}}{A logical of length one indicating whether empty columns should be removed from the resulting table or not. Defaults to FALSE.}
+
+\item{\code{format}}{A character of length one indicating whether the resulting table should be cracked to a \code{wide} or \code{compact} format.
+\code{wide} means multiple entries will be distributed over several columns with indexed names. \code{compact} means multiple entries will be pasted into one cell/column separated by \code{sep} .
+Defaults to \code{compact}.}
+
+\item{\code{keep_attr}}{A logical of length one indicating whether the attribute name of the respective element (\verb{@value} in most cases)
+should be attached to the name of the variable in the resulting table. Defaults to \code{FALSE}}
 }}
 
 \seealso{
-\code{\link[=fhir_resource_type]{fhir_resource_type()}},\code{\link[=fhir_columns]{fhir_columns()}},\code{\link[=fhir_style]{fhir_style()}}, \code{\link[=fhir_design]{fhir_design()}}, \code{\link[=fhir_crack]{fhir_crack()}}
+\code{\link[=fhir_resource_type]{fhir_resource_type()}},\code{\link[=fhir_columns]{fhir_columns()}}, \code{\link[=fhir_design]{fhir_design()}}, \code{\link[=fhir_crack]{fhir_crack()}}
 }

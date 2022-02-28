@@ -45,7 +45,7 @@ setValidity(
 #'
 fhir_resource_type <- function(string, fix_capitalization = TRUE) {
 
-	if(length(string)>1) {stop("Please provide only a single string to define the FHIR resource.")}
+	if(1 < length(string)) {stop("Please provide only a single string to define the FHIR resource.")}
 
 	#convert to correct case and check for validity
 	if(tolower(string) %in% tolower(existing_resource_types) && fix_capitalization) {

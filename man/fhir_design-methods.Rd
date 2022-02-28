@@ -17,7 +17,7 @@ fhir_design(...)
 \S4method{fhir_design}{fhir_table_list}(...)
 }
 \arguments{
-\item{...}{One ore more \code{fhir_table_description} objects or a named list containing
+\item{...}{One or more \code{fhir_table_description} objects or a named list containing
 \code{fhir_table_description} objects, or an object of class \linkS4class{fhir_df_list}/\linkS4class{fhir_dt_list}.
 See \code{\link[=fhir_table_description]{fhir_table_description()}}.}
 }
@@ -28,34 +28,37 @@ the function how to flatten each resource type.
 }
 \details{
 A \code{fhir_design} looks for example like this:\preformatted{A fhir_design with 2 table_descriptions:
-=====================================================
-Name: Patients
+A fhir_table_description with the following elements:
 
-Resource type: Patient
+	fhir_resource_type: Patient
 
-Columns:
-column name | xpath expression
-------------------------
+fhir_columns:
+	------------ -----------------
+	column name | xpath expression
+------------ -----------------
+	id          | id
 name        | name/family
 gender      | gender
-id          | id
+------------ -----------------
 
-Style:
-sep: ||
-brackets: '[' ']'
+	sep:           '||'
+brackets:      '[', ']'
 rm_empty_cols: FALSE
-=====================================================
-Name: MedicationAdministrations
+format:        'compact'
+keep_attr:     TRUE
 
-Resource type: MedicationAdministration
+A fhir_table_description with the following elements:
 
-Columns:
-An empty fhir_columns object
+	fhir_resource_type: MedicationAdministration
 
-Style:
-sep: ' '
-brackets: character(0)
-rm_empty_cols: TRUE
+fhir_columns:
+	An empty fhir_columns object
+
+sep:           ':::'
+brackets:      no brackets
+rm_empty_cols: FALSE
+format:        'wide'
+keep_attr:     TRUE
 }
 
 The names of the table_descriptions are taken from the names of the arguments. If the table_descriptions are
@@ -75,15 +78,18 @@ extract the design that was used to create the respective list.
 ###create fhir_table_descriptions first
 #see ?fhir_table_description for explanation
 
-pat <- fhir_table_description(resource = "Patient",
-                    cols = c(name = "name/family",
-                             gender = "gender",
-                             id = "id"),
-                    style = fhir_style(sep = "||",
-                                       brackets = c("[", "]"),
-                                       rm_empty_cols = FALSE
-                            )
-             )
+pat <- fhir_table_description(
+    resource      = "Patient",
+    cols          = c(
+        id            = "id",
+        name          = "name/family",
+        gender        = "gender"
+    ),
+    sep           = "||",
+    brackets      = c("[", "]"),
+    rm_empty_cols = FALSE
+
+)
 
 meds <- fhir_table_description(resource = "MedicationAdministration")
 
@@ -112,32 +118,7 @@ design3 <- fhir_design(list(Patients = pat, Medications = meds))
 print(design3)
 
 
-####Example 2####
-#This option will be deprecated at some point
-
-#old style design
-old_design <- list(
-                 Patients = list(
-                    resource = "//Patient",
-                    cols = list(
-                       name = "name/family",
-                       gender = "gender",
-                       id = "id"),
-                    style = list(
-                       sep = "||",
-                       brackets = c("[", "]"),
-                       rm_empty_cols = FALSE
-                    )
-                 ),
-                 Medications = list(
-                    resource = "//Medication"
-                 )
-              )
-
-new_design <- fhir_design(old_design)
-print(new_design)
-
-###Example 3###
+###Example 2###
 ###Extract design from fhir_df_list/fhir_dt_list
 
 #unserialize and crack example bundles

@@ -3,43 +3,47 @@ bundle <- xml2::read_xml(
 "<Bundle>
      <type value='searchset'/>
      <entry>
-		<Patient>
-			<id value='id1'/>
-			<address>
-				<use value='home'/>
-				<city value='Amsterdam'/>
-				<type value='physical'/>
-				<country value='Netherlands'/>
-			</address>
-			<name>
-				<given value='Marie'/>
-			</name>
-		</Patient>
+    	<resource>
+			<Patient>
+				<id value='id1'/>
+				<address>
+					<use value='home'/>
+					<city value='Amsterdam'/>
+					<type value='physical'/>
+					<country value='Netherlands'/>
+				</address>
+				<name>
+					<given value='Marie'/>
+				</name>
+			</Patient>
+		</resource>
 	  </entry>
 	  <entry>
-		<Patient>
-			<id value='id3'/>
-			<address>
-				<use value='home'/>
-				<city value='Berlin'/>
-			</address>
-			<address>
-				<type value='postal'/>
-				<country value='France'/>
-			</address>
-			<address>
-				<use value='work'/>
-				<city value='London'/>
-				<type value='postal'/>
-				<country value='England'/>
-			</address>
-			<name>
-				<given value='Frank'/>
-			</name>
-			<name>
-				<given value='Max'/>
-			</name>
-		</Patient>
+		<resource>
+			<Patient>
+				<id value='id3'/>
+				<address>
+					<use value='home'/>
+					<city value='Berlin'/>
+				</address>
+				<address>
+					<type value='postal'/>
+					<country value='France'/>
+				</address>
+				<address>
+					<use value='work'/>
+					<city value='London'/>
+					<type value='postal'/>
+					<country value='England'/>
+				</address>
+				<name>
+					<given value='Frank'/>
+				</name>
+				<name>
+					<given value='Max'/>
+				</name>
+			</Patient>
+		</resource>
 	</entry>
 
 </Bundle>"

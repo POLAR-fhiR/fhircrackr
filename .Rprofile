@@ -1,0 +1,6 @@
+FHIRCRACKR_SEP              = ':::'
+FHIRCRACKR_BRACKETS         = c('[', ']')
+FHIRCRACKR_RM_EMPTY_COLUMNS = FALSE
+FHIRCRACKR_FORMAT           = 'compact'
+FHIRCRACKR_USE_BRACKETS     = c('[', ']')
+FHIRCRACKR_KEEP_ATTR        = FALSE

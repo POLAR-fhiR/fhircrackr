@@ -3,10 +3,10 @@
 
 
 #' Cast table with multiple entries
-#' This function divides multiple entries in an indexed table as produced by [fhir_crack()] into separate columns.
+#' This function divides multiple entries in a compact indexed table as produced by [fhir_crack()] into separate columns.
 #'
-#' Every column containing multiple entries will be turned into multiple columns.
-#' The number of columns created from a single column in the original table is determined by maximum number of
+#' This function turns a table from compact format into wide format. Every column containing multiple entries will be turned into multiple columns.
+#' The number of columns created from a single column in the original table is determined by the maximum number of
 #' multiple entries occurring in this column. Rows with less than the maximally occurring number of entries will
 #' be filled with NA values.
 #'
@@ -14,15 +14,15 @@
 #' with {.} as a separator, e.g. `code.coding.system`. These names are produced automatically by [fhir_crack()]
 #' when the names are not explicitly set in the `cols` element of the [fhir_table_description()]/[fhir_design()].
 #'
-#' In the names of the newly created columns the indices will be assigned to the respective elements of the column names.
-#' See examples and the corresponding package vignette for a more detailed description.
+#' In the names of the newly created columns the indices will be added in front of the column names, similar to the result of [fhir_crack()] with
+#' `format="wide"`. See examples and the corresponding package vignette for a more detailed description.
 #'
-#' @param indexed_df A data.frame/data.table with indexed multiple entries. Column names should reflect the XPath expression of the respective element.
+#' @param indexed_df A compact data.frame/data.table with indexed multiple entries. Column names should reflect the XPath expression of the respective element.
 #' @param brackets A character vector of length two, defining the brackets used for the indices.
 #' @param sep A character vector of length one defining the separator that was used when pasting together multiple entries in [fhir_crack()].
-#' @param use_brackets Put brackets around indices in the new column names? Defaults to `TRUE`.
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only general progress is printed, if > 1,
 #' progress for each variable is printed. Defaults to 1.
+#' @param use_brackets Deprecated.
 #' @export
 #' @examples
 #'
@@ -30,25 +30,30 @@
 #' bundles <- fhir_unserialize(bundles = example_bundles1)
 #'
 #' #crack fhir resources
-#' table_desc <- fhir_table_description(resource = "Patient",
-#'                                      style = fhir_style(brackets = c("[","]"),
-#'                                                         sep = " "))
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = c('[', ']'),
+#'     sep      = " ",
+#'     keep_attr=TRUE
+#' )
 #' df <- fhir_crack(bundles = bundles, design = table_desc)
 #'
 #' #original df
 #' df
 #'
 #' #cast
-#' fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
+#' fhir_cast(df, brackets=c('[', ']'), sep = ' ', verbose = 0)
 #'
 #' @seealso [fhir_crack()], [fhir_melt()], [fhir_build_bundle()]
-
 fhir_cast <- function(
 	indexed_df,
 	brackets,
 	sep,
-	use_brackets = F,
-	verbose = 1) {
+	verbose = 1,
+	use_brackets = NULL) {
+
+	if(!is.null(use_brackets)){warning("Argument use_brackets is deprecated since fhircrackr 2.0.0 and will be ignored.\n",
+									   "The column names will be created the same way as in the wide format of fhir_crack.\n")}
 
 	if(is.null(indexed_df)) {stop("indexed_df is NULL.")}
 	if(nrow(indexed_df) < 1) {stop("indexed_df doesn't contain any data.")}
@@ -58,6 +63,7 @@ fhir_cast <- function(
 
 	col_names <- names(indexed_df)
 	sep_ <- esc(sep)
+	brackets <- fix_brackets(brackets)
 	bra_ <- esc(brackets[1])
 	ket_ <- esc(brackets[2])
 	regexpr_ids <- paste0(bra_, "([0-9]+(\\.[0-9]+)*)", ket_, "(.*$)")
@@ -101,23 +107,14 @@ fhir_cast <- function(
 								id_,
 								function(i_) {
 									i_ <- as.numeric(i_)
-									if(use_brackets) {
-										bras_ <- rep_len("[", length(i_))
-										kets_ <- rep_len("]", length(i_))
-										paste0(paste0(name_vec, bras_, i_, kets_), collapse = ".")
-									} else {
-										paste0(paste0(name_vec, i_), collapse = ".")
-									}
+									paste0(paste0(brackets[1],paste(i_, collapse="."), brackets[2]), paste(name_vec, collapse = "."))
+
 								},
-								simplify = F
+								simplify = FALSE
 							)
 						} else {
 							i <- as.numeric(id)
-							a <- if(use_brackets) {
-								paste0(name_vec, "[", i, "]")
-							} else {
-								paste0(name_vec, i)
-							}
+							a <- paste0(brackets[1], i, brackets[2], name_vec)
 							names(a) <- id
 							a
 						}
@@ -127,10 +124,10 @@ fhir_cast <- function(
 			)
 			sort(name_expanded[unique(names(name_expanded))])
 		},
-		simplify = F
+		simplify = FALSE
 	)
 
-	df_new_names <- unlist(map, use.names = F)
+	df_new_names <- unlist(map, use.names = FALSE)
 	d <- data.table(matrix(data = rep_len(character(), nrow(indexed_df) * length(df_new_names)), nrow = nrow(indexed_df), ncol = length(df_new_names)))
 	setnames(d, df_new_names)
 
@@ -155,7 +152,7 @@ fhir_cast <- function(
 					function(entry) {
 						entry[grep(id_str, entry, perl = T)]
 					},
-					simplify = F
+					simplify = FALSE
 				)
 			)
 			d[row_with_id, (sname) := values]
@@ -165,7 +162,6 @@ fhir_cast <- function(
 	d[]#to avoid problems with printing
 	d
 }
-
 
 #' Find common columns
 #'
@@ -243,9 +239,12 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #' bundles <- fhir_unserialize(bundles = example_bundles1)
 #'
 #' #crack fhir resources
-#' table_desc <- fhir_table_description(resource = "Patient",
-#'                                      style = fhir_style(brackets = c("[","]"),
-#'                                                         sep = " "))
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = c("[", "]"),
+#'     sep = " "
+#' )
+#'
 #' df <- fhir_crack(bundles = bundles, design = table_desc)
 #'
 #' #find all column names associated with attribute address
@@ -255,8 +254,12 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #' df
 #'
 #' #only keep address columns
-#' fhir_melt(indexed_data_frame = df, columns = col_names,
-#'           brackets = c("[","]"), sep = " ")
+#' fhir_melt(
+#'      indexed_data_frame = df,
+#'      columns            = col_names,
+#'      brackets           = c("[", "]"),
+#'      sep = " "
+#'  )
 #'
 #' #keep all columns
 #' fhir_melt(indexed_data_frame = df, columns = col_names,

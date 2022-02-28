@@ -6,13 +6,13 @@
 
 #definition
 setClass(
-	Class = "fhir_xpath_expression",
+	Class    = "fhir_xpath_expression",
 	contains = "character"
 )
 
 #validity check
 setValidity(
-	Class = "fhir_xpath_expression",
+	Class  = "fhir_xpath_expression",
 	method = function(object) {
 
 		if(length(object) == 0) {return(TRUE)}

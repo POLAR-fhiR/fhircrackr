@@ -1,3 +1,8 @@
+#DEPRECATED#
+#This class is deprecated since fhircrackr 2.0.0 and will be removed eventually.
+#All information stored in the fhir_design have now been moved to fhir_table_description
+
+
 #Class definition
 #' An S4 class to represent a design for cracking FHIR resources
 #'
@@ -74,7 +79,8 @@ setValidity(
 
 
 fhir_style <- function(sep = ":::", brackets = character(), rm_empty_cols = FALSE) {
-
+	warning("fhir_style is deprecated since fhircrackr 2.0.0. Please don't use it anymore.\n",
+			"The elements 'sep', 'brackets' and 'rm_empty_cols' should be moved directly into the fhir_table_description (see ?fhir_table_description).\n")
 	if(is.null(brackets)) {brackets <- character()}
 	if(any(is.na(brackets))) {stop("You cannot use NA in brackets.")}
 	brackets <- fix_brackets(brackets = brackets)

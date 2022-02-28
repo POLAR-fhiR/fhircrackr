@@ -49,9 +49,12 @@ For a more detailed description on how to use this function please see the corre
 bundles <- fhir_unserialize(bundles = example_bundles1)
 
 #crack fhir resources
-table_desc <- fhir_table_description(resource = "Patient",
-                                     style = fhir_style(brackets = c("[","]"),
-                                                        sep = " "))
+table_desc <- fhir_table_description(
+    resource = "Patient",
+    brackets = c("[", "]"),
+    sep = " "
+)
+
 df <- fhir_crack(bundles = bundles, design = table_desc)
 
 #find all column names associated with attribute address
@@ -61,8 +64,12 @@ col_names <- fhir_common_columns(df, "address")
 df
 
 #only keep address columns
-fhir_melt(indexed_data_frame = df, columns = col_names,
-          brackets = c("[","]"), sep = " ")
+fhir_melt(
+     indexed_data_frame = df,
+     columns            = col_names,
+     brackets           = c("[", "]"),
+     sep = " "
+ )
 
 #keep all columns
 fhir_melt(indexed_data_frame = df, columns = col_names,

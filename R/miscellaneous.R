@@ -11,6 +11,7 @@ assign(x = "recent_http_error", value = NULL, envir= fhircrackr_env)
 #imports
 #' @import data.table
 #' @import methods
+xml_nodeset <- utils::getFromNamespace("xml_nodeset", "xml2")
 
 #to ensure data.table version of d[] is called, even though it is not explicitly stated in
 #import section of NAMESPACE file (https://cran.r-project.org/web/packages/data.table/vignettes/datatable-importing.html)
@@ -248,35 +249,40 @@ fhir_rm_div <- function(x){
 #' Concatenate paths
 #' @description Concatenates two strings to a path string correctly.
 #'
-#' @param path1 A a character vector of length one specifying the left hand part of the resulting path.
-#' @param path2 A a character vector of length one specifying the right hand part of the resulting path.
-#' @param os A a character vector of length one specifying the operating system you're operating on: windows or linux.
-#'
-#' @return A a character vector of length one containing the concatenated path.
-#' @export
-#'
+#' @param ... A Set of Path Strings. Only works if list_of_paths is NULL
+#' @param list_of_paths Either a vector or a list of paths strings
+#' @param ext An Extension to add at the end of the path
+#' @noRd
+#' @return A Character of length one, the combined path.
 #' @examples
-#' paste_paths(path1 = "data", path2 = "patients")
-#' paste_paths(path1 = "/data", path2 = "patients")
-#' paste_paths(path1 = "/data/", path2 = "patients")
-#' paste_paths(path1 = "/data", path2 = "/patients")
-#' paste_paths(path1 = "/data/", path2 = "/patients/")
-#' paste_paths(path1 = "data", path2 = "patients", os = "windows")
-
-paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
-	os <- tolower(substr(os, 1, 1))
-	if(os == "w") {
-		return(
-			paste0(
-				sub(pattern = "\\\\$" , replacement = "", x = path1),
-				"\\",
-				sub(pattern = "^\\\\", replacement = "", x = path2)
-			)
-		)
-	}
-	paste0(sub(pattern = "/$" , replacement = "", x = path1), "/", sub(pattern = "^/", replacement = "", x = path2))
+#' pastep('a', 'b', 'c', 'd')
+#' pastep(list_of_paths = list(paste0('/', letters, '/'), as.character(1:13)))
+#' pastep(list_of_paths = c(letters, as.character(1:13)))
+#' pastep(list_of_paths = c(letters, as.character(1:13)), ext = '.txt')
+#' pastep(list_of_paths = c(letters, as.character(1:13)), ext = '_dat.txt')
+pastep <- function(..., list_of_paths = NULL, ext = NULL) {
+	paths <- if(is.null(list_of_paths)) {list(...)} else {unlist(list_of_paths)}
+	len <- length(paths) - 1
+	if(len < 0) return(NULL)
+	ids <- seq_len(length.out = len)
+	paths[ids]     <- gsub('/$', '', paths[ids])
+	paths[ids + 1] <- gsub('^/', '', paths[ids + 1])
+	paste0(paste0(paths, collapse = '/'), ext)
 }
 
+#' gsub with different order signature for use with `|>`
+#'
+#' @param x A character.
+#' @param pattern A character of length one.
+#' @param replacement A character of length one.
+#'
+#' @return A character.
+#' @noRd
+#' @examples
+#' 'ABC' |> busg('A', 'b') |> busg('B', 'c') |> busg('C', 'a')
+busg <- function(x, pattern, replacement) {
+	gsub(pattern = pattern, replacement = replacement, x = x)
+}
 
 fhir_ns_strip <- function(xml) {
 	# cat("\nis(xml):\n")
@@ -398,6 +404,7 @@ fhir_ns_strip <- function(xml) {
 #'<Bundle>
 #'  <type value='searchset'/>
 #'  <entry>
+#'   <resource>
 #'     <Patient>
 #'        <id value='id1'/>
 #' 	      <address>
@@ -410,9 +417,11 @@ fhir_ns_strip <- function(xml) {
 #' 	         <given value='Marie'/>
 #' 	      </name>
 #'     </Patient>
+#'   </resource>
 #'  </entry>
 #'
 #'  <entry>
+#'   <resource>
 #'     <Patient>
 #'        <id value='id3'/>
 #' 	      <address>
@@ -436,6 +445,7 @@ fhir_ns_strip <- function(xml) {
 #'           <given value='Max'/>
 #'        </name>
 #'     </Patient>
+#'   </resource>
 #'  </entry>
 #'</Bundle>
 #'```
@@ -459,6 +469,7 @@ fhir_ns_strip <- function(xml) {
 #'<Bundle>
 #'  <type value='searchset'/>
 #'  <entry>
+#'   <resource>
 #'      <Patient>
 #'         <id value='id1'/>
 #'         <address>
@@ -471,9 +482,11 @@ fhir_ns_strip <- function(xml) {
 #'            <given value='Marie'/>
 #'         </name>
 #'      </Patient>
+#'    </resource>
 #'  </entry>
 #'
 #'  <entry>
+#'   <resource>
 #'     <Patient>
 #'         <id value='id2'/>
 #'         <address>
@@ -492,9 +505,11 @@ fhir_ns_strip <- function(xml) {
 #'            <given value='Susie'/>
 #'        </name>
 #'     </Patient>
+#'   </resource>
 #'  </entry>
 #'
 #'  <entry>
+#'   <resource>
 #'     <Patient>
 #'        <id value='id3'/>
 #'        <address>
@@ -518,6 +533,7 @@ fhir_ns_strip <- function(xml) {
 #'           <given value='Max'/>
 #'        </name>
 #'     </Patient>
+#'   </resource>
 #'  </entry>
 #'</Bundle>
 #'```
@@ -540,6 +556,7 @@ fhir_ns_strip <- function(xml) {
 #' <Bundle>
 #'  <type value='searchset'/>
 #'  <entry>
+#'   <resource>
 #'     <Patient>
 #'        <id value='id1'/>
 #'        <address>
@@ -552,9 +569,11 @@ fhir_ns_strip <- function(xml) {
 #'           <given value='Marie'/>
 #'        </name>
 #'     </Patient>
+#'   </resource>
 #'  </entry>
 #'
 #'  <entry>
+#'   <resource>
 #'     <Patient>
 #'        <id value='id2'/>
 #'        <address>
@@ -573,9 +592,11 @@ fhir_ns_strip <- function(xml) {
 #'           <given value='Susie'/>
 #'        </name>
 #'     </Patient>
+#'   </resource>
 #'  </entry>
 #'
 #'  <entry>
+#'   <resource>
 #'     <Patient>
 #'        <id value='id3'/>
 #'        <address>
@@ -599,9 +620,11 @@ fhir_ns_strip <- function(xml) {
 #'           <given value='Max'/>
 #'        </name>
 #'     </Patient>
+#'   <resource/>
 #'  </entry>
 #'
 #'  <entry>
+#'   <resource>
 #'     <Observation>
 #'        <id value = 'obs1'/>
 #'        <code>
@@ -620,6 +643,7 @@ fhir_ns_strip <- function(xml) {
 #'           <reference value='Patient/id3'/>
 #'        </subject>
 #'     </Observation>
+#'   </resource>
 #'  </entry>
 #' </Bundle>"
 #'
@@ -764,6 +788,64 @@ fhir_ns_strip <- function(xml) {
 
 #################################################################################
 #################################################################################
+`..i` <- NULL #To stop "no visible binding" NOTE in check()
+
+convert_wide_table_to_a_compact_one <- function(wide, bra, ket, sep, rm_ids = FALSE, ncores = 1) {
+	ncores <- limit_ncores(ncores)
+	pastl <- function(l, ids, sep = ' ~ ') {
+		pastv <- function(v, ids, sep = ' ~ ') {
+			len <- length(v)
+			ids <- rep_len(ids, len)
+			flt <- !is.na(v)
+			paste0(ids[flt], v[flt], collapse = sep)
+		}
+		apply(
+			X      = l,
+			MARGIN = 1,
+			FUN    = pastv,
+			ids    = ids,
+			sep    = sep
+		)
+	}
+	#ncores <- limit_ncores(ncores)
+	names <- names(wide)
+	short_names <- names |> busg(paste0('^.+', ket), '')
+	unique_short_names <- unique(short_names)
+	sep <- sep
+	ids <- if(rm_ids) {names |> busg(paste0('(^', esc(bra), '([0-9]+\\.*)+', ket, ')(.*)'),  '\\1')} else {''}
+	d <- parallel::mclapply(
+		X        = lst(unique_short_names),
+		FUN      = function(unique_short_name) {
+			#unique_short_name <- lst(unique_short_names)[[2]]
+			i <- which(unique_short_name == short_names)
+			pastl(l = wide[,..i,with=TRUE], ids = ids, sep = sep)
+		},
+		mc.cores = ncores
+	)
+	data.table::setDT(d)
+	d
+}
+
+convert_wide_tables_to_compact_ones <- function(wide, design, rm_ids = FALSE, ncores = 1) {
+	ncores <- limit_ncores(ncores)
+	lapply(
+		X   = design,
+		FUN = function(d) {
+			convert_wide_table_to_a_compact_one(
+				wide   = wide[[paste0(d@resource, 's')]],
+				bra    = d@brackets[1],
+				ket    = d@brackets[2],
+				sep    = d@sep,
+				rm_ids = rm_ids,
+				ncores = ncores
+			)
+		}
+	)
+}
+
+
+
+
 #' Transform vector to named list
 #' @description Transforms a vector of items to a named list. The names are created with a prefix and a suffix surrounding the items.
 #'
@@ -792,6 +874,25 @@ esc <- function(s) {
 	gsub("([\\.|\\^|\\$|\\*|\\+|\\?|\\(|\\)|\\[|\\{|\\\\\\|\\|])", "\\\\\\1", s)
 }
 
+#' Duplicate brackets, if just one string is provided as brackets, truncate if more than two
+#' @param brackets A character or NULL.
+#'
+#' @return A character of length two or NULL.
+#'
+#' @example fix_brackets(brackets = '|')
+#' @noRd
+#'
+
+fix_brackets <- function(brackets) {
+	if(is.null(brackets) || length(brackets) < 1) return(character())
+	if(1 == length(brackets)) return(c(brackets[1], brackets[1]))
+	if(2 < length(brackets)) {
+		warning('brackets has to be of length two, using only the first two elements.')
+		return(brackets[1:2])
+	}
+	brackets
+}
+
 ## determine operating system
 get_os <- function() {
 	sysinf <- Sys.info()
@@ -808,8 +909,16 @@ get_os <- function() {
 	tolower(os)
 }
 
+# get number of available cpus
 get_ncores <- function(os) {
 	if(os %in% c("linux", "osx")) parallel::detectCores() else 1
+}
+
+# limit number of cpus to available ones
+limit_ncores <- function(ncores) {
+	os <- get_os()
+	available_cores <- get_ncores(os)
+	if(is.null(ncores)) 1 else min(c(available_cores, ncores))
 }
 
 #' Escape characters reserved in xml
@@ -959,3 +1068,60 @@ auth_helper <- function(username, password, token){
 
 	list(basicAuth = auth, token = bearerToken)
 }
+
+#' Order Strings with Numbers correctly
+#'
+#' @param s A character vector containing the strings to be ordered.
+#'
+#' @return A character vector containing the order of the given strings.
+#' @export
+#'
+#' @examples
+#' s <- c('[1.0]', '[10.1]', '[2.0]')
+#' order(s)
+#' order_strings_with_numbers_correctly(s = s)
+order_strings_with_numbers_correctly <- function(s) {
+	sc <- as.character(s)
+	ss <- stringr::str_extract_all(sc, "[0-9]+")
+	i  <- 1
+	max_char <- max(sapply(ss, function(x) {if(0 < length(x) && !all(is.na(x))) {max(nchar(x), na.rm = T)} else {0}}))
+	s_numbers <- strsplit(sc, "[^0-9]+")
+	s_letters <- strsplit(sc, "[0-9]+")
+	order(
+		sapply(
+			seq_along(ss),
+			function(i) {
+				sn <- s_numbers[[i]]
+				sl <- s_letters[[i]]
+				if(length(sn) < length(sl)) {
+					sn <- c(sn, "")
+				} else if(length(sl) < length(sn)) {
+					sl <- c(sl, "")
+				}
+				sn <- ifelse(!is.na(sn) & sn != "", stringr::str_pad(sn, max_char, "left", "0"), "")
+				if(sn[1] != "") paste0(sl, sn, collapse = "") else paste0(sn, sl, collapse = "")
+			}
+		)
+	)
+}
+
+
+#' Sort Strings with Numbers correctly
+#'
+#' @param s A character vector containing the strings to be sorted.
+#'
+#' @return A character vector containing the the given strings sorted.
+#' @export
+#'
+#' @examples
+#' s <- c('[1.0]', '[10.1]', '[2.0]')
+#' sort(s)
+#' sort_strings_with_numbers_correctly(s = s)
+sort_strings_with_numbers_correctly <- function(s) {
+	if(is.null(s)){
+		return(s)
+	}
+	sc <- as.character(s)
+	s[order_strings_with_numbers_correctly(s)]
+}
+

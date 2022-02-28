@@ -90,7 +90,7 @@ fhir_resource_type(string = "medicationstatement") #fixed
 fhir_resource_type(string = "medicationstatement", fix_capitalization = FALSE) #not fixed
 
 fhir_resource_type(string = "Hospital") #an unknown resource type, a warning is issued
-# Warnmeldung:
+# Warning:
 # In fhir_resource_type("Hospital") :
 #   You gave "Hospital" as the resource type.
 # This doesn't match any of the resource types defined under
@@ -463,7 +463,7 @@ url <- fhir_url(
 	resource   = "Observation",
 	parameters = list("_count" = "500"))
 
-#count <- 0
+count <- 0
 
 table_description <- fhir_table_description(resource = "Observation")
 
@@ -481,7 +481,7 @@ while(!is.null(url)){
 	#retrieve starting point for next 10 bundles
 	url <- fhir_next_bundle_url()
 	
-	# count <- count + 1
+	count <- count + 1
 	# if(count >= 20) {break}
 }
 

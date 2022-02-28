@@ -10,19 +10,27 @@
 #' @export
 #'
 setClass(
-	Class = "fhir_columns",
+	Class    = "fhir_columns",
 	contains = "fhir_xpath_expression",
-	slots = c(names = "character")
+	slots    = c(names = "character")
 )
 
 setValidity(
-	Class = "fhir_columns",
+	Class  = "fhir_columns",
 	method = function(object) {
 
 		messages <- c()
 		if(length(object) == 0) {return(TRUE)}
 		if(length(names(object)) == 0) {
 			messages <- c(messages, "fhir_columns has to be a *named* character.")
+		}
+
+		with_attribute <- object[grepl("/@[[:alpha:]]*$",object)]
+
+		if(0 < length(with_attribute)){
+			messages <- c(messages,
+						  paste0("Please don't search for specific attributes like '/@value' as you did in ",
+						  	   with_attribute[1], ".\n fhir_crack() will extract all available attributes for you."))
 		}
 		if(0 < length(messages)) {messages} else {TRUE}
 	}
@@ -59,7 +67,7 @@ setValidity(
 #' @export
 setGeneric(
 	name = "fhir_columns",
-	def = function(xpaths, colnames) {
+	def  = function(xpaths, colnames) {
 		standardGeneric("fhir_columns")
 	}
 )
@@ -67,8 +75,10 @@ setGeneric(
 #' @rdname fhir_columns-methods
 #' @aliases fhir_columns,missing,missing-method
 setMethod(
-	f = "fhir_columns",
-	signature = c(xpaths = "missing", colnames = "missing"),
+	f          = "fhir_columns",
+	signature  = c(
+		xpaths   = "missing",
+		colnames = "missing"),
 	definition = function() {
 		new(Class = "fhir_columns")
 	}
@@ -78,8 +88,10 @@ setMethod(
 #' @aliases fhir_columns,NULL,missing-method
 #'
 setMethod(
-	f = "fhir_columns",
-	signature = c(xpaths = "NULL", colnames = "missing"),
+	f          = "fhir_columns",
+	signature  = c(
+		xpaths   = "NULL",
+		colnames = "missing"),
 	definition = function(xpaths) {
 		new(Class = "fhir_columns")
 	}
@@ -88,10 +100,17 @@ setMethod(
 #' @rdname fhir_columns-methods
 #' @aliases fhir_columns,character,character-method
 setMethod(
-	f = "fhir_columns",
-	signature = c(xpaths = "character", colnames = "character"),
+	f          = "fhir_columns",
+	signature  = c(
+		xpaths   = "character",
+		colnames = "character"
+	),
 	definition = function(xpaths, colnames){
-		new(Class = "fhir_columns", fhir_xpath_expression(expression = xpaths), names = colnames)
+		new(
+			Class = "fhir_columns",
+			fhir_xpath_expression(expression = xpaths),
+			names = colnames
+		)
 	}
 )
 
@@ -139,20 +158,22 @@ setMethod(
 	definition = function(object) {
 
 		if(length(object) == 0) {
-			cat("An empty fhir_columns object");
+			cat("An empty fhir_columns object\n");
 			return()
 		}
 
 		pairs <- paste(names(object), object, sep = "=")
-		colwidth1 <- max(c(stringr::str_length(string = names(object)),11)) + 1
-		colwidth2 <- max(stringr::str_length(string = object)) + 1
-
-		header <- paste(
-			stringr::str_pad(string = "column name", width = colwidth1 - 1, side = "right"),
+		colwidth1 <- max(c(nchar(names(object)), nchar('column_name'))) + 1
+		colwidth2 <- max(c(nchar(object), nchar('xpath_expression'))) + 1
+		horiz_bar <- paste0(
+			paste0(rep("-", colwidth1), collapse = ""), ' ',
+			paste0(rep("-", colwidth2), collapse = ""), '\n'
+		)
+		header <- paste0(
+			horiz_bar,
+			stringr::str_pad(string = "column name", width = colwidth1 , side = "right"),
 			"| xpath expression", "\n",
-			paste(rep("-", colwidth1 + colwidth2), collapse = ""),
-			"\n",
-			collapse = ""
+			horiz_bar
 		)
 
 		cat(
@@ -161,7 +182,8 @@ setMethod(
 				paste(
 					paste0(stringr::str_pad(string = names(object), width = colwidth1, side = "right"), "| ", object),
 					collapse = "\n"
-				)
+				), '\n',
+				horiz_bar
 			)
 		)
 	}

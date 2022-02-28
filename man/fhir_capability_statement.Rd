@@ -10,9 +10,9 @@ fhir_capability_statement(
   password = NULL,
   token = NULL,
   brackets = NULL,
-  sep = " || ",
+  sep = " ::: ",
   log_errors = NULL,
-  verbose = 2
+  verbose = NULL
 )
 }
 \arguments{
@@ -25,7 +25,7 @@ fhir_capability_statement(
 \item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
 for how to create this.}
 
-\item{brackets}{A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "<", ">")}. Defaults to \code{NULL}.
+\item{brackets}{A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "[", "]")}. Defaults to \code{NULL}.
 If \code{NULL}, no indices will be added to multiple entries.}
 
 \item{sep}{A character vector of length one to separate pasted multiple entries}
@@ -33,8 +33,7 @@ If \code{NULL}, no indices will be added to multiple entries.}
 \item{log_errors}{Either \code{NULL} or a character vector of length one indicating the name of a file in which to save the http errors.
 \code{NULL} means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to \code{NULL}}
 
-\item{verbose}{An integer Scalar.  If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
-extraction progress will be printed. Defaults to 2.}
+\item{verbose}{Deprecated since fhircrackr 2.0.0.}
 }
 \value{
 A list of data frames containing the information from the statement
@@ -56,16 +55,19 @@ will also be assigned indices so you can melt them using \code{\link[=fhir_melt]
 \examples{
 \dontrun{
 #without indices
-cap <- fhir_capability_statement("https://server.fire.ly")
+cap <- fhir_capability_statement(url = "https://server.fire.ly")
 
 #with indices
-cap <- fhir_capability_statement("https://server.fire.ly", brackets = c("[","]"))
+cap <- fhir_capability_statement(url = "https://server.fire.ly",
+                                 brackets = c("[","]"),
+                                 sep = " || ")
 
 #melt searchInclude variable
 resources <- fhir_melt(cap$Resources,
                        columns = "searchInclude",
-                       brackets = c("[", "]"), sep = " || ",
-                       all_columns = TRUE)
+                       brackets = c("[", "]"),
+                       sep = " || ",
+                       all_columns = FALSE)
 
 #remove indices
 resources <- fhir_rm_indices(resources, brackets = c("[", "]"))

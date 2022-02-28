@@ -3,14 +3,14 @@
 \name{fhir_show_tree}
 \alias{fhir_show_tree}
 \title{Print xml-like tree from cast table
-This function takes a table as created by \code{\link[=fhir_cast]{fhir_cast()}} and prints the tree structure implicit in the
+This function takes a wide table as created by \code{\link[=fhir_crack]{fhir_crack()}} with \code{format="wide"}and prints the tree structure implicit in the
 column names of the tables. It is useful to get an overview over the implied structure when planning to create
 FHIR bundles from this table using \code{\link[=fhir_build_bundle]{fhir_build_bundle()}}.}
 \usage{
-fhir_show_tree(cast_table, resource, nrow = 5, rm_indices = TRUE)
+fhir_show_tree(table, resource, nrow = 5, rm_indices = TRUE)
 }
 \arguments{
-\item{cast_table}{A data.frame or data.table as produced by \code{\link[=fhir_cast]{fhir_cast()}}}
+\item{table}{A data.frame or data.table as produced by \code{\link[=fhir_crack]{fhir_crack()}} with \code{format="wide"} or \code{\link[=fhir_cast]{fhir_cast()}}}
 
 \item{resource}{A character vector of length one or \linkS4class{fhir_resource_type} object
 indicating which resource type the table is build from.}
@@ -28,16 +28,18 @@ can be changed by setting the argument \code{nrow} to the desired number.
 bundles <- fhir_unserialize(bundles = example_bundles1)
 
 #crack fhir resources
-table_desc <- fhir_table_description(resource = "Patient",
-                                     style = fhir_style(brackets = c("[","]"),
-                                                        sep = " "))
+table_desc <- fhir_table_description(
+    resource = "Patient",
+    brackets = c("[", "]"),
+    sep      = " ",
+    format   = "wide"
+)
+
 df <- fhir_crack(bundles = bundles, design = table_desc)
 
-#cast
-cast_df <- fhir_cast(df, brackets=c("[","]"), sep=" ", verbose=0)
 
 #show tree
-fhir_show_tree(cast_df, resource="Patient")
+fhir_show_tree(df, resource="Patient")
 }
 \seealso{
 \code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_build_bundle]{fhir_build_bundle()}}
