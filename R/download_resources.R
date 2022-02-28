@@ -806,7 +806,7 @@ fhir_authenticate <- function(
 		endpoint = endpoint,
 		app = app,
 		client_credentials = TRUE,
-		cache = TRUE,
+		cache = FALSE,
 		query_authorize_extra = query_authorize_extra
 	)
 	if(names(t_$credentials)[1] == "error") {
@@ -829,7 +829,7 @@ fhir_authenticate <- function(
 #' @param request An object of class [fhir_search_url-class] or character vector of length one containing the full FHIR search request.
 #' @param username A character vector of length one containing the username for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param password A character vector of length one containing the password for basic authentication. Defaults to NULL, meaning no authentication.
-#' @param token A bearer token as a character vector of length one or NULL.
+#' @param token The token for token based auth, either a string or a httr token object
 #' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
 #' @param verbose An integer scalar. If > 1,  Downloading progress is printed. Defaults to 2.
 #' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.

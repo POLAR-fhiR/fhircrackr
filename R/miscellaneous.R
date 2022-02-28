@@ -1033,9 +1033,9 @@ frame_string <- function(text = "\nHello !!!\n\n\nIs\nthere\n\nA N Y O N E\n\nou
 
 
 #' Prepare authentication info for fhir_search/fhir_post/fhir_put
-#' @param username The username for basic auth
-#' @param password The password for basic auth
-#' @param token The token for token based auth
+#' @param username A string with the username for basic auth
+#' @param password A string with the password for basic auth
+#' @param token The token for token based auth, either a string or a httr token object
 #' @noRd
 auth_helper <- function(username, password, token){
 
