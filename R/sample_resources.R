@@ -1,59 +1,3 @@
-#' Order Strings with Numbers correctly
-#'
-#' @param s A character containing the strings to be ordered.
-#'
-#' @return A character containing the order of the given strings.
-#' @noRd
-#' @examples
-#' s <- c("12", "2", "1", "21")
-#' order(s)
-#' order_strings_with_numbers_correctly(s = s)
-order_strings_with_numbers_correctly <- function(s) {
-	sc <- as.character(s)
-	ss <- stringr::str_extract_all(sc, "[0-9]+")
-	i  <- 1
-	max_char <- max(sapply(ss, function(x) {if(0 < length(x) && !is.na(x)) max(nchar(x), na.rm = T) else 0}))
-	s_numbers <- strsplit(sc, "[^0-9]+")
-	s_letters <- strsplit(sc, "[0-9]+")
-	order(
-		sapply(
-			seq_along(ss),
-			function(i) {
-				sn <- s_numbers[[i]]
-				sl <- s_letters[[i]]
-				if(length(sn) < length(sl)) {
-					sn <- c(sn, "")
-				} else if(length(sl) < length(sn)) {
-					sl <- c(sl, "")
-				}
-				sn <- ifelse(!is.na(sn) && sn != "", stringr::str_pad(sn, max_char, "left", "0"), "")
-				if(sn[1] != "") paste0(sl, sn, collapse = "") else paste0(sn, sl, collapse = "")
-			}
-		)
-	)
-}
-
-
-
-#' Sort Strings with Numbers correctly
-#'
-#' @param s A character containing the strings to be sorted.
-#'
-#' @return A character containing the the given strings sorted.
-#' @noRd
-#' @examples
-#' s <- c("12", "2", "1", "21")
-#' sort(s)
-#' sort_strings_with_numbers_correctly(s = s)
-sort_strings_with_numbers_correctly <- function(s) {
-	if(is.null(s)){
-		return(s)
-	}
-	sc <- as.character(s)
-	s[order_strings_with_numbers_correctly(s)]
-}
-
-
 
 #' Paste Parameters for a FHIR Search Request
 #'
@@ -357,7 +301,7 @@ fhir_get_resources_by_ids <- function(
 		bundle_count <- 1
 		while(0 < length(ids)) {
 			ids_ <- collect_ids_for_request(ids = ids, max_ids = length(ids))
-			url_ <- paste0(paste_paths(base_url, resource), "?_id=", ids_$str)
+			url_ <- paste0(pastep(base_url, resource), "?_id=", ids_$str)
 			bnd_ <- fhir_search(request = url_, username = username, password = password, token = token, verbose = 0)
 			total <- total + ids_$n
 			ids <- ids[-seq_len(ids_$n)]
