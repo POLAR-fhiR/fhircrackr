@@ -423,14 +423,14 @@ fhir_capability_statement <- function(
 
 	auth <- auth_helper(username = username, password = password, token = token)
 
-	response <- httr::GET(
+	response <- try(httr::GET(
 		url = pastep(url, "metadata?"),
 		config = httr::add_headers(
 			Accept = "application/fhir+xml",
 			Authorization = auth$token
 		),
 		auth$basicAuth
-	)
+	), silent = TRUE)
 
 	#check for http errors
 	check_response(response = response, log_errors = log_errors)
@@ -463,7 +463,7 @@ fhir_capability_statement <- function(
 	)
 	if(use_indices) {
 		META <- (META[, id := path |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')][, paste0(bra, id, ket, value, collapse = sep), by='column'] |>
-					 data.table::transpose(make.names = 'column'))
+				 	 data.table::transpose(make.names = 'column'))
 	} else {
 		META <- (META[, paste0(value, collapse = sep), by='column'] |> data.table::transpose(make.names = 'column'))
 	}
@@ -866,7 +866,7 @@ get_bundle <- function(
 		#VonK: Next-Links have to be POSTed, Hapi: Next-Links have to be GETed
 		#search via POST
 		if(grepl("_search", request)) {
-			response <- httr::POST(
+			response <- try(httr::POST(
 				url = request,
 				config = httr::add_headers(
 					Accept = "application/fhir+xml",
@@ -875,19 +875,19 @@ get_bundle <- function(
 				httr::content_type(type = body@type),
 				auth$basicAuth,
 				body = body@content
-			)
+			), silent = TRUE)
 
 		} else {#search via GET
-			response <- httr::GET(
+			response <- try(httr::GET(
 				url = request,
 				config = httr::add_headers(
 					Accept = "application/fhir+xml",
 					Authorization = auth$token
 				),
 				auth$basicAuth
-			)
+			), silent = TRUE)
 		}
-		#check for http errors
+		#check for errors
 		check_response(response = response, log_errors = log_errors)
 		#extract payload
 		payload <- try(httr::content(x = response, as = "text", encoding = "UTF-8"), silent = TRUE)
@@ -925,6 +925,19 @@ error_to_file <- function(response, log_errors, append) {
 #'
 #'
 check_response <- function(response, log_errors, append = FALSE) {
+
+	#Error in curl
+	if(is(response, "try-error")){
+		if(!is.null(log_errors)){
+			write(x = response, file = log_errors)
+			stop("The server could not be reached:\n", response, ".\n",
+				 "This has been logged in the generated error file.")
+		}else{
+			stop("The server could not be reached:\n", response, ".\n")
+		}
+	}
+
+	#http error
 	code <- response$status_code
 	if(code >= 400){
 		fhircrackr_env$recent_http_error <- httr::content(x = response, as = "text", encoding = "UTF-8")
