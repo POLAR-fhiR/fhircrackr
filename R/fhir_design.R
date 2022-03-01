@@ -234,7 +234,7 @@ setMethod(
 		if(length(object) == 0) {
 			cat("An empty fhir_design_object")
 		} else {
-			cat(paste0("A fhir_design with ", length(object), " table_descriptions:\n"))
+			cat(paste0("A fhir_design with ", length(object), " table descriptions:\n"))
 			lapply(
 				seq_len(length(object)),
 				function(i) {
