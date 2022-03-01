@@ -4,10 +4,12 @@
 \alias{fhir_load}
 \title{Load bundles from xml-files}
 \usage{
-fhir_load(directory)
+fhir_load(directory, max_bundles = Inf)
 }
 \arguments{
 \item{directory}{A character vector of length one containing the path to the folder were the files are stored.}
+
+\item{max_bundles}{Maximal number of bundles to load. Defaults to Inf meaning all bundles from the directory are loaded.}
 }
 \value{
 A \linkS4class{fhir_bundle_list}.
@@ -18,10 +20,16 @@ Reads all bundles stored as xml files from a directory.
 \examples{
 #unserialize example bundle
 bundles <- fhir_unserialize(medication_bundles)
+length(bundles)
 
 #save to temporary directory
 fhir_save(bundles, directory = tempdir())
 
 #load from temporary directory
 loaded_bundles <- fhir_load(tempdir())
+length(loaded_bundles)
+
+#load only the first two bundles
+loaded_bundles <- fhir_load(tempdir(), max_bundles = 2)
+length(loaded_bundles)
 }
