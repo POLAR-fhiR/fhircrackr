@@ -249,8 +249,8 @@ setMethod(
 	signature = 'fhir_table_description',
 	function(object) {
 		cat('A fhir_table_description with the following elements: \n\n')
-		cat(paste0('fhir_resource_type: ', as.character(object@resource), '\n\n'))
-		cat('fhir_columns: \n');
+		cat(paste0('resource: ', as.character(object@resource), '\n\n'))
+		cat('cols: \n');
 		show(object@cols)
 		cat(paste0('\nsep:           \'', object@sep, '\'\n'))
 		if(length(object@brackets) < 1) {
