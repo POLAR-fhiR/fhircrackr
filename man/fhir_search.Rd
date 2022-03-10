@@ -16,8 +16,7 @@ fhir_search(
   delay_between_attempts = 10,
   log_errors = NULL,
   save_to_disc = NULL,
-  delay_between_bundles = 0,
-  directory = paste0("FHIR_bundles_", gsub("-| |:", "", Sys.time()))
+  delay_between_bundles = 0
 )
 }
 \arguments{
@@ -61,8 +60,6 @@ Defaults to \code{NULL}, i.e. bundles are returned as a list within the R sessio
 \item{delay_between_bundles}{A numeric scalar specifying a time in seconds to wait between pages of the search result,
 i.e. between downloading the current bundle and the next bundle. This can be used to avoid choking a weak server with
 too many requests to quickly. Defaults to zero.}
-
-\item{directory}{Deprecated. Please specify the directory directly in the \code{save_to_disc} argument.}
 }
 \value{
 A \linkS4class{fhir_bundle_list} when \code{save_to_disc = NULL} (the default),  else \code{NULL}.

@@ -55,7 +55,6 @@
 #' and not returned as a bundle list in the R session. This is useful when a lot of bundles are to be downloaded and keeping them all
 #' in one R session might overburden working memory. When the download is complete, the bundles can be loaded into R using [fhir_load()].
 #' Defaults to `NULL`, i.e. bundles are returned as a list within the R session.
-#' @param directory Deprecated. Please specify the directory directly in the `save_to_disc` argument.
 #' @param delay_between_bundles A numeric scalar specifying a time in seconds to wait between pages of the search result,
 #' i.e. between downloading the current bundle and the next bundle. This can be used to avoid choking a weak server with
 #' too many requests to quickly. Defaults to zero.
@@ -103,32 +102,8 @@ fhir_search <- function(
 	delay_between_attempts = 10,
 	log_errors = NULL,
 	save_to_disc = NULL,
-	delay_between_bundles = 0,
-	directory = paste0("FHIR_bundles_", gsub("-| |:", "", Sys.time()))) {
+	delay_between_bundles = 0) {
 
-	####remove at some point####
-	if(is.logical(save_to_disc)) {
-		warning(
-			"The use of TRUE/FALSE in the argument save_to_disc in combination with the argument directory is ",
-			"deprecated. Please specify the directory name in the save_to_disc argument directly (see ?fhir_search)."
-		)
-		if(save_to_disc) {
-			message("Setting save_to_disc to '", directory, "'.")
-			save_to_disc <- directory
-		}
-	}
-
-	if(is.numeric(log_errors)) {
-		warning("The use of numbers in log_errors is deprecated. Please specify a file name if you want to log erros and NULL if you don't.\n")
-		if(0 < log_errors) {
-			message("Setting log_errors to 'http_error_fhir_search.xml'.")
-			log_errors <- "http_error_fhir_search.xml"
-		} else {
-			log_errors <- NULL
-		}
-	}
-
-	#######################################################
 	if(is.null(request)) {
 		stop(
 			"You have not provided a FHIR search request and there is no ",

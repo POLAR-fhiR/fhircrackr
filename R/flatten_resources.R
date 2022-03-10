@@ -29,8 +29,10 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- NU
 #' If `brackets = NULL`, it is looked up in `design`, where the default is `character(0)`,i.e. no indices are added to multiple entries.
 #' Empty strings (`""`) are not allowed.
 #'
-#' @param remove_empty_columns Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
-#' `design`. If `remove_empty_columns = NULL`, it is looked up in `design`, where the default is `FALSE`.
+#' @param rm_empty_cols Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
+#' `design`. If `rm_empty_cols = NULL`, it is looked up in `design`, where the default is `FALSE`.
+#'
+#' @param remove_empty_columns Deprecated since fhircrackr 2.0.0, use argument `rm_empty_cols` instead.
 #'
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
@@ -116,12 +118,13 @@ setGeneric(
 		design,
 		sep                     = NULL,
 		brackets                = NULL,
-		remove_empty_columns    = NULL,
+		rm_empty_cols           = NULL,
 		verbose                 = 2,
 		data.table              = FALSE,
 		format                  = NULL,
 		keep_attr               = NULL,
-		ncores                  = 1) {
+		ncores                  = 1,
+		remove_empty_columns    = NULL) {
 
 		standardGeneric("fhir_crack")
 	}
@@ -137,12 +140,13 @@ setMethod(
 		design,
 		sep                  = NULL,
 		brackets             = NULL,
-		remove_empty_columns = NULL,
+		rm_empty_cols        = NULL,
 		verbose              = 2,
 		data.table           = FALSE,
 		format               = NULL,
 		keep_attr            = NULL,
-		ncores               = 1) {
+		ncores               = 1,
+		remove_empty_columns = NULL) {
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
@@ -154,8 +158,16 @@ setMethod(
 			design@brackets <- brackets
 		}
 
+		###### remove at some point ########
 		if(!is.null(remove_empty_columns)) {
+			warning("Argument remove_empty_columns has been deprecated since fhircrackr 2.0.0.\n",
+					"Please use rm_empty_cols instead.")
 			design@rm_empty_cols <- remove_empty_columns
+		}
+		#############################
+
+		if(!is.null(rm_empty_cols)) {
+			design@rm_empty_cols <- rm_empty_cols
 		}
 
 		if(!is.null(format)) {
@@ -203,12 +215,13 @@ setMethod(
 		design,
 		sep                     = NULL,
 		brackets                = NULL,
-		remove_empty_columns    = NULL,
+		rm_empty_cols           = NULL,
 		verbose                 = 2,
 		data.table              = FALSE,
 		format                  = NULL,
 		keep_attr               = NULL,
-		ncores                  = 1) {
+		ncores                  = 1,
+		remove_empty_columns    = NULL) {
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
@@ -234,12 +247,28 @@ setMethod(
 			)
 		}
 
+		##### remove at some point #####
 		if(!is.null(remove_empty_columns)) {
+			warning("Argument remove_empty_columns has been deprecated since fhircrackr 2.0.0.\n",
+					"Please use rm_empty_cols instead.")
 			design <- fhir_design(
 				lapply(
 					design,
 					function(x) {
 						x@rm_empty_cols <- remove_empty_columns
+						x
+					}
+				)
+			)
+		}
+		############################
+
+		if(!is.null(rm_empty_cols)) {
+			design <- fhir_design(
+				lapply(
+					design,
+					function(x) {
+						x@rm_empty_cols <- rm_empty_cols
 						x
 					}
 				)
