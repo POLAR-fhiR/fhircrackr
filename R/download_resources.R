@@ -29,6 +29,14 @@
 #' 2. Token Authentication: Provide a token in the argument `token`, either as a character vector of length one or as as an object of class
 #' [httr::Token-class]. You can use the function [fhir_authenticate()] to create this object.
 #'
+#' ## HTML removal
+#' FHIR resources can contain a considerable amount of html code (e.g. in a [narrative](https://www.hl7.org/fhir/narrative.html#xhtml) object),
+#' which is often created by the server for example to provide a human-readable summary of the resource.
+#' This data is usually not the aim of structured statistical analysis, so in the default setting [fhir_search()] will remove the html
+#' parts immediately after download to reduce memory usage (on a hapi server typically by around 30%, see [fhir_rm_div()]).
+#' The memory gain is payed with a runtime increase of 10%-20%. The html removal can be disabled by setting `rm_tag = NULL`
+#' to increase speed at the cost of increased memory usage.
+#'
 #' @param request An object of class [fhir_url-class] or a character vector of length one containing the full FHIR search request. It is
 #' recommended to explicitly create the request via [fhir_url()] as this will do some validity checks and format the url properly.
 #' Defaults to [fhir_current_request()]
@@ -45,7 +53,9 @@
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' downloading progress will be printed. Defaults to 1.
 #' @param max_attempts A numeric vector of length one. The maximal number of attempts to send a request, defaults to 5.
-#' @param delay_between_attempts A numeric vector of length one specifying the delay in seconds between two attempts. Defaults to 10.
+#' @param delay_between_attempts A numeric vector of length `max_attempts` specifying the delay in seconds after each attempt.
+#' Defaults to `c(0.1,1,5,20,60)`. If `length(delay_between_attempts) < max_attempts`, the last element of `delay_between_attempts`
+#' is repeated for the remaining attempts.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`.
 #' Regardless of the value of `log_errors` the most recent http error message within the current R session is saved internally and can
@@ -58,7 +68,9 @@
 #' @param delay_between_bundles A numeric scalar specifying a time in seconds to wait between pages of the search result,
 #' i.e. between downloading the current bundle and the next bundle. This can be used to avoid choking a weak server with
 #' too many requests to quickly. Defaults to zero.
-#'
+#' @param rm_tag Character vector of length 1 defining an xml tag of elements that will removed from the bundle automatically.
+#' Defaults to `"div"`,leading to the removal of all html parts (see Details). Set to `NULL` to keep the bundles untouched.
+#' See [fhir_rm_div()] and [fhir_rm_tag()] for more info.
 #' @return A [fhir_bundle_list-class] when `save_to_disc = NULL` (the default),  else `NULL`.
 #' @export
 #'
@@ -99,10 +111,11 @@ fhir_search <- function(
 	max_bundles = Inf,
 	verbose = 1,
 	max_attempts = 5,
-	delay_between_attempts = 10,
+	delay_between_attempts = c(0.1,1,5,20,60),
 	log_errors = NULL,
 	save_to_disc = NULL,
-	delay_between_bundles = 0) {
+	delay_between_bundles = 0,
+	rm_tag = "div") {
 
 	if(is.null(request)) {
 		stop(
@@ -168,7 +181,8 @@ fhir_search <- function(
 			verbose = verbose,
 			max_attempts = max_attempts,
 			delay_between_attempts = delay_between_attempts,
-			log_errors = log_errors
+			log_errors = log_errors,
+			rm_tag = rm_tag
 		)
 		if(is.null(bundle)) {
 			if(0 < verbose) {
@@ -819,8 +833,9 @@ fhir_authenticate <- function(
 #' @param token The token for token based auth, either a string or a httr token object
 #' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
 #' @param verbose An integer scalar. If > 1,  Downloading progress is printed. Defaults to 2.
-#' @param delay_between_attempts A numeric scalar specifying the delay in seconds between two attempts. Defaults to 10.
-#' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
+#' @param delay_between_attempts A numeric vector of length `max_attempts` specifying the delay in seconds after each attempt.
+#' Defaults to `c(0.1,1,5,20,60)`. If `length(delay_between_attempts) < max_attempts`, the last element of `delay_between_attempts`
+#' is repeated for the remaining attempts.#' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`
 #'
 #' @return The downloaded bundle as an [fhir_bundle_xml-class].
@@ -840,8 +855,16 @@ get_bundle <- function(
 	token = NULL,
 	verbose = 2,
 	max_attempts = 5,
-	delay_between_attempts = 10,
-	log_errors = NULL) {
+	delay_between_attempts = c(0.1,1,5,20,60),
+	log_errors = NULL,
+	rm_tag = "div") {
+
+	#expand delay_between attempts to match max_attempts
+	if(length(delay_between_attempts) < max_attempts){
+		c(delay_between_attempts,
+		  rep(delay_between_attempts[length(delay_between_attempts)], max_attempts - length(delay_between_attempts))
+		  )
+	}
 
 	#download response
 	for(n in seq_len(max_attempts)) {
@@ -876,15 +899,18 @@ get_bundle <- function(
 		}
 		#check for errors
 		check_response(response = response, log_errors = log_errors)
+
 		#extract payload
 		payload <- try(httr::content(x = response, as = "text", encoding = "UTF-8"), silent = TRUE)
 		if(class(payload)[1] != "try-error") {
 			xml <- try(xml2::read_xml(x = payload), silent = TRUE)
 			if(class(xml)[1] != "try-error") {
-				return(fhir_bundle_xml(bundle = xml))
+				bundle <- fhir_bundle_xml(bundle = xml)
+				if(!is.null(rm_tag)){bundle <- fhir_rm_tag(x = bundle, tag = rm_tag)}
+				return(bundle)
 			}
 		}
-		Sys.sleep(delay_between_attempts)
+		Sys.sleep(delay_between_attempts[n])
 	}
 	NULL
 }
