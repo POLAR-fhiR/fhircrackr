@@ -13,10 +13,11 @@ fhir_search(
   max_bundles = Inf,
   verbose = 1,
   max_attempts = 5,
-  delay_between_attempts = 10,
+  delay_between_attempts = c(0.1, 1, 5, 20, 60),
   log_errors = NULL,
   save_to_disc = NULL,
-  delay_between_bundles = 0
+  delay_between_bundles = 0,
+  rm_tag = "div"
 )
 }
 \arguments{
@@ -44,7 +45,9 @@ downloading progress will be printed. Defaults to 1.}
 
 \item{max_attempts}{A numeric vector of length one. The maximal number of attempts to send a request, defaults to 5.}
 
-\item{delay_between_attempts}{A numeric vector of length one specifying the delay in seconds between two attempts. Defaults to 10.}
+\item{delay_between_attempts}{A numeric vector of length \code{max_attempts} specifying the delay in seconds after each attempt.
+Defaults to \code{c(0.1,1,5,20,60)}. If \code{length(delay_between_attempts) < max_attempts}, the last element of \code{delay_between_attempts}
+is repeated for the remaining attempts.}
 
 \item{log_errors}{Either \code{NULL} or a character vector of length one indicating the name of a file in which to save the http errors.
 \code{NULL} means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to \code{NULL}.
@@ -60,6 +63,10 @@ Defaults to \code{NULL}, i.e. bundles are returned as a list within the R sessio
 \item{delay_between_bundles}{A numeric scalar specifying a time in seconds to wait between pages of the search result,
 i.e. between downloading the current bundle and the next bundle. This can be used to avoid choking a weak server with
 too many requests to quickly. Defaults to zero.}
+
+\item{rm_tag}{Character vector of length 1 defining an xml tag of elements that will removed from the bundle automatically.
+Defaults to \code{"div"},leading to the removal of all html parts (see Details). Set to \code{NULL} to keep the bundles untouched.
+See \code{\link[=fhir_rm_div]{fhir_rm_div()}} and \code{\link[=fhir_rm_tag]{fhir_rm_tag()}} for more info.}
 }
 \value{
 A \linkS4class{fhir_bundle_list} when \code{save_to_disc = NULL} (the default),  else \code{NULL}.
@@ -96,6 +103,16 @@ just leave the arguments described in the following at their default values of \
 \item Token Authentication: Provide a token in the argument \code{token}, either as a character vector of length one or as as an object of class
 \link[httr:Token-class]{httr::Token}. You can use the function \code{\link[=fhir_authenticate]{fhir_authenticate()}} to create this object.
 }
+}
+
+\subsection{HTML removal}{
+
+FHIR resources can contain a considerable amount of html code (e.g. in a \href{https://www.hl7.org/fhir/narrative.html#xhtml}{narrative} object),
+which is often created by the server for example to provide a human-readable summary of the resource.
+This data is usually not the aim of structured statistical analysis, so in the default setting \code{\link[=fhir_search]{fhir_search()}} will remove the html
+parts immediately after download to reduce memory usage (on a hapi server typically by around 30\%, see \code{\link[=fhir_rm_div]{fhir_rm_div()}}).
+The memory gain is payed with a runtime increase of 10\%-20\%. The html removal can be disabled by setting \code{rm_tag = NULL}
+to increase speed at the cost of increased memory usage.
 }
 }
 \examples{
