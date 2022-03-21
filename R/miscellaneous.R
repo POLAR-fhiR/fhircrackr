@@ -127,7 +127,6 @@ setMethod(
 			text <- list()
 			for(i in seq_len(nrow(tags))) {
 				part <- if(tags$type[i] == 0) {
-					#tags$text[i]
 					substr(x, tags$start[i], tags$end[i])
 				} else if(tags$type[i] == -1 && tags$s[i] == 0 && i < nrow(tags)) {
 					substr(x, tags$end[i] + 1, tags$start[i + 1] - 1)
