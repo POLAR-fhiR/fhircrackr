@@ -93,10 +93,11 @@ fhir_cast <- function(
 						names(id_) <- id
 
 						if(length(id_[[1]])!=length(name_vec) && !warning_given){
-							warning("Column name '", paste0(name_vec, collapse = "."),
-									"' doesn't fit the id pattern found in this column.",
-									"The column name should be build the way ",
-									"fhir_crack() automatically builds it. See ?fhir_cast."
+							warning(
+								"Column name '", paste0(name_vec, collapse = "."),
+								"' doesn't fit the id pattern found in this column.",
+								"The column name should be build the way ",
+								"fhir_crack() automatically builds it. See ?fhir_cast."
 							)
 							warning_given <<- TRUE
 						}
@@ -297,10 +298,11 @@ fhir_melt <- function(
 
 	if(all_columns){
 		rest <- setdiff(names(indexed_dt), columns)
-		result <- merge.data.table(x = expanded,
-								   y = indexed_dt[, rest, with=FALSE],
-								   by = id_name,
-								   all.x = T
+		result <- merge.data.table(
+			x = expanded,
+			y = indexed_dt[, rest, with=FALSE],
+			by = id_name,
+			all.x = T
 		)
 		data.table::setcolorder(result, names(indexed_dt))
 	}else{
