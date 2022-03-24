@@ -1,6 +1,5 @@
 ## This file contains all functions dealing with multiple entries/indices##
 ## Exported functions are on top, internal functions below ##
-..rest <- NULL # to shut up warning about undefined global variable
 
 #' Cast table with multiple entries
 #' This function divides multiple entries in a compact indexed table as produced by [fhir_crack()] into separate columns.
@@ -276,23 +275,21 @@ fhir_melt <- function(
 	id_name = "resource_identifier",
 	all_columns = FALSE) {
 
-
 	if(!is.data.frame(indexed_data_frame)) {
 		stop(
 			"You need to supply a data.frame or data.table to the argument indexed_data_frame.",
 			"The object you supplied is of type ", class(indexed_data_frame), "."
 		)
 	}
+
 	if(!all(columns %in% names(indexed_data_frame))) {
 		stop("Not all column names you gave match with the column names in the data frame.")
 	}
-
 
 	indexed_dt <- copy(indexed_data_frame) #copy to avoid side effects
 	is_DT <- data.table::is.data.table(x = indexed_dt)
 	if(!is_DT) {data.table::setDT(x = indexed_dt)}
 	brackets <- fix_brackets(brackets = brackets)
-
 
 	indexed_dt[,(id_name):=1:nrow(indexed_dt)]
 
@@ -301,7 +298,7 @@ fhir_melt <- function(
 	if(all_columns){
 		rest <- setdiff(names(indexed_dt), columns)
 		result <- merge.data.table(x = expanded,
-								   y = indexed_dt[, ..rest],
+								   y = indexed_dt[, rest, with=FALSE],
 								   by = id_name,
 								   all.x = T
 		)
@@ -310,12 +307,10 @@ fhir_melt <- function(
 		result <- expanded
 	}
 
-
 	if(nrow(result) == 0) {warning("The brackets you specified don't seem to appear in the indices of the provided data.frame. Returning NULL.")}
 
-    if(!is_DT) {setDF(result)}
+	if(!is_DT) {setDF(result)}
 	result
-
 }
 
 #' Remove indices from data.frame/data.table
