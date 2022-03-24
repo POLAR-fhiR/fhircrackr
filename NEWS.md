@@ -17,6 +17,8 @@
 - `fhir_sample_resources()`: Randomly sample from a set of resources matching a specific search request in a FHIR server.
 
 ## New behaviour
+- `fhir_melt()` has been rewritten to be faster and more memory efficient.
+
 - `fhir_style`: This class is now deprecated, all the information contained in the `fhir_style` object has been moved to the `fhir_table_description`. 
 
 - `fhir_table_description`: 
