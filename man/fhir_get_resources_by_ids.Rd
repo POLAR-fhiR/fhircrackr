@@ -8,6 +8,8 @@ fhir_get_resources_by_ids(
   base_url,
   resource,
   ids,
+  id_param = "_id",
+  parameters = NULL,
   username = NULL,
   password = NULL,
   token = NULL,
@@ -19,7 +21,15 @@ fhir_get_resources_by_ids(
 
 \item{resource}{A character vector of length one or \linkS4class{fhir_resource_type} object with the resource type to be searched, e.g. \code{"Patient"}.}
 
-\item{ids}{A character vector containing the resource (aka logical) IDs of the resources that should be downloaded.}
+\item{ids}{A character vector containing the IDs of the resources that should be downloaded. In the default setting these should be resource (aka logical) IDs.}
+
+\item{id_param}{A character vector of length one containing the FHIR Search parameter belonging to the ids in \code{ids}. Defaults to \code{"_id"} meaning \code{ids} is interpreted as
+containing resource (aka logical) ids. Could be changed to \code{"identifier"} if \code{ids} contains a vector of identifier values instead.}
+
+\item{parameters}{FHIR Search parameters to further restrict the set of resources that is returned, e.g. \code{gender=male} to only download the resources from
+the \code{ids} list that correspond to males. Can be either a length 1 character containing properly formatted FHIR search parameters, e.g.
+\code{"gender=male"} or a named list or named character vector e.g. \code{list(gender="male")}or \code{c(gender="male")}. Defaults to \code{NULL} meaning no restriction on
+the IDs provided in \code{ids}.}
 
 \item{username}{A character vector of length one containing the username for basic authentication.}
 

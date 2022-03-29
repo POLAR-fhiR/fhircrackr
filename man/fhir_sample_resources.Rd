@@ -12,7 +12,7 @@ fhir_sample_resources(
   password = NULL,
   token = NULL,
   sample_size = 20,
-  seed = as.double(Sys.time()),
+  seed = 1,
   verbose = 1
 )
 }

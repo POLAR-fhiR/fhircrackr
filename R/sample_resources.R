@@ -177,33 +177,39 @@ fhir_get_resource_ids <- function(
 					parameters = paste_parameters(parameters, c("_elements" = "id", "_count" = "500"))
 				)
 
-	bundles <- 	fhir_search(
-					request = request,
-					username = username,
-					password = password,
-					token = token,
-					verbose = 0
-				)
-
-	unlist(
-		lapply(
-			bundles,
-			function(bundle) {
-				xml2::xml_attr(
-					xml2::xml_find_all(
-						bundle,
-						paste0(
-							"entry/resource/",
-							resource,
-							"/id"
-						)
-					),
-					"value"
-				)
-			}
-		)
+	bundles <- 	try(
+		fhir_search(
+			request = request,
+			username = username,
+			password = password,
+			token = token,
+			verbose = 0
+			)
 	)
 
+	if(inherits(bundles, "try-error")){
+		warning(paste0("The url ", request, " could not be succesfully resolved. Use fhir_recent_http_error() to get more information!"))
+		NA_integer_;
+	}else{
+		unlist(
+			lapply(
+				bundles,
+				function(bundle) {
+					xml2::xml_attr(
+						xml2::xml_find_all(
+							bundle,
+							paste0(
+								"entry/resource/",
+								resource,
+								"/id"
+							)
+						),
+						"value"
+					)
+				}
+			)
+		)
+	}
 }
 
 
@@ -222,7 +228,13 @@ fhir_get_resource_ids <- function(
 #'
 #' @param base_url A character vector of length one specifying the base URL of the FHIR server, e.g. `"http://hapi.fhir.org/baseR4"`.
 #' @param resource A character vector of length one or [fhir_resource_type-class] object with the resource type to be searched, e.g. `"Patient"`.
-#' @param ids A character vector containing the resource (aka logical) IDs of the resources that should be downloaded.
+#' @param ids A character vector containing the IDs of the resources that should be downloaded. In the default setting these should be resource (aka logical) IDs.
+#' @param id_param A character vector of length one containing the FHIR Search parameter belonging to the ids in `ids`. Defaults to `"_id"` meaning `ids` is interpreted as
+#' containing resource (aka logical) ids. Could be changed to `"identifier"` if `ids` contains a vector of identifier values instead.
+#' @param parameters FHIR Search parameters to further restrict the set of resources that is returned, e.g. `gender=male` to only download the resources from
+#' the `ids` list that correspond to males. Can be either a length 1 character containing properly formatted FHIR search parameters, e.g.
+#' `"gender=male"` or a named list or named character vector e.g. `list(gender="male")`or `c(gender="male")`. Defaults to `NULL` meaning no restriction on
+#' the IDs provided in `ids`.
 #' @param username A character vector of length one containing the username for basic authentication.
 #' @param password A character vector of length one containing the password for basic authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
@@ -260,13 +272,15 @@ fhir_get_resources_by_ids <- function(
 	base_url,
 	resource,
 	ids,
+	id_param = '_id',
+	parameters = NULL,
 	username = NULL,
 	password = NULL,
 	token = NULL,
 	verbose = 0) {
 
 	#download via GET
-	get_resources_by_ids_get <- function(base_url, resource, ids, username = NULL, password = NULL, token = NULL,  verbose = 1) {
+	get_resources_by_ids_get <- function(base_url, resource, ids, id_param, username = NULL, password = NULL, token = NULL,  verbose = 1) {
 		collect_ids_for_request <- function(ids, max_ids = length(ids), max_len = 2083 - sum(nchar(base_url),nchar(resource),50)) {
 			if(length(ids) < 1) {
 				warning(
@@ -301,29 +315,35 @@ fhir_get_resources_by_ids <- function(
 		bundle_count <- 1
 		while(0 < length(ids)) {
 			ids_ <- collect_ids_for_request(ids = ids, max_ids = length(ids))
-			url_ <- paste0(pastep(base_url, resource), "?_id=", ids_$str)
+			url_ <- fhir_url(base_url, resource, paste_parameters(paste0(id_param, "=", ids_$str), parameters))
 			bnd_ <- fhir_search(request = url_, username = username, password = password, token = token, verbose = 0)
 			total <- total + ids_$n
 			ids <- ids[-seq_len(ids_$n)]
 			bundles <- c(bundles, bnd_)
-			cat(paste0("Bundle ", bundle_count, " a ", ids_$n, " ", resource, "s  \u03A3 ", total - 1, "\n"))
+			if(1 < verbose){cat(paste0("Bundle ", bundle_count, " a ", ids_$n, " ", resource, "s  \u03A3 ", total - 1, "\n"))}
 			bundle_count <- bundle_count + 1
 		}
 		fhir_bundle_list(bundles)
 	}
 
 	#download via POST
-	get_resources_by_ids_post <- function(base_url, resource, ids, username, password, token, verbose = 1) {
+	get_resources_by_ids_post <- function(base_url, resource, ids, id_param, username, password, token, verbose = 1) {
+
+		parameters_list <- stats::setNames(
+			list(paste0(ids, collapse = ","),"100"),
+			c(id_param, '_count')
+		)
+
 		fhir_search(
 			request = fhir_url(
 				url = base_url,
 				resource = resource,
-				url_enc = T
+				url_enc = TRUE
 			),
 			body = fhir_body(
-				content = list(
-					"_id" = paste0(ids, collapse = ","),
-					"_count" = "500"
+				content = paste_parameters(
+					parameters     = parameters_list,
+					parameters2add = parameters
 				),
 				type = "application/x-www-form-urlencoded"
 			),
@@ -335,21 +355,20 @@ fhir_get_resources_by_ids <- function(
 	}
 
 	bundles <- try(
-		get_resources_by_ids_post(base_url = base_url, resource = resource, ids = ids, username = username, password = password, token = token, verbose = verbose),
+		get_resources_by_ids_post(base_url = base_url, resource = resource, ids = ids, id_param = id_param ,username = username, password = password, token = token, verbose = verbose),
 		silent = T
 		)
 	if(inherits(bundles, "try-error")) {
 		if(verbose>0){message("Search via POST failed, falling back to iterative download via GET")}
-		bundles <- get_resources_by_ids_get(base_url = base_url, resource = resource, ids = ids, username = username, password = password, token = token, verbose = verbose)
+		bundles <- get_resources_by_ids_get(base_url = base_url, resource = resource, ids = ids, id_param = id_param, username = username, password = password, token = token, verbose = verbose)
 	}
 	bundles
 }
 
 
 
-#' Download random sample if resource ID list from a FHIR server
-#'
-#' Downloads a random sample of resources from a vector of resource IDs.
+
+#' Download a random sample of resources from a vector of resource IDs.
 #'
 #' @details
 #' This function takes a character vector `ids` containing logical Ids of resources of a given type (specified in `resource`) on a
@@ -365,6 +384,8 @@ fhir_get_resources_by_ids <- function(
 #' @param base_url A character vector of length one specifying the base URL of the FHIR server, e.g. `"http://hapi.fhir.org/baseR4"`.
 #' @param resource A character vector of length one or [fhir_resource_type-class] object with the resource type to be downloaded e.g. `"Patient"`.
 #' @param ids A character vector containing the IDs from which to sample.
+#' @param id_param A character vector of length one containing the FHIR Search parameter belonging to the ids in `ids`. Defaults to `"_id"` meaning `ids` is interpreted as
+#' containing resource (aka logical) ids. Could be changed to `"identifier"` if `ids` contains a vector of identifier values instead.
 #' @param username A character vector of length one containing the username for basic authentication.
 #' @param password A character vector of length one containing the password for basic authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
@@ -406,18 +427,19 @@ fhir_sample_resources_by_ids <- function(
 	base_url,
 	resource,
 	ids,
+	id_param = "_id",
 	username = NULL,
 	password = NULL,
 	token = NULL,
 	sample_size = 20,
-	seed = as.double(Sys.time()),
+	seed = 1,
 	verbose = 1) {
 
 	if(length(ids) < sample_size) {stop("The id list has only length", length(ids), " . sample_size must be smaller than this number.")}
 	set.seed(seed = seed)
 	ids <- sample(ids, sample_size, replace = F)
 	if(0 < verbose){message("Downloading ", sample_size, " full resources.")}
-	fhir_get_resources_by_ids(base_url = base_url, resource = resource, ids = ids, username = username, password = password, token = token, verbose = verbose)
+	fhir_get_resources_by_ids(base_url = base_url, resource = resource, ids = ids, id_param = id_param, username = username, password = password, token = token, verbose = verbose)
 }
 
 
@@ -490,7 +512,7 @@ fhir_sample_resources <- function(
 	password = NULL,
 	token = NULL,
 	sample_size = 20,
-	seed = as.double(Sys.time()),
+	seed = 1,
 	verbose = 1) {
 
 	cnt <- fhir_count_resource(base_url = base_url, resource = resource, parameters = parameters, username = username, password = password, token = token)
