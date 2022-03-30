@@ -578,6 +578,9 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 	} else {
 		stop("You need to provide brackets if you want to crack to format 'wide'")
 	}
+
+	table_description@cols <- fhir_columns(c(c(dummy="id"), table_description@cols))
+
 	result <- data.table::rbindlist(
 		parallel::mclapply(
 			seq_along(bundles),
@@ -625,7 +628,9 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 		use.names = TRUE,
 		fill = TRUE
 	)
-	if(nrow(result)==0){result}else{unique(result[, -c('entry')])}
+	if(nrow(result)!=0){result <- unique(result[, -c('entry')])}
+	result[,1:=NULL]
+	result
 }
 
 #' Convert Bundles to a compact table when only some elements should be extracted
@@ -637,25 +642,29 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 crack_compact_given_columns <- function(bundles, table_description, ncores = 1) {
 	use_indices <- FALSE
 	bra <- ket <- ''
+
+	table_description@cols <- fhir_columns(c(c(dummy="entry"), table_description@cols))
+
+
 	if(2 == length(table_description@brackets)) {
 		bra <- table_description@brackets[[1]]
 		ket <- table_description@brackets[[2]]
 		use_indices <- TRUE
 	}
-	unique(
+	result <- unique(
 		data.table::rbindlist(
 			parallel::mclapply(
 				seq_along(bundles),
-				function(bundle_id) {# bundle_id <- 2
+				function(bundle_id) {# bundle_id <- 1
 					nodes <- xml_nodeset(
 						unlist(
 							recursive = FALSE,
 							lapply(
 								table_description@cols,
-								function(xpath) {# xpath <- table_description@cols[[2]]
+								function(xpath) {# xpath <- table_description@cols[[1]]
 									xml2::xml_find_all(
 										bundles[[bundle_id]],
-										paste0('./entry/resource/', table_description@resource, '/', xpath, '/@*')
+										if(xpath == "entry"){"entry"}else{paste0('./entry/resource/', table_description@resource, '/', xpath, '/@*')}
 									)
 								}
 							)
@@ -692,6 +701,8 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 			fill = TRUE
 		)
 	)
+	result[,dummy:=NULL]
+	result
 }
 
 
