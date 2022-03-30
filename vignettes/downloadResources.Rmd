@@ -60,6 +60,8 @@ This vignette covers the following topics:
 
 - Dealing with large data sets
 
+- Downloading random samples from a server
+
 - Downloading the capability statement
 
 
@@ -487,11 +489,32 @@ while(!is.null(url)){
 
 ```
 
+## Download random samples from a server
+Sometimes it can be useful to download a random sample of resources from a server, e.g. in some kind of case-control scenario. The fhircrackr offers a function `fhir_sample_resources()` which takes a base url, a resource type and (optionally) some FHIR Search parameters and returns a random sample of those resources with a given size.
+For example you could download 10 random Patient resources of all female patients born before 1960 like this:
+
+```{r}
+bundle <- fhir_sample_resources(base_url = "http://hapi.fhir.org/baseR4",
+								resource = "Patient",
+								parameters = c(gender = "female", birthdate = "lt1960-01-01"),
+								sample_size = 10)
+```
+
+This request may take some time because in the first step, the resource (aka logical) IDs of all resources matching the request (i.e. all Patient resources of females born before 1960) are downloaded. This is necessary because the sampling is actually done in this vector of resource IDs.
+
+```{r}
+pat <- fhir_table_description(resource = "Patient",
+							  cols = c("gender", "birthDate"))
+
+
+d <- fhir_crack(bundles = bundle, design = pat)
+``` 
+
 ## Download Capability Statement
 The <a href="https://www.hl7.org/fhir/capabilitystatement.html" target="_blank">capability statement</a> documents a set of capabilities (behaviors) of a FHIR Server for a particular version of FHIR. You can download this statement using the function `fhir_capability_statement()`:
 
 ```{r, eval=F}
-cap <- fhir_capability_statement(url = "http://hapi.fhir.org/baseR4", verbose = 0)
+cap <- fhir_capability_statement(url = "http://hapi.fhir.org/baseR4")
 ```
 
 `fhir_capability_statement()` takes the base URL of a FHIR server and returns a list of three data frames containing all information from the capability statement of this server. The first one is called `Meta` and contains some general server information. The second is called `Rest` and contains information on the operations the server implements. The third is called `resources` and gives information on the resource types and associated parameters the server supports. This information can be useful to determine, for example, which FHIR search parameters are implemented in you FHIR server.
