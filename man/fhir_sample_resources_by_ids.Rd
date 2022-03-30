@@ -2,17 +2,18 @@
 % Please edit documentation in R/sample_resources.R
 \name{fhir_sample_resources_by_ids}
 \alias{fhir_sample_resources_by_ids}
-\title{Download random sample if resource ID list from a FHIR server}
+\title{Download a random sample of resources from a vector of resource IDs.}
 \usage{
 fhir_sample_resources_by_ids(
   base_url,
   resource,
   ids,
+  id_param = "_id",
   username = NULL,
   password = NULL,
   token = NULL,
   sample_size = 20,
-  seed = as.double(Sys.time()),
+  seed = 1,
   verbose = 1
 )
 }
@@ -22,6 +23,9 @@ fhir_sample_resources_by_ids(
 \item{resource}{A character vector of length one or \linkS4class{fhir_resource_type} object with the resource type to be downloaded e.g. \code{"Patient"}.}
 
 \item{ids}{A character vector containing the IDs from which to sample.}
+
+\item{id_param}{A character vector of length one containing the FHIR Search parameter belonging to the ids in \code{ids}. Defaults to \code{"_id"} meaning \code{ids} is interpreted as
+containing resource (aka logical) ids. Could be changed to \code{"identifier"} if \code{ids} contains a vector of identifier values instead.}
 
 \item{username}{A character vector of length one containing the username for basic authentication.}
 
@@ -40,7 +44,7 @@ for how to create this.}
 A list of bundles containing sampled resources.
 }
 \description{
-Downloads a random sample of resources from a vector of resource IDs.
+Download a random sample of resources from a vector of resource IDs.
 }
 \details{
 This function takes a character vector \code{ids} containing logical Ids of resources of a given type (specified in \code{resource}) on a
