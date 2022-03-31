@@ -2,8 +2,10 @@
 title: "fhircrackr: Recreate FHIR resources"
 
 date: "`r Sys.Date()`"
-output:	rmarkdown::html_vignette
-
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
 
 
 vignette: >
@@ -20,12 +22,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette covers the following topics:
-
-- Cracking and casting data
-- Modifying data
-- Recreating a single resource
-- Recreating a bundle of resources
+This vignette covers all topics concerned with recreating resources. If you are interested in a quick overview over the fhircrackr package, please have a look at the fhircrackr:intro vignette.
 
 
 Before running any of the following code, you need to load the `fhircrackr` package:
@@ -99,7 +96,7 @@ new_resource
 ## Recreate a bundle of resources
 It is also possible to bundle together several resources to upload them to the server together. This is done using bundles of type transaction or batch (see <a href="https://www.hl7.org/fhir/bundle.html" target="_blank">https://www.hl7.org/fhir/bundle.html</a> and <a href="https://www.hl7.org/fhir/http.html" target="_blank">https://www.hl7.org/fhir/http.html</a>). 
   
-We can create such a bundle from a cast table using the function `fhir_build_bundle`, which takes a cast table and the resource type represented in the table, as well as information on the type of bundle you want to create:
+We can create such a bundle from a wide table using the function `fhir_build_bundle`, which takes a wide table and the resource type represented in the table, as well as information on the type of bundle you want to create:
 
 ```{r}
 bundle <- fhir_build_bundle(
@@ -144,6 +141,8 @@ bundle <- fhir_build_bundle(
   bundle_type   = "transaction", 
   verbose       = 0
 )
+
+cat(toString(bundle))
 ```
 
 ## Upload resources to a server
@@ -196,7 +195,7 @@ bundle
 
 The `request` element we've added before specifies for each resource which HTTP verb (`PUT` or `POST`) and which url to use. Note that the URL must match the HTTP action, i.e. with PUT the URL must contain a resource id, while with `POST` it cannot contain a resource id. 
 
-You can `POST` the entire list of bundles to the server like this:
+You can `POST` the bundle to the server like this:
 
 ```{r, eval=FALSE}
 fhir_post("http://hapi.fhir.org/baseR4", body=bundle)
@@ -209,7 +208,7 @@ message("Bundle sucessfully POSTed")
 Uploading independent resources of a single type to a server is easy, as you've seen above. Matters get a lot more complicated, however, when resources contain references to other resources, e.g. a MedicationStatement resource that links to a Patient resource. 
 
 How to best upload interlinked resources to a FHIR server depends on the individual settings of the server, but in most cases it makes sense to include the linked resources in the same transaction bundle. This can be achieved with `fhir_build_bundle()` by passing a list of tables to the function. The most tricky part in this is to get references right because you need to know the id of the referenced resource beforehand. That is why in most cases it is easier to PUT the resources instead of POSTing them, because this allows you to choose the resource id yourself. 
-The details of creating valid transaction bundles is beyond the scope of this vignette, but here is a small example to illustrate the general process. First lets crack and cast a simple example bundle containing 3 Patients and one Observation resource:
+The details of creating valid transaction bundles is beyond the scope of this vignette, but here is a small example to illustrate the general process. First let's crack and cast a simple example bundle containing 3 Patients and one Observation resource:
 
 ```{r}
 #unserialize example bundles
@@ -281,7 +280,3 @@ fhir_post(url = "http://hapi.fhir.org/baseR4", body = bundle)
 ```{r, echo=F}
 message("Bundle sucessfully POSTed")
 ```
-
-# TODO
-- Write something about html stuff in resources
-- Write something about attributes that are not `value`
