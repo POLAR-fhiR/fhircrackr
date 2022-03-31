@@ -572,12 +572,21 @@ crack_compact_all_columns <- function(bundles, table_description, ncores = 1) {
 #' @noRd
 #'
 crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
+	rm_dummy <- FALSE
+
 	if(2 == length(table_description@brackets)) {
 		bra <- table_description@brackets[[1]]
 		ket <- table_description@brackets[[2]]
 	} else {
 		stop("You need to provide brackets if you want to crack to format 'wide'")
 	}
+
+	#add dummy column for id so each resource is represented in one row
+	if(!any(grepl("id", table_description@cols))){
+		table_description@cols <- fhir_columns(c(c(dummy="id"), table_description@cols))
+		rm_dummy <- TRUE
+	}
+
 	result <- data.table::rbindlist(
 		parallel::mclapply(
 			seq_along(bundles),
@@ -625,7 +634,9 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 		use.names = TRUE,
 		fill = TRUE
 	)
-	if(nrow(result)==0){result}else{unique(result[, -c('entry')])}
+	if(nrow(result)!=0){result <- unique(result[, -c('entry')])}
+	if(rm_dummy){result[,1:=NULL]}
+	result
 }
 
 #' Convert Bundles to a compact table when only some elements should be extracted
@@ -636,23 +647,32 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 #'
 crack_compact_given_columns <- function(bundles, table_description, ncores = 1) {
 	use_indices <- FALSE
+	rm_dummy <- FALSE
 	bra <- ket <- ''
+
+	#add dummy column for id so each resource is represented in one row
+	if(!any(grepl("id", table_description@cols))){
+		table_description@cols <- fhir_columns(c(c(dummy="id"), table_description@cols))
+		rm_dummy <- TRUE
+	}
+
 	if(2 == length(table_description@brackets)) {
 		bra <- table_description@brackets[[1]]
 		ket <- table_description@brackets[[2]]
 		use_indices <- TRUE
 	}
-	unique(
+
+	result <- unique(
 		data.table::rbindlist(
 			parallel::mclapply(
 				seq_along(bundles),
-				function(bundle_id) {# bundle_id <- 2
+				function(bundle_id) {# bundle_id <- 1
 					nodes <- xml_nodeset(
 						unlist(
 							recursive = FALSE,
 							lapply(
 								table_description@cols,
-								function(xpath) {# xpath <- table_description@cols[[2]]
+								function(xpath) {# xpath <- table_description@cols[[1]]
 									xml2::xml_find_all(
 										bundles[[bundle_id]],
 										paste0('./entry/resource/', table_description@resource, '/', xpath, '/@*')
@@ -692,6 +712,8 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 			fill = TRUE
 		)
 	)
+	if(rm_dummy){result[,dummy:=NULL]}
+	result
 }
 
 
