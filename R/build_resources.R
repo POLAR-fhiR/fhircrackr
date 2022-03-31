@@ -635,20 +635,29 @@ build_tree <- function(row, brackets = c('[', ']'), root = "Bundle", keep_nas = 
 	ids_split <- strsplit(ids, "\\.")
 	rownames_split <- strsplit(rownames, "\\.")
 
+	attributes <- sapply(rownames_split, function(x){
+		res <- stats::na.omit(stringr::str_extract(x, "@.*$"))
+		if(length(res)==0){"@value"}
+		})
+	attributes <- substr(attributes, 2, nchar(attributes))
+	rownames_split <- lapply(rownames_split, function(x){gsub("@.*$", "", x)})
+
 	names(row) <- sapply(seq_along(rownames_split), function(i){
 		diff <- length(rownames_split[[i]]) - length(ids_split[[i]])
 		paste0(rownames_split[[i]], c(rep("",diff), ifelse(!is.na(ids_split[[i]]),ids_split[[i]],"")), collapse=".")
 	})
+	names(attributes) <- copy(names(row))
 
 	data.table::setcolorder(row, neworder = sort(names(row)))
+	attributes <- attributes[order(names(attributes))]
 
-	new_tree <- function(col_names, tree, value = 1) {
+	new_tree <- function(col_names, tree, attr, value = 1) {
 		len <- length(col_names)
 		if(is.null(tree)) {tree <- list()}
 		if(len == 0) {
-			setattr(tree, "value", value)
+			setattr(tree, attr, value)
 		} else {
-			tr <- new_tree(col_names = col_names[-1], tree = tree[[col_names[1]]], value = value)
+			tr <- new_tree(col_names = col_names[-1], attr = attr, tree = tree[[col_names[1]]], value = value)
 			tree[[col_names[1]]] <- tr
 		}
 		tree
@@ -656,16 +665,21 @@ build_tree <- function(row, brackets = c('[', ']'), root = "Bundle", keep_nas = 
 
 	tree <- list()
 	row <- sapply(row, function(x)x)
-	if(!keep_nas) row <- row[!is.na(row)]
+	if(!keep_nas) {
+		attributes <- attributes[!is.na(row)]
+		row <- row[!is.na(row)]
+		}
 	names(row) <- paste0(root, ".", names(row))
-	for(col_name in names(row)) {
+	for(i in 1:length(row)) {#i<-1
+		col_name <- names(row)[i]
+		attribute <- attributes[i]
 		value <- row[[col_name]]
 		col_names_split <- strsplit(col_name, "\\.")[[1]]
 		if(length(col_names_split) == 1) {
 			tr <- list()
-			setattr(tr, "value", value)
+			setattr(tr, attribute, value)
 		} else {
-			tr <- new_tree(col_names = col_names_split[-1], tree = tree[[col_names_split[[1]]]], value = value)
+			tr <- new_tree(col_names = col_names_split[-1], tree = tree[[col_names_split[[1]]]], attr = attribute, value = value)
 		}
 		tree[[col_names_split[1]]] <- tr
 	}
@@ -863,9 +877,12 @@ tree2xml <- function(tree, escaped = TRUE, tab = "", add = "  ") {
 		tr <- tree[[i]]
 
 		s <- paste0(tab, "<", n)
-		a <- attr(tr, "value")
-		if(!is.null(a)) {
-			s <- paste0(s, " value=\"", if(escaped) esc_xml(a) else a, "\"")
+
+		attribute <- names(attributes(tr))
+
+		if(attribute!="names"){
+			a <- attr(tr, attribute)
+			s <- paste0(s, " ", attribute, "=\"", if(escaped) esc_xml(a) else a, "\"")
 		}
 		s <- if(length(tr) == 0) paste0(s, "/>") else paste0(s, ">")
 		s = paste0(s, "\n", tree2xml(tree = tr, escaped = escaped, tab = inc_tab(tab, add), add = add))

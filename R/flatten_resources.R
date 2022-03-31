@@ -1,7 +1,7 @@
 ## This file contains all functions needed for flattening ##
 ## Exported functions are on top, internal functions below ##
 
-path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- NULL #To stop "no visible binding" NOTE in check()
+path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- dummy <- NULL #To stop "no visible binding" NOTE in check()
 
 
 #' Flatten list of FHIR bundles
