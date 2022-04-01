@@ -434,7 +434,7 @@ crack_bundles_to_one_table <- function(bundles, table_description, data.table = 
 			}else{
 				regexpr_ids <- paste0(esc(table_description@brackets[1]), "([0-9]+(\\.[0-9]+)*)", esc(table_description@brackets[2]))
 				names <- unique(gsub(regexpr_ids, "", names(table)))
-				empty_cols <- setdiff(names(table_description@cols), names)
+				empty_cols <- setdiff(names(table_description@cols), gsub("@.*$", "", names))
 				if(0 < length(empty_cols)){table[,(empty_cols):=NA]}
 			}
 			#rm_empty_cols=TRUE
@@ -635,7 +635,7 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 		fill = TRUE
 	)
 	if(nrow(result)!=0){result <- unique(result[, -c('entry')])}
-	if(rm_dummy){result[,1:=NULL]}
+	if(rm_dummy){result[,grep("dummy", names(result)):=NULL]}
 	result
 }
 
@@ -712,7 +712,7 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 			fill = TRUE
 		)
 	)
-	if(rm_dummy){result[,dummy:=NULL]}
+	if(rm_dummy){result[,grep("^dummy", names(result)):=NULL]}
 	result
 }
 
