@@ -14,7 +14,7 @@ An object of class \code{fhir_resource_serialized} of length 267.
 
 An object of class \code{fhir_resource_serialized} of length 290.
 
-An object of class \code{fhir_resource_serialized} of length 871.
+An object of class \code{fhir_resource_serialized} of length 608.
 }
 \source{
 \strong{transaction_bundle_example}\preformatted{<Bundle>
@@ -101,22 +101,14 @@ An object of class \code{fhir_resource_serialized} of length 871.
         </coding>
     </code>
     <ingredient id="1">
-        <itemCodeableConcept>
-            <coding>
-                <system value="http://snomed.info/sct"/>
-                <code value="11713004"/>
-                <display value="Water (substance)"/>
-            </coding>
-        </itemCodeableConcept>
+    	<itemReference>
+     		<reference value="Substance/5463"/>
+   		</itemReference>
     </ingredient>
     <ingredient id="2">
-        <itemCodeableConcept>
-            <coding>
-                <system value="http://snomed.info/sct"/>
-                <code value="129472003"/>
-                <display value="Alemtuzamab (substance)"/>
-            </coding>
-        </itemCodeableConcept>
+    	<itemReference>
+     		<reference value="Substance/3401"/>
+ 		</itemReference>
     </ingredient>
 </Medication>
 }

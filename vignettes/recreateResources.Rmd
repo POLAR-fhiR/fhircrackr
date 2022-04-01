@@ -145,6 +145,51 @@ bundle <- fhir_build_bundle(
 cat(toString(bundle))
 ```
 
+## Different attributes
+Almost all the time, the only xml attribute that is used in a FHIR resource is the `value` attribute like in this small example resource:
+
+```{r}
+fhir_unserialize(example_resource1)
+```
+In rare cases, however, there can be other types of attributes, namely `id` or `url`, which looks for example like this:
+
+```{r}
+fhir_unserialize(example_resource3)
+```
+
+As you can see, this example Medication has ingredient elements which have an `id` attribute. `fhir_crack()` will just extract all kinds of attributes, e.g. from this bundle containing the above Medication resource:
+
+```{r}
+bundle <- fhir_unserialize(example_bundles4)
+med <- fhir_table_description(resource = "Medication", 
+                              cols = c("id", "ingredient", "ingredient/itemReference/reference"),
+                              format = "wide",
+                              brackets = c("[", "]")
+)
+without_attribute <- fhir_crack(bundles = bundle, design = med, verbose = 0)
+without_attribute
+``` 
+
+If you are interested in which kind of attribute the extracted value had, you can set `keep_attr=TRUE`:
+
+```{r}
+with_attribute <- fhir_crack(bundles = bundle, design = med, keep_attr = TRUE, verbose = 0)
+with_attribute
+```
+
+This is important when you want to recreate the resources properly. If there is no attribute information in the column names, `fhir_build_resource()` will assume that all columns have `value` attributes, which is wrong in this case:
+
+```{r}
+fhir_build_resource(row = without_attribute[1,], resource_type = "Medication")
+```
+
+Instead one should build the resource from a table that contains the attribute information:
+
+```{r}
+fhir_build_resource(row = with_attribute[1,], resource_type = "Medication")
+```
+
+
 ## Upload resources to a server
 
 ### Upload a single resource
