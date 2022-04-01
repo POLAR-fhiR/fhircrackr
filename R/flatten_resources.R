@@ -635,7 +635,7 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 		fill = TRUE
 	)
 	if(nrow(result)!=0){result <- unique(result[, -c('entry')])}
-	if(rm_dummy){result[,1:=NULL]}
+	if(rm_dummy){result[,grep("dummy", names(result)):=NULL]}
 	result
 }
 
@@ -712,7 +712,7 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 			fill = TRUE
 		)
 	)
-	if(rm_dummy){result[,dummy:=NULL]}
+	if(rm_dummy){result[,grep("^dummy", names(result)):=NULL]}
 	result
 }
 
