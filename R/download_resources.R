@@ -124,9 +124,8 @@ fhir_search <- function(
 			"for fhir_current_request()"
 		)
 	}
-	#prepare body
+	#preparation for POST vs. GET
 	if(!is.null(body)) {
-		if(0 < verbose) {message("Initializing search via POST.")}
 		#filter out bad urls
 		if(grepl("\\?", request)) {
 			stop(
@@ -148,25 +147,28 @@ fhir_search <- function(
 		} else {
 			stop("The body must be either of type character or of class fhir_body")
 		}
+
+		#startup message
+		if(0 < verbose) {message("Initializing search via POST",
+								 " from FHIR base URL ",
+								 gsub("(^.+)(/.+\\?).*$", "\\1", request, perl = TRUE),
+								 ".\n")}
+	}else if(0 < verbose){
+		message(
+			"Starting download of ",
+			if(max_bundles < Inf) {max_bundles} else {"all"},
+			" bundles of resource type ",
+			stringr::str_extract(request, "(?<=/)([^/\\?]*)(?=\\?|$)"),
+			" from FHIR base URL ",
+			gsub("(^.+)(/.+\\?).*$", "\\1", request, perl = TRUE),
+			".\n"
+		)
+		if(9 < max_bundles) {message("This may take a while...")}
 	}
 
 	bundles <- list()
 	addr <- fhir_url(url = request)
-	#starting message
-	if(0 < verbose) {
-		message(
-			paste0(
-				"Starting download of ",
-				if(max_bundles < Inf) {max_bundles} else {"ALL!"},
-				" bundles of resource type ",
-				gsub("(^.+/)(.+)(\\?).*$", "\\2", request, perl = TRUE),
-				" from FHIR base URL ",
-				gsub("(^.+)(/.+\\?).*$", "\\1", request, perl = TRUE),
-				".\n"
-			)
-		)
-		if(9 < max_bundles) {message("This may take a while...")}
-	}
+
 	#download bundles
 	cnt <- 0
 	repeat {
