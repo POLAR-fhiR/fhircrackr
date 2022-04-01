@@ -1,4 +1,4 @@
-## code to prepare `example_bundles1` dataset goes here
+## code to prepare `example_bundles3` dataset goes here
 bundle <- xml2::read_xml(
 	"<Bundle>
      <type value='searchset'/>

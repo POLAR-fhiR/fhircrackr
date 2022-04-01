@@ -2,7 +2,11 @@
 title: "fhircrackr: Download FHIR resources"
 
 date: "`r Sys.Date()`"
-output:	rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+
 
 
 
@@ -44,23 +48,7 @@ knitr::knit_hooks$set(output = function(x, options) {
 
 ```
 
-This vignette covers the following topics:
-
-- Building FHIR search requests
-
-- Downloading resources from a FHIR server
-
-- Authentication
-
-- Search via POST
-
-- Dealing with HTTP errors
-
-- Saving the downloaded bundles
-
-- Dealing with large data sets
-
-- Downloading the capability statement
+This vignette covers all topics concerned with downloading resources from a server in some depth. If you are interested in a quick overview, please have a look at the fhircrackr:intro vignette.
 
 
 Before running any of the following code, you need to load the `fhircrackr` package:
@@ -283,7 +271,7 @@ url <- fhir_url(url = "https://hapi.fhir.org/baseR4/", resource = "Patient")
 bundles <- fhir_search(request = url, body = body)
 ```
 
-## Dealing with HTTP Errors
+## Deal with HTTP Errors
 `fhir_search()` internally sends a `GET` or `POST` request to the server. If anything goes wrong, e.g. because your request wasn't valid or the server caused an error, the result of you request will be a HTTP error. `fhir_search()` will print the error code along with some suggestions for the most common errors to the console. 
 
 To get more detailed information on the error response, you can pass a string with a file name to the argument `log_errors` . This will write a log with error information to the specified file.
@@ -295,7 +283,7 @@ medication_bundles <- fhir_search(
 	log_errors  = "myErrorFile")
 ```
 
-## Saving the downloaded bundles
+## Save the downloaded bundles
 There are two ways of saving the FHIR bundles you downloaded: Either you save them as R objects, or you write them to an xml file. This is possible while downloading the bundles or after all bundles have been downloaded. The following section covers saving after downloading. See the **Dealing with large data sets** section for how to save bundles during downloading.
 
 ### Save bundles as R objects
@@ -415,12 +403,113 @@ bundles <- fhir_load(directory = temp_dir)
 ## Dealing with large data sets
 If you want to download a lot of resources from a server, you might run into several problems. 
 
-First of all, downloading a lot of resources will require a lot of time, depending on the performance of your FHIR server. Because `fhir_search()` essentially runs a loop pulling bundle after bundle, downloads can usually be accelerated if the bundle size is increased, because that way we can lower the number of requests to the server. You can achieve this by adding `_count=` parameter to your FHIR search request. `http://hapi.fhir.org/baseR4/Patient?_count=500` for example will pull patient resources in bundles of 500 resources from the server.
+First of all, downloading a lot of resources will require a lot of time, depending on the performance of your FHIR server. Because `fhir_search()` essentially runs a loop pulling bundle after bundle, downloads can usually be accelerated if the bundle size is increased, because that way we can lower the number of requests to the server. You can achieve this by adding `_count=` parameter to your FHIR search request. `http://hapi.fhir.org/baseR4/Patient?_count=500` for example will pull Patient resources in bundles of 500 resources from the server.
 
 A problem that is also related to the number of requests to the server is that sometimes servers might crash when too many requests are sent to them in a row. 
-The third problem is that large amounts of resources can at some point exceed the working memory you have available. There are two solutions to the problem of crashing servers and working memory:
+The third problem is that large amounts of resources can at some point exceed the working memory you have available. There are three solutions to those problems:
 
-### 1. Use the save_to_disc argument of fhir_search()
+### 1. Download trimmed resources using the `_elements` search parameter
+If you know you are just going to need a few elements from each resource, you can restrict the downloaded resources to those elements to save memory. The following example downloads the first bundle of Patient resources that are trimmed down to the `name`, `gender` and `birthDate` elements, which are specified in the `_elements` parameter. `_elements` takes a comma separated list of base level elements for the resource and will make sure that the downloaded resources only contain those elements plus the mandatory elements `id` and `meta`. The `_count` parameter in the examples restricts the number of resources in the bundle to 2, which is just done to make the result more printable for this vignette.
+
+```{r, eval=FALSE}
+request <- fhir_url(url = "http://hapi.fhir.org/baseR4", 
+					resource = "Patient",
+					parameters = c("_elements" = "name,gender,birthDate",
+								   "_count"= "2"))
+
+
+bundles <- fhir_search(request, max_bundles = 1)
+
+cat(toString(bundles[[1]]))
+```
+
+```{r}
+# <Bundle>
+#   <id value="8e0db3ce-817b-48cd-ba3e-1a0d20f64366"/>
+#   <meta>
+#     <lastUpdated value="2022-03-31T08:48:55.934+00:00"/>
+#   </meta>
+#   <type value="searchset"/>
+#   <link>
+#     <relation value="self"/>
+#     <url value="http://hapi.fhir.org/baseR4/Patient?_count=2&amp;_elements=name%2Cgender%2CbirthDate"/>
+#   </link>
+#   <link>
+#     <relation value="next"/>
+#     <url value="http://hapi.fhir.org/baseR4?_getpages=8e0db3ce-817b-48cd-ba3e-1a0d20f64366&amp;_getpagesoffset=2&amp;_count=2&amp;_pretty=true&amp;_bundletype=searchset&amp;_elements=birthDate,gender,name"/>
+#   </link>
+#   <entry>
+#     <fullUrl value="http://hapi.fhir.org/baseR4/Patient/2564886"/>
+#     <resource>
+#       <Patient>
+#         <id value="2564886"/>
+#         <meta>
+#           <versionId value="1"/>
+#           <lastUpdated value="2021-09-28T01:04:35.774+00:00"/>
+#           <source value="#rxRuwftRVG3erMwy"/>
+#           <tag>
+#             <system value="http://terminology.hl7.org/CodeSystem/v3-ObservationValue"/>
+#             <code value="SUBSETTED"/>
+#             <display value="Resource encoded in summary mode"/>
+#           </tag>
+#         </meta>
+#         <name>
+#           <text value="반영훈 사원"/>
+#           <family value="반"/>
+#           <given value="영훈"/>
+#           <prefix value="사원"/>
+#         </name>
+#         <gender value="male"/>
+#         <birthDate value="1992-01-12"/>
+#       </Patient>
+#     </resource>
+#     <search>
+#       <mode value="match"/>
+#     </search>
+#   </entry>
+#   <entry>
+#     <fullUrl value="http://hapi.fhir.org/baseR4/Patient/2564911"/>
+#     <resource>
+#       <Patient>
+#         <id value="2564911"/>
+#         <meta>
+#           <versionId value="1"/>
+#           <lastUpdated value="2021-09-28T01:12:59.207+00:00"/>
+#           <source value="#rmWF4JDz6p1WVwzl"/>
+#           <security>
+#             <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+#             <code value="RM"/>
+#           </security>
+#           <tag>
+#             <system value="http://terminology.hl7.org/CodeSystem/v2-0203sbtest05"/>
+#             <code value="SBTest05m"/>
+#           </tag>
+#           <tag>
+#             <system value="http://terminology.hl7.org/CodeSystem/v3-ObservationValue"/>
+#             <code value="SUBSETTED"/>
+#             <display value="Resource encoded in summary mode"/>
+#           </tag>
+#         </meta>
+#         <name>
+#           <use value="usual"/>
+#           <text value="human name"/>
+#           <family value="Jonathan"/>
+#           <given value="token_sort_test_data05"/>
+#         </name>
+#         <gender value="male"/>
+#         <birthDate value="2021-09-01"/>
+#       </Patient>
+#     </resource>
+#     <search>
+#       <mode value="match"/>
+#     </search>
+#   </entry>
+# </Bundle>
+```
+
+As you can see, the resulting Bundle is much smaller than it would be if the full resources where downloaded.
+
+### 2. Use the save_to_disc argument of fhir_search()
 If you pass the name of a directory to the argument `save_to_disc` in your call to `fhir_search()`, the bundles will not be combined in a bundle list that is returned when the downloading is done, but will instead be saved as xml-files to the directory specified in the argument `directory` one by one. If the directory you specified doesn't exist yet, `fhir_search()` will create it for you. This way, the R session will only have to keep one bundle at a time in the working memory and if the server crashes halfway trough, all bundles up to the crash are safely saved in your directory. You can later load them using `fhir_load()`:
 
 ```{r, eval=F}
@@ -434,7 +523,7 @@ fhir_search(
 bundles<- fhir_load(directory = "MyProject/downloadedBundles")
 ```
 
-### 2. Use fhir_next_bundle_url() 
+### 3. Use fhir_next_bundle_url() 
 Alternatively, you can also use `fhir_next_bundle_url()`. This function returns the url to the next bundle from you most recent call to `fhir_search()`:
 
 ```{r, include=F}
@@ -487,14 +576,49 @@ while(!is.null(url)){
 
 ```
 
+## Download random samples from a server
+Sometimes it can be useful to download a random sample of resources from a server, e.g. when you want to to some kind case-control analysis. The fhircrackr offers a function `fhir_sample_resources()` which takes a base url, a resource type and (optionally) some FHIR Search parameters and returns a random sample with a given size of those resources.
+For example you could download 10 random Patient resources of all female patients born before 1960 like this:
+
+```{r}
+bundle <- fhir_sample_resources(base_url = "http://hapi.fhir.org/baseR4",
+								resource = "Patient",
+								parameters = c(gender = "female", birthdate = "lt1960-01-01"),
+								sample_size = 10)
+```
+
+This request may take some time because in the first step, the resource (aka logical) IDs of all resources matching the request (i.e. all Patient resources of females born before 1960) are downloaded. This is necessary because the sampling is actually done in this vector of resource IDs.
+
+The following code shows that the result is actually 10 Patient resources who are female and born before 1960. If you want to know more about how to extract information from the resources like this, please see the vignette on flattening resources.
+
+```{r}
+pat <- fhir_table_description(resource = "Patient",
+							  cols = c("id", "gender", "birthDate"))
+
+fhir_crack(bundles = bundle, design = pat)
+``` 
+
+Internally `fhir_sample_resources()` performs the following steps:
+
+1) Extract the logical IDs of all resources matching the resource type and search parameters given in `resource` and `parameters` with the function `fhir_get_resource_ids()`. This function uses the `_elements` parameter of FHIR Search to avoid downloading all resources in full and you can use this function as a standalone function too, see `?fhir_get_resource_ids()`.
+
+2) Draw a random sample (without replacement) from the vector of IDs created in 1).
+
+3) Download the resources belonging to the sampled IDs using `fhir_get_resources_by_ids()`
+
+If you want to sample resources based on another element then the logical ID, e.g. based on an identifier value or based on a reference, you can use the function `fhir_sample_resources_by_ids()` provided you have a vector of identifiers/references you want wo sample from. Note that in this case the number of actually returned resources won't necessarily match the number in `sample_size`, because as opposed to the logical ID, an identifier or reference doesn't have to be unique for each resource. 
+
 ## Download Capability Statement
 The <a href="https://www.hl7.org/fhir/capabilitystatement.html" target="_blank">capability statement</a> documents a set of capabilities (behaviors) of a FHIR Server for a particular version of FHIR. You can download this statement using the function `fhir_capability_statement()`:
 
 ```{r, eval=F}
-cap <- fhir_capability_statement(url = "http://hapi.fhir.org/baseR4", verbose = 0)
+cap <- fhir_capability_statement(url = "http://hapi.fhir.org/baseR4")
 ```
 
 `fhir_capability_statement()` takes the base URL of a FHIR server and returns a list of three data frames containing all information from the capability statement of this server. The first one is called `Meta` and contains some general server information. The second is called `Rest` and contains information on the operations the server implements. The third is called `resources` and gives information on the resource types and associated parameters the server supports. This information can be useful to determine, for example, which FHIR search parameters are implemented in you FHIR server.
+
+## A note on HTML in resources
+FHIR resources can contain a considerable amount of HTML code (e.g. in a narrative object), which is often created by the server for example to provide a human-readable summary of the resource. This data is usually not the aim of structured statistical analysis, so in the default setting `fhir_search()` will remove the html parts immediately after download to reduce memory usage (on a hapi server typically by around 30%, see `fhir_rm_div()`). The memory gain is payed with a runtime increase of 10%-20%. The html removal can be disabled by setting rm_tag = NULL to increase speed at the cost of increased memory usage.
 
 ## Next steps
 To learn about how `fhircrackr` allows you to convert the downloaded FHIR resources into data.frames/data.tables, see the vignette on flattening FHIR resources.

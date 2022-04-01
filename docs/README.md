@@ -221,54 +221,55 @@ will just use one simple example here.
 #define table_description
 table_description <- fhir_table_description(
     resource = "Patient",
-    
-    cols = c(
-            PID           = "id",
-            use_name      = "name/use",
-            given_name    = "name/given",
-            family_name   = "name/family",
-            gender        = "gender",
-            birthday      = "birthDate"
-        ),
-    
-    style = fhir_style(
-            sep = "|",
-            brackets = c("[","]"),
-            rm_empty_cols = FALSE
-        )
-    
+    cols     = c(
+        PID         = "id",
+        use_name    = "name/use",
+        given_name  = "name/given",
+        family_name = "name/family",
+        gender      = "gender",
+        birthday    = "birthDate"
+    ),
+    sep           = "|",
+    brackets      = c("[", "]"),
+    rm_empty_cols = FALSE,
+    format        = 'compact',
+    keep_attr     = FALSE
 )
 
-#Have a look
+#have a look
 table_description
 #> A fhir_table_description with the following elements: 
 #> 
-#> fhir_resource_type: Patient
+#> resource: Patient
 #> 
-#> fhir_columns: 
-#> column name | xpath expression 
-#>  ------------------------ 
+#> cols: 
+#> ------------ -----------------
+#> column name | xpath expression
+#> ------------ -----------------
 #> PID         | id
 #> use_name    | name/use
 #> given_name  | name/given
 #> family_name | name/family
 #> gender      | gender
 #> birthday    | birthDate
+#> ------------ -----------------
 #> 
-#> fhir_style: 
-#> sep: '|'
-#> brackets: '[' ']'
+#> sep:           '|'
+#> brackets:      '[', ']'
 #> rm_empty_cols: FALSE
+#> format:        'compact'
+#> keep_attr:     FALSE
 ```
 
-All three elements of `style` can also be controlled directly by the
-`fhir_crack()` arguments `sep`, `brackets` and `remove_empty_columns`.
-If the function arguments are `NULL` (their default), the values
-provided in `style` are used, if they are not NULL, they will overwrite
-any values in `style`. If both the function arguments and the `style`
-component of the `fhir_table_description` are NULL, default
-values(`sep = " "`, `brackets = NULL`, `rm_empty_cols = TRUE`) will be
-assumed.
+All five style elements of can also be controlled directly by the
+`fhir_crack()` arguments `sep`, `brackets`, `remove_empty_columns`,
+`format` and `keep_attr`. If the function arguments are `NULL` (their
+default), the values provided as style arguments are used, if they are
+not NULL, they will overwrite any values in `fhir_table_description`. If
+both the function arguments and the `fhir_table_description` components
+are NULL, default values(`sep = " "`, `brackets = NULL`,
+`rm_empty_cols = TRUE`, `format` = ‘compact’, `keep_attr` = FALSE) will
+be assumed.
 
 After it is defined, the `fhir_table_description` can be used in
 `fhir_crack()` like this:
@@ -279,27 +280,27 @@ patients <- fhir_crack(bundles = patient_bundles, design = table_description, ve
 
 #have look at the results
 head(patients)
-#>             PID                             use_name
-#> 1    [1]1837602                        [1.1]official
-#> 2 [1]example-r4 [1.1]official|[2.1]usual|[3.1]maiden
-#> 3    [1]1837624                                 <NA>
-#> 4    [1]1837626                                 <NA>
-#> 5    [1]1837631                        [1.1]official
-#> 6    [1]1837716                                 <NA>
+#>          PID                             use_name
+#> 1 [1]2072744                        [1.1]official
+#> 2 [1]2431578                        [1.1]official
+#> 3 [1]2431568 [1.1]official|[2.1]usual|[3.1]maiden
+#> 4 [1]2431577                        [1.1]official
+#> 5 [1]2431757                             [1.1]old
+#> 6 [1]2431759                        [1.1]official
 #>                                             given_name
-#> 1                                         [1.1]Jeffrey
-#> 2 [1.1]Peter|[1.2]James|[2.1]Jim|[3.1]Peter|[3.2]James
-#> 3                                                 <NA>
-#> 4                                                 <NA>
-#> 5                                            [1.1]juan
-#> 6                                                 <NA>
-#>                  family_name  gender      birthday
-#> 1                [1.1]Jacobs [1]male [1]1996-07-08
-#> 2 [1.1]Chalmers|[3.1]Windsor [1]male [1]1974-12-25
-#> 3                       <NA>    <NA>          <NA>
-#> 4                       <NA> [1]male [1]1972-10-13
-#> 5               [1.1]paredes [1]male [1]2021-01-26
-#> 6                       <NA> [1]male [1]2021-01-20
+#> 1                                     [1.1]K|[1.2]Kari
+#> 2                                           [1.1]Roman
+#> 3 [1.1]Peter|[1.2]James|[2.1]Jim|[3.1]Peter|[3.2]James
+#> 4                             [1.1]Ganpat|[1.2]Malekar
+#> 5                                                 <NA>
+#> 6                                             [1.1]ABC
+#>                  family_name    gender      birthday
+#> 1              [1.1]Nordmann [1]female [1]2018-09-12
+#> 2                 [1.1]Smith   [1]male [1]2021-07-19
+#> 3 [1.1]Chalmers|[3.1]Windsor   [1]male [1]1974-12-25
+#> 4               [1.1]Malekar   [1]male [1]1996-02-07
+#> 5                [1.1]murali   [1]male          <NA>
+#> 6                   [1.1]XYZ   [1]male [1]1998-01-03
 ```
 
 ## Extract more than one resource type
@@ -317,12 +318,11 @@ We can build the request like this:
 
 ``` r
 request  <- fhir_url(
-    url = "https://hapi.fhir.org/baseR4", 
-    resource = "MedicationStatement", 
-    parameters = c("code" = "http://snomed.info/ct|429374003", 
-                   "_include" = "MedicationStatement:subject")
-    
-)
+    url        = "https://hapi.fhir.org/baseR4", 
+    resource   = "MedicationStatement", 
+    parameters = c(
+         "code"    = "http://snomed.info/ct|429374003",
+        "_include" = "MedicationStatement:subject"))
 ```
 
 Then we can download the resources:
@@ -337,10 +337,8 @@ MedicationStatement resources and one for the Patient resources:
 
 ``` r
 MedicationStatements <- fhir_table_description(
-
     resource = "MedicationStatement",
-
-    cols = c(
+    cols     = c(
         MS.ID              = "id",
         STATUS.TEXT        = "text/status",
         STATUS             = "status",
@@ -351,12 +349,11 @@ MedicationStatements <- fhir_table_description(
         PATIENT            = "subject/reference",
         LAST.UPDATE        = "meta/lastUpdated"
     ),
-    
-    style = fhir_style(
-        sep = "|",
-        brackets = NULL, 
-        rm_empty_cols = FALSE
-    )
+    sep           = "|",
+    brackets      = NULL,
+    rm_empty_cols = FALSE,
+    format        = "compact",
+    keep_attr     = FALSE
 )
 
 Patients <- fhir_table_description(resource = "Patient")
@@ -370,15 +367,15 @@ design looks like this:
 
 ``` r
 design
-#> A fhir_design with 2 table_descriptions:
-#> =====================================================
-#> Name: MedicationStatements
+#> A fhir_design with 2 table descriptions:
+#> A fhir_table_description with the following elements: 
 #> 
-#> Resource type: MedicationStatement
+#> resource: MedicationStatement
 #> 
-#> Columns: 
-#> column name        | xpath expression 
-#>  ------------------------------------------------------------ 
+#> cols: 
+#> ------------------- -----------------------------------------
+#> column name        | xpath expression
+#> ------------------- -----------------------------------------
 #> MS.ID              | id
 #> STATUS.TEXT        | text/status
 #> STATUS             | status
@@ -388,23 +385,25 @@ design
 #> DOSAGE             | dosage/text
 #> PATIENT            | subject/reference
 #> LAST.UPDATE        | meta/lastUpdated
+#> ------------------- -----------------------------------------
 #> 
-#> Style: 
-#> sep: '|'
-#> brackets: character(0)
+#> sep:           '|'
+#> brackets:      no brackets
 #> rm_empty_cols: FALSE
-#> =====================================================
-#> Name: Patients
+#> format:        'compact'
+#> keep_attr:     FALSE
+#> A fhir_table_description with the following elements: 
 #> 
-#> Resource type: Patient
+#> resource: Patient
 #> 
-#> Columns: 
+#> cols: 
 #> An empty fhir_columns object
 #> 
-#> Style: 
-#> sep: ' '
-#> brackets: character(0)
-#> rm_empty_cols: TRUE
+#> sep:           ':::'
+#> brackets:      no brackets
+#> rm_empty_cols: FALSE
+#> format:        'compact'
+#> keep_attr:     FALSE
 ```
 
 We can now use this `design` for `fhir_crack()`:
@@ -413,50 +412,134 @@ We can now use this `design` for `fhir_crack()`:
 list_of_tables <- fhir_crack(bundles = medication_bundles, design = design, verbose = 0)
 
 list_of_tables$MedicationStatements[1:5,]
-#>     MS.ID STATUS.TEXT STATUS     MEDICATION.SYSTEM MEDICATION.CODE
-#> 1 2084775   generated active http://snomed.info/ct       429374003
-#> 2 2084671   generated active http://snomed.info/ct       429374003
-#> 3 2084572   generated active http://snomed.info/ct       429374003
-#> 4 2084493   generated active http://snomed.info/ct       429374003
-#> 5 2084411   generated active http://snomed.info/ct       429374003
-#>   MEDICATION.DISPLAY           DOSAGE         PATIENT
-#> 1   simvastatin 40mg 1 tab once daily Patient/2084708
-#> 2   simvastatin 40mg 1 tab once daily Patient/2084604
-#> 3   simvastatin 40mg 1 tab once daily Patient/2084505
-#> 4   simvastatin 40mg 1 tab once daily Patient/2084426
-#> 5   simvastatin 40mg 1 tab once daily Patient/2084344
+#>   MS.ID STATUS.TEXT STATUS     MEDICATION.SYSTEM MEDICATION.CODE
+#> 1 30233   generated active http://snomed.info/ct       429374003
+#> 2 42091   generated active http://snomed.info/ct       429374003
+#> 3 45724   generated active http://snomed.info/ct       429374003
+#> 4 59597   generated active http://snomed.info/ct       429374003
+#> 5 69117   generated active http://snomed.info/ct       429374003
+#>   MEDICATION.DISPLAY           DOSAGE       PATIENT
+#> 1   simvastatin 40mg 1 tab once daily Patient/30163
+#> 2   simvastatin 40mg 1 tab once daily Patient/42024
+#> 3   simvastatin 40mg 1 tab once daily Patient/45657
+#> 4   simvastatin 40mg 1 tab once daily Patient/59530
+#> 5   simvastatin 40mg 1 tab once daily Patient/69050
 #>                     LAST.UPDATE
-#> 1 2021-05-10T05:23:41.686+00:00
-#> 2 2021-05-10T03:14:24.264+00:00
-#> 3 2021-05-09T20:09:07.446+00:00
-#> 4 2021-05-09T18:06:22.183+00:00
-#> 5 2021-05-09T15:29:57.406+00:00
+#> 1 2019-09-26T14:34:44.543+00:00
+#> 2 2019-10-09T22:44:05.728+00:00
+#> 3 2019-10-11T16:30:24.411+00:00
+#> 4 2019-11-12T14:27:00.098+00:00
+#> 5 2019-11-16T16:51:50.759+00:00
 
 list_of_tables$Patients[1:5,]
-#>        id meta.versionId              meta.lastUpdated       meta.source
-#> 1 2082559              1 2021-05-06T23:19:31.967+00:00 #wjSG0x8YGkFzMzav
-#> 2 2083743              1 2021-05-07T17:53:07.707+00:00 #uTNjj6EX3iU5pKw2
-#> 3 2081756              1 2021-05-05T23:32:34.605+00:00 #kWCVkuLJ9rQSAYwj
-#> 4 2083836              1 2021-05-07T18:48:48.888+00:00 #c3JUhMltFV87nsAu
-#> 5 2084604              1 2021-05-10T03:14:21.154+00:00 #OFuL46MT7dmyDT7v
-#>   text.status                                identifier.system
-#> 1   generated http://clinfhir.com/fhir/NamingSystem/identifier
-#> 2   generated http://clinfhir.com/fhir/NamingSystem/identifier
-#> 3   generated http://clinfhir.com/fhir/NamingSystem/identifier
-#> 4   generated http://clinfhir.com/fhir/NamingSystem/identifier
-#> 5   generated                                             <NA>
-#>              identifier.value name.use       name.text name.family name.given
-#> 1            Kaushal.Kishore9 official Kaushal Kishore     Kishore    Kaushal
-#> 2 Karlina.Kavi@kaviglobal.com official    Karlina Kavi        Kavi    Karlina
-#> 3    marcelagillr@hotmail.com official     Marcela Gil         Gil    Marcela
-#> 4                marcelagillr official     Marcela Gil         Gil    Marcela
-#> 5                        <NA> official    Vicky Walker      Walker      Vicky
-#>   gender  birthDate
-#> 1   male 2000-05-06
-#> 2 female 2015-05-07
-#> 3 female 1965-09-10
-#> 4 female 1965-09-10
-#> 5   male 2021-05-09
+#>   address.city address.country address.district address.extension
+#> 1         <NA>            <NA>             <NA>              <NA>
+#> 2         <NA>            <NA>             <NA>              <NA>
+#> 3         <NA>            <NA>             <NA>              <NA>
+#> 4         <NA>            <NA>             <NA>              <NA>
+#> 5         <NA>            <NA>             <NA>              <NA>
+#>   address.extension.extension address.extension.extension.valueDecimal
+#> 1                        <NA>                                     <NA>
+#> 2                        <NA>                                     <NA>
+#> 3                        <NA>                                     <NA>
+#> 4                        <NA>                                     <NA>
+#> 5                        <NA>                                     <NA>
+#>   address.line address.postalCode address.state address.text address.type
+#> 1         <NA>               <NA>          <NA>         <NA>         <NA>
+#> 2         <NA>               <NA>          <NA>         <NA>         <NA>
+#> 3         <NA>               <NA>          <NA>         <NA>         <NA>
+#> 4         <NA>               <NA>          <NA>         <NA>         <NA>
+#> 5         <NA>               <NA>          <NA>         <NA>         <NA>
+#>   address.use  birthDate communication.language.coding.code
+#> 1        <NA> 2020-03-23                               <NA>
+#> 2        <NA> 2020-03-24                               <NA>
+#> 3        <NA> 1979-10-08                               <NA>
+#> 4        <NA> 2019-11-10                               <NA>
+#> 5        <NA> 1970-01-10                               <NA>
+#>   communication.language.coding.display communication.language.coding.system
+#> 1                                  <NA>                                 <NA>
+#> 2                                  <NA>                                 <NA>
+#> 3                                  <NA>                                 <NA>
+#> 4                                  <NA>                                 <NA>
+#> 5                                  <NA>                                 <NA>
+#>   communication.language.text extension extension.extension
+#> 1                        <NA>      <NA>                <NA>
+#> 2                        <NA>      <NA>                <NA>
+#> 3                        <NA>      <NA>                <NA>
+#> 4                        <NA>      <NA>                <NA>
+#> 5                        <NA>      <NA>                <NA>
+#>   extension.extension.valueCoding.code extension.extension.valueCoding.display
+#> 1                                 <NA>                                    <NA>
+#> 2                                 <NA>                                    <NA>
+#> 3                                 <NA>                                    <NA>
+#> 4                                 <NA>                                    <NA>
+#> 5                                 <NA>                                    <NA>
+#>   extension.extension.valueCoding.system extension.extension.valueString
+#> 1                                   <NA>                            <NA>
+#> 2                                   <NA>                            <NA>
+#> 3                                   <NA>                            <NA>
+#> 4                                   <NA>                            <NA>
+#> 5                                   <NA>                            <NA>
+#>   extension.valueAddress.city extension.valueAddress.country
+#> 1                        <NA>                           <NA>
+#> 2                        <NA>                           <NA>
+#> 3                        <NA>                           <NA>
+#> 4                        <NA>                           <NA>
+#> 5                        <NA>                           <NA>
+#>   extension.valueAddress.state extension.valueCode extension.valueDecimal
+#> 1                         <NA>                <NA>                   <NA>
+#> 2                         <NA>                <NA>                   <NA>
+#> 3                         <NA>                <NA>                   <NA>
+#> 4                         <NA>                <NA>                   <NA>
+#> 5                         <NA>                <NA>                   <NA>
+#>   extension.valueString gender generalPractitioner.reference      id
+#> 1                  <NA>   male                          <NA>  697738
+#> 2                  <NA>   male                          <NA>  697934
+#> 3                  <NA> female                          <NA>   42024
+#> 4                  <NA> female                          <NA>   59530
+#> 5                  <NA>   male                          <NA> 1162779
+#>   identifier.system identifier.type.coding.code identifier.type.coding.display
+#> 1              <NA>                        <NA>                           <NA>
+#> 2              <NA>                        <NA>                           <NA>
+#> 3              <NA>                        <NA>                           <NA>
+#> 4              <NA>                        <NA>                           <NA>
+#> 5              <NA>                        <NA>                           <NA>
+#>   identifier.type.coding.system identifier.type.text identifier.value
+#> 1                          <NA>                 <NA>             <NA>
+#> 2                          <NA>                 <NA>             <NA>
+#> 3                          <NA>                 <NA>             <NA>
+#> 4                          <NA>                 <NA>             <NA>
+#> 5                          <NA>                 <NA>             <NA>
+#>   managingOrganization.reference maritalStatus.coding.code
+#> 1                           <NA>                      <NA>
+#> 2                           <NA>                      <NA>
+#> 3                           <NA>                      <NA>
+#> 4                           <NA>                      <NA>
+#> 5                           <NA>                      <NA>
+#>   maritalStatus.coding.display maritalStatus.coding.system maritalStatus.text
+#> 1                         <NA>                        <NA>               <NA>
+#> 2                         <NA>                        <NA>               <NA>
+#> 3                         <NA>                        <NA>               <NA>
+#> 4                         <NA>                        <NA>               <NA>
+#> 5                         <NA>                        <NA>               <NA>
+#>                meta.lastUpdated       meta.source meta.versionId
+#> 1 2020-03-23T16:12:33.294+00:00 #LUrUNxAhdZrFHftu              1
+#> 2 2020-03-24T06:19:22.991+00:00 #F6KTacg6zpZSnNLM              1
+#> 3 2020-08-07T14:25:55.860+00:00 #S9uv5jD2iAAi5WFP              3
+#> 4 2021-07-13T08:44:06.580+00:00 #qWzI8wftDtgcB3LC              6
+#> 5 2021-10-15T09:10:37.409+00:00 #JnxgDwhILtrVk2uc              5
+#>   multipleBirthBoolean name.family name.given name.prefix     name.text
+#> 1                 <NA>      Cooper     Xavier        <NA> Xavier Cooper
+#> 2                 <NA>         Hay      Harry        <NA>     Harry Hay
+#> 3                 <NA>      Walker      Pippa        <NA>  Pippa Walker
+#> 4                 <NA>      Singh2      Anna         <NA>          <NA>
+#> 5                 <NA>         Doe       John        <NA>      John Doe
+#>   name.use telecom.system telecom.use telecom.value text.status
+#> 1 official           <NA>        <NA>          <NA>   generated
+#> 2 official           <NA>        <NA>          <NA>   generated
+#> 3 official           <NA>        <NA>          <NA>   generated
+#> 4     <NA>           <NA>        <NA>          <NA>   generated
+#> 5 official           <NA>        <NA>          <NA>   generated
 ```
 
 As you can see, the result now contains two data frames, one for Patient
@@ -478,7 +561,7 @@ bundle containing just two Patient resources. The example is part of the
 `fhricrackr` package and you can make it available like this:
 
 ``` r
-bundles <- fhir_unserialize(example_bundles1)
+bundles <- fhir_unserialize(bundles = example_bundles1)
 ```
 
 They represent a very simple bundle of just two Patient resources which
@@ -530,26 +613,28 @@ second Patient resource has an address attribute with three entries
 containing different elements and also two entries for the name
 attribute.
 
-This is where the `style` element of the `table_description` comes into
+This is where the style elements of the `table_description` comes into
 play:
 
 ``` r
 table_description <- fhir_table_description(
     resource = "Patient",
-    style = fhir_style(
-        brackets = c("[","]"),
-        sep = " | ",
-        rm_empty_cols = FALSE
-    )
+    brackets      = c("[", "]"),
+    sep           = " | ",
+    rm_empty_cols = FALSE,
+    format        = 'compact',
+    keep_attr     = FALSE
 )
+
 df <- fhir_crack(bundles = bundles, design = table_description, verbose = 0)
+
 df
-#>       id           address.use              address.city
-#> 1 [1]id1             [1.1]home            [1.1]Amsterdam
-#> 2 [1]id3 [1.1]home | [3.1]work [1.1]Berlin | [3.1]London
-#>                address.type            address.country            name.given
-#> 1             [1.1]physical           [1.1]Netherlands            [1.1]Marie
-#> 2 [2.1]postal | [3.1]postal [2.1]France | [3.1]England [1.1]Frank | [2.1]Max
+#>                address.city            address.country
+#> 1            [1.1]Amsterdam           [1.1]Netherlands
+#> 2 [1.1]Berlin | [3.1]London [2.1]France | [3.1]England
+#>                address.type           address.use     id            name.given
+#> 1             [1.1]physical             [1.1]home [1]id1            [1.1]Marie
+#> 2 [2.1]postal | [3.1]postal [1.1]home | [3.1]work [1]id3 [1.1]Frank | [2.1]Max
 ```
 
 Multiple entries are pasted together with the specified separator in
@@ -570,13 +655,18 @@ or several `columns` and spreads (aka melts) these entries over several
 rows:
 
 ``` r
-fhir_melt(df, columns = "address.city", 
-          brackets = c("[","]"), sep = " | ", all_columns = FALSE)
-#>   address.city resource_identifier
-#> 1 [1]Amsterdam                   1
-#> 2    [1]Berlin                   2
-#> 3         <NA>                   2
-#> 4    [1]London                   2
+fhir_melt(
+    indexed_data_frame = df,
+    columns            = "address.city",
+    brackets           = c("[", "]"),
+    sep                = " | ",
+    all_columns        = FALSE
+)
+#>   resource_identifier address.city
+#> 1                   1 [1]Amsterdam
+#> 2                   2    [1]Berlin
+#> 3                   2         <NA>
+#> 4                   2    [1]London
 ```
 
 The new variable `resource_identifier` maps which rows in the created
@@ -591,13 +681,18 @@ attribute together in one call to `fhir_melt()`:
 ``` r
 cols <- c("address.city", "address.use", "address.type", "address.country")
 
-fhir_melt(df, columns = cols, brackets = c("[","]"), 
-          sep = " | ", all_columns = FALSE)
-#>   address.city address.use address.type address.country resource_identifier
-#> 1 [1]Amsterdam     [1]home  [1]physical  [1]Netherlands                   1
-#> 2    [1]Berlin     [1]home         <NA>            <NA>                   2
-#> 3         <NA>        <NA>    [1]postal       [1]France                   2
-#> 4    [1]London     [1]work    [1]postal      [1]England                   2
+fhir_melt(
+    indexed_data_frame = df,
+    columns            = cols,
+    brackets           = c("[", "]"),
+    sep                = " | ",
+    all_columns        = FALSE
+)
+#>   resource_identifier address.city address.use address.type address.country
+#> 1                   1 [1]Amsterdam     [1]home  [1]physical  [1]Netherlands
+#> 2                   2    [1]Berlin     [1]home         <NA>            <NA>
+#> 3                   2         <NA>        <NA>    [1]postal       [1]France
+#> 4                   2    [1]London     [1]work    [1]postal      [1]England
 ```
 
 With the argument `all_columns` you can control whether the resulting
@@ -605,14 +700,20 @@ data frame contains only the molten columns or all columns of the
 original data frame:
 
 ``` r
-molten <- fhir_melt(df, columns = cols, brackets = c("[","]"), 
-                    sep=" | ", all_columns = TRUE)
+molten <- fhir_melt(
+    indexed_data_frame = df,
+    columns            = cols,
+    brackets           = c("[", "]"),
+    sep                = " | ",
+    all_columns        = TRUE
+)
+
 molten
-#>       id address.use address.city address.type address.country
-#> 1 [1]id1     [1]home [1]Amsterdam  [1]physical  [1]Netherlands
-#> 2 [1]id3     [1]home    [1]Berlin         <NA>            <NA>
-#> 3 [1]id3        <NA>         <NA>    [1]postal       [1]France
-#> 4 [1]id3     [1]work    [1]London    [1]postal      [1]England
+#>   address.city address.country address.type address.use     id
+#> 1 [1]Amsterdam  [1]Netherlands  [1]physical     [1]home [1]id1
+#> 2    [1]Berlin            <NA>         <NA>     [1]home [1]id3
+#> 3         <NA>       [1]France    [1]postal        <NA> [1]id3
+#> 4    [1]London      [1]England    [1]postal     [1]work [1]id3
 #>              name.given resource_identifier
 #> 1            [1.1]Marie                   1
 #> 2 [1.1]Frank | [2.1]Max                   2
@@ -631,12 +732,12 @@ of the indices in your data.frame. This can be achieved using
 `fhir_rm_indices()`:
 
 ``` r
-fhir_rm_indices(molten, brackets = c("[","]"))
-#>    id address.use address.city address.type address.country  name.given
-#> 1 id1        home    Amsterdam     physical     Netherlands       Marie
-#> 2 id3        home       Berlin         <NA>            <NA> Frank | Max
-#> 3 id3        <NA>         <NA>       postal          France Frank | Max
-#> 4 id3        work       London       postal         England Frank | Max
+fhir_rm_indices(indexed_data_frame = molten, brackets = c("[", "]"))
+#>   address.city address.country address.type address.use  id  name.given
+#> 1    Amsterdam     Netherlands     physical        home id1       Marie
+#> 2       Berlin            <NA>         <NA>        home id3 Frank | Max
+#> 3         <NA>          France       postal        <NA> id3 Frank | Max
+#> 4       London         England       postal        work id3 Frank | Max
 #>   resource_identifier
 #> 1                   1
 #> 2                   2
@@ -671,7 +772,7 @@ by `fhir_search()`:
 
 ``` r
 #serialize bundles
-serialized_bundles <- fhir_serialize(patient_bundles)
+serialized_bundles <- fhir_serialize(bundles = patient_bundles)
 
 #have a look at them
 head(serialized_bundles[[1]])
@@ -696,7 +797,7 @@ load(paste0(temp_dir, "/bundles.rda"))
 
 ``` r
 #unserialize
-bundles <- fhir_unserialize(serialized_bundles)
+bundles <- fhir_unserialize(bundles = serialized_bundles)
 
 #have a look
 bundles
@@ -780,14 +881,14 @@ current working directory.
 
 ``` r
 #save bundles as xml files
-fhir_save(patient_bundles, directory = temp_dir)
+fhir_save(bundles = patient_bundles, directory = temp_dir)
 ```
 
 To read bundles saved with `fhir_save()` back into R, you can use
 `fhir_load()`:
 
 ``` r
-bundles <- fhir_load(temp_dir)
+bundles <- fhir_load(directory = temp_dir)
 ```
 
 `fhir_load()` takes the name of the directory (or path to it) as its

@@ -546,7 +546,7 @@ fhir_ns_strip <- function(xml) {
 #'
 #' @examples
 #' #unserialize xml objects before doing anything else with them!
-#' fhir_unserialize(bundles = example_bundles2)
+#' fhir_unserialize(bundles = example_bundles3)
 #' @rdname datasets_selfmade
 #' @source
 #' **example_bundles3**
@@ -651,7 +651,77 @@ fhir_ns_strip <- function(xml) {
 
 "example_bundles3"
 
+##### Documentation for example_bundles4 data set ######
+#' @details
+#' `example_bundles4` contains 1 bundle with 2 Medication resources, one of which has some `@id` xml attributes
+#'
+#' @examples
+#' #unserialize xml objects before doing anything else with them!
+#' fhir_unserialize(bundles = example_bundles4)
+#' @rdname datasets_selfmade
+#' @source
+#' **example_bundles4**
+#'
+#'```
+#' <Bundle>
+#'     <type value='searchset'/>
+#'	 <entry>
+#'		 <resource>
+#'			<Medication>
+#'			    <id value='1285'/>
+#'			    <code>
+#'			        <coding>
+#'			            <system value='http://www.nlm.nih.gov/research/umls/rxnorm'/>
+#'			            <code value='1594660'/>
+#'			            <display value='Alemtuzumab 10mg/ml (Lemtrada)'/>
+#'			        </coding>
+#'			    </code>
+#'			    <ingredient id='1'>
+#'			    	<itemReference>
+#'		        		<reference value='Substance/5463'/>
+#'		    		</itemReference>
+#'			    </ingredient>
+#'			    <ingredient id='2'>
+#'			    	<itemReference>
+#'		        		<reference value='Substance/3401'/>
+#'		    		</itemReference>
+#'			    </ingredient>
+#'			</Medication>
+#'		</resource>
+#'	 </entry>
+#'
+#'	 <entry>
+#'		 <resource>
+#'          <Medication>
+#'              <id value='45226'/>
+#'              <code>
+#'                  <coding>
+#'                      <system value='http://snomed.info/sct'/>
+#'                      <code value='373994007'/>
+#'                      <display value='Prednisone 5mg tablet (Product)'/>
+#'                  </coding>
+#'                  <text value='Prednisone 5mg tablet (Product)'/>
+#'              </code>
+#'			    <ingredient id='1'>
+#'			    	<itemReference>
+#'		        		<reference value='Substance/6912'/>
+#'		    		</itemReference>
+#'			    </ingredient>
+#'			    <ingredient id='2'>
+#'			    	<itemReference>
+#'		        		<reference value='Substance/3710'/>
+#'		    		</itemReference>
+#'			    </ingredient>
+#'			</Medication>
+#'		</resource>
+#'	 </entry>
+#'
+#'	</Bundle>
+#'
+#'```
+#'
 
+"example_bundles4"
 ##### Documentation for transaction_bundle_example data set ######
 #' Toy examples to POST/PUT on a server
 #'
@@ -784,6 +854,44 @@ fhir_ns_strip <- function(xml) {
 
 "example_resource2"
 
+##### Documentation for example_resource3 ######
+#' Toy examples to POST on a server
+#'
+#' @details
+#' `example_resource3` contains 1 Medication resource with an id xml attribute
+
+#' @examples
+#' #unserialize xml objects before doing anything else with them!
+#' fhir_unserialize(example_resource3)
+
+#' @rdname datasets_for_post
+#' @source
+#' **example_resource3**
+#'
+#'```
+#'<Medication>
+#'	    <code>
+#'	        <coding>
+#'	            <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+#'	            <code value="1594660"/>
+#'	            <display value="Alemtuzumab 10mg/ml (Lemtrada)"/>
+#'	        </coding>
+#'	    </code>
+#'	    <ingredient id="1">
+#'	    	<itemReference>
+#'      		<reference value="Substance/5463"/>
+#'    		</itemReference>
+#'	    </ingredient>
+#'	    <ingredient id="2">
+#'	    	<itemReference>
+#'      		<reference value="Substance/3401"/>
+#'  		</itemReference>
+#'	    </ingredient>
+#'	</Medication>
+#'```
+#'
+
+"example_resource3"
 
 #################################################################################
 #################################################################################

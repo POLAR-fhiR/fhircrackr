@@ -2,7 +2,10 @@
 title: "fhircrackr: Flatten FHIR resources"
 
 date: "`r Sys.Date()`"
-output:	rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
 
 
 
@@ -19,18 +22,7 @@ knitr::opts_chunk$set(
   comment = "#"
 )
 ```
-
-This vignette covers the following topics:
-
-- Extracting one resource type
-
-- The Design 
-
-- Extracting more than one resource type
-
-- Multiple Entries
-
-- Processing tables with multiple entries
+This vignette covers all topics concerned with flattening FHIR resources in some depth. If you are interested in a quick overview, please have a look at the fhircrackr:intro vignette.
 
 
 Before running any of the following code, you need to load the `fhircrackr` package:
@@ -280,7 +272,7 @@ fhir_design(list_of_tables)
 Note that this doesn't work on single tables created with a `fhir_table_description`. 
 
 
-### Saving and reading designs
+## Saving and reading designs
 If you want to save a design for later or to share with others, you can do so using the `fhir_save_design()`. This function takes a design and saves it as an xml file:
 
 ```{r}
@@ -515,7 +507,7 @@ fhir_rm_indices(indexed_data_frame = molten_2, brackets = c("[", "]"))
 ```
 Again, `brackets` and `sep` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()` respectively.
 
-### Cast data frames with multiple entries
+### Cast tables with multiple entries
 Instead of spreading the entries across rows, you can also spread them across columns using `fhir_cast()`. As you've seen above this can be achieved by setting `format = "wide"` in `fhir_crack()`. There is, however, a function that turns a `compact` table into a `wide` table and this funtion is `fhir_cast()`. It takes a compact table with multiple entries and the brackets and separator that have been used in `fhir_crack()` as input:
 
 ```{r}
