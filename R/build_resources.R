@@ -637,7 +637,8 @@ build_tree <- function(row, brackets = c('[', ']'), root = "Bundle", keep_nas = 
 
 	attributes <- sapply(rownames_split, function(x){
 		res <- stats::na.omit(stringr::str_extract(x, "@.*$"))
-		if(length(res)==0){"@value"}
+		if(length(res)==0){res <- "@value"}
+		res
 		})
 	attributes <- substr(attributes, 2, nchar(attributes))
 	rownames_split <- lapply(rownames_split, function(x){gsub("@.*$", "", x)})
@@ -878,9 +879,9 @@ tree2xml <- function(tree, escaped = TRUE, tab = "", add = "  ") {
 
 		s <- paste0(tab, "<", n)
 
-		attribute <- names(attributes(tr))
+		attribute <- grep("value|id|url", names(attributes(tr)), value = TRUE)
 
-		if(attribute!="names"){
+		if(0 < length(attribute)){
 			a <- attr(tr, attribute)
 			s <- paste0(s, " ", attribute, "=\"", if(escaped) esc_xml(a) else a, "\"")
 		}
