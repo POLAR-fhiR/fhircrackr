@@ -5,8 +5,11 @@
 \alias{example_bundles1}
 \alias{example_bundles2}
 \alias{example_bundles3}
+\alias{example_bundles4}
 \title{Toy example bundles for mulitple entries}
 \format{
+An object of class \code{fhir_bundle_list} of length 1.
+
 An object of class \code{fhir_bundle_list} of length 1.
 
 An object of class \code{fhir_bundle_list} of length 1.
@@ -230,6 +233,103 @@ An object of class \code{fhir_bundle_list} of length 1.
 </Bundle>"
 
 }
+
+\strong{example_bundles4}\preformatted{<Bundle>
+   <type value='searchset'/>
+	 <entry>
+		 <resource>
+			<Medication>
+				<id value='8266'/>
+			    <code>
+			        <coding>
+			            <system value='http://www.nlm.nih.gov/research/umls/rxnorm'/>
+			            <code value='1594660'/>
+			            <display value='Alemtuzumab 10mg/ml (Lemtrada)'/>
+			        </coding>
+			    </code>
+			    <ingredient id='1'>
+			        <itemCodeableConcept>
+			            <coding>
+			                <system value='http://snomed.info/sct'/>
+			                <code value='11713004'/>
+			                <display value='Water (substance)'/>
+			            </coding>
+			        </itemCodeableConcept>
+			    </ingredient>
+			    <ingredient id='2'>
+			        <itemCodeableConcept>
+			            <coding>
+			                <system value='http://snomed.info/sct'/>
+			                <code value='129472003'/>
+			                <display value='Alemtuzamab (substance)'/>
+			            </coding>
+			        </itemCodeableConcept>
+			    </ingredient>
+			</Medication>
+		</resource>
+	 </entry>
+
+	 <entry>
+		 <resource>
+            <Medication>
+                <id value='45226'/>
+                <code>
+                   <coding>
+                       <system value='http://snomed.info/sct'/>
+                        <code value='373994007'/>
+                        <display value='Prednisone 5mg tablet (Product)'/>
+                    </coding>
+                    <text value='Prednisone 5mg tablet (Product)'/>
+                </code>
+                <ingredient>
+                    <itemCodeableConcept>
+                        <coding>
+                            <system value='http://www.nlm.nih.gov/research/umls/rxnorm'/>
+                            <code value='315266'/>
+                            <display value='Acetaminophen 500 MG'/>
+                        </coding>
+                    </itemCodeableConcept>
+                    <strength>
+                        <numerator>
+                            <value value='500'/>
+                            <system value='http://unitsofmeasure.org'/>
+                            <code value='mg'/>
+                        </numerator>
+                        <denominator>
+                            <value value='1'/>
+                            <system value='http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm'/>
+                            <code value='Tab'/>
+                        </denominator>
+                    </strength>
+                </ingredient>
+                <ingredient>
+                    <itemCodeableConcept>
+                        <coding>
+                            <system value='http://www.nlm.nih.gov/research/umls/rxnorm'/>
+                            <code value='901813'/>
+                            <display value='Diphenhydramine Hydrochloride 25 mg'/>
+                        </coding>
+                    </itemCodeableConcept>
+                    <strength>
+                        <numerator>
+                            <value value='25'/>
+                            <system value='http://unitsofmeasure.org'/>
+                            <code value='mg'/>
+                        </numerator>
+                        <denominator>
+                            <value value='1'/>
+                            <system value='http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm'/>
+                            <code value='Tab'/>
+                        </denominator>
+                    </strength>
+                </ingredient>
+			</Medication>
+		</resource>
+	 </entry>
+
+	</Bundle>"
+
+}
 }
 \usage{
 example_bundles1
@@ -237,6 +337,8 @@ example_bundles1
 example_bundles2
 
 example_bundles3
+
+example_bundles4
 }
 \description{
 These data examples are bundles that contain very few very simple Patient resources
@@ -249,6 +351,8 @@ xml versions look.
 \code{example_bundles2} contains 1 bundle with 3 Patient resources.
 
 \code{example_bundles3} contains 1 bundle with 3 Patient resources and 1 Observation resource.
+
+\code{example_bundles4} contains 1 bundle with 2 Medication resources, one of which has some \verb{@id} xml attributes
 }
 \examples{
 #unserialize xml objects before doing anything else with them!
@@ -256,6 +360,8 @@ fhir_unserialize(bundles = example_bundles1)
 #unserialize xml objects before doing anything else with them!
 fhir_unserialize(example_bundles2)
 #unserialize xml objects before doing anything else with them!
-fhir_unserialize(bundles = example_bundles2)
+fhir_unserialize(bundles = example_bundles3)
+#unserialize xml objects before doing anything else with them!
+fhir_unserialize(bundles = example_bundles4)
 }
 \keyword{datasets}
