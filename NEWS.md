@@ -33,7 +33,10 @@
 
 - `fhir_search()`: 
 	- New argument `rm_tag="div"` per default removes all html bits in the bundle immediately after download. Can be disabled by setting `rm_tag=NULL`.
-	- `delay_between_attempts` can now be a vector with different times for each retry defined in `max_attemps`.
+	
+	- `delay_between_attempts` can now be a vector with different waiting times betwwen retries of reaching the server. The length of `delay_between_attempts` determines the number of retries.
+
+	- `max_attempts` is deprecated in favor of `delay_between_attempts`.
 
 - `fhir_load()` and `fhir_save()` have a new argument `max_bundles` that allows to restrict the number of bundles that is loaded/saved.
 
