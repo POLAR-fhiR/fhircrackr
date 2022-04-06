@@ -12,12 +12,12 @@ fhir_search(
   token = NULL,
   max_bundles = Inf,
   verbose = 1,
-  max_attempts = 5,
-  delay_between_attempts = c(0.1, 1, 5, 20, 60),
+  delay_between_attempts = c(1, 3, 9, 27, 81),
   log_errors = NULL,
   save_to_disc = NULL,
   delay_between_bundles = 0,
-  rm_tag = "div"
+  rm_tag = "div",
+  max_attempts = NULL
 )
 }
 \arguments{
@@ -43,11 +43,9 @@ for how to create this.}
 \item{verbose}{An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 downloading progress will be printed. Defaults to 1.}
 
-\item{max_attempts}{A numeric vector of length one. The maximal number of attempts to send a request, defaults to 5.}
-
-\item{delay_between_attempts}{A numeric vector of length \code{max_attempts} specifying the delay in seconds after each attempt.
-Defaults to \code{c(0.1,1,5,20,60)}. If \code{length(delay_between_attempts) < max_attempts}, the last element of \code{delay_between_attempts}
-is repeated for the remaining attempts.}
+\item{delay_between_attempts}{A numeric vector specifying the delay in seconds between attempts of reaching the server
+that \code{fhir_search()} will make. The length of this vector determines the number of attempts that will be made before stopping with an error.
+Defaults to \code{c(1,3,9,27,81)}.}
 
 \item{log_errors}{Either \code{NULL} or a character vector of length one indicating the name of a file in which to save the http errors.
 \code{NULL} means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to \code{NULL}.
@@ -67,6 +65,8 @@ too many requests to quickly. Defaults to zero.}
 \item{rm_tag}{Character vector of length 1 defining an xml tag of elements that will removed from the bundle automatically.
 Defaults to \code{"div"},leading to the removal of all html parts (see Details). Set to \code{NULL} to keep the bundles untouched.
 See \code{\link[=fhir_rm_div]{fhir_rm_div()}} and \code{\link[=fhir_rm_tag]{fhir_rm_tag()}} for more info.}
+
+\item{max_attempts}{Deprecated. The number of maximal attempts is determined by the length of \code{delay_between_attempts}}
 }
 \value{
 A \linkS4class{fhir_bundle_list} when \code{save_to_disc = NULL} (the default),  else \code{NULL}.

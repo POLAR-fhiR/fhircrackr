@@ -52,10 +52,10 @@
 #' @param max_bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' downloading progress will be printed. Defaults to 1.
-#' @param max_attempts A numeric vector of length one. The maximal number of attempts to send a request, defaults to 5.
-#' @param delay_between_attempts A numeric vector of length `max_attempts` specifying the delay in seconds after each attempt.
-#' Defaults to `c(0.1,1,5,20,60)`. If `length(delay_between_attempts) < max_attempts`, the last element of `delay_between_attempts`
-#' is repeated for the remaining attempts.
+#' @param max_attempts Deprecated. The number of maximal attempts is determined by the length of `delay_between_attempts`
+#' @param delay_between_attempts A numeric vector specifying the delay in seconds between attempts of reaching the server
+#' that `fhir_search()` will make. The length of this vector determines the number of attempts that will be made before stopping with an error.
+#' Defaults to `c(1,3,9,27,81)`.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`.
 #' Regardless of the value of `log_errors` the most recent http error message within the current R session is saved internally and can
@@ -110,12 +110,17 @@ fhir_search <- function(
 	token = NULL,
 	max_bundles = Inf,
 	verbose = 1,
-	max_attempts = 5,
-	delay_between_attempts = c(0.1,1,5,20,60),
+	delay_between_attempts = c(1,3,9,27,81),
 	log_errors = NULL,
 	save_to_disc = NULL,
 	delay_between_bundles = 0,
-	rm_tag = "div") {
+	rm_tag = "div",
+	max_attempts = NULL) {
+
+	if(!is.null(max_attempts)){
+		warning("Argument max_attempts is deprecated since fhircrackr version 4.0.0.",
+				"The number of maximal attempts to reach the server is determined by the length of argument delay_between_attemps.")
+	}
 
 	if(is.null(request)) {
 		stop(
@@ -833,11 +838,12 @@ fhir_authenticate <- function(
 #' @param username A character vector of length one containing the username for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param password A character vector of length one containing the password for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param token The token for token based auth, either a string or a httr token object
-#' @param max_attempts A numeric scalar. The maximal number of attempts to send a request, defaults to 5.
+#' @param max_attempts Deprecated. The number of maximal attempts is determined by the length of `delay_between_attempts`
 #' @param verbose An integer scalar. If > 1,  Downloading progress is printed. Defaults to 2.
-#' @param delay_between_attempts A numeric vector of length `max_attempts` specifying the delay in seconds after each attempt.
-#' Defaults to `c(0.1,1,5,20,60)`. If `length(delay_between_attempts) < max_attempts`, the last element of `delay_between_attempts`
-#' is repeated for the remaining attempts.#' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
+#' @param delay_between_attempts A numeric vector specifying the delay in seconds between attempts of reaching the server
+#' that `fhir_search()` will make. The length of this vector determines the number of attempts that will be made before stopping with an error.
+#' Defaults to `c(1,3,9,27,81)`.
+#' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`
 #'
 #' @return The downloaded bundle as an [fhir_bundle_xml-class].
@@ -856,20 +862,13 @@ get_bundle <- function(
 	password = NULL,
 	token = NULL,
 	verbose = 2,
-	max_attempts = 5,
-	delay_between_attempts = c(0.1,1,5,20,60),
+	max_attempts = NULL,
+	delay_between_attempts = c(1,3,9,27,81),
 	log_errors = NULL,
 	rm_tag = "div") {
 
-	#expand delay_between attempts to match max_attempts
-	if(length(delay_between_attempts) < max_attempts){
-		c(delay_between_attempts,
-		  rep(delay_between_attempts[length(delay_between_attempts)], max_attempts - length(delay_between_attempts))
-		  )
-	}
-
 	#download response
-	for(n in seq_len(max_attempts)) {
+	for(n in seq_along(delay_between_attempts)) {
 		if(1 < verbose) {message("(", n, "): ", request)}
 
 		auth <- auth_helper(username = username, password = password, token = token)
