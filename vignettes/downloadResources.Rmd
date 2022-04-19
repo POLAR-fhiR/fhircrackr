@@ -401,15 +401,14 @@ bundles <- fhir_load(directory = temp_dir)
 `fhir_load()` takes the name of the directory (or path to it) as its only argument. All xml-files in this directory will be read into R and returned as a list of bundles in xml format just as returned by `fhir_search()`.
 
 ## Dealing with large data sets
-If you want to download a lot of resources from a server, you might run into several problems. 
+If you need to download a particularly large data set from a FHIR server this can lead to challenges in two areas: computation time and memory usage. Downloading the FHIR Bundles will be time consuming because the paging mechanism leading from one bundle to the next is not optimized for speed in most FHIR server implementations and neither is the execution of complex search queries. Keeping a lot of bundles in the working memory is memory consuming because the xml structures contain a lot of overhead that will be removed, once the relevant bits of information will be transferred into a table.
 
-First of all, downloading a lot of resources will require a lot of time, depending on the performance of your FHIR server. Because `fhir_search()` essentially runs a loop pulling bundle after bundle, downloads can usually be accelerated if the bundle size is increased, because that way we can lower the number of requests to the server. You can achieve this by adding `_count=` parameter to your FHIR search request. `http://hapi.fhir.org/baseR4/Patient?_count=500` for example will pull Patient resources in bundles of 500 resources from the server.
+There are several options to alleviate these problems, a couple of which will be shown in the following.
 
-A problem that is also related to the number of requests to the server is that sometimes servers might crash when too many requests are sent to them in a row. 
-The third problem is that large amounts of resources can at some point exceed the working memory you have available. There are three solutions to those problems:
+### Saving memory
 
-### 1. Download trimmed resources using the `_elements` search parameter
-If you know you are just going to need a few elements from each resource, you can restrict the downloaded resources to those elements to save memory. The following example downloads the first bundle of Patient resources that are trimmed down to the `name`, `gender` and `birthDate` elements, which are specified in the `_elements` parameter. `_elements` takes a comma separated list of base level elements for the resource and will make sure that the downloaded resources only contain those elements plus the mandatory elements `id` and `meta`. The `_count` parameter in the examples restricts the number of resources in the bundle to 2, which is just done to make the result more printable for this vignette.
+#### 1. Download trimmed resources using `_elements`
+If you know you are just going to need a few elements from each resource, you can restrict the downloaded resources to those elements, which will result in much smaller resources and thus much smaller bundles. The following example downloads the first bundle of Patient resources that are trimmed down to the `name`, `gender` and `birthDate` elements, which are specified in the `_elements` parameter. `_elements` takes a comma separated list of base level elements for the resource and will make sure that the downloaded resources only contain those elements plus the mandatory elements `id` and `meta`. The `_count` parameter in the examples restricts the number of resources in the bundle to 2, which is just done to make the result more printable for this vignette.
 
 ```{r, eval=FALSE}
 request <- fhir_url(url = "http://hapi.fhir.org/baseR4", 
@@ -509,8 +508,8 @@ cat(toString(bundles[[1]]))
 
 As you can see, the resulting Bundle is much smaller than it would be if the full resources where downloaded.
 
-### 2. Use the save_to_disc argument of fhir_search()
-If you pass the name of a directory to the argument `save_to_disc` in your call to `fhir_search()`, the bundles will not be combined in a bundle list that is returned when the downloading is done, but will instead be saved as xml-files to the directory specified in the argument `directory` one by one. If the directory you specified doesn't exist yet, `fhir_search()` will create it for you. This way, the R session will only have to keep one bundle at a time in the working memory and if the server crashes halfway trough, all bundles up to the crash are safely saved in your directory. You can later load them using `fhir_load()`:
+#### 2. Batch process bundles by saving them to hard drive
+You can spare working memory by saving the bundles to your hard drive during the download instead of keeping them all in the working memory of your R session at once. If you pass the name of a directory to the argument `save_to_disc` in your call to `fhir_search()`, the bundles will not be combined in a bundle list that is returned when the downloading is done, but will instead be saved as xml-files to the directory specified in the argument `directory` one by one. If the directory you specified doesn't exist yet, `fhir_search()` will create it for you. This way, the R session will only have to keep one bundle at a time in the working memory. You can later load them using `fhir_load()` and crack them one after another:
 
 ```{r, eval=F}
 request <- fhir_url(url = "http://hapi.fhir.org/baseR4", resource = "Patient")
@@ -518,12 +517,13 @@ request <- fhir_url(url = "http://hapi.fhir.org/baseR4", resource = "Patient")
 fhir_search(
 	request      = request,
 	max_bundles  = 10,
-	save_to_disc = "MyProject/downloadedBundles")
+	save_to_disc = "MyProject/downloadedBundles"
+	)
 
 bundles<- fhir_load(directory = "MyProject/downloadedBundles")
 ```
 
-### 3. Use fhir_next_bundle_url() 
+### 3. Batch process bundles by downloading them piece by piece
 Alternatively, you can also use `fhir_next_bundle_url()`. This function returns the url to the next bundle from you most recent call to `fhir_search()`:
 
 ```{r, include=F}
@@ -543,7 +543,7 @@ When there is no next bundle (because all available resources have been download
 
 If a download with `fhir_search()` is interrupted due to a server error somewhere in between, you can use `fhir_next_bundle_url()` to see where the download was interrupted.
 
-You can also use this function to avoid memory issues. Th following block of code utilizes `fhir_next_bundle_url()` to download all available Observation resources in small batches of 10 bundles that are immediately cracked and saved before the next batch of bundles is downloaded. Note that this example can be very time consuming if there are a lot of resources on the server, to limit the number of iterations uncomment the lines of code that have been commented out here:
+You can also use this function to avoid memory issues. Th following block of code utilizes `fhir_next_bundle_url()` to download all available Observation resources in small batches of 10 bundles that are immediately cracked and saved before the next batch of bundles is downloaded. Note that this example can be very time consuming if there are a lot of resources on the server. To limit the number of iterations uncomment the `if` statement at the end of the `while` loop:
 
 ```{r, eval=F}
 #Starting fhir search request
@@ -573,6 +573,93 @@ while(!is.null(url)){
 	count <- count + 1
 	# if(count >= 20) {break}
 }
+
+```
+
+### Saving download time
+
+In most cases the bottle neck in your analysis will be the download time from the server, because most FHIR server are optimized for handling a lot of simultaneous small requests instead of a single big one. You can gain time by splitting up your request into chunks and sending it to the server in parallel using a parallelized version of `lapply()` but there are couple of issues to take care of.
+
+#### Operating system 
+The easiest to use version of parallelization is the function `parallel::mclapply()` which uses forking to process list elements from a `lapply()` call in parallel. As windows doesn't support forking, this solution only can only be used on osx or linux operating systems. 
+If you want to achieve similar results on a windows machine, you can either run the fhircrackr in an R installation/RStudio Server that you set up in WSL2 (see [here](https://support.rstudio.com/hc/en-us/articles/360049776974-Using-RStudio-Server-in-Windows-WSL2) for an installation guide) or you can try out the [windows mclapply hack](https://github.com/nathanvan/parallelsugar) written by Nathan vanHoudnos.
+
+#### Breaking pointers
+
+The xml objects that represent the FHIR bundles contain external pointers that will break when they are exported to/from a cluster. This means that objects of type `fhir_bundle` or `fhir_bundle_list` always have to be serialized using `fhir_serialize()` when they are downloaded in parallel.
+
+#### Splitting up requests 
+
+Splitting up a FHIR request isn't always trivial. We'll show you two scenarios where you can split up a request into smaller chunks.
+
+a) You have a list of resource ids or a list of identifiers (e.g. patient identifiers) for which you intend to download the corresponding resources. This is the most simple case, because here you just have to split up the vector of ids that you have into smaller chunks and then send one FHIR search request per chunk. You can to that with `fhir_search()` but there is also a convenience function for exactly that use case called `fhir_get_resources_by_ids()`. The following minimal example of course only works if the ids defined here are actually found on the server:
+
+```{r, eval = FALSE}
+# define list of Patient resource ids
+ids <- c("4b7736c3-c005-4383-bf7c-99710811efd9", "bef39d3a-62bb-48c0-83ff-3bb70b51d831",
+		 "f371ed2f-5cb0-4093-a491-9df6e6bfcdf2", "277c4631-955e-4b52-bd40-78ddcde333b1",
+		 "72173a13-d32f-4489-a7b4-dfc301df087f", "4a97acec-028e-4b45-a72f-2b7e08cf80ba")
+
+#split into smaller chunks of 2
+id_list <- split(ids, ceiling(seq_along(ids)/2))
+
+#Define function that downloads one chunk of patients and serializes the result
+extract_and_serialize <- function(x){
+                            b <- fhir_get_resources_by_ids(base_url = "http://hapi.fhir.org/baseR4",
+                                                           resource = "Patient",
+                                                           ids = x)
+                            fhir_serialize(b)
+}
+
+#Download using 4 cores on linux:
+bundles_serialized <- parallel::mclapply(
+	X = pat_list,
+	FUN = extract_and_serialize,
+    mc.cores = 2
+)
+
+#Unserialize the resulting list and create one fhir_bundle_list object from it
+bundles_unserialized <- lapply(bundles_serialized, fhir_unserialize)
+result <- fhir_bundle_list(unlist(bundles_unserialized, recursive = FALSE))
+
+```
+
+b) You have a request that downloads multiple resource types, like `"http://hapi.fhir.org/baseR4/Encounter?_include=Encounter:patient"`, which downloads all Encounters as well as the Patient resources the Encounter is referencing. This type of request will often take a lot of time and can (depending on your system) be sped up if you only load the encounters in a first step, extract the ids of the referenced Patient resources and download those in parallel in a second step:
+
+```{r, eval=FALSE}
+#Download all Encounters
+encounter_bundles <- fhir_search(request = "http://hapi.fhir.org/baseR4/Encounter")
+
+#Flatten
+encounter_table <- fhir_crack(
+	bundles = encounter_bundles,
+	design = fhir_table_description(resource = "Encounter")
+)
+
+#Extract Patient ids
+pat_ids <- sub("Patient/", "", encounter_table$subject.reference)
+
+#Split into chunks of 20
+pat_id_list <- split(pat_ids, ceiling(seq_along(pat_ids)/20))
+
+#Define function that downloads one chunk and serializes the result
+extract_and_serialize <- function(x){
+                            b <- fhir_get_resources_by_ids(base_url = "http://hapi.fhir.org/baseR4",
+                            							   resource = "Patient",
+                                                           ids = x)
+                            fhir_serialize(b)
+}
+
+#Download using 4 cores on linux:
+bundles_serialized <- parallel::mclapply(
+	X = pat_id_list,
+	FUN = extract_and_serialize,
+    mc.cores = 4
+)
+
+#Unserialize the resulting list and create one fhir_bundle_list object from it
+bundles_unserialized <- lapply(bundles_serialized, fhir_unserialize)
+result <- fhir_bundle_list(unlist(bundles_unserialized, recursive = FALSE))
 
 ```
 
