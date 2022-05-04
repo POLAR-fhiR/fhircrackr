@@ -611,7 +611,7 @@ extract_and_serialize <- function(x){
                             fhir_serialize(b)
 }
 
-#Download using 4 cores on linux:
+#Download using 2 cores on linux:
 bundles_serialized <- parallel::mclapply(
 	X = pat_list,
 	FUN = extract_and_serialize,
