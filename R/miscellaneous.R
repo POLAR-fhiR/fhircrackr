@@ -243,6 +243,37 @@ fhir_rm_div <- function(x){
 }
 
 
+#' Concatenate two paths
+#' @description Concatenates two strings to a path string correctly.
+#'
+#' @param path1 A a character vector of length one specifying the left hand part of the resulting path.
+#' @param path2 A a character vector of length one specifying the right hand part of the resulting path.
+#' @param os A a character vector of length one specifying the operating system you're operating on: windows or linux.
+#'
+#' @return A a character vector of length one containing the concatenated path.
+#' @export
+#'
+#' @examples
+#' paste_paths(path1 = "data", path2 = "patients")
+#' paste_paths(path1 = "/data", path2 = "patients")
+#' paste_paths(path1 = "/data/", path2 = "patients")
+#' paste_paths(path1 = "/data", path2 = "/patients")
+#' paste_paths(path1 = "/data/", path2 = "/patients/")
+#' paste_paths(path1 = "data", path2 = "patients", os = "windows")
+
+paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
+	os <- tolower(substr(os, 1, 1))
+	if(os == "w") {
+		return(
+			paste0(
+				sub(pattern = "\\\\$" , replacement = "", x = path1),
+				"\\",
+				sub(pattern = "^\\\\", replacement = "", x = path2)
+			)
+		)
+	}
+	paste0(sub(pattern = "/$" , replacement = "", x = path1), "/", sub(pattern = "^/", replacement = "", x = path2))
+}
 
 
 #' Concatenate paths
