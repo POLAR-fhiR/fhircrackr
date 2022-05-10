@@ -25,6 +25,11 @@ setValidity(
 			messages <- c(messages, "fhir_columns has to be a *named* character.")
 		}
 
+		if(any(duplicated(object))){
+			messages <- c(messages, paste("There are duplicates in the columns defined. Please remove the following duplicates: ",
+										  paste(object[duplicated(object)], collapse = ", ")))
+		}
+
 		with_attribute <- object[grepl("/@[[:alpha:]]*$",object)]
 
 		if(0 < length(with_attribute)){

@@ -65,7 +65,7 @@ fhir_cast <- function(
 	brackets <- fix_brackets(brackets)
 	bra_ <- esc(brackets[1])
 	ket_ <- esc(brackets[2])
-	regexpr_ids <- paste0(bra_, "([0-9]+(\\.[0-9]+)*)", ket_, "(.*$)")
+	regexpr_ids <- stringr::str_c(bra_, "([0-9]+(\\.[0-9]+)*)", ket_, "(.*$)")
 
 	if(!any(grepl(regexpr_ids, indexed_df[1,]))){
 		stop("Cannot find ids with the specified brackets in the table.")
@@ -94,7 +94,7 @@ fhir_cast <- function(
 
 						if(length(id_[[1]])!=length(name_vec) && !warning_given){
 							warning(
-								"Column name '", paste0(name_vec, collapse = "."),
+								"Column name '", stringr::str_c(name_vec, collapse = "."),
 								"' doesn't fit the id pattern found in this column.",
 								"The column name should be build the way ",
 								"fhir_crack() automatically builds it. See ?fhir_cast."
@@ -107,14 +107,14 @@ fhir_cast <- function(
 								id_,
 								function(i_) {
 									i_ <- as.numeric(i_)
-									paste0(paste0(brackets[1],paste(i_, collapse="."), brackets[2]), paste(name_vec, collapse = "."))
+									stringr::str_c(stringr::str_c(brackets[1],paste(i_, collapse="."), brackets[2]), paste(name_vec, collapse = "."))
 
 								},
 								simplify = FALSE
 							)
 						} else {
 							i <- as.numeric(id)
-							a <- paste0(brackets[1], i, brackets[2], name_vec)
+							a <- stringr::str_c(brackets[1], i, brackets[2], name_vec)
 							names(a) <- id
 							a
 						}
@@ -141,7 +141,7 @@ fhir_cast <- function(
 			#id <- names(map[[name]])[[1]]
 			sname <- map[[name]][[id]]
 			if(1 < verbose) {message("   ", sname)}
-			id_str <- paste0(bra_, id, ket_)
+			id_str <- stringr::str_c(bra_, id, ket_)
 			row_with_id <- grep(id_str, indexed_df[[name]], perl = T)
 			entries <- strsplit(indexed_df[[name]][row_with_id], sep_)
 			values <- gsub(
@@ -202,7 +202,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 			"The object you supplied is of type ", class(data_frame), "."
 		)
 	}
-	pattern_column_names  <- paste0("^", column_names_prefix, "($|\\.+)")
+	pattern_column_names  <- stringr::str_c("^", column_names_prefix, "($|\\.+)")
 	column_names <- names(data_frame)
 	hits <- grepl(pattern_column_names, column_names)
 	if(!any(hits)) {stop("The column prefix you gave doesn't appear in any of the column names.")}
@@ -302,7 +302,7 @@ fhir_melt <- function(
 			x = expanded,
 			y = indexed_dt[, rest, with=FALSE],
 			by = id_name,
-			all.x = T
+			all = T
 		)
 		data.table::setcolorder(result, names(indexed_dt))
 	}else{
@@ -355,7 +355,7 @@ fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), columns 
 	if(!is_DT) {data.table::setDT(x = indexed_dt)}
 	brackets <- fix_brackets(brackets = brackets)
 	brackets.escaped <- esc(s = brackets)
-	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)*", brackets.escaped[2])
+	pattern.ids <- stringr::str_c(brackets.escaped[1], "([0-9]+\\.*)*", brackets.escaped[2])
 	if(!any(grepl(pattern.ids, indexed_dt))) {
 		warning("The brackets you specified don't seem to appear in the data.frame.")
 	}
@@ -384,10 +384,10 @@ fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), columns 
 melt_row <- function(row, columns, brackets = c("<", ">"), sep = " ") {
 	row <- as.data.frame(row)
 	brackets.escaped <- esc(s = brackets)
-	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
+	pattern.ids <- stringr::str_c(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 	ids <- stringr::str_extract_all(string = row, pattern = pattern.ids)
 	names(ids) <- columns
-	pattern.items <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
+	pattern.items <- stringr::str_c(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 	items <- stringr::str_split(string = row, pattern = pattern.items)
 	items <- lapply(
 		items,
@@ -403,19 +403,19 @@ melt_row <- function(row, columns, brackets = c("<", ">"), sep = " ") {
 		id <- ids[[i]]
 		if(!all(is.na(id))) {
 			it <- items[[i]]
-			new.rows <- gsub(paste0(brackets.escaped[1], "([0-9]+)\\.*.*"), "\\1", id)
-			new.ids <- gsub(paste0("(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")" ), "\\1\\3", id)
+			new.rows <- gsub(stringr::str_c(brackets.escaped[1], "([0-9]+)\\.*.*"), "\\1", id)
+			new.ids <- gsub(stringr::str_c("(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")" ), "\\1\\3", id)
 			unique.new.rows <- unique(new.rows)
-			set <- paste0(new.ids, it)
+			set <- stringr::str_c(new.ids, it)
 			f <- sapply(
 				unique.new.rows,
 				function(unr) {
 					fltr <- unr == new.rows
-					paste0(set[fltr], collapse = "")
+					stringr::str_c(set[fltr], collapse = "")
 				}
 			)
 			for(n in unique.new.rows) {
-				d[as.numeric(n), i]<- gsub(pattern = paste0(esc(sep), "$"), replacement = "", x = f[names(f) == n], perl = TRUE)
+				d[as.numeric(n), i]<- gsub(pattern = stringr::str_c(esc(sep), "$"), replacement = "", x = f[names(f) == n], perl = TRUE)
 			}
 		}
 	}
