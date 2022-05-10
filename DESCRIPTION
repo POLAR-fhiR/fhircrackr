@@ -46,6 +46,7 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
+Config/testthat/edition: 3
 Depends: 
     R (>= 4.0.0)
 Collate: 
