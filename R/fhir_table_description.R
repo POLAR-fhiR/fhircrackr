@@ -228,7 +228,7 @@ fhir_table_description <- function(
 
 	brackets <- fix_brackets(brackets = brackets)
 
-	if(class(cols) != 'fhir_columns') {
+	if(!inherits(cols, 'fhir_columns')) {
 		cols <- fhir_columns(xpaths = cols)
 	}
 
