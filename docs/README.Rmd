@@ -177,7 +177,7 @@ table_description <- fhir_table_description(
 table_description
 ```
 
-All five style elements of can also be controlled directly by the `fhir_crack()` arguments `sep`, `brackets`, `remove_empty_columns`, `format` and `keep_attr`. If the function arguments are `NULL` (their default), the values provided as style arguments are used, if they are not NULL, they will overwrite any values in `fhir_table_description`. If both the function arguments and the `fhir_table_description` components are NULL, default values(`sep = " "`, `brackets = NULL`, `rm_empty_cols = TRUE`, `format` = 'compact', `keep_attr` = FALSE) will be assumed. 
+Each of the five style elements `sep`, `brackets`, `remove_empty_columns`, `format` and `keep_attr` in `table_description` can also be controlled directly by the argument of the same name of `fhir_crack()`. If one of these function arguments is `NULL` (the default value for each argument), the corresponding value specified as style argument in `table_description` will be used. If the argument in `fhir_crack` is not `NULL`, the corresponding value in `fhir_table_description` will be ignored. If both the `fhir_crack` function argument and the corresponding component in `fhir_table_description` are `NULL`, the respective default value (`sep = " "`, `brackets = NULL`, `rm_empty_cols = TRUE`, `format` = 'compact', `keep_attr` = FALSE) will be applied. 
 
 After it is defined, the `fhir_table_description` can be used in `fhir_crack()` like this:
 
