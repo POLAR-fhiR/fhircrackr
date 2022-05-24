@@ -176,8 +176,8 @@ table_description <- fhir_table_description(
 		gender      = "gender",
 		birthday    = "birthDate"
 	),
-	sep           = "|",
-	brackets      = c("[", "]"),
+	sep           = " ~ ",
+	brackets      = c("<<", ">>"),
 	rm_empty_cols = FALSE,
 	format        = 'compact',
 	keep_attr     = FALSE
@@ -187,7 +187,7 @@ table_description <- fhir_table_description(
 table_description
 ```
 
-All five style elements of can also be controlled directly by the `fhir_crack()` arguments `sep`, `brackets`, `remove_empty_columns`, `format` and `keep_attr`. If the function arguments are `NULL` (their default), the values provided as style arguments are used, if they are not NULL, they will overwrite any values in `fhir_table_description`. If both the function arguments and the `fhir_table_description` components are NULL, default values(`sep = " "`, `brackets = NULL`, `rm_empty_cols = TRUE`, `format` = 'compact', `keep_attr` = FALSE) will be assumed. 
+Each of the five style elements `sep`, `brackets`, `remove_empty_columns`, `format` and `keep_attr` in `table_description` can also be controlled directly by the argument of the same name of `fhir_crack()`. If one of these function arguments is `NULL` (the default value for each argument), the corresponding value specified as style argument in `table_description` will be used. If the argument in `fhir_crack` is not `NULL`, the corresponding value in `fhir_table_description` will be ignored. If both the `fhir_crack` function argument and the corresponding component in `fhir_table_description` are `NULL`, the respective default value (`sep = " "`, `brackets = NULL`, `rm_empty_cols = TRUE`, `format` = 'compact', `keep_attr` = FALSE) will be applied. 
 
 After it is defined, the `fhir_table_description` can be used in `fhir_crack()` like this:
 
@@ -253,7 +253,7 @@ Patients <- fhir_table_description(resource = "Patient")
 design <- fhir_design(MedicationStatements, Patients)
 
 ```
-In this example, we have spelled out the description MedicationStatement completely, while we have used a short form for Patients. The resulting design looks like this:
+In this example, we have spelled out the table description `MedicationStatement` completely, while we have used a short form for `Patients`. The resulting design looks like this:
 ```{r}
 design
 ```
@@ -265,7 +265,8 @@ list_of_tables <- fhir_crack(bundles = medication_bundles, design = design, verb
 
 list_of_tables$MedicationStatements[1:5,]
 
-list_of_tables$Patients[1:5,]
+# only completely filled columns are shown here
+list_of_tables$Patients[1:5,sapply(list_of_tables$Patients[1:5,], function(x) !any(is.na(x)))]
 ```
 
 As you can see, the result now contains two data frames, one for Patient resources and one for MedicationStatement resources.
@@ -276,13 +277,13 @@ A particularly complicated problem in flattening FHIR resources is caused by the
 In general, `fhir_crack()` will paste multiple entries for the same attribute together in the data frame, using the separator provided by the `sep` argument. 
 
 
-Let's have a look at the following simple example, where we have a bundle containing just two Patient resources. The example is part of the `fhricrackr` package and you can make it available like this:
+Let's have a look at the following simple example, where we have a bundle containing just two Patient resources. The example is part of the `fhircrackr` package and you can make it available like this:
 
 ```{r}
 bundles <- fhir_unserialize(bundles = example_bundles1)
 ```
 
-They represent a very simple bundle of just two Patient resources which looks like this:
+This represents a bundle list with only one very simple bundle of just two Patient resources which looks like this:
 
 ```
 <Bundle>
@@ -344,12 +345,12 @@ df <- fhir_crack(bundles = bundles, design = table_description, verbose = 0)
 
 df
 ```
-Multiple entries are pasted together with the specified separator in between and the indices (inside the specified brackets) display the entry the value belongs to. That way you can see that Patient resource 2 had three entries for the attribute `address` and you can also see which attributes belong to which entry.
+Multiple entries are pasted together with the specified separator string (in this case: " | ") in between and the indices (inside the specified bracket strings (here: "[" and "]")) display the entry the value belongs to. That way you can see that Patient resource 2 had three entries for the attribute `address` and you can also see which attributes belong to which entry.
 
 ## Process Data Frames with multiple Entries
 
 ### Melt data frames with multiple entries
-If the data frame produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. This is where `fhir_melt()` comes into play. `fhir_melt()` takes an indexed data frame with multiple entries in one or several `columns` and spreads (aka melts) these entries over several rows:
+If the data frame produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. This is where `fhir_melt()` comes into play. `fhir_melt()` takes an *indexed data frame* with multiple entries in one or several `columns` and spreads (aka melts) these entries over several rows:
 
 ```{r}
 fhir_melt(
@@ -360,9 +361,11 @@ fhir_melt(
 	all_columns        = FALSE
 )
 ```
-
+Note!  
+To get `fhir_melt()` work, the data frame has to be *cracked with indices*.  
+  
 The new variable `resource_identifier` maps which rows in the created data frame belong to which row (usually equivalent to one resource) in the original data frame.
-`brackets` and `sep` should be given the same character vectors that have been used to build the indices in `fhir_melt()`. `columns` is a character vector with the names of the variables you want to melt. You can provide more than one column here but it makes sense to only have variables from the same repeating attribute together in one call to `fhir_melt()`:
+`brackets` and `sep` have to be the same character vectors that have been used to build the indices with `fhir_crack()`. `columns` is a character vector with the names of the variables/columns you want to melt. You can provide more than one column here but it makes sense to only have variables from the same repeating attribute together in one call to `fhir_melt()`:
 
 ```{r}
 cols <- c("address.city", "address.use", "address.type", "address.country")
@@ -393,20 +396,20 @@ Values on the other variables will just repeat in the newly created rows. For mo
 
 
 ### Remove indices
-Once you have sorted out the multiple entries, you might want to get rid of the indices in your data.frame. This can be achieved using `fhir_rm_indices()`:
+Once you have sorted out the multiple entries, you might want to get rid of the indices in your data frame. This can be achieved using `fhir_rm_indices()`:
 
 ```{r}
 fhir_rm_indices(indexed_data_frame = molten, brackets = c("[", "]"))
 ```
-Again, `brackets` and `sep` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()`respectively.
+Again, `brackets` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()` respectively.
 
 ## Save and load downloaded bundles
-Since `fhir_crack()` ignores all data not specified in `design`, it makes sense to store the original search result for reproducibility and in case you realize later on that you need elements from the resources that you haven't extracted at first.
+Since `fhir_crack()` ignores data like resources or data fields, that are not specified in `design`, it makes sense to store the original search result for reproducibility and in case you realize later on that you need elements from the resources that you haven't extracted at first.
 
 There are two ways of saving the FHIR bundles you downloaded: Either you save them as R objects, or you write them to an xml file.
 
 ### Save and load bundles as R objects
-If you want to save the list of downloaded bundles as an `.rda` or `.RData` file, you can't just use R's `save()` or `save_image()` on it, because this will break the external pointers in the xml objects representing your bundles. Instead, you have to serialize the bundles before saving and unserialize them after loading. For single xml objects the package `xml2` provides serialization functions. For convenience, however, `fhircrackr` provides the functions `fhir_serialize()` and `fhir_unserialize()` that can be used directly on the bundles returned by `fhir_search()`:
+If you want to save the list of downloaded bundles as an `.rda` or `.RData` file, you can't just use R's `save()` or `save_image()` on it, because this will break the external pointers in the xml objects representing your bundles. Instead, you have to serialize the bundles before saving and unserialize them after loading. For single xml objects the package `xml2` provides serialization functions. For convenience, however, `fhircrackr` provides the functions `fhir_serialize()` that can be used directly on the bundles returned by `fhir_search()` and `fhir_unserialize()`:
 
 ```{r}
 #serialize bundles
@@ -421,7 +424,7 @@ head(serialized_bundles[[1]])
 temp_dir <- tempdir()
 
 #save
-save(serialized_bundles, file = paste0(temp_dir, "/bundles.rda"))
+saveRDS(serialized_bundles, file = paste0(temp_dir, "/bundles.rda"))
 
 ```
 
@@ -429,12 +432,12 @@ If you reload this bundle, you have to unserialize it before you can work with i
 
 ```{r}
 #load bundles
-load(paste0(temp_dir, "/bundles.rda"))
+serialized_bundles_reloaded <- readRDS(paste0(temp_dir, "/bundles.rda"))
 ```
 
 ```{r,results='hide'}
 #unserialize
-bundles <- fhir_unserialize(bundles = serialized_bundles)
+bundles <- fhir_unserialize(bundles = serialized_bundles_reloaded)
 
 #have a look
 bundles
