@@ -520,7 +520,6 @@ fhir_capability_statement <- function(
 #'
 #' @param bundles A list of xml objects representing the FHIR bundles.
 #' @param directory A character vector of length one containing the path to the folder to store the data in.
-#' @param max_bundles Maximal number of bundles to save. Defaults to Inf meaning all bundles from the list are saved
 #' @export
 #'
 #' @examples
@@ -530,19 +529,27 @@ fhir_capability_statement <- function(
 #' #save all bundles to temporary directory
 #' fhir_save(bundles, directory = tempdir())
 #'
-#' #save first two bundles to temporary directory
-#' fhir_save(bundles, directory = tempdir(), max_bundles = 2)
+#' #save only two bundles (the second and the fourth) to temporary directory
+#' fhir_save(bundles[c(2,4)], directory = tempdir())
 
-fhir_save <- function(bundles, directory = "result", max_bundles = Inf) {
+fhir_save <- function(bundles, directory = NULL) {
 
 	w <- 1 + floor(log10(length(bundles)))
-	if(!dir.exists(directory)) {dir.create(directory, recursive = TRUE)}
 
-	max <- min(length(bundles), max_bundles)
+	if(is.null(directory)) {
 
-	for(n in seq_len(length(bundles))[1:max]) {
+		stop('Destination directory name is missing in call of fhir_save().')
+	}
+
+	if(!dir.exists(directory)) {
+
+		dir.create(path = directory, recursive = TRUE)
+	}
+
+	for(n in seq_len(length(bundles))) {
+
 		xml2::write_xml(
-			x = bundles[[n]],
+			x    = bundles[[n]],
 			file = pastep(
 				directory,
 				stringr::str_pad(n, width = w, pad = "0"),
@@ -558,7 +565,7 @@ fhir_save <- function(bundles, directory = "result", max_bundles = Inf) {
 #' @description Reads all bundles stored as xml files from a directory.
 #'
 #' @param directory A character vector of length one containing the path to the folder were the files are stored.
-#' @param max_bundles Maximal number of bundles to load. Defaults to Inf meaning all bundles from the directory are loaded.
+#' @param indices A numeric vector of integers indicating which bundles from the specified directory should be loaded. Defaults to NULL meaning all bundles from the directory are loaded.
 #' @return A [fhir_bundle_list-class].
 #' @export
 #'
@@ -574,23 +581,41 @@ fhir_save <- function(bundles, directory = "result", max_bundles = Inf) {
 #' loaded_bundles <- fhir_load(tempdir())
 #' length(loaded_bundles)
 #'
-#' #load only the first two bundles
-#' loaded_bundles <- fhir_load(tempdir(), max_bundles = 2)
+#' #load only two, the second and the fourth bundle
+#' loaded_bundles <- fhir_load(tempdir(), indices = c(2,4))
 #' length(loaded_bundles)
 
-fhir_load <- function(directory, max_bundles = Inf) {
-	if(!dir.exists(directory)) {stop("Cannot find the specified directory.")}
-	xml.files <- dir(directory, "*.xml")
-	if(length(xml.files)==0){stop("Cannot find any xml-files in the specified directory.")}
+fhir_load <- function(directory, indices = NULL) {
 
-	max <- min(length(xml.files), max_bundles)
+	if(!dir.exists(directory)) {
 
-	list_ <- lapply(
-		lst(xml.files)[1:max],
-		function(x) xml2::read_xml(pastep(directory, x))
+		warning("Cannot find the specified directory.")
+
+		return(fhir_bundle_list(list()))
+	}
+
+	if(is.null(indices)) {
+
+		indices <- sort(grep('^[0-9]+\\.xml$', dir(directory)))
+	}
+
+	xml.files <- dir(directory)[indices]
+
+	if(length(xml.files) < 1) {
+
+		warning("Cannot find any xml-files in the specified directory.")
+
+		return(fhir_bundle_list(list()))
+	}
+
+	fhir_bundle_list(
+		bundles = lapply(
+			lst(xml.files),
+			function(x) {
+				xml2::read_xml(pastep(directory, x))
+			}
+		)
 	)
-
-	fhir_bundle_list(bundles = list_)
 }
 
 
