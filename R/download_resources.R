@@ -103,23 +103,26 @@
 #' }
 
 fhir_search <- function(
-	request = fhir_current_request(),
-	body = NULL,
-	username = NULL,
-	password = NULL,
-	token = NULL,
-	max_bundles = Inf,
-	verbose = 1,
-	delay_between_attempts = c(1,3,9,27,81),
-	log_errors = NULL,
-	save_to_disc = NULL,
-	delay_between_bundles = 0,
-	rm_tag = "div",
-	max_attempts = NULL) {
-
-	if(!is.null(max_attempts)){
-		warning("Argument max_attempts is deprecated since fhircrackr version 4.0.0.",
-				"The number of maximal attempts to reach the server is determined by the length of argument delay_between_attemps.")
+	request                = fhir_current_request(),
+	body                   = NULL,
+	username               = NULL,
+	password               = NULL,
+	token                  = NULL,
+	max_bundles            = Inf,
+	verbose                = 1,
+	delay_between_attempts = c(1, 3, 9, 27, 81),
+	log_errors             = NULL,
+	save_to_disc           = NULL,
+	delay_between_bundles  = 0,
+	rm_tag                 = "div",
+	max_attempts           = NULL
+) {
+	if(!is.null(max_attempts)) {
+		warning(
+			"Argument max_attempts is deprecated since fhircrackr version 4.0.0. ",
+			"The number of maximal attempts to reach the server is determined by ",
+			"the length of argument delay_between_attemps."
+		)
 	}
 
 	if(is.null(request)) {
@@ -154,11 +157,14 @@ fhir_search <- function(
 		}
 
 		#startup message
-		if(0 < verbose) {message("Initializing search via POST",
-								 " from FHIR base URL ",
-								 gsub("(^.+)(/.+\\?).*$", "\\1", request, perl = TRUE),
-								 ".\n")}
-	}else if(0 < verbose){
+		if(0 < verbose) {
+			message(
+				"Initializing search via POST from FHIR base URL ",
+				gsub(pattern = "(^.+)(/.+\\?).*$", "\\1", replacement = request, perl = TRUE),
+				".\n"
+			)
+		}
+	} else if(0 < verbose) {
 		message(
 			"Starting download of ",
 			if(max_bundles < Inf) {max_bundles} else {"all"},
@@ -179,6 +185,7 @@ fhir_search <- function(
 	repeat {
 		cnt <- cnt + 1
 		if(1 < verbose) {message("bundle[", cnt, "]", appendLF = FALSE)}
+
 		bundle <- get_bundle(
 			request = addr,
 			body = body,
@@ -191,18 +198,20 @@ fhir_search <- function(
 			log_errors = log_errors,
 			rm_tag = rm_tag
 		)
+
 		if(is.null(bundle)) {
 			if(0 < verbose) {
 				message("Download interrupted.")
 			}
 			break
 		}
+
 		if(!is.null(save_to_disc)) {
 			if (!dir.exists(save_to_disc)) {
 				dir.create(path = save_to_disc, recursive = TRUE)
 			}
 			xml2::write_xml(
-				x = bundle,
+				x    = bundle,
 				file = pastep(save_to_disc, cnt, ext = ".xml")
 			)
 		} else {
@@ -217,8 +226,7 @@ fhir_search <- function(
 						" bundles, this is less than the total number of bundles available."
 					)
 					assign(x = "last_next_link", value = bundle@next_link, envir = fhircrackr_env)
-				}
-				else {
+				} else {
 					message("\nDownload completed. All available bundles were downloaded.")
 				}
 			}
@@ -226,22 +234,24 @@ fhir_search <- function(
 		} else { #finished because there are no more bundles
 			assign(x = "last_next_link", value = new("fhir_url"), envir = fhircrackr_env)
 		}
+
 		if(length(bundle@next_link) == 0) {
 			if(0 < verbose) {
 				message("\nDownload completed. All available bundles were downloaded.")
 			}
 			break
 		}
+
 		addr <- bundle@next_link
-		if(0 < delay_between_bundles) {Sys.sleep(delay_between_bundles)}
+
+		if(0 < delay_between_bundles) {
+			Sys.sleep(delay_between_bundles)
+		}
 	}
+
 	fhircrackr_env$current_request <- request
 
-	return(
-		if(is.null(save_to_disc)) {
-			fhir_bundle_list(bundles)
-		} else {NULL} #brauchts eigentlich auch nicht
-	)
+	if(is.null(save_to_disc)) {fhir_bundle_list(bundles)} else {NULL} #brauchts eigentlich auch nicht
 }
 
 
@@ -532,14 +542,9 @@ fhir_capability_statement <- function(
 #' #save only two bundles (the second and the fourth) to temporary directory
 #' fhir_save(bundles[c(2,4)], directory = tempdir())
 
-fhir_save <- function(bundles, directory = NULL) {
+fhir_save <- function(bundles, directory) {
 
 	w <- 1 + floor(log10(length(bundles)))
-
-	if(is.null(directory)) {
-
-		stop('Destination directory name is missing in call of fhir_save().')
-	}
 
 	if(!dir.exists(directory)) {
 
