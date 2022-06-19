@@ -58,7 +58,7 @@ library(fhircrackr)
 ```
 
 ## FHIR search requests
-To download data from a  FHIR server, you need to specify which resources you want to get with a *FHIR search request*. You can just define your search request as a simple string that you provide to `fhir_search()`. In that case, however, no checking of spelling mistakes of resource types and URL encoding will be done for you. If you are comfortable with this, you can skip the following paragraph, as the first part of this vignette introduces the basics of FHIR search and some functions to build valid FHIR search requests with `fhircrackr`. 
+To download data from a FHIR server, you need to specify which resources you want to get with a *FHIR search request*. You can just define your search request as a simple string that you provide to `fhir_search()`. In that case, however, no checking of spelling mistakes of resource types and URL encoding will be done for you. If you are comfortable with this, you can skip the following paragraph, as the first part of this vignette introduces the basics of FHIR search and some functions to build valid FHIR search requests with `fhircrackr`. 
 
 A FHIR search request will mostly have the form `[base]/[type]?parameter(s)`, where `[base]` is the base URL to the FHIR server you are trying to access, `[type]` refers to the type of resource you are looking for and `parameter(s)` characterize specific properties those resources should have. The function `fhir_url()` offers a solution to bring those three components together correctly, taking care of proper formatting. 
 
@@ -667,11 +667,13 @@ result <- fhir_bundle_list(unlist(bundles_unserialized, recursive = FALSE))
 Sometimes it can be useful to download a random sample of resources from a server, e.g. when you want to to some kind case-control analysis. The fhircrackr offers a function `fhir_sample_resources()` which takes a base url, a resource type and (optionally) some FHIR Search parameters and returns a random sample with a given size of those resources.
 For example you could download 10 random Patient resources of all female patients born before 1960 like this:
 
-```{r}
-bundle <- fhir_sample_resources(base_url = "http://hapi.fhir.org/baseR4",
-								resource = "Patient",
-								parameters = c(gender = "female", birthdate = "lt1960-01-01"),
-								sample_size = 10)
+```{r, eval=F}
+bundle <- fhir_sample_resources(
+	base_url    = "http://hapi.fhir.org/baseR4",
+	resource    = "Patient",
+	parameters  = c(gender = "female", birthdate = "lt1960-01-01"),
+	sample_size = 10
+)
 ```
 
 This request may take some time because in the first step, the resource (aka logical) IDs of all resources matching the request (i.e. all Patient resources of females born before 1960) are downloaded. This is necessary because the sampling is actually done in this vector of resource IDs.

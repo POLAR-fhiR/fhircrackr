@@ -187,7 +187,7 @@ table_description <- fhir_table_description(
 table_description
 ```
 
-Each of the five style elements `sep`, `brackets`, `remove_empty_columns`, `format` and `keep_attr` in `table_description` can also be controlled directly by the argument of the same name of `fhir_crack()`. If one of these function arguments is `NULL` (the default value for each argument), the corresponding value specified as style argument in `table_description` will be used. If the argument in `fhir_crack` is not `NULL`, the corresponding value in `fhir_table_description` will be ignored. If both the `fhir_crack` function argument and the corresponding component in `fhir_table_description` are `NULL`, the respective default value (`sep = " "`, `brackets = NULL`, `rm_empty_cols = TRUE`, `format` = 'compact', `keep_attr` = FALSE) will be applied. 
+Each of the five style elements `sep`, `brackets`, `remove_empty_columns`, `format` and `keep_attr` in `table_description` can also be controlled directly by the argument of the same name of `fhir_crack()`. If one of these function arguments is `NULL` (the default value for each argument), the corresponding value specified as style argument in `table_description` will be used. If the argument in `fhir_crack` is set, the corresponding value in `fhir_table_description` will be overruled. If both the `fhir_crack` function argument and the corresponding component in `fhir_table_description` are `NULL`, the respective default value (`sep = ':::'`, `brackets = NULL`, `rm_empty_cols = TRUE`, `format = 'compact'`, `keep_attr = FALSE`) will be applied. 
 
 After it is defined, the `fhir_table_description` can be used in `fhir_crack()` like this:
 
@@ -269,12 +269,12 @@ list_of_tables$MedicationStatements[1:5,]
 list_of_tables$Patients[1:5,sapply(list_of_tables$Patients[1:5,], function(x) !any(is.na(x)))]
 ```
 
-As you can see, the result now contains two data frames, one for Patient resources and one for MedicationStatement resources.
+As you can see, the result now contains two tables, one for Patient resources and one for MedicationStatement resources.
 
 ## Multiple entries
 A particularly complicated problem in flattening FHIR resources is caused by the fact that there can be multiple entries to an attribute. For a more detailed description of this problem, please see the vignette on flattening resources. 
 
-In general, `fhir_crack()` will paste multiple entries for the same attribute together in the data frame, using the separator provided by the `sep` argument. 
+In general, `fhir_crack()` will paste multiple entries for the same attribute together in the table, using the separator provided by the `sep` argument. 
 
 
 Let's have a look at the following simple example, where we have a bundle containing just two Patient resources. The example is part of the `fhircrackr` package and you can make it available like this:
@@ -347,10 +347,10 @@ df
 ```
 Multiple entries are pasted together with the specified separator string (in this case: " | ") in between and the indices (inside the specified bracket strings (here: "[" and "]")) display the entry the value belongs to. That way you can see that Patient resource 2 had three entries for the attribute `address` and you can also see which attributes belong to which entry.
 
-## Process Data Frames with multiple Entries
+## Process Tables with multiple Entries
 
-### Melt data frames with multiple entries
-If the data frame produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. This is where `fhir_melt()` comes into play. `fhir_melt()` takes an *indexed data frame* with multiple entries in one or several `columns` and spreads (aka melts) these entries over several rows:
+### Melt tables with multiple entries
+If the table produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. This is where `fhir_melt()` comes into play. `fhir_melt()` takes an *indexed data frame* with multiple entries in one or several `columns` and spreads (aka melts) these entries over several rows:
 
 ```{r}
 fhir_melt(
@@ -392,7 +392,7 @@ molten <- fhir_melt(
 
 molten
 ```
-Values on the other variables will just repeat in the newly created rows. For more information, e.g. on how to melt all multiple entries in a data.frame at once, please see the vignette on flattening resources.
+Values on the other variables will just repeat in the newly created rows. For more information please see the vignette on flattening resources.
 
 
 ### Remove indices
@@ -404,7 +404,7 @@ fhir_rm_indices(indexed_data_frame = molten, brackets = c("[", "]"))
 Again, `brackets` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()` respectively.
 
 ## Save and load downloaded bundles
-Since `fhir_crack()` ignores data like resources or data fields, that are not specified in `design`, it makes sense to store the original search result for reproducibility and in case you realize later on that you need elements from the resources that you haven't extracted at first.
+Since `fhir_crack()` ignores all data, that are not specified in `design`, it makes sense to store the original search result for reproducibility and in case you realize later on that you need elements from the resources that you haven't extracted at first.
 
 There are two ways of saving the FHIR bundles you downloaded: Either you save them as R objects, or you write them to an xml file.
 
