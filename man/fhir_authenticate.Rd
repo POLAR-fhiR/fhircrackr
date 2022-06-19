@@ -28,11 +28,13 @@ This can be identical to \code{authorize}.}
 \item{authorize}{The url to send the client for authorization.}
 
 \item{query_authorize_extra}{A named list holding query parameters to append to initial auth page query.
-Could hold info about user identity and scope for keycloak like this:\preformatted{list(scope = "openid",
+Could hold info about user identity and scope for keycloak like this:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{list(scope = "openid",
      grant_type = "password",
      username = "fhir-user",
      password = "fhirtest")
-}}
+}\if{html}{\out{</div>}}}
 }
 \description{
 This function is a wrapper to create an \link[httr:Token-class]{httr::Token} object for authentication with OAuth2/OpenID Connect.

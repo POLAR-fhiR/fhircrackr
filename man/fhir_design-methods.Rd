@@ -27,7 +27,9 @@ and should be created using the function described here. The design is used in \
 the function how to flatten each resource type.
 }
 \details{
-A \code{fhir_design} looks for example like this:\preformatted{A fhir_design with 2 table_descriptions:
+A \code{fhir_design} looks for example like this:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{A fhir_design with 2 table_descriptions:
 A fhir_table_description with the following elements:
 
 	fhir_resource_type: Patient
@@ -59,7 +61,7 @@ brackets:      no brackets
 rm_empty_cols: FALSE
 format:        'wide'
 keep_attr:     TRUE
-}
+}\if{html}{\out{</div>}}
 
 The names of the table_descriptions are taken from the names of the arguments. If the table_descriptions are
 created within the call to \code{fhir_design} and therefore have no names, the names will be created from the respective

@@ -56,28 +56,28 @@ fhir_url(url = "http://hapi.fhir.org/baseR4/Patient?gender=male&_summary=count")
 
 #provide base url and resource type
 fhir_url(
-   url = "http://hapi.fhir.org/baseR4",
+   url      = "http://hapi.fhir.org/baseR4",
    resource = "Patient"
  )
 
 #parameters in one string
 fhir_url(
-   url = "http://hapi.fhir.org/baseR4",
-   resource = "Patient",
+   url        = "http://hapi.fhir.org/baseR4",
+   resource   = "Patient",
    parameters = "gender=male&_summary=count"
  )
 
 #parameters as a named character
 fhir_url(
-   url = "http://hapi.fhir.org/baseR4",
-   resource = "Patient",
+   url        = "http://hapi.fhir.org/baseR4",
+   resource   = "Patient",
    parameters = c("gender" = "male", "_summary" = "count")
  )
 
 #parameters as a named list
 fhir_url(
-   url = "http://hapi.fhir.org/baseR4",
-   resource = "Patient",
+   url        = "http://hapi.fhir.org/baseR4",
+   resource   = "Patient",
    parameters = list("gender" = "male", "_summary" = "count")
  )
 }

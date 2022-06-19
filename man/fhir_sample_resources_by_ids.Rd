@@ -79,7 +79,7 @@ fhir_crack(
   fhir_table_description(
     resource = "Patient",
     cols     = list(
-      ID      = "id",
+      ID     = "id",
       given  = "name/given",
       family = "name/family")))
 }

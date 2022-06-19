@@ -35,10 +35,12 @@ Empty strings (\code{""}) are not allowed.
 \item \code{rm_empty_cols}: A logical scalar defining whether or not to remove empty columns after cracking. Empty columns arise when you
 try to extract an element that doesn't appear in any of the resources.
 A \code{fhir_style} object looks for example like this:
-}\preformatted{sep: ':::'
+}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{sep: ':::'
 brackets: '<|' '|>'
 rm_empty_cols: FALSE
-}
+}\if{html}{\out{</div>}}
 }
 \examples{
 fhir_style(sep = ":::",

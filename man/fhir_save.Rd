@@ -4,14 +4,12 @@
 \alias{fhir_save}
 \title{Save FHIR bundles as xml-files}
 \usage{
-fhir_save(bundles, directory = "result", max_bundles = Inf)
+fhir_save(bundles, directory)
 }
 \arguments{
 \item{bundles}{A list of xml objects representing the FHIR bundles.}
 
 \item{directory}{A character vector of length one containing the path to the folder to store the data in.}
-
-\item{max_bundles}{Maximal number of bundles to save. Defaults to Inf meaning all bundles from the list are saved}
 }
 \description{
 Writes a list of FHIR bundles as numbered xml files into a directory.
@@ -23,6 +21,6 @@ bundles <- fhir_unserialize(medication_bundles)
 #save all bundles to temporary directory
 fhir_save(bundles, directory = tempdir())
 
-#save first two bundles to temporary directory
-fhir_save(bundles, directory = tempdir(), max_bundles = 2)
+#save only two bundles (the second and the fourth) to temporary directory
+fhir_save(bundles[c(2,4)], directory = tempdir())
 }

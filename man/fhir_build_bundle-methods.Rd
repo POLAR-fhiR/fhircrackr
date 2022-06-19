@@ -8,27 +8,38 @@
 \title{Build a FHIR bundle}
 \usage{
 fhir_build_bundle(
-  table,
-  resource_type,
+  table = "data.frame",
+  brackets = "character",
+  resource_type = "character",
   bundle_type = "transaction",
   verbose = 1
 )
 
 \S4method{fhir_build_bundle}{data.frame}(
-  table,
-  resource_type,
+  table = "data.frame",
+  brackets = "character",
+  resource_type = "character",
   bundle_type = "transaction",
   verbose = 1
 )
 
-\S4method{fhir_build_bundle}{list}(table, bundle_type = "transaction", verbose = 1)
+\S4method{fhir_build_bundle}{list}(
+  table = "data.frame",
+  brackets = "character",
+  bundle_type = "transaction",
+  verbose = 1
+)
 }
 \arguments{
 \item{table}{A wide table as produced by \code{\link[=fhir_crack]{fhir_crack()}}, possibly modified (see details) or a named list
 of wide tables, if different resource types have to be included in the same bundle. In this case the names of
 the list elements must correspond to the resource type represented in the table!}
 
+\item{brackets}{A character vector of length one. The brackets used for cracking.}
+
 \item{resource_type}{A character vector of length one or \linkS4class{fhir_resource_type} object
+indicating which resource type is represented in the table, if a single table is provided. This argument is
+ignored when \code{table} is a named list of tables.
 indicating which resource type is represented in the table, if a single table is provided. This argument is
 ignored when \code{table} is a named list of tables.}
 
@@ -57,7 +68,9 @@ The typical use case would look like this:
 }
 
 A FHIR bundle that can be POSTed to a server is usually of type \code{transaction} or \code{batch}. Each entry of these bundles consists of the resource itself
-as well as an instruction for the server of what to to with the resource. A very simple example looks like this:\preformatted{<Bundle>
+as well as an instruction for the server of what to to with the resource. A very simple example looks like this:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{<Bundle>
    <type value="transaction"/>
   <entry>
      <resource>
@@ -96,7 +109,7 @@ as well as an instruction for the server of what to to with the resource. A very
     </request>
  </entry>
 </Bundle>
-}
+}\if{html}{\out{</div>}}
 
 In this example the bundle contains two Patient resources that are sent to server with a POST. For more information the structure of transaction/batch bundles,
 please see the FHIR documentation at https://www.hl7.org/fhir/http.html and https://www.hl7.org/fhir/bundle.html.
