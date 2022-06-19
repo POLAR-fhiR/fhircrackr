@@ -166,7 +166,7 @@ table_description <- fhir_table_description(
 		gender      = "gender",
 		birthday    = "birthDate"
 	),
-	sep           = "|",
+	sep           = " <~>",
 	brackets      = c("[", "]"),
 	rm_empty_cols = FALSE,
 	format        = 'compact',

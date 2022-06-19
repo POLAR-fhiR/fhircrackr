@@ -1,3 +1,41 @@
+#' build_request
+#'
+#' @param url A character of length 1.
+#' @param resource A character of length 1.
+#'
+#' @return A character of length 1.
+#' @noRd
+#' @examples
+#' build_request('https://server/', 'patient')
+#' build_request('https://server', 'Patient')
+build_request <- function(url, resource) {
+
+	paste(
+		url,
+		fhir_resource_type(string = resource),
+		sep = if(stringr::str_sub(string = url, start = -1) == '/') '' else '/'
+	)
+}
+
+#' url_encode
+#'
+#' @param url A character of length 1.
+#' @param url_enc A logical  of length 1, indicating whether encoding should be applied. Defaults to TRUE.
+#'
+#' @return A character of length 1.
+#' @noRd
+#' @examples
+#' url_encode('https://server/Patient?id=https://codesys1.com|005,https://codesys2.com|AbD')
+#' url_encode('https://server/Patient?id=https://codesys1.com|005,https://codesys2.com|AbD', FALSE)
+url_encode <- function(url, url_enc = TRUE) {
+
+	if(url_enc) {
+		utils::URLencode(URL = url)
+	} else {
+		url
+	}
+}
+
 #' An S4 object to represent a URL for a FHIR server
 #'
 #' Objects of this class are basically strings (character vectors of length one) representing
@@ -54,28 +92,28 @@ setValidity(
 #'
 #' #provide base url and resource type
 #' fhir_url(
-#'    url = "http://hapi.fhir.org/baseR4",
+#'    url      = "http://hapi.fhir.org/baseR4",
 #'    resource = "Patient"
 #'  )
 #'
 #' #parameters in one string
 #' fhir_url(
-#'    url = "http://hapi.fhir.org/baseR4",
-#'    resource = "Patient",
+#'    url        = "http://hapi.fhir.org/baseR4",
+#'    resource   = "Patient",
 #'    parameters = "gender=male&_summary=count"
 #'  )
 #'
 #' #parameters as a named character
 #' fhir_url(
-#'    url = "http://hapi.fhir.org/baseR4",
-#'    resource = "Patient",
+#'    url        = "http://hapi.fhir.org/baseR4",
+#'    resource   = "Patient",
 #'    parameters = c("gender" = "male", "_summary" = "count")
 #'  )
 #'
 #' #parameters as a named list
 #' fhir_url(
-#'    url = "http://hapi.fhir.org/baseR4",
-#'    resource = "Patient",
+#'    url        = "http://hapi.fhir.org/baseR4",
+#'    resource   = "Patient",
 #'    parameters = list("gender" = "male", "_summary" = "count")
 #'  )
 #' @export
@@ -96,9 +134,13 @@ setMethod(
 	signature = c(url = "character", resource = "missing", parameters = "missing"),
 	definition = function(url, url_enc = TRUE) {
 
-		if(0 < length(url) && url_enc) {url <- utils::URLencode(URL = url)}
-
-		new(Class = "fhir_url", url)
+		new(
+			Class = "fhir_url",
+			url_encode(
+				url     = url,
+				url_enc = url_enc && 1 == length(url)
+			)
+		)
 	}
 )
 
@@ -110,16 +152,13 @@ setMethod(
 	signature = c(url = "character", resource = "character", parameters = "missing"),
 	function(url, resource, url_enc = TRUE) {
 
-		resource <- fhir_resource_type(string = resource)
-
-		if(stringr::str_sub(string = url, start = -1) == "/") {
-			request <- paste0(url, resource)
-		} else {
-			request <- paste(url, resource, sep = "/")
-		}
-
-		if(url_enc) {request <- utils::URLencode(URL = request)}
-	 	new(Class = "fhir_url", request)
+	 	new(
+	 		Class = "fhir_url",
+	 		url_encode(
+	 			url     = build_request(url = url, resource = resource),
+	 			url_enc = url_enc
+	 		)
+	 	)
 	}
 )
 
@@ -131,40 +170,39 @@ setMethod(
 	signature = c(url = "character", resource = "character", parameters = "character"),
 	definition = function(url, resource, parameters, url_enc = TRUE) {
 
-		resource <- fhir_resource_type(string = resource)
-
-		if(stringr::str_sub(string = url, start = -1) == "/") {
-			request <- paste0(url, resource)
-		} else {
-			request <- paste(url, resource, sep="/")
-		}
+		request <- build_request(url = url, resource = resource)
 
 		if(length(parameters) == 1 && grepl("=", parameters)) {
 			request <- paste0(request, "?", parameters)
-			if(url_enc) {request <- utils::URLencode(URL = request)}
-			return(new(Class = "fhir_url", request))
-		}
-
-		if(is.null(names(parameters))) {
-			stop("A character vector has to be named to create parameters from it.")
-		}
-
-		if("" %in% names(parameters)) {
-			stop(
-				"All elements in the parameter vector must have names. \n",
-				"Please provide a name for the following parameters: \"",
-				paste(parameters[names(parameters)==""], collapse = "\", \""), "\"."
-			)
+			return(new(
+				Class = "fhir_url",
+				url_encode(url = request, url_enc = url_enc)
+			))
 		}
 
 		keys <- names(parameters)
-		pairs <- paste(keys, parameters, sep = "=")
-		string <- paste(pairs, collapse = "&")
+
+		if(is.null(keys)) {
+			stop("A character vector has to be named to create parameters from it.")
+		}
+
+		if("" %in% keys) {
+			stop(
+				"All elements in the parameter vector must have names. \n",
+				"Please provide a name for the following parameters: \"",
+				paste(parameters[keys == ""], collapse = "\", \""),
+				"\"."
+			)
+		}
+
+		pairs   <- paste(keys, parameters, sep = "=")
+		string  <- paste(pairs, collapse = "&")
 		request <- paste0(request, "?", string)
 
-		if(url_enc) {request <- utils::URLencode(URL = request)}
-
-	 	new(Class = "fhir_url", request)
+	 	new(
+	 		Class = "fhir_url",
+	 		url_encode(url = request, url_enc = url_enc)
+	 	)
 	}
 )
 
@@ -176,30 +214,55 @@ setMethod(
 	signature = c(url = "character", resource = "character", parameters = "list"),
 	function(url, resource, parameters, url_enc = TRUE) {
 
-		resource <- fhir_resource_type(string = resource)
-
-		if(stringr::str_sub(string = url, start = -1) == "/") {
-			request <- paste0(url, resource)
-		} else {
-			request <- paste(url, resource, sep = "/")
-		}
-
-		if(any(!sapply(parameters, function(x) {is.character(x)}))) {
+		if(any(!sapply(parameters, is.character))) {
 			stop("The provided list must have elements of type character")
 		}
 
-		if(is.null(names(parameters))) {
+		keys <- names(parameters)
+
+		if(is.null(keys)) {
 			stop("Please provide a named list.")
 		}
 
-		keys <- names(parameters)
-		values <- unlist(parameters)
-		pairs <- paste(keys, values, sep = "=")
-		string <- paste(pairs, collapse = "&")
+		request <- build_request(url = url, resource = resource)
+
+		values  <- unlist(parameters)
+		pairs   <- paste(keys, values, sep = "=")
+		string  <- paste(pairs, collapse = "&")
 		request <- paste0(request, "?", string)
 
-		if(url_enc) {request <- utils::URLencode(URL = request)}
-
-		new(Class = "fhir_url", request)
+		new(
+			Class = "fhir_url",
+			url_encode(url = request, url_enc = url_enc)
+		)
 	}
 )
+
+#' fhir_request
+#' @description A Wrapper for fhir_url
+#'
+#' @param url The same as for `fhir_url()`.
+#' @param resource The same as for `fhir_url()`. Defaults to NULL.
+#' @param parameters The same as for `fhir_url()`. Defaults to NULL.
+#' @param url_enc The same as for `fhir_url()`. Defaults to TRUE.
+#'
+#' @return The same as for `fhir_url()`.
+#' @export
+#'
+#' @examples See `fhir_url()`!
+fhir_request <- function(url, resource = NULL, parameters = NULL, url_enc = TRUE) {
+
+	if(is.null(resource)) {
+		if(is.null(parameters)) {
+			fhir_url(url = url, url_enc = url_enc)
+		} else {
+			stop('\'resource\' has to be given in fhir_request(), if parameters shall be added.')
+		}
+	} else {
+		if(is.null(parameters)) {
+			fhir_url(url = url, resource = resource, url_enc = url_enc)
+		} else {
+			fhir_url(url = url, resource = resource, parameters = parameters, url_enc = url_enc)
+		}
+	}
+}
