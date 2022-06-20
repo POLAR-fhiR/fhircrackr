@@ -123,14 +123,14 @@ If these columns are not added to the table, \code{\link[=fhir_build_bundle]{fhi
 bundles <- fhir_unserialize(bundles = example_bundles1)
 
 #crack fhir resources
-Pat <- fhir_table_description(
+table_desc_pat <- fhir_table_description(
     resource = "Patient",
     brackets = c("[", "]"),
     sep      = " ",
     format = "wide"
 )
 
-df <- fhir_crack(bundles = bundles, design = Pat)
+df <- fhir_crack(bundles = bundles, design = table_desc_pat)
 
 #add request info to table
 request <- data.frame(
@@ -141,7 +141,7 @@ request <- data.frame(
 request_df <- cbind(df, request)
 
 #build bundle
-bundle <- fhir_build_bundle(request_df, "Patient", bundle_type = "transaction")
+bundle <- fhir_build_bundle(request_df, table_desc_pat@brackets, "Patient", bundle_type = "transaction")
 
 #print to console
 cat(toString(bundle))
