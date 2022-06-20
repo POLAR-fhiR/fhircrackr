@@ -1097,21 +1097,6 @@ desc_xml <- function(s) {
 	)
 }
 
-#' Increment tab
-#' @param tab A character vector with strings to increment
-#' @param add The string to use for incrementation
-#' @return The incremented tab
-#' @noRd
-inc_tab <- function(tab, add = "....") {paste0(tab, add)}
-
-#' Decrement tab
-#' @param tab A character vector with strings to decrement
-#' @param add The string to remove
-#' @return The decremented tab
-#' @noRd
-dec_tab <- function(tab, sub = "....") {substr(tab, 1, nchar(tab) - nchar(sub))}
-
-
 #' Create value list
 #' This function creates a list that has values as attributes.
 #' Can be used to create trees that are digesteable by xml2.
@@ -1263,27 +1248,19 @@ sort_strings_with_numbers_correctly <- function(s) {
 	s[order_strings_with_numbers_correctly(s)]
 }
 
-separate_indices <- function(names, bra, ket) {
-	pattern <- paste0(bra, '([0-9]+\\.*)+ *', ket)
-	gsub(
-		pattern     = paste0(bra, '|', ket, '| '),
-		replacement = '',
-		x = stringr::str_extract(
-			pattern     = pattern,
-			string      = names
-		)
-	)
-}
 
-separate_names <- function(names, bra, ket) {
-	pattern <- paste0(bra, '([0-9]+\\.*)+ *', ket)
-	gsub(
-		pattern     = paste0(bra, '|', ket, '| '),
-		replacement = '',
-		x = gsub(
-			pattern     = pattern,
-			replacement = '',
-			x           = names
-		)
-	)
-}
+#' Add a 's' to a plural.
+#'
+#' @param n A numeric of length one.
+#'
+#' @return A character.
+#' @export
+#'
+#' @examples
+#' n <- 0
+#' cat(paste0('We have ', n, ' Rabbit', pluralS(n), '.\n'))
+#' n <- n + 1
+#' cat(paste0('Now we have ', n, ' Rabbit', pluralS(n), '.\n'))
+#' n <- n + 1
+#' cat(paste0('Finally we have ', n, ' Rabbit', pluralS(n), '.\n'))
+pluralS <- function(n) {if(n==1) '' else 's'}
