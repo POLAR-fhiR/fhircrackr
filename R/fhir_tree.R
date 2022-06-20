@@ -49,15 +49,17 @@ fhir_tree.new <- function(table, brackets, root) {
 	bra <- esc(brackets[1])
 	ket <- esc(brackets[2])
 	full_names <- names(table)
-	names <- gsub(
-		pattern     = paste0(bra, '|', ket, '| '),
-		replacement = '',
-		x = gsub(
-			pattern     = paste0(bra, '([0-9]+\\.*)+ *', ket),
-			replacement = '',
-			x           = full_names
-		)
-	)
+	# names <- gsub(
+	# 	pattern     = paste0(bra, '|', ket, '| '),
+	# 	replacement = '',
+	# 	x = gsub(
+	# 		pattern     = paste0(bra, '([0-9]+\\.*)+ *', ket),
+	# 		replacement = '',
+	# 		x           = full_names
+	# 	)
+	# )
+
+	names <- separate_names(names = full_names, bra = bra, ket = ket)
 
 	n.attrs <- sapply(strsplit(x = names, split = '@'), function(x) if(is.na(x[2])) 'value' else x[2])
 
@@ -65,14 +67,16 @@ fhir_tree.new <- function(table, brackets, root) {
 
 	n.parts <- strsplit(x = names, split = '\\.')
 
-	indices <- gsub(
-		pattern     = paste0(bra, '|', ket, '| '),
-		replacement = '',
-		x = stringr::str_extract(
-			pattern = paste0(bra, '([0-9]+\\.*)+ *', ket),
-			string  = full_names
-		)
-	)
+	# indices <- gsub(
+	# 	pattern     = paste0(bra, '|', ket, '| '),
+	# 	replacement = '',
+	# 	x           = stringr::str_extract(
+	# 		pattern = paste0(bra, '([0-9]+\\.*)+ *', ket),
+	# 		string  = full_names
+	# 	)
+	# )
+
+	indices <- separate_indices(names = full_names, bra = bra, ket = ket)
 
 	final_names <- if(length(indices) == length(names) && !all(is.na(indices))) {
 		i.parts <- strsplit(x = indices, split = '\\.')
@@ -160,11 +164,6 @@ fhir_tree.fun.rm_ids <- function(node) {
 	node
 }
 
-fhir_tree.fun.rm_attributes <- function(node) {
-	names(node) <- gsub('@.+$', '', names(node))
-	node
-}
-
 fhir_tree.fun.skip_one <- function(node) {
 	names(node) <- gsub('([^0-9]+)(1$)', '\\1',  names(node))
 	node
@@ -199,7 +198,7 @@ fhir_tree.fun.skip_one <- function(node) {
 fhir_tree.rm_ids <- function(tree) {
 	tree.names <- names(tree)
 	for(n in tree.names) {
-		tree[[n]] <- rm_ids_from_tree(tree = tree[[n]])
+		tree[[n]] <- fhir_tree.rm_ids(tree = tree[[n]])
 	}
 	names(tree) <- gsub('[0-9]+', '', tree.names)
 	tree
@@ -208,7 +207,12 @@ fhir_tree.rm_ids <- function(tree) {
 
 
 
-#######################################################################################################################
+#' Get Attributes of a Tree Node
+#'
+#' @param tree A tree as build by fhir_tree.new
+#'
+#' @return A list of attributes' names and values
+#' @export
 fhir_tree.get_attr <- function(tree) {
 	attribs <- attributes(tree)
 	attribs_names <- names(attribs)
@@ -216,7 +220,7 @@ fhir_tree.get_attr <- function(tree) {
 	attribs_names <- names(attribs)
 	list(names = attribs_names, values = attribs)
 }
-#######################################################################################################################
+
 
 #' Create text version of tree
 #'
@@ -251,6 +255,7 @@ fhir_tree.get_attr <- function(tree) {
 #' @noRd
 fhir_tree.as_text <- function(
 		tree,
+		prompt    = ': ',
 		tab       = '  ',
 		keep_attr = FALSE,
 		keep_ids  = TRUE,
@@ -263,15 +268,14 @@ fhir_tree.as_text <- function(
 		if(!keep_ids) s <- gsub('[0-9]+$', '', s) else if(skip_one) s <- gsub('1$', '', s)
 		s <- paste0(tabs, s)
 		a <- fhir_tree.get_attr(tree[[i]])
-		v <- a$values
-		n <- a$names
-		if(0 < length(n)) {
-			s <- paste0(s, if(keep_attr) paste0('@', n) else '', ': ', v)
+		if(0 < length(a$names)) {
+			s <- paste0(s, if(keep_attr) paste0('@', a$names) else '', prompt, a$values)
 		}
 		str <- paste0(
 			str, s, '\n',
 			fhir_tree.as_text(
 				tree      = tree[[i]],
+				prompt    = prompt,
 				tabs      = inc_tab(tabs, tab),
 				tab       = tab,
 				keep_attr = keep_attr,
@@ -359,6 +363,63 @@ fhir_tree.as_string <- function(tree, prompt = ' \u2500 ', keep_attr = TRUE, kee
 	t2s(tree = tree, pre = "", prompt = prompt, keep_attr = keep_attr, keep_ids = keep_ids, skip_one = skip_one)
 }
 
+#' Increment tab
+#' @param tab A character vector with strings to increment
+#' @param add The string to use for incrementation
+#' @return The incremented tab
+#' @noRd
+inc_tab <- function(tab, add = "....") {paste0(tab, add)}
+
+#' Decrement tab
+#' @param tab A character vector with strings to decrement
+#' @param add The string to remove
+#' @return The decremented tab
+#' @noRd
+dec_tab <- function(tab, sub = "....") {substr(tab, 1, nchar(tab) - nchar(sub))}
+
+
+#' Separate indices from column names
+#'
+#' @param names A character of length one.
+#' @param bra A character of length one.
+#' @param ket A character of length one.
+#'
+#' @return A character.
+#' @export
+#'
+#' @examples
+separate_indices <- function(names, bra, ket) {
+	gsub(
+		pattern     = paste0(bra, '|', ket, '| '),
+		replacement = '',
+		x = stringr::str_extract(
+			pattern     = paste0(bra, '([0-9]+\\.*)+ *', ket),
+			string      = names
+		)
+	)
+}
+
+#' Separate names from column names with indices
+#'
+#' @param names A character of length one.
+#' @param bra A character of length one.
+#' @param ket A character of length one.
+#'
+#' @return A character.
+#' @export
+#'
+#' @examples
+separate_names <- function(names, bra, ket) {
+	gsub(
+		pattern     = paste0(bra, '|', ket, '| '),
+		replacement = '',
+		x = gsub(
+			pattern     = paste0(bra, '([0-9]+\\.*)+ *', ket),
+			replacement = '',
+			x           = names
+		)
+	)
+}
 
 #' Create xml version of tree
 #'
@@ -400,13 +461,21 @@ fhir_tree.as_xml <- function(tree, escaped = TRUE, tabs = "", tab = "  ") {
 		n <- names(tree)[i]
 		tr <- tree[[i]]
 		s <- paste0(tabs, "<", n)
-		attribute <- grep("value|id|url", names(attributes(tr)), value = TRUE)
-		if(0 < length(attribute)){
-			a <- attr(tr, attribute)
-			s <- paste0(s, " ", attribute, "=\"", if(escaped) esc_xml(a) else a, "\"")
+		attrib <- fhir_tree.get_attr(tr)
+		if(0 < length(attrib$names)){
+			s <- paste0(s, " ", attrib$names, "=\"", if(escaped) esc_xml(attrib$values) else a, "\"")
 		}
 		s <- if(length(tr) == 0) paste0(s, "/>") else paste0(s, ">")
-		s = paste0(s, "\n", fhir_tree.as_xml(tree = tr, escaped = escaped, tabs = inc_tab(tabs, tab), tab = tab))
+		s = paste0(
+			s,
+			"\n",
+			fhir_tree.as_xml(
+				tree = tr,
+				escaped = escaped,
+				tabs = inc_tab(tabs, tab),
+				tab = tab
+			)
+		)
 		if(0 < length(tr)) s <- paste0(s, tabs, "</", n, ">\n")
 		str <- paste0(str, s)
 	}
@@ -417,8 +486,10 @@ fhir_tree.as_xml <- function(tree, escaped = TRUE, tabs = "", tab = "  ") {
 #' Short form for cat(fhir_tree.as_string(tree, prompt))
 #'
 #' @param tree A Tree.
-#' @param prompt A character of length one carrying a prompt sign.
-#'
+#' @param prompt A string that is put between each element and its value. Defaults to a semicolon.
+#' @param keep_attr A logical of length one indication whether attributes should be keeped in names. Defaults to `FALSE`.
+#' @param keep_ids A logical of length one indication whether attributes should be keeped in names. Defaults to `TRUE`.
+#' @param skip_one A logical of length one indication whether attributes should be keeped in names. Defaults to `TRUE`. Has no effect if `keep_ids` is `FALSE`.
 #' @export
 #' @noRd
 #' @examples
@@ -440,14 +511,18 @@ fhir_tree.as_xml <- function(tree, escaped = TRUE, tabs = "", tab = "  ") {
 #' #build tree
 #' tree <- fhir_tree.new(cast_df, brackets = table_desc@brackets, root = "Patient")
 #' fhir_tree.print(tree, '\u2500')
-fhir_tree.print <- function(tree, prompt = ":") {
-	cat(fhir_tree.as_string(tree = tree, prompt = prompt))
+fhir_tree.print <- function(tree, prompt = ":", keep_attr = FALSE, keep_ids = FALSE, skip_one = FALSE) {
+	cat(fhir_tree.as_string(tree = tree, prompt = prompt, keep_attr = keep_attr, keep_ids = keep_ids, skip_one = skip_one))
 }
 
 #' Short form for cat(fhir_tree.as_text(tree, prompt))
 #'
 #' @param tree A Tree.
-#' @param prompt A character of length one carrying a prompt sign.
+#' @param prompt A string that is put between each element and its value. Defaults to a semicolon.
+#' @param tab A character of length one.
+#' @param keep_attr A logical of length one indication whether attributes should be keeped in names. Defaults to `FALSE`.
+#' @param keep_ids A logical of length one indication whether attributes should be keeped in names. Defaults to `TRUE`.
+#' @param skip_one A logical of length one indication whether attributes should be keeped in names. Defaults to `TRUE`. Has no effect if `keep_ids` is `FALSE`.
 #'
 #' @export
 #' @noRd
@@ -470,8 +545,8 @@ fhir_tree.print <- function(tree, prompt = ":") {
 #' #build tree
 #' tree <- fhir_tree.new(cast_df, brackets = table_desc@brackets, root = "Patient")
 #' fhir_tree.text(tree)
-fhir_tree.text <- function(tree, prompt = ":") {
-	cat(fhir_tree.as_text(tree = tree, prompt = prompt))
+fhir_tree.text <- function(tree, prompt = ': ', tab = '  ', keep_attr = FALSE, keep_ids = FALSE, skip_one = FALSE) {
+	cat(fhir_tree.as_text(tree = tree, prompt = prompt, tab = tab, keep_attr = keep_attr, keep_ids = keep_ids, skip_one = skip_one))
 }
 
 
