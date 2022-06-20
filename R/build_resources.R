@@ -137,14 +137,14 @@ fhir_build_resource <- function(row, brackets, resource_type) {
 #' bundles <- fhir_unserialize(bundles = example_bundles1)
 #'
 #' #crack fhir resources
-#' Pat <- fhir_table_description(
+#' table_desc_pat <- fhir_table_description(
 #'     resource = "Patient",
 #'     brackets = c("[", "]"),
 #'     sep      = " ",
 #'     format = "wide"
 #' )
 #'
-#' df <- fhir_crack(bundles = bundles, design = Pat)
+#' df <- fhir_crack(bundles = bundles, design = table_desc_pat)
 #'
 #' #add request info to table
 #' request <- data.frame(
@@ -155,7 +155,7 @@ fhir_build_resource <- function(row, brackets, resource_type) {
 #' request_df <- cbind(df, request)
 #'
 #' #build bundle
-#' bundle <- fhir_build_bundle(request_df, "Patient", bundle_type = "transaction")
+#' bundle <- fhir_build_bundle(request_df, table_desc_pat@brackets, "Patient", bundle_type = "transaction")
 #'
 #' #print to console
 #' cat(toString(bundle))
@@ -192,18 +192,31 @@ setMethod(
 		verbose       = 1
 ) {
 		names(table)[!grepl("^request", names(table))] <- paste0("resource.", resource_type, ".", names(table)[!grepl("^request", names(table))])
+		# should be different
 		max_ <- nrow(table)
 		i <- 1
 		s <- ""
 		while(i <= max_) {
-			s <- paste0(s, fhir_tree.as_xml(fhir_tree.rm_ids(fhir_tree.new(table = table[i,], brackets = brackets, root = "entry")), tabs = "  "))
+			s <- paste0(
+				s,
+				fhir_tree.as_xml(
+					fhir_tree.rm_ids(
+						fhir_tree.new(
+							table    = table[i,],
+							brackets = brackets,
+							root     = "entry"
+						)
+					),
+					tabs = "  "
+				)
+			)
 			i <- i + 1
 		}
 		s <- paste0("<Bundle>\n", "   <type value='", bundle_type, "'/>\n", s, "</Bundle>")
 
 		bundle <- xml2::read_xml(s)
 		if(0 < verbose) {
-			message("Created a  ", bundle_type, " Bundle with ", max_, " resources.")
+			message("Created a ", bundle_type, " Bundle with ", max_, " resource", pluralS(max_), ".")
 		}
 
 		fhir_bundle_xml(bundle)
@@ -228,7 +241,7 @@ setMethod(
 		if(length(names(table)) != length(table)) {
 			stop("You have to provide a **named** list, where the names correspond to the resource type represented in the table.")
 		}
-
+		# should be different
 		s <- ""
 		lapply(
 			X = seq_len(length(table)),
@@ -240,7 +253,19 @@ setMethod(
 				max_ <- nrow(single_table)
 				i <- 1
 				while(i <= max_) {
-					s <<- paste0(s, fhir_tree.as_xml(fhir_tree.rm_ids(fhir_tree.new(table = single_table[i,], brackets = brackets, root = "entry")), tabs = "  "))
+					s <<- paste0(
+						s,
+						fhir_tree.as_xml(
+							fhir_tree.rm_ids(
+								fhir_tree.new(
+									table = single_table[i,],
+									brackets = brackets,
+									root = "entry"
+								)
+							),
+							tabs = "  "
+						)
+					)
 					i <- i + 1
 				}
 			}
