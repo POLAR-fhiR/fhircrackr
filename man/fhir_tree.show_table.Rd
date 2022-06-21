@@ -55,7 +55,7 @@ df <- fhir_crack(bundles = bundles, design = table_desc)
 
 
 #show tree
-fhir_show_as_tree(table = df, brackets = c("[", "]"), resource = "Patient")
+fhir_tree.show_table(table = df, brackets = c("[", "]"), resource = "Patient")
 }
 \seealso{
 \code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_build_bundle]{fhir_build_bundle()}}

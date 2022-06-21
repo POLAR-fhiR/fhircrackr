@@ -22,5 +22,33 @@ The same as for \code{fhir_url()}.
 A Wrapper for fhir_url
 }
 \examples{
-See `fhir_url()`!
+#provide full FHIR search request
+fhir_request(url = "http://hapi.fhir.org/baseR4/Patient?gender=male&_summary=count")
+
+#provide base url and resource type
+fhir_request(
+   url      = "http://hapi.fhir.org/baseR4",
+   resource = "Patient"
+ )
+
+#parameters in one string
+fhir_request(
+   url        = "http://hapi.fhir.org/baseR4",
+   resource   = "Patient",
+   parameters = "gender=male&_summary=count"
+ )
+
+#parameters as a named character
+fhir_request(
+   url        = "http://hapi.fhir.org/baseR4",
+   resource   = "Patient",
+   parameters = c("gender" = "male", "_summary" = "count")
+ )
+
+#parameters as a named list
+fhir_request(
+   url        = "http://hapi.fhir.org/baseR4",
+   resource   = "Patient",
+   parameters = list("gender" = "male", "_summary" = "count")
+ )
 }

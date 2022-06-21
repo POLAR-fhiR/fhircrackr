@@ -8,27 +8,22 @@
 \title{Build a FHIR bundle}
 \usage{
 fhir_build_bundle(
-  table = "data.frame",
-  brackets = "character",
-  resource_type = "character",
+  table,
+  brackets,
+  resource_type,
   bundle_type = "transaction",
   verbose = 1
 )
 
 \S4method{fhir_build_bundle}{data.frame}(
-  table = "data.frame",
-  brackets = "character",
-  resource_type = "character",
+  table,
+  brackets,
+  resource_type,
   bundle_type = "transaction",
   verbose = 1
 )
 
-\S4method{fhir_build_bundle}{list}(
-  table = "data.frame",
-  brackets = "character",
-  bundle_type = "transaction",
-  verbose = 1
-)
+\S4method{fhir_build_bundle}{list}(table, brackets, bundle_type = "transaction", verbose = 1)
 }
 \arguments{
 \item{table}{A wide table as produced by \code{\link[=fhir_crack]{fhir_crack()}}, possibly modified (see details) or a named list

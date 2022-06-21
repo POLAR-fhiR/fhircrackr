@@ -49,15 +49,6 @@ fhir_tree.new <- function(table, brackets, root) {
 	bra <- esc(brackets[1])
 	ket <- esc(brackets[2])
 	full_names <- names(table)
-	# names <- gsub(
-	# 	pattern     = paste0(bra, '|', ket, '| '),
-	# 	replacement = '',
-	# 	x = gsub(
-	# 		pattern     = paste0(bra, '([0-9]+\\.*)+ *', ket),
-	# 		replacement = '',
-	# 		x           = full_names
-	# 	)
-	# )
 
 	names <- separate_names(names = full_names, bra = bra, ket = ket)
 
@@ -66,15 +57,6 @@ fhir_tree.new <- function(table, brackets, root) {
 	names <- gsub('@.*', '', names)
 
 	n.parts <- strsplit(x = names, split = '\\.')
-
-	# indices <- gsub(
-	# 	pattern     = paste0(bra, '|', ket, '| '),
-	# 	replacement = '',
-	# 	x           = stringr::str_extract(
-	# 		pattern = paste0(bra, '([0-9]+\\.*)+ *', ket),
-	# 		string  = full_names
-	# 	)
-	# )
 
 	indices <- separate_indices(names = full_names, bra = bra, ket = ket)
 
@@ -159,11 +141,17 @@ fhir_tree.apply <- function(tree, fun.start = NULL, fun.finish = NULL) {
 ###
 # Closure Functions for fhir_tree.apply
 ###
+#' more docu needed
+#' @param node the node
+#' @export
 fhir_tree.fun.rm_ids <- function(node) {
 	names(node) <- gsub('[0-9]+$', '', names(node))
 	node
 }
 
+#' more docu needed
+#' @param node the node
+#' @export
 fhir_tree.fun.skip_one <- function(node) {
 	names(node) <- gsub('([^0-9]+)(1$)', '\\1',  names(node))
 	node
@@ -194,7 +182,7 @@ fhir_tree.fun.skip_one <- function(node) {
 #'
 #' tree <- fhir_tree.rm_ids(tree)
 #' cat(fhir_tree.as_text(tree))
-#' @noRd
+#' @export
 fhir_tree.rm_ids <- function(tree) {
 	tree.names <- names(tree)
 	for(n in tree.names) {
@@ -583,7 +571,7 @@ fhir_tree.text <- function(tree, prompt = ': ', tab = '  ', keep_attr = FALSE, k
 #'
 #'
 #' #show tree
-#' fhir_show_as_tree(table = df, brackets = c("[", "]"), resource = "Patient")
+#' fhir_tree.show_table(table = df, brackets = c("[", "]"), resource = "Patient")
 #' @export
 #' @seealso [fhir_cast()], [fhir_build_bundle()]
 #'
@@ -600,13 +588,10 @@ fhir_tree.show_table <- function(
 	cat(paste0(
 		'Bundle\n',
 		fhir_tree.as_string(
-			tree = tree(
+			tree = fhir_tree.new(
 				table     = table,
 				brackets  = brackets,
-				root      = resource,
-				keep_attr = keep_attr,
-				keep_ids  = keep_ids,
-				skip_one  = skip_one
+				root      = resource
 			),
 			prompt = prompt
 		)

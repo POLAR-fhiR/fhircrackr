@@ -282,7 +282,7 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 #' @param ... A Set of Path Strings. Only works if list_of_paths is NULL
 #' @param list_of_paths Either a vector or a list of paths strings
 #' @param ext An Extension to add at the end of the path
-#' @noRd
+#' @export
 #' @return A Character of length one, the combined path.
 #' @examples
 #' pastep('a', 'b', 'c', 'd')
@@ -1254,7 +1254,7 @@ sort_strings_with_numbers_correctly <- function(s) {
 #' @param n A numeric of length one.
 #'
 #' @return A character.
-#' @export
+#' @noRd
 #'
 #' @examples
 #' n <- 0

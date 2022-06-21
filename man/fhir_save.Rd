@@ -21,6 +21,6 @@ bundles <- fhir_unserialize(medication_bundles)
 #save all bundles to temporary directory
 fhir_save(bundles, directory = tempdir())
 
-#save only two bundles (the second and the fourth) to temporary directory
-fhir_save(bundles[c(2,4)], directory = tempdir())
+#save only two bundles (the second and the third) to temporary directory
+fhir_save(bundles[c(2,3)], directory = tempdir())
 }

@@ -539,8 +539,8 @@ fhir_capability_statement <- function(
 #' #save all bundles to temporary directory
 #' fhir_save(bundles, directory = tempdir())
 #'
-#' #save only two bundles (the second and the fourth) to temporary directory
-#' fhir_save(bundles[c(2,4)], directory = tempdir())
+#' #save only two bundles (the second and the third) to temporary directory
+#' fhir_save(bundles[c(2,3)], directory = tempdir())
 
 fhir_save <- function(bundles, directory) {
 
@@ -580,14 +580,15 @@ fhir_save <- function(bundles, directory) {
 #' length(bundles)
 #'
 #' #save to temporary directory
-#' fhir_save(bundles, directory = tempdir())
+#' dir <- tempdir()
+#' fhir_save(bundles, directory = dir)
 #'
 #' #load from temporary directory
-#' loaded_bundles <- fhir_load(tempdir())
+#' loaded_bundles <- fhir_load(dir)
 #' length(loaded_bundles)
 #'
-#' #load only two, the second and the fourth bundle
-#' loaded_bundles <- fhir_load(tempdir(), indices = c(2,4))
+#' #load only two, the second and the third bundle
+#' loaded_bundles <- fhir_load(dir, indices = c(2,3))
 #' length(loaded_bundles)
 
 fhir_load <- function(directory, indices = NULL) {
@@ -604,7 +605,7 @@ fhir_load <- function(directory, indices = NULL) {
 		indices <- sort(grep('^[0-9]+\\.xml$', dir(directory)))
 	}
 
-	xml.files <- dir(directory)[indices]
+	xml.files <- paste0(indices, ".xml")
 
 	if(length(xml.files) < 1) {
 

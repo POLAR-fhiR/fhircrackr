@@ -40,10 +40,7 @@ fhir_build_resource <- function(row, brackets, resource_type) {
 				tree = fhir_tree.new(
 					table     = row,
 					brackets  = brackets,
-					root      = resource_type,
-					keep_attr = TRUE,
-					keep_ids  = FALSE,
-					skip_one  = FALSE
+					root      = resource_type
 				)
 			)
 		)
@@ -169,9 +166,9 @@ fhir_build_resource <- function(row, brackets, resource_type) {
 setGeneric(
 	name = "fhir_build_bundle",
 	def = function(
-		table         = 'data.frame',
-		brackets      = 'character',
-		resource_type = 'character',
+		table,
+		brackets,
+		resource_type,
 		bundle_type   = "transaction",
 		verbose       = 1
 	){
@@ -185,24 +182,23 @@ setMethod(
 	f = "fhir_build_bundle",
 	signature = c("table" = "data.frame"),
 	definition =  function(
-		table         = 'data.frame',
-		brackets      = 'character',
-		resource_type = 'character',
+		table,
+		brackets,
+		resource_type,
 		bundle_type   = "transaction",
 		verbose       = 1
 ) {
 		names(table)[!grepl("^request", names(table))] <- paste0("resource.", resource_type, ".", names(table)[!grepl("^request", names(table))])
 		# should be different
 		max_ <- nrow(table)
-		i <- 1
 		s <- ""
-		while(i <= max_) {
+		for(row in seq_len(max_)) {
 			s <- paste0(
 				s,
 				fhir_tree.as_xml(
 					fhir_tree.rm_ids(
 						fhir_tree.new(
-							table    = table[i,],
+							table    = table[row,],
 							brackets = brackets,
 							root     = "entry"
 						)
@@ -210,7 +206,6 @@ setMethod(
 					tabs = "  "
 				)
 			)
-			i <- i + 1
 		}
 		s <- paste0("<Bundle>\n", "   <type value='", bundle_type, "'/>\n", s, "</Bundle>")
 
@@ -229,8 +224,8 @@ setMethod(
 	f          = "fhir_build_bundle",
 	signature  = c("table" = "list"),
 	definition =  function(
-		table       = 'data.frame',
-		brackets    = 'character',
+		table,
+		brackets,
 		bundle_type = "transaction",
 		verbose     = 1
 	) {
@@ -241,7 +236,6 @@ setMethod(
 		if(length(names(table)) != length(table)) {
 			stop("You have to provide a **named** list, where the names correspond to the resource type represented in the table.")
 		}
-		# should be different
 		s <- ""
 		lapply(
 			X = seq_len(length(table)),
@@ -251,14 +245,13 @@ setMethod(
 
 				names(single_table)[!grepl("^request", names(single_table))] <- paste0("resource.", resource_type, ".", names(single_table)[!grepl("^request", names(single_table))])
 				max_ <- nrow(single_table)
-				i <- 1
-				while(i <= max_) {
+				for(row in seq_len(max_)) {
 					s <<- paste0(
 						s,
 						fhir_tree.as_xml(
 							fhir_tree.rm_ids(
 								fhir_tree.new(
-									table = single_table[i,],
+									table = single_table[row,],
 									brackets = brackets,
 									root = "entry"
 								)
@@ -266,7 +259,6 @@ setMethod(
 							tabs = "  "
 						)
 					)
-					i <- i + 1
 				}
 			}
 		)
