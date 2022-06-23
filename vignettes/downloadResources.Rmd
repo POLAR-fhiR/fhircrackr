@@ -676,6 +676,9 @@ bundle <- fhir_sample_resources(
 )
 ```
 
+```{r, include=F}
+bundle <- fhir_unserialize(fhircrackr:::female_pat_bundle)
+```
 This request may take some time because in the first step, the resource (aka logical) IDs of all resources matching the request (i.e. all Patient resources of females born before 1960) are downloaded. This is necessary because the sampling is actually done in this vector of resource IDs.
 
 The following code shows that the result is actually 10 Patient resources who are female and born before 1960. If you want to know more about how to extract information from the resources like this, please see the vignette on flattening resources.

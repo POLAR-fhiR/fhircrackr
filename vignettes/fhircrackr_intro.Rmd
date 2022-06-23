@@ -350,8 +350,7 @@ Multiple entries are pasted together with the specified separator string (in thi
 ## Process Tables with multiple Entries
 
 ### Melt tables with multiple entries
-If the table produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. This is where `fhir_melt()` comes into play. `fhir_melt()` takes an *indexed data frame* with multiple entries in one or several `columns` and spreads (aka melts) these entries over several rows:
-
+If the table produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. This is where `fhir_melt()` comes into play. `fhir_melt()` takes an *indexed data frame* with multiple entries in one or several `columns` and spreads (aka melts) these entries over several rows. 
 ```{r}
 fhir_melt(
 	indexed_data_frame = df,
@@ -361,9 +360,7 @@ fhir_melt(
 	all_columns        = FALSE
 )
 ```
-Note!  
-To get `fhir_melt()` work, the data frame has to be *cracked with indices*.  
-  
+
 The new variable `resource_identifier` maps which rows in the created data frame belong to which row (usually equivalent to one resource) in the original data frame.
 `brackets` and `sep` have to be the same character vectors that have been used to build the indices with `fhir_crack()`. `columns` is a character vector with the names of the variables/columns you want to melt. You can provide more than one column here but it makes sense to only have variables from the same repeating attribute together in one call to `fhir_melt()`:
 
