@@ -37,12 +37,16 @@ Pat <- fhir_table_description(
 df <- fhir_crack(bundles = bundles, design = Pat)
 
 
-#build bundles
-resource <- fhir_build_resource(df[1,], c('[', ']'), "Patient")
+#build resource
+resource <- fhir_build_resource(
+                row           = df[1,],
+                brackets      = c('[', ']'),
+                resource_type = "Patient"
+            )
 
 #print to console
 resource
 }
 \seealso{
-\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_crack]{fhir_crack()}}, \code{\link[=fhir_build_bundle]{fhir_build_bundle()}}
+\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_crack]{fhir_crack()}}, \code{\link[=fhir_build_bundle]{fhir_build_bundle()}}, \code{\link[=fhir_post]{fhir_post()}}, \code{\link[=fhir_put]{fhir_put()}}
 }

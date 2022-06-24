@@ -34,8 +34,6 @@ the list elements must correspond to the resource type represented in the table!
 
 \item{resource_type}{A character vector of length one or \linkS4class{fhir_resource_type} object
 indicating which resource type is represented in the table, if a single table is provided. This argument is
-ignored when \code{table} is a named list of tables.
-indicating which resource type is represented in the table, if a single table is provided. This argument is
 ignored when \code{table} is a named list of tables.}
 
 \item{bundle_type}{A character vector of length one defining the bundle type. Will usually be
@@ -50,7 +48,7 @@ A \linkS4class{fhir_bundle_xml} object.
 This function takes a table as produced by \code{\link[=fhir_crack]{fhir_crack()}} with \code{format="wide"} and builds a \linkS4class{fhir_bundle_xml} object from it. It is primarily used
 to create transaction/batch bundles to POST back to a FHIR server. The column names of the table must represent the XPath expression of the
 respective element with indices for repeating items. A table like this is produced when FHIR resources have been cracked with \code{\link[=fhir_crack]{fhir_crack()}} without
-assigning explicit column names in the \linkS4class{fhir_design}/\linkS4class{fhir_table_description} and the format has been set  to \code{"wide"}.
+assigning explicit column names in the \linkS4class{fhir_design}/\linkS4class{fhir_table_description} and the format has been set to \code{"wide"}.
 }
 \details{
 The typical use case would look like this:
@@ -122,7 +120,7 @@ table_desc_pat <- fhir_table_description(
     resource = "Patient",
     brackets = c("[", "]"),
     sep      = " ",
-    format = "wide"
+    format   = "wide"
 )
 
 df <- fhir_crack(bundles = bundles, design = table_desc_pat)
@@ -136,11 +134,14 @@ request <- data.frame(
 request_df <- cbind(df, request)
 
 #build bundle
-bundle <- fhir_build_bundle(request_df, table_desc_pat@brackets, "Patient", bundle_type = "transaction")
+bundle <- fhir_build_bundle(table          = request_df,
+                            brackets       = table_desc_pat@brackets,
+                            resource_type  = "Patient",
+                            bundle_type    = "transaction")
 
 #print to console
 cat(toString(bundle))
 }
 \seealso{
-\code{\link[=fhir_crack]{fhir_crack()}},\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_build_resource]{fhir_build_resource()}}
+\code{\link[=fhir_crack]{fhir_crack()}},\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_build_resource]{fhir_build_resource()}}, \code{\link[=fhir_post]{fhir_post()}}
 }
