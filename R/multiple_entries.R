@@ -21,7 +21,6 @@
 #' @param sep A character vector of length one defining the separator that was used when pasting together multiple entries in [fhir_crack()].
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only general progress is printed, if > 1,
 #' progress for each variable is printed. Defaults to 1.
-#' @param use_brackets Deprecated.
 #' @export
 #' @examples
 #'
@@ -48,11 +47,7 @@ fhir_cast <- function(
 	indexed_df,
 	brackets,
 	sep,
-	verbose = 1,
-	use_brackets = NULL) {
-
-	if(!is.null(use_brackets)){warning("Argument use_brackets is deprecated since fhircrackr 2.0.0 and will be ignored.\n",
-									   "The column names will be created the same way as in the wide format of fhir_crack.\n")}
+	verbose = 1) {
 
 	if(is.null(indexed_df)) {stop("indexed_df is NULL.")}
 	if(nrow(indexed_df) < 1) {stop("indexed_df doesn't contain any data.")}

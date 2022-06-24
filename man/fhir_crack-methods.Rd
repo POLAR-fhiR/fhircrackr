@@ -20,7 +20,7 @@ fhir_crack(
   format = NULL,
   keep_attr = NULL,
   ncores = 1,
-  remove_empty_columns = NULL
+  remove_empty_columns = deprecated()
 )
 
 \S4method{fhir_crack}{ANY,fhir_table_description}(
@@ -34,7 +34,7 @@ fhir_crack(
   format = NULL,
   keep_attr = NULL,
   ncores = 1,
-  remove_empty_columns = NULL
+  remove_empty_columns = deprecated()
 )
 
 \S4method{fhir_crack}{ANY,fhir_design}(
@@ -48,7 +48,7 @@ fhir_crack(
   format = NULL,
   keep_attr = NULL,
   ncores = 1,
-  remove_empty_columns = NULL
+  remove_empty_columns = deprecated()
 )
 }
 \arguments{
@@ -83,7 +83,7 @@ should be attached to the name of the variable in the resulting table. Will over
 \item{ncores}{Either NULL (no parallelisation) or an integer of length 1 containing the number of
 cpu cores that should be used for parallelised cracking. Defaults to NULL.}
 
-\item{remove_empty_columns}{Deprecated since fhircrackr 2.0.0, use argument \code{rm_empty_cols} instead.}
+\item{remove_empty_columns}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use argument \code{rm_empty_cols} instead.}
 }
 \value{
 If a \linkS4class{fhir_design} was used, the result is a list of data.frames, i.e. a \linkS4class{fhir_df_list} object, or a list of data.tables,

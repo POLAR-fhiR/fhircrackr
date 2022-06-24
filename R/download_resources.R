@@ -52,7 +52,7 @@
 #' @param max_bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' downloading progress will be printed. Defaults to 1.
-#' @param max_attempts Deprecated. The number of maximal attempts is determined by the length of `delay_between_attempts`
+#' @param max_attempts `r lifecycle::badge("deprecated")` The number of maximal attempts is now determined by the length of `delay_between_attempts`
 #' @param delay_between_attempts A numeric vector specifying the delay in seconds between attempts of reaching the server
 #' that `fhir_search()` will make. The length of this vector determines the number of attempts that will be made before stopping with an error.
 #' Defaults to `c(1,3,9,27,81)`.
@@ -79,7 +79,7 @@
 #' - OAuth2 Authentication: [fhir_authenticate()]
 #' - Saving/reading bundles from disc: [fhir_save()] and [fhir_load()]
 #' - Flattening the bundles: [fhir_crack()]
-#'
+#' @importFrom lifecycle deprecated
 #' @examples
 #' \donttest{
 #' #Search with GET
@@ -115,13 +115,13 @@ fhir_search <- function(
 	save_to_disc           = NULL,
 	delay_between_bundles  = 0,
 	rm_tag                 = "div",
-	max_attempts           = NULL
+	max_attempts           = deprecated()
 ) {
-	if(!is.null(max_attempts)) {
-		warning(
-			"Argument max_attempts is deprecated since fhircrackr version 4.0.0. ",
-			"The number of maximal attempts to reach the server is determined by ",
-			"the length of argument delay_between_attemps."
+	if(lifecycle::is_present(max_attempts)) {
+		lifecycle::deprecate_warn(
+			when = "2.0.0",
+			what = "fhir_search(max_attempts)",
+			details = "The number of maximal attempts is now controlled by the length of the argument delay_between_attempts."
 		)
 	}
 
@@ -377,7 +377,7 @@ fhir_recent_http_error <- function() {
 #' If `NULL`, no indices will be added to multiple entries.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`
-#' @param verbose Deprecated since fhircrackr 2.0.0.
+#' @param verbose `r lifecycle::badge("deprecated")`
 #' @return A list of data frames containing the information from the statement
 #' @export
 #'
@@ -412,10 +412,10 @@ fhir_capability_statement <- function(
 	brackets = NULL,
 	sep = " ::: ",
 	log_errors = NULL,
-	verbose = NULL) {
+	verbose = deprecated()) {
 
-	if(!is.null(verbose)){
-		warning("The verbose argument of fhir_capability statement is deprecated since fhircrackr 2.0.0")
+	if(lifecycle::is_present(verbose)){
+		lifecycle::deprecate_warn(when = "2.0.0", what = "fhir_capability_statement(verbose)")
 	}
 
 	resource <- NULL #To stop "no visible binding" NOTE in check()

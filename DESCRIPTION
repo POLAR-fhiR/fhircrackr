@@ -38,7 +38,8 @@ Imports:
     utils,
     data.table,
     methods,
-    parallel
+    parallel,
+    lifecycle
 Suggests: 
     knitr,
     rmarkdown

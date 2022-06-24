@@ -153,7 +153,7 @@ setValidity(
 #' Defaults to `"compact"`.
 #' @param keep_attr A logical of length one indicating whether the attribute name of the respective element (`@value` in most cases)
 #' should be attached to the name of the variable in the resulting table. Defaults to `FALSE`.
-#' @param style Deprecated since fhircrackr 2.0.0. Can at the moment still be used for backwards compatibility but will throw an warning.
+#' @param style `r lifecycle::badge("deprecated")`
 #' @return An object of class [fhir_table_description-class].
 #'
 #' @examples
@@ -213,11 +213,12 @@ fhir_table_description <- function(
 	rm_empty_cols = FALSE,
 	format        = 'compact',
 	keep_attr     = FALSE,
-	style         = NULL
+	style         = deprecated()
 	) {
 
-	if(!is.null(style)){
-		warning("Have to overwrite fhir_table_description arguments because deprecated fhir_style is used.\n")
+	if(lifecycle::is_present(style)){
+		lifecycle::deprecate_warn(when = "2.0.0", what = "fhir_table_description(style)",
+								  details = "Please code style elements directly in the table description. Overwriting fhir_table_descriptions arguments for now.\n")
 		sep <- style@sep
 		brackets <- style@brackets
 		rm_empty_cols <- style@rm_empty_cols

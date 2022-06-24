@@ -12,7 +12,7 @@ fhir_table_description(
   rm_empty_cols = FALSE,
   format = "compact",
   keep_attr = FALSE,
-  style = NULL
+  style = deprecated()
 )
 }
 \arguments{
@@ -42,7 +42,7 @@ Defaults to \code{"compact"}.}
 \item{keep_attr}{A logical of length one indicating whether the attribute name of the respective element (\verb{@value} in most cases)
 should be attached to the name of the variable in the resulting table. Defaults to \code{FALSE}.}
 
-\item{style}{Deprecated since fhircrackr 2.0.0. Can at the moment still be used for backwards compatibility but will throw an warning.}
+\item{style}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 }
 \value{
 An object of class \linkS4class{fhir_table_description}.
