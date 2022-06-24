@@ -7,14 +7,26 @@
 - `fhir_search()` can now log errors from FHIR servers regardless of whether they are valid xml. 
 
 ## New functions
-- `fhir_rm_tag()`: Remove elements enclosed by a specified xml-tag from fhir bundles.
-- `fhir_rm_div()`: Remove html elements from fhir bundles.
+- `fhir_build_bundle()`: Build a xml FHIR Bundle from a wide table.
+- `fhir_build_resource()`: Build a xml FHIR resource from a wide table.
 - `fhir_bundle_list()`: Constructor function to create `fhir_bundle_list` objects is now exported.
+- `fhir_cast()`: Similar to `fhir_melt()` but spreads multiple entries across columns instead of rows.
 - `fhir_count_resource()`: Count resources matching a specific search request on a server.
 - `fhir_get_resource_ids()`: Extract the logical IDs of all FHIR resources matching a sepcific search request from a server.
 - `fhir_get_resources_by_ids()`: Extract a set of resources based on their logical IDs.
+- `fhir_post()`: POST an object to a FHIR server.
+- `fhir_put()`: PUT an object to a FHIR server.
+- `fhir_recent_http_error()`: Returns the most recent http error to the console.
+- `fhir_request()`: Wrapper for `fhir_url()`
+- `fhir_resource_xml()`: Constructor function to create `fhirresource_xml()` objects is now exported.
+- `fhir_rm_div()`: Remove html elements from FHIR bundles.
+- `fhir_rm_tag()`: Remove elements enclosed by a specified xml-tag from FHIR bundles.
 - `fhir_sample_resources_by_ids()`: Randomly sample resources from a given logical ID vector and download them from a FHIR server.
 - `fhir_sample_resources()`: Randomly sample from a set of resources matching a specific search request in a FHIR server.
+- `fhir_tree()`: Returns a string representing the tree structure implicit in the column names of a wide table.
+- `pastep()`: Concatenates two or more strings to a path string correctly.
+
+
 
 ## New behaviour
 - `fhir_melt()` has been rewritten to be faster and more memory efficient.
