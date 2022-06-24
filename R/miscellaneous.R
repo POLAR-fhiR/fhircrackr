@@ -1197,7 +1197,7 @@ auth_helper <- function(username, password, token){
 #' @param s A character vector containing the strings to be ordered.
 #'
 #' @return A character vector containing the order of the given strings.
-#' @export
+#' @noRd
 #'
 #' @examples
 #' s <- c('[1.0]', '[10.1]', '[2.0]')
@@ -1234,7 +1234,7 @@ order_strings_with_numbers_correctly <- function(s) {
 #' @param s A character vector containing the strings to be sorted.
 #'
 #' @return A character vector containing the the given strings sorted.
-#' @export
+#' @noRd
 #'
 #' @examples
 #' s <- c('[1.0]', '[10.1]', '[2.0]')

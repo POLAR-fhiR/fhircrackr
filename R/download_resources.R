@@ -999,7 +999,7 @@ check_response <- function(response, log_errors, append = FALSE) {
 		} else {
 			stop(
 				"HTTP code 400 - This can be caused by an invalid request or a server issue. ",
-				"To print more detailed error information to a file, set argument log_errors to a filename and rerun you request."
+				"To print more detailed error information, run fhir_recent_http_error() or set argument log_errors to a filename and rerun you request."
 			)
 		}
 	}
@@ -1008,8 +1008,8 @@ check_response <- function(response, log_errors, append = FALSE) {
 			stop("HTTP code 401 - Authentication needed. For more information see the generated error file.")
 		} else {
 			stop(
-				"HTTP code 401 - Authentication needed. To print more detailed error information to a file, ",
-				"set argument log_errors to a filename and rerun you request."
+				"HTTP code 401 - Authentication needed. To print more detailed error information,",
+				"run fhir_recent_http_error() or set argument log_errors to a filename and rerun you request."
 			)
 		}
 	}
@@ -1018,8 +1018,8 @@ check_response <- function(response, log_errors, append = FALSE) {
 			stop("HTTP code 404 - Not found. Did you misspell the resource? For more information see the generated error file.")
 		} else {
 			stop(
-				"HTTP code 404 - Not found. Did you misspell the resource? To print more detailed error information to a file, ",
-				"set argument log_errors to a filename and rerun you request."
+				"HTTP code 404 - Not found. Did you misspell the resource? To print more detailed error information, ",
+				"run fhir_recent_http_error() or set argument log_errors to a filename and rerun you request."
 			)
 		}
 	}
@@ -1034,8 +1034,7 @@ check_response <- function(response, log_errors, append = FALSE) {
 			warning(
 				"Your request generated a HTTP code ",
 				code,
-				". To print more detailed information to a file, set argument log_errors to a filename and rerun you request."
-			)
+				". To print more detailed error information, run fhir_recent_http_error() or set argument log_errors to a filename and rerun you request.")
 		}
 	}
 	if(400 <= code && code < 500) {
@@ -1049,7 +1048,7 @@ check_response <- function(response, log_errors, append = FALSE) {
 			stop(
 				"Your request generated a client error, HTTP code ",
 				code,
-				". To print more detailed information to a file, set argument log_errors to a filename and rerun you request."
+				". To print more detailed error information, run fhir_recent_http_error() or set argument log_errors to a filename and rerun you request."
 			)
 		}
 	}
@@ -1064,7 +1063,7 @@ check_response <- function(response, log_errors, append = FALSE) {
 			stop(
 				"Your request generated a server error, HTTP code ",
 				code,
-				". To print more detailed error information to a file, set argument log_errors to a filename and rerun you request."
+				". To print more detailed error information, run fhir_recent_http_error() or set argument log_errors to a filename and rerun you request."
 			)
 		}
 	}
