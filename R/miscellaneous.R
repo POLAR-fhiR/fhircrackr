@@ -101,7 +101,7 @@ setMethod(
 		tag
 	) {
 		if(1 < length(x)) {
-			return(sapply(x, fhir_rm_tag, tag = tag, USE.NAMES = F))
+			return(sapply(x, fhir_rm_tag, tag = tag, USE.NAMES = FALSE))
 		}
 		start <- end <- s <- type <- NULL #just to shut up CRAN check about undefined global variables
 		tOn <- paste0("(<", tag, ")((>)|( +[^/]*?>))")
@@ -277,12 +277,12 @@ paste_paths <- function(path1 = "w", path2 = "d", os = "LiNuX") {
 
 
 #' Concatenate paths
-#' @description Concatenates two strings to a path string correctly.
+#' @description Concatenates two or more strings to a path string correctly.
 #'
 #' @param ... A Set of Path Strings. Only works if list_of_paths is NULL
 #' @param list_of_paths Either a vector or a list of paths strings
 #' @param ext An Extension to add at the end of the path
-#' @noRd
+#' @export
 #' @return A Character of length one, the combined path.
 #' @examples
 #' pastep('a', 'b', 'c', 'd')
@@ -1097,25 +1097,10 @@ desc_xml <- function(s) {
 	)
 }
 
-#' Increment tab
-#' @param tab A character vector with strings to increment
-#' @param add The string to use for incrementation
-#' @return The incremented tab
-#' @noRd
-inc_tab <- function(tab, add = "....") {paste0(tab, add)}
-
-#' Decrement tab
-#' @param tab A character vector with strings to dencrement
-#' @param add The string to remove
-#' @return The decremented tab
-#' @noRd
-dec_tab <- function(tab, sub = "....") {substr(tab, 1, nchar(tab) - nchar(sub))}
-
-
 #' Create value list
 #' This function creates a list that has values as attributes.
 #' Can be used to create trees that are digesteable by xml2.
-#' @param .value The value for the attribure
+#' @param .value The value for the attribute
 #' @param ... other vlists
 #' @return A value list
 #' @noRd
@@ -1137,12 +1122,13 @@ vlist <- function(.value, ...) {
 #' @examples
 #' cat(frame_string(text="Some\ntest\n       text", pos="right", edge="*"))
 #' @noRd
-frame_string <- function(text = "\nHello !!!\n\n\nIs\nthere\n\nA N Y O N E\n\nout\nthere\n???\n ",
-						 pos = c("left", "center", "right")[1],
-						 edge = " ",
-						 hori = "-",
-						 vert = "|") {
-
+frame_string <- function(
+	text = "\nHello !!!\n\n\nIs\nthere\n\nA N Y O N E\n\nout\nthere\n???\n ",
+	pos = c("left", "center", "right")[1],
+	edge = " ",
+	hori = "-",
+	vert = "|"
+) {
 	strpad <- function(string, width, pos = c("left", "right"), pad) {
 		n_chars <- function(char, count) paste0(rep_len(char, count), collapse = "")
 		w <- nchar(string)
@@ -1203,7 +1189,6 @@ auth_helper <- function(username, password, token){
 		auth <- NULL
 	}
 
-
 	list(basicAuth = auth, token = bearerToken)
 }
 
@@ -1212,7 +1197,7 @@ auth_helper <- function(username, password, token){
 #' @param s A character vector containing the strings to be ordered.
 #'
 #' @return A character vector containing the order of the given strings.
-#' @export
+#' @noRd
 #'
 #' @examples
 #' s <- c('[1.0]', '[10.1]', '[2.0]')
@@ -1249,7 +1234,7 @@ order_strings_with_numbers_correctly <- function(s) {
 #' @param s A character vector containing the strings to be sorted.
 #'
 #' @return A character vector containing the the given strings sorted.
-#' @export
+#' @noRd
 #'
 #' @examples
 #' s <- c('[1.0]', '[10.1]', '[2.0]')
@@ -1263,3 +1248,19 @@ sort_strings_with_numbers_correctly <- function(s) {
 	s[order_strings_with_numbers_correctly(s)]
 }
 
+
+#' Add a 's' to a plural.
+#'
+#' @param n A numeric of length one.
+#'
+#' @return A character.
+#' @noRd
+#'
+#' @examples
+#' n <- 0
+#' cat(paste0('We have ', n, ' Rabbit', pluralS(n), '.\n'))
+#' n <- n + 1
+#' cat(paste0('Now we have ', n, ' Rabbit', pluralS(n), '.\n'))
+#' n <- n + 1
+#' cat(paste0('Finally we have ', n, ' Rabbit', pluralS(n), '.\n'))
+pluralS <- function(n) {if(n==1) '' else 's'}

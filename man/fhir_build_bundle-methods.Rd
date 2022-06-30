@@ -9,6 +9,7 @@
 \usage{
 fhir_build_bundle(
   table,
+  brackets,
   resource_type,
   bundle_type = "transaction",
   verbose = 1
@@ -16,17 +17,20 @@ fhir_build_bundle(
 
 \S4method{fhir_build_bundle}{data.frame}(
   table,
+  brackets,
   resource_type,
   bundle_type = "transaction",
   verbose = 1
 )
 
-\S4method{fhir_build_bundle}{list}(table, bundle_type = "transaction", verbose = 1)
+\S4method{fhir_build_bundle}{list}(table, brackets, bundle_type = "transaction", verbose = 1)
 }
 \arguments{
 \item{table}{A wide table as produced by \code{\link[=fhir_crack]{fhir_crack()}}, possibly modified (see details) or a named list
 of wide tables, if different resource types have to be included in the same bundle. In this case the names of
 the list elements must correspond to the resource type represented in the table!}
+
+\item{brackets}{A character vector of length one. The brackets used for cracking.}
 
 \item{resource_type}{A character vector of length one or \linkS4class{fhir_resource_type} object
 indicating which resource type is represented in the table, if a single table is provided. This argument is
@@ -44,7 +48,7 @@ A \linkS4class{fhir_bundle_xml} object.
 This function takes a table as produced by \code{\link[=fhir_crack]{fhir_crack()}} with \code{format="wide"} and builds a \linkS4class{fhir_bundle_xml} object from it. It is primarily used
 to create transaction/batch bundles to POST back to a FHIR server. The column names of the table must represent the XPath expression of the
 respective element with indices for repeating items. A table like this is produced when FHIR resources have been cracked with \code{\link[=fhir_crack]{fhir_crack()}} without
-assigning explicit column names in the \linkS4class{fhir_design}/\linkS4class{fhir_table_description} and the format has been set  to \code{"wide"}.
+assigning explicit column names in the \linkS4class{fhir_design}/\linkS4class{fhir_table_description} and the format has been set to \code{"wide"}.
 }
 \details{
 The typical use case would look like this:
@@ -57,7 +61,9 @@ The typical use case would look like this:
 }
 
 A FHIR bundle that can be POSTed to a server is usually of type \code{transaction} or \code{batch}. Each entry of these bundles consists of the resource itself
-as well as an instruction for the server of what to to with the resource. A very simple example looks like this:\preformatted{<Bundle>
+as well as an instruction for the server of what to to with the resource. A very simple example looks like this:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{<Bundle>
    <type value="transaction"/>
   <entry>
      <resource>
@@ -96,7 +102,7 @@ as well as an instruction for the server of what to to with the resource. A very
     </request>
  </entry>
 </Bundle>
-}
+}\if{html}{\out{</div>}}
 
 In this example the bundle contains two Patient resources that are sent to server with a POST. For more information the structure of transaction/batch bundles,
 please see the FHIR documentation at https://www.hl7.org/fhir/http.html and https://www.hl7.org/fhir/bundle.html.
@@ -110,14 +116,14 @@ If these columns are not added to the table, \code{\link[=fhir_build_bundle]{fhi
 bundles <- fhir_unserialize(bundles = example_bundles1)
 
 #crack fhir resources
-Pat <- fhir_table_description(
+table_desc_pat <- fhir_table_description(
     resource = "Patient",
     brackets = c("[", "]"),
     sep      = " ",
-    format = "wide"
+    format   = "wide"
 )
 
-df <- fhir_crack(bundles = bundles, design = Pat)
+df <- fhir_crack(bundles = bundles, design = table_desc_pat)
 
 #add request info to table
 request <- data.frame(
@@ -128,11 +134,14 @@ request <- data.frame(
 request_df <- cbind(df, request)
 
 #build bundle
-bundle <- fhir_build_bundle(request_df, "Patient", bundle_type = "transaction")
+bundle <- fhir_build_bundle(table          = request_df,
+                            brackets       = table_desc_pat@brackets,
+                            resource_type  = "Patient",
+                            bundle_type    = "transaction")
 
 #print to console
 cat(toString(bundle))
 }
 \seealso{
-\code{\link[=fhir_crack]{fhir_crack()}},\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_build_resource]{fhir_build_resource()}}
+\code{\link[=fhir_crack]{fhir_crack()}},\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_build_resource]{fhir_build_resource()}}, \code{\link[=fhir_post]{fhir_post()}}
 }

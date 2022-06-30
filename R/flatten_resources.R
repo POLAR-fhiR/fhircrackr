@@ -32,7 +32,7 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- du
 #' @param rm_empty_cols Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
 #' `design`. If `rm_empty_cols = NULL`, it is looked up in `design`, where the default is `FALSE`.
 #'
-#' @param remove_empty_columns Deprecated since fhircrackr 2.0.0, use argument `rm_empty_cols` instead.
+#' @param remove_empty_columns `r lifecycle::badge("deprecated")` Use argument `rm_empty_cols` instead.
 #'
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
@@ -116,16 +116,16 @@ setGeneric(
 	def = function(
 		bundles,
 		design,
-		sep                     = NULL,
-		brackets                = NULL,
-		rm_empty_cols           = NULL,
-		verbose                 = 2,
-		data.table              = FALSE,
-		format                  = NULL,
-		keep_attr               = NULL,
-		ncores                  = 1,
-		remove_empty_columns    = NULL) {
-
+		sep                  = NULL,
+		brackets             = NULL,
+		rm_empty_cols        = NULL,
+		verbose              = 2,
+		data.table           = FALSE,
+		format               = NULL,
+		keep_attr            = NULL,
+		ncores               = 1,
+		remove_empty_columns = deprecated()
+	) {
 		standardGeneric("fhir_crack")
 	}
 )
@@ -133,8 +133,8 @@ setGeneric(
 #' @rdname fhir_crack-methods
 #' @aliases fhir_crack,fhir_table_description-method
 setMethod(
-	f = "fhir_crack",
-	signature = c(design = "fhir_table_description"),
+	f          = "fhir_crack",
+	signature  = c(design = "fhir_table_description"),
 	definition = function(
 		bundles,
 		design,
@@ -146,7 +146,13 @@ setMethod(
 		format               = NULL,
 		keep_attr            = NULL,
 		ncores               = 1,
-		remove_empty_columns = NULL) {
+		remove_empty_columns = deprecated()
+	) {
+
+		if(lifecycle::is_present(remove_empty_columns)){
+			lifecycle::deprecate_warn(when = "2.0.0", what = "fhir_crack(remove_empty_columns)", with = "fhir_crack(rm_empty_cols)")
+			design@rm_empty_cols <- remove_empty_columns
+		}
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
@@ -157,14 +163,6 @@ setMethod(
 			brackets <- fix_brackets(brackets = brackets)
 			design@brackets <- brackets
 		}
-
-		###### remove at some point ########
-		if(!is.null(remove_empty_columns)) {
-			warning("Argument remove_empty_columns has been deprecated since fhircrackr 2.0.0.\n",
-					"Please use rm_empty_cols instead.")
-			design@rm_empty_cols <- remove_empty_columns
-		}
-		#############################
 
 		if(!is.null(rm_empty_cols)) {
 			design@rm_empty_cols <- rm_empty_cols
@@ -208,21 +206,21 @@ setMethod(
 #' @rdname fhir_crack-methods
 #' @aliases fhir_crack,fhir_design-method
 setMethod(
-	f = "fhir_crack",
-	signature = c(design = "fhir_design"),
+	f          = "fhir_crack",
+	signature  = c(design = "fhir_design"),
 	definition = function(
 		bundles,
 		design,
-		sep                     = NULL,
-		brackets                = NULL,
-		rm_empty_cols           = NULL,
-		verbose                 = 2,
-		data.table              = FALSE,
-		format                  = NULL,
-		keep_attr               = NULL,
-		ncores                  = 1,
-		remove_empty_columns    = NULL) {
-
+		sep                  = NULL,
+		brackets             = NULL,
+		rm_empty_cols        = NULL,
+		verbose              = 2,
+		data.table           = FALSE,
+		format               = NULL,
+		keep_attr            = NULL,
+		ncores               = 1,
+		remove_empty_columns = deprecated()
+	) {
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
 			design <- fhir_design(lapply(
@@ -248,9 +246,8 @@ setMethod(
 		}
 
 		##### remove at some point #####
-		if(!is.null(remove_empty_columns)) {
-			warning("Argument remove_empty_columns has been deprecated since fhircrackr 2.0.0.\n",
-					"Please use rm_empty_cols instead.")
+		if(lifecycle::is_present(remove_empty_columns)){
+			lifecycle::deprecate_warn(when = "2.0.0", what = "fhir_crack(remove_empty_columns)", with = "fhir_crack(rm_empty_cols)")
 			design <- fhir_design(
 				lapply(
 					design,
@@ -276,25 +273,28 @@ setMethod(
 		}
 
 		if(!is.null(format)) {
-			design <- fhir_design(lapply(
-				design,
-				function(x) {
-					x@format <- format
-					x
-				})
+			design <- fhir_design(
+				lapply(
+					design,
+					function(x) {
+						x@format <- format
+						x
+					}
+				)
 			)
 		}
 
 		if(!is.null(keep_attr)) {
-			design <- fhir_design(lapply(
-				design,
-				function(x) {
-					x@keep_attr <- keep_attr
-					x
-				})
+			design <- fhir_design(
+				lapply(
+					design,
+					function(x) {
+						x@keep_attr <- keep_attr
+						x
+					}
+				)
 			)
 		}
-
 
 		validObject(object = design, complete = TRUE)
 		#Check for dangerous XPath expressions ins cols
@@ -383,7 +383,13 @@ crack_bundles_to_tables <- function(bundles, design, data.table = FALSE, ncores 
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
 #' @noRd
-crack_bundles_to_one_table <- function(bundles, table_description, data.table = FALSE, ncores = 1, verbose = 0) {
+crack_bundles_to_one_table <- function(
+		bundles,
+		table_description,
+		data.table        = FALSE,
+		ncores            = 1,
+		verbose           = 0
+	) {
 	os <- get_os()
 	available_cores <- get_ncores(os)
 	ncores <- limit_ncores(ncores)
@@ -397,7 +403,7 @@ crack_bundles_to_one_table <- function(bundles, table_description, data.table = 
 			if(1 == length(bundles)) 'Bundle' else 'Bundles',
 			' on a ',
 			toupper(os),
-			'-Mashine using ',
+			'-Engine using ',
 			ncores,
 			'/',
 			available_cores,
@@ -415,8 +421,7 @@ crack_bundles_to_one_table <- function(bundles, table_description, data.table = 
 	} else {
 		if(table_description@format == 'wide') {
 			crack_wide_all_columns(bundles = bundles, table_description = table_description, ncores = ncores)
-		}
-		else {
+		} else {
 			crack_compact_all_columns(bundles = bundles, table_description = table_description, ncores = ncores)
 		}
 	}
@@ -432,7 +437,7 @@ crack_bundles_to_one_table <- function(bundles, table_description, data.table = 
 				warning("The resource type or columns you are looking for don't seem to be present in the bundles.\n ",
 						"Returning an empty table.")
 				#some items were found: Fill missing with NA
-			}else{
+			} else {
 				names <- names(table)
 				if(0 < length(table_description@brackets)){
 					regexpr_ids <- stringr::str_c(esc(table_description@brackets[1]), "([0-9]+(\\.[0-9]+)*)", esc(table_description@brackets[2]))
@@ -442,7 +447,7 @@ crack_bundles_to_one_table <- function(bundles, table_description, data.table = 
 				if(0 < length(empty_cols)){table[,(empty_cols):=NA]}
 			}
 			#rm_empty_cols=TRUE
-		}else{
+		} else {
 			if(nrow(table)==0){
 				warning("The resource type or columns you are looking for don't seem to be present in the bundles.\n ",
 						"Returning an empty table.")
@@ -452,7 +457,7 @@ crack_bundles_to_one_table <- function(bundles, table_description, data.table = 
 		data.table::setcolorder(x = table, neworder = names(table_description@cols)[names(table_description@cols) %in% names(table)])
 
 		#all columns
-	}else{
+	} else {
 		if(nrow(table)==0){warning("The resource type you are looking for (",table_description@resource ,") doesn't seem to be present in the bundles.\n ",
 								   "Returning an empty table.")}
 	}
@@ -490,7 +495,8 @@ crack_wide_all_columns <- function(bundles, table_description, ncores = 1) {
 					) # intermediate save entries
 				)
 				if(0 < nrow(d)){
-					d <-(d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
+					d <-(d
+						 [, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
 						 [, value    := xml2::xml_text(node)] # get value
 						 [, attrib   := path |> busg('.*@', '')] # get attribute
 						 [, path     := path |> busg('@.*', '')] # remove attribute from path
@@ -502,8 +508,8 @@ crack_wide_all_columns <- function(bundles, table_description, ncores = 1) {
 						 		busg('/', '.') |>
 						 		stringr::str_c(if(table_description@keep_attr) stringr::str_c('@', attrib) else '')
 						 ] # create column name
-						 [, -c('node', 'xpath', 'spath', 'attrib', 'id')]) # remove unnecessary columns
-
+						 [, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary columns
+					)
 					d <- dcast(d, entry ~ column) # cast columns by bundle and entry
 				}
 				d
@@ -511,10 +517,19 @@ crack_wide_all_columns <- function(bundles, table_description, ncores = 1) {
 			mc.cores = ncores
 		),
 		use.names = TRUE,
-		fill = TRUE
+		fill      = TRUE
 	)
-	if(nrow(result)==0){result}else{unique(result[, -c('entry')])}
 
+	result <- if(nrow(result) == 0) {result} else {unique(result[, -c('entry')])}
+
+	ebra <- esc(bra)
+	eket <- esc(ket)
+	n <- separate_names(  names = names(result), ebra, eket)
+	i <- separate_indices(names = names(result), ebra, eket)
+	o <- order(paste(n, i))
+	names(result) <- paste0(bra, i, ket, n)
+	setcolorder(result, o)
+	result
 }
 
 #' Convert Bundles to a compact table when all elements should be extracted

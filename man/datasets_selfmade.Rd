@@ -17,7 +17,9 @@ An object of class \code{fhir_bundle_list} of length 1.
 An object of class \code{fhir_bundle_list} of length 1.
 }
 \source{
-\strong{example_bundles1}\preformatted{<Bundle>
+\strong{example_bundles1}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{<Bundle>
  <type value='searchset'/>
  <entry>
   <resource>
@@ -64,9 +66,11 @@ An object of class \code{fhir_bundle_list} of length 1.
   </resource>
  </entry>
 </Bundle>
-}
+}\if{html}{\out{</div>}}
 
-\strong{example_bundles2}\preformatted{<Bundle>
+\strong{example_bundles2}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{<Bundle>
  <type value='searchset'/>
  <entry>
   <resource>
@@ -136,9 +140,11 @@ An object of class \code{fhir_bundle_list} of length 1.
   </resource>
  </entry>
 </Bundle>
-}
+}\if{html}{\out{</div>}}
 
-\strong{example_bundles3}\preformatted{<Bundle>
+\strong{example_bundles3}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{<Bundle>
  <type value='searchset'/>
  <entry>
   <resource>
@@ -232,9 +238,11 @@ An object of class \code{fhir_bundle_list} of length 1.
  </entry>
 </Bundle>"
 
-}
+}\if{html}{\out{</div>}}
 
-\strong{example_bundles4}\preformatted{<Bundle>
+\strong{example_bundles4}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{<Bundle>
     <type value='searchset'/>
  <entry>
 	 <resource>
@@ -289,7 +297,7 @@ An object of class \code{fhir_bundle_list} of length 1.
 
 </Bundle>
 
-}
+}\if{html}{\out{</div>}}
 }
 \usage{
 example_bundles1

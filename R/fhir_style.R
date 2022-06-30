@@ -6,13 +6,16 @@
 #Class definition
 #' An S4 class to represent a design for cracking FHIR resources
 #'
-#'
+#' `r lifecycle::badge("deprecated")`
+#' [fhir_style-class] is now deprecated, the information that used to be coded here has been moved to the [fhir_table_description-class].
+
 #' @slot sep A string to separate pasted multiple entries. Defaults to `":::"`.
 #' @slot brackets  A character vector of length two defining the brackets surrounding indices for multiple entries,
 #' e.g. `c("<|", "|>")`. If this is empty (i.e. character of length 0, the default), no indices will be added to multiple entries.
 #' Empty strings (`""`) are not allowed.
 #' @slot rm_empty_cols Logical scalar. Remove empty columns? Defaults to FALSE.
 #' @export
+#' @keywords internal
 #'
 setClass(
 	Class = "fhir_style",
@@ -41,8 +44,9 @@ setValidity(
 
 #' Create fhir_style object
 #'
-#' This function creates an object of class `fhir_style`.
-#' It contains the three elements `sep`, `brackets` and `rm_empty_cols`. See Details.
+#' `r lifecycle::badge("deprecated")`
+#' This function was used to create an object of class `fhir_style` in fhircrackr < 2.0.0.
+#' It is now deprecated, the information that used to be coded in `fhir_style` has been moved to the [fhir_table_description-class].
 #'
 #' @details
 #' A `fhir_style` object is part of a [fhir_table_description-class] which in turn is part of a [fhir_design-class] and
@@ -71,16 +75,30 @@ setValidity(
 #' @param rm_empty_cols A logical vector of length one. Remove empty columns? Defaults to `FALSE`.
 #' @return A fhir_style object
 #' @examples
-#' fhir_style(sep = ":::",
-#'            brackets = c("<|", "|>"),
-#'            rm_empty_cols = TRUE)
+#'
+#' #instead of this:
+#'
+#' style <- fhir_style(sep           = ":::",
+#'                     brackets      = c("<|", "|>"),
+#'                     rm_empty_cols = TRUE)
+#'
+#' table_description <- fhir_table_description(
+#'                         resource = "Patient",
+#'                         style = style)
+#' #use this:
+#' table_description <- fhir_table_description(
+#'                         resource       = "Patient",
+#'                         sep            = ":::",
+#'                         brackets       = c("<|", "|>"),
+#'                          rm_empty_cols = TRUE)
 #'
 #' @export
+#' @keywords internal
 
 
 fhir_style <- function(sep = ":::", brackets = character(), rm_empty_cols = FALSE) {
-	warning("fhir_style is deprecated since fhircrackr 2.0.0. Please don't use it anymore.\n",
-			"The elements 'sep', 'brackets' and 'rm_empty_cols' should be moved directly into the fhir_table_description (see ?fhir_table_description).\n")
+	lifecycle::deprecate_warn(when = "2.0.0", what = "fhir_style()",
+							  details =  "Please code style elements directly in fhir_table_description().")
 	if(is.null(brackets)) {brackets <- character()}
 	if(any(is.na(brackets))) {stop("You cannot use NA in brackets.")}
 	brackets <- fix_brackets(brackets = brackets)

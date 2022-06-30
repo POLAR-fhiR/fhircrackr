@@ -17,7 +17,7 @@ fhir_search(
   save_to_disc = NULL,
   delay_between_bundles = 0,
   rm_tag = "div",
-  max_attempts = NULL
+  max_attempts = deprecated()
 )
 }
 \arguments{
@@ -66,7 +66,7 @@ too many requests to quickly. Defaults to zero.}
 Defaults to \code{"div"},leading to the removal of all html parts (see Details). Set to \code{NULL} to keep the bundles untouched.
 See \code{\link[=fhir_rm_div]{fhir_rm_div()}} and \code{\link[=fhir_rm_tag]{fhir_rm_tag()}} for more info.}
 
-\item{max_attempts}{Deprecated. The number of maximal attempts is determined by the length of \code{delay_between_attempts}}
+\item{max_attempts}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} The number of maximal attempts is now determined by the length of \code{delay_between_attempts}}
 }
 \value{
 A \linkS4class{fhir_bundle_list} when \code{save_to_disc = NULL} (the default),  else \code{NULL}.

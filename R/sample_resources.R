@@ -20,7 +20,7 @@
 #'   parameters2add = list("_summary" = "count", "_count" = "1"),
 #'   add_question_sign = TRUE)
 
-paste_parameters <- function(parameters = NULL, parameters2add = NULL, add_question_sign = F) {
+paste_parameters <- function(parameters = NULL, parameters2add = NULL, add_question_sign = FALSE) {
 	convert <- function(arg) {
 		n <- names(arg)
 		if(length(n) < length(arg)) {
@@ -88,22 +88,27 @@ fhir_count_resource <- function(
 	base_url,
 	resource,
 	parameters = NULL,
-	username = NULL,
-	password = NULL,
-	token = NULL) {
+	username   = NULL,
+	password   = NULL,
+	token      = NULL
+) {
 	as.numeric(
 		xml2::xml_attr(
 			xml2::xml_find_first(
 				fhir_search(
 					request = fhir_url(
-						url = base_url,
-						resource = resource,
-						parameters = paste_parameters(parameters = parameters, parameters2add = c("_summary" = "count"), add_question_sign = F),
+						url        = base_url,
+						resource   = resource,
+						parameters = paste_parameters(
+							parameters        = parameters,
+							parameters2add    = c("_summary" = "count"),
+							add_question_sign = FALSE
+						),
 					),
 					username = username,
 					password = password,
-					token = token,
-					verbose = 0
+					token    = token,
+					verbose  = 0
 				)[[1]],
 				"//total"
 			),
@@ -147,22 +152,22 @@ fhir_get_resource_ids <- function(
 	base_url,
 	resource,
 	parameters = NULL,
-	username = NULL,
-	password = NULL,
-	token = NULL,
-	verbose = 0) {
-
+	username   = NULL,
+	password   = NULL,
+	token      = NULL,
+	verbose    = 0
+) {
 	if(0 < verbose) {
 		message(
 			paste0(
 				"Download ",
 				fhir_count_resource(
-					base_url = base_url,
-					resource = resource,
+					base_url   = base_url,
+					resource   = resource,
 					parameters = paste_parameters(parameters),
-					username = username,
-					password = password,
-					token = token
+					username   = username,
+					password   = password,
+					token      = token
 				),
 				" ",
 				resource,
@@ -172,25 +177,29 @@ fhir_get_resource_ids <- function(
 	}
 
 	request <-  fhir_url(
-					url = base_url,
-					resource = resource,
-					parameters = paste_parameters(parameters, c("_elements" = "id", "_count" = "500"))
-				)
+		url        = base_url,
+		resource   = resource,
+		parameters = paste_parameters(parameters, c("_elements" = "id", "_count" = "500"))
+	)
 
 	bundles <- 	try(
 		fhir_search(
-			request = request,
+			request  = request,
 			username = username,
 			password = password,
-			token = token,
-			verbose = 0
-			)
+			token    = token,
+			verbose  = 0
+		)
 	)
 
 	if(inherits(bundles, "try-error")){
-		warning(paste0("The url ", request, " could not be succesfully resolved. Use fhir_recent_http_error() to get more information!"))
-		NA_integer_;
-	}else{
+		warning(paste0(
+			"The url ",
+			request,
+			" could not be succesfully resolved. Use fhir_recent_http_error() to get more information!"
+		))
+		NA_integer_
+	} else {
 		unlist(
 			lapply(
 				bundles,
@@ -266,19 +275,19 @@ fhir_get_resource_ids <- function(
 #'     cols     = list(
 #'       ID      = "id",
 #'       given   = "name/given",
-#'       family = "name/family")))
+#'       family  = "name/family")))
 #'}
 fhir_get_resources_by_ids <- function(
 	base_url,
 	resource,
 	ids,
-	id_param = '_id',
+	id_param   = '_id',
 	parameters = NULL,
-	username = NULL,
-	password = NULL,
-	token = NULL,
-	verbose = 0) {
-
+	username   = NULL,
+	password   = NULL,
+	token      = NULL,
+	verbose    = 0
+) {
 	#download via GET
 	get_resources_by_ids_get <- function(base_url, resource, ids, id_param, username = NULL, password = NULL, token = NULL,  verbose = 1) {
 		collect_ids_for_request <- function(ids, max_ids = length(ids), max_len = 2083 - sum(nchar(base_url),nchar(resource),50)) {
@@ -338,7 +347,7 @@ fhir_get_resources_by_ids <- function(
 			request = fhir_url(
 				url = base_url,
 				resource = resource,
-				url_enc = TRUE
+				url_enc  = TRUE
 			),
 			body = fhir_body(
 				content = paste_parameters(
@@ -349,18 +358,39 @@ fhir_get_resources_by_ids <- function(
 			),
 			username = username,
 			password = password,
-			token = token,
-			verbose = verbose
+			token    = token,
+			verbose  = verbose
 		)
 	}
 
 	bundles <- try(
-		get_resources_by_ids_post(base_url = base_url, resource = resource, ids = ids, id_param = id_param ,username = username, password = password, token = token, verbose = verbose),
-		silent = T
-		)
+		get_resources_by_ids_post(
+			base_url = base_url,
+			resource = resource,
+			ids      = ids,
+			id_param = id_param,
+			username = username,
+			password = password,
+			token    = token,
+			verbose  = verbose
+		),
+		silent = TRUE
+	)
 	if(inherits(bundles, "try-error")) {
-		if(verbose>0){message("Search via POST failed, falling back to iterative download via GET")}
-		bundles <- get_resources_by_ids_get(base_url = base_url, resource = resource, ids = ids, id_param = id_param, username = username, password = password, token = token, verbose = verbose)
+		if(0 < verbose) {
+			message("Search via POST failed, falling back to iterative download via GET")
+		}
+
+		bundles <- get_resources_by_ids_get(
+			base_url = base_url,
+			resource = resource,
+			ids      = ids,
+			id_param = id_param,
+			username = username,
+			password = password,
+			token    = token,
+			verbose  = verbose
+		)
 	}
 	bundles
 }
@@ -419,7 +449,7 @@ fhir_get_resources_by_ids <- function(
 #'   fhir_table_description(
 #'     resource = "Patient",
 #'     cols     = list(
-#'       ID      = "id",
+#'       ID     = "id",
 #'       given  = "name/given",
 #'       family = "name/family")))
 #'}
@@ -427,19 +457,35 @@ fhir_sample_resources_by_ids <- function(
 	base_url,
 	resource,
 	ids,
-	id_param = "_id",
-	username = NULL,
-	password = NULL,
-	token = NULL,
+	id_param    = "_id",
+	username    = NULL,
+	password    = NULL,
+	token       = NULL,
 	sample_size = 20,
-	seed = 1,
-	verbose = 1) {
+	seed        = 1,
+	verbose     = 1
+) {
+	if(length(ids) < sample_size) {
+		stop("The id list has only length ", length(ids), ". sample_size must be smaller than this number.")
+	}
 
-	if(length(ids) < sample_size) {stop("The id list has only length", length(ids), " . sample_size must be smaller than this number.")}
 	set.seed(seed = seed)
-	ids <- sample(ids, sample_size, replace = F)
-	if(0 < verbose){message("Downloading ", sample_size, " full resources.")}
-	fhir_get_resources_by_ids(base_url = base_url, resource = resource, ids = ids, id_param = id_param, username = username, password = password, token = token, verbose = verbose)
+	ids <- sample(ids, sample_size, replace = FALSE)
+
+	if(0 < verbose){
+		message("Downloading ", sample_size, " full resources.")
+	}
+
+	fhir_get_resources_by_ids(
+		base_url = base_url,
+		resource = resource,
+		ids      = ids,
+		id_param = id_param,
+		username = username,
+		password = password,
+		token    = token,
+		verbose  = verbose
+	)
 }
 
 
@@ -507,26 +553,48 @@ fhir_sample_resources_by_ids <- function(
 fhir_sample_resources <- function(
 	base_url,
 	resource,
-	parameters = NULL,
-	username = NULL,
-	password = NULL,
-	token = NULL,
+	parameters  = NULL,
+	username    = NULL,
+	password    = NULL,
+	token       = NULL,
 	sample_size = 20,
-	seed = 1,
-	verbose = 1) {
+	seed        = 1,
+	verbose     = 1
+) {
+	cnt <- fhir_count_resource(
+		base_url   = base_url,
+		resource   = resource,
+		parameters = parameters,
+		username   = username,
+		password   = password,
+		token      = token
+	)
 
-	cnt <- fhir_count_resource(base_url = base_url, resource = resource, parameters = parameters, username = username, password = password, token = token)
-	if(cnt < sample_size) stop("There are only ", cnt, " resources on the server. sample_size must be smaller than this number.")
-	ids <- fhir_get_resource_ids(base_url = base_url, resource = resource, parameters = parameters, username = username, password = password, token = token, verbose = verbose)
+	if(cnt < sample_size) {
+		stop(
+			"There are only ",
+			cnt,
+			" resources available on the server. sample_size must be smaller than this number."
+		)
+	}
+
 	fhir_sample_resources_by_ids(
-		base_url = base_url,
-		resource = resource,
-		ids = ids,
-		username = username,
-		password = password,
-		token = token,
+		base_url    = base_url,
+		resource    = resource,
+		ids         = fhir_get_resource_ids(
+			base_url   = base_url,
+			resource   = resource,
+			parameters = parameters,
+			username   = username,
+			password   = password,
+			token      = token,
+			verbose    = verbose
+		),
+		username    = username,
+		password    = password,
+		token       = token,
 		sample_size = sample_size,
-		seed = seed,
-		verbose = verbose
+		seed        = seed,
+		verbose     = verbose
 	)
 }

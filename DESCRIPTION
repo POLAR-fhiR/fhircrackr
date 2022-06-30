@@ -30,7 +30,7 @@ BugReports: https://github.com/POLAR-fhiR/fhircrackr/issues
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Imports: 
     xml2,
     stringr,
@@ -38,7 +38,8 @@ Imports:
     utils,
     data.table,
     methods,
-    parallel
+    parallel,
+    lifecycle
 Suggests: 
     knitr,
     rmarkdown
@@ -63,6 +64,7 @@ Collate:
     'fhir_design.R'
     'fhir_style.R'
     'fhir_table_list.R'
+    'fhir_tree.R'
     'flatten_resources.R'
     'miscellaneous.R'
     'multiple_entries.R'

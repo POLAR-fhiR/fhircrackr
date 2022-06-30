@@ -30,7 +30,9 @@ Defaults to \code{compact}.
 should be attached to the name of the variable in the resulting table. Defaults to \code{FALSE}.
 }
 
-A full \code{fhir_table_description} looks for example like this:\preformatted{fhir_resource_type: Patient
+A full \code{fhir_table_description} looks for example like this:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{fhir_resource_type: Patient
 
 fhir_columns:
 column name | xpath expression
@@ -44,7 +46,7 @@ brackets:      '[', ']'
 rm_empty_cols: FALSE
 format:        'compact'
 keep_attr:     FALSE
-}
+}\if{html}{\out{</div>}}
 }
 \section{Slots}{
 

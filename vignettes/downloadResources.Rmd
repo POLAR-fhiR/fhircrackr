@@ -58,9 +58,9 @@ library(fhircrackr)
 ```
 
 ## FHIR search requests
-To download FHIR resources from the server, you need to specify which resources you want with a *FHIR search request*. If you are already familiar with the topic and prefer writing your FHIR search request yourself, you can just define your search request as a simple string that you provide to `fhir_search()`. In that case, however, no checking of spelling mistakes of resource types and URL encoding will be done for you. If you are comfortable with this, you can skip the following paragraph, as the first part of this vignette introduces the basics of FHIR search and some functions to build valid FHIR search requests with `fhircrackr`. 
+To download data from a FHIR server, you need to specify which resources you want to get with a *FHIR search request*. You can just define your search request as a simple string that you provide to `fhir_search()`. In that case, however, no checking of spelling mistakes of resource types and URL encoding will be done for you. If you are comfortable with this, you can skip the following paragraph, as the first part of this vignette introduces the basics of FHIR search and some functions to build valid FHIR search requests with `fhircrackr`. 
 
-A FHIR search request will mostly have the form `[base]/[type]?parameter(s)`, where `[base]` is the base URL to the FHIR server you are trying to access, `[type]` refers to the type of resource you are looking for and `parameter(s)` characterize specific properties those resources should have. The function `fhir_url()` offers a solution to bring those three components together correctly, taking care of proper formatting for you. 
+A FHIR search request will mostly have the form `[base]/[type]?parameter(s)`, where `[base]` is the base URL to the FHIR server you are trying to access, `[type]` refers to the type of resource you are looking for and `parameter(s)` characterize specific properties those resources should have. The function `fhir_url()` offers a solution to bring those three components together correctly, taking care of proper formatting. 
 
 In the simplest case, `fhir_url()` takes only the base url and the resource type you are looking for like this:
 
@@ -68,7 +68,7 @@ In the simplest case, `fhir_url()` takes only the base url and the resource type
 fhir_url(url = "http://hapi.fhir.org/baseR4", resource = "Patient")
 ```
 
-Internally, `fhir_resource_type` is called to check the type you provided against list of all currently available resource types can be found at <a href="https://hl7.org/FHIR/resourcelist.html" target="_blank">https://hl7.org/FHIR/resourcelist.html</a>. Case errors are corrected automatically and the function throws a warning, if the resource type doesn't match the list under hl7.org:
+Internally, the function `fhir_resource_type()` is called to check the type you provided against list of all currently available resource types can be found at <a href="https://hl7.org/FHIR/resourcelist.html" target="_blank">https://hl7.org/FHIR/resourcelist.html</a>. Case errors are corrected automatically and the function throws a warning, if the resource type doesn't match the list under hl7.org:
 
 ```{r,warning=FALSE}
 fhir_resource_type(string = "Patient") #correct
@@ -88,7 +88,7 @@ fhir_resource_type(string = "Hospital") #an unknown resource type, a warning is 
 
 Beside telling the server which resource type to give back, the resource type also determines the kinds of search parameters that are allowed. Search parameters are use to further qualify the resources you want to get back, e.g by restricting the search result to Patient resources of female patients only. 
 
-You can add zero, one, or multiple search parameters to the request. If you don't give any parameters, the search will just return all resources of the specified type from the server. Search parameters generally come in the form `key = value`. There are a number of resource independent parameters that can be found under <a href="https://www.hl7.org/fhir/search.html#Summary" target="_blank">https://www.hl7.org/fhir/search.html#Summary</a>. These parameters usually have a `_` at the beginning. `"_sort" = "status"` for examples sorts the results by their status, `"_include" = "Observation:patient"`, will include the linked Patient resources in a search for Observation resources.  
+You can add several parameters to the search request. If you don't give any parameters, the search will just return all (if not explicitly limited by the `fhir_search()` parameter `max_bundles`) resources of the specified type from the server. Search parameters generally come in the form `key = value`. There are also a number of resource independent parameters that can be found under <a href="https://www.hl7.org/fhir/search.html#Summary" target="_blank">https://www.hl7.org/fhir/search.html#Summary</a>. These parameters usually have a `_` at the beginning. `"_sort" = "status"` for examples sorts the results by their status, `"_include" = "Observation:patient"` includes the linked Patient resources in a search for Observation resources.  
 
 Apart from the resource independent parameters, there are also resource dependent parameters referring to elements specific to that resource. These parameters come without a `_` and you can find a list of them at the end of every resource site e.g. at <a href="https://www.hl7.org/fhir/patient.html#search" target="_blank">https://www.hl7.org/fhir/patient.html#search</a> for the Patient resource. An example of such a parameter would be `"birthdate" = "lt2000-01-01"` for patients born before the year 2000 or `"gender" = "female"` to get female patients only.
 
@@ -128,8 +128,8 @@ patient_bundles <- fhir_search(request = request, max_bundles = 2, verbose = 0)
 patient_bundles <- fhir_unserialize(bundles = patient_bundles)
 ``` 
 
-In general, a FHIR search request returns a *bundle* of the resources you requested. If there are a lot of resources matching your request, the search result isn't returned in one big bundle but distributed over several of them, sometimes called *pages*, the size of which is determined by the FHIR server. 
-If the argument `max_bundles` is set to its default `Inf`, `fhir_search()` will return all available bundles/pages, meaning all resources matching your request. If you set it to `2` as in the example above, the download will stop after the first two bundles. Note that in this case, the result *may not contain all* the resources from the server matching your request, but it can be useful to first look at the first couple of search results before you download all of them.
+In general, a FHIR search request returns a *bundle* of the resources you requested. If there are a lot of resources matching your request, the search result isn't returned in one big bundle but distributed over several of them, also called *pages*, the size of which is determined by the FHIR server. 
+If the argument `max_bundles` is not set, its default `Inf` will be applied. `fhir_search()` then will return all available bundles/pages, meaning all resources matching your request. If you set it to `2` as in the example above, the download will stop after the second bundle. Note that in this case, the result *may not contain all* the resources from the server matching your request, but it can be useful to first look at the first couple of search results before you download all of them.
 
 If you want to connect to a FHIR server that uses basic authentication, you can supply the arguments `username` and `password`. If the server uses some bearer token authentication, you can provide the token in the argument `token`. See below for more information on authentication.
 
@@ -385,7 +385,7 @@ After unserialization, the pointers are restored and you can continue to work wi
 
 ### Save and load bundles as xml files
 If you want to store the bundles in xml files instead of R objects, you can use the functions `fhir_save()` and `fhir_load()`.
-`fhir_save()` takes a list of bundles in form of xml objects (as returned by `fhir_search()`) and writes them into the directory specified in the argument `directory`. Each bundle is saved as a separate xml-file. If the folder defined in `directory` doesn't exist, it is created in the current working directory.
+`fhir_save()` takes a list of bundles in form of xml objects (as returned by `fhir_search()`) and writes them into the directory specified in the argument `directory`. Each bundle is saved as a separate xml-file named by its index, e.g. 3.xml for the third downloaded bundle. If the folder defined in `directory` doesn't exist, it is created in the current working directory.
 
 ```{r}
 #save bundles as xml files
@@ -667,13 +667,18 @@ result <- fhir_bundle_list(unlist(bundles_unserialized, recursive = FALSE))
 Sometimes it can be useful to download a random sample of resources from a server, e.g. when you want to to some kind case-control analysis. The fhircrackr offers a function `fhir_sample_resources()` which takes a base url, a resource type and (optionally) some FHIR Search parameters and returns a random sample with a given size of those resources.
 For example you could download 10 random Patient resources of all female patients born before 1960 like this:
 
-```{r}
-bundle <- fhir_sample_resources(base_url = "http://hapi.fhir.org/baseR4",
-								resource = "Patient",
-								parameters = c(gender = "female", birthdate = "lt1960-01-01"),
-								sample_size = 10)
+```{r, eval=F}
+bundle <- fhir_sample_resources(
+	base_url    = "http://hapi.fhir.org/baseR4",
+	resource    = "Patient",
+	parameters  = c(gender = "female", birthdate = "lt1960-01-01"),
+	sample_size = 10
+)
 ```
 
+```{r, include=F}
+bundle <- fhir_unserialize(fhircrackr:::female_pat_bundle)
+```
 This request may take some time because in the first step, the resource (aka logical) IDs of all resources matching the request (i.e. all Patient resources of females born before 1960) are downloaded. This is necessary because the sampling is actually done in this vector of resource IDs.
 
 The following code shows that the result is actually 10 Patient resources who are female and born before 1960. If you want to know more about how to extract information from the resources like this, please see the vignette on flattening resources.

@@ -86,7 +86,6 @@ setValidity(
 		if(1 < length(object@rm_empty_cols)) {messages <- c(messages, "rm_empty_cols must be logical of length one.")}
 		if(!object@format %in% c("wide", "compact")) {messages <- c(messages, "format must be either 'compact' or 'wide'.")}
 		if(1 < length(object@keep_attr)) {messages <- c(messages, "keep_attr must be logical of length one.")}
-
 		if(0 < length(messages)) {messages} else {TRUE}
 	}
 )
@@ -149,12 +148,12 @@ setValidity(
 #' and the second one the closing bracket. Vectors of length one will be recycled.
 #' Defaults to `character(0)`, i.e. no brackets, meaning that multiple entries won't be indexed.
 #' @param rm_empty_cols A logical of length one indicating whether empty columns should be removed from the resulting table or not. Defaults to `FALSE`.
-#' @param format  A character of length one indicating whether the resulting table should be cracked to a `wide` or `compact` format.
-#' `wide` means multiple entries will be distributed over several columns with indexed names. `compact` means multiple entries will be pasted into one cell/column separated by `sep` .
-#' Defaults to `compact`.
+#' @param format  A character of length one indicating whether the resulting table should be cracked to a `"wide"` or `"compact"` format.
+#' `"wide"` means multiple entries will be distributed over several columns with indexed names. `"compact"` means multiple entries will be pasted into one cell/column separated by `sep` .
+#' Defaults to `"compact"`.
 #' @param keep_attr A logical of length one indicating whether the attribute name of the respective element (`@value` in most cases)
 #' should be attached to the name of the variable in the resulting table. Defaults to `FALSE`.
-#' @param style Deprecated since fhircrackr 2.0.0. Can at the moment still be used for backwards compatibility but will throw an warning.
+#' @param style `r lifecycle::badge("deprecated")`
 #' @return An object of class [fhir_table_description-class].
 #'
 #' @examples
@@ -214,11 +213,12 @@ fhir_table_description <- function(
 	rm_empty_cols = FALSE,
 	format        = 'compact',
 	keep_attr     = FALSE,
-	style = NULL
+	style         = deprecated()
 	) {
 
-	if(!is.null(style)){
-		warning("Have to overwrite fhir_table_description arguments because deprecated fhir_style is used.\n")
+	if(lifecycle::is_present(style)){
+		lifecycle::deprecate_warn(when = "2.0.0", what = "fhir_table_description(style)",
+								  details = "Please code style elements directly in the table description. Overwriting fhir_table_descriptions arguments for now.\n")
 		sep <- style@sep
 		brackets <- style@brackets
 		rm_empty_cols <- style@rm_empty_cols

@@ -5,7 +5,7 @@
 \title{Cast table with multiple entries
 This function divides multiple entries in a compact indexed table as produced by \code{\link[=fhir_crack]{fhir_crack()}} into separate columns.}
 \usage{
-fhir_cast(indexed_df, brackets, sep, verbose = 1, use_brackets = NULL)
+fhir_cast(indexed_df, brackets, sep, verbose = 1)
 }
 \arguments{
 \item{indexed_df}{A compact data.frame/data.table with indexed multiple entries. Column names should reflect the XPath expression of the respective element.}
@@ -16,8 +16,6 @@ fhir_cast(indexed_df, brackets, sep, verbose = 1, use_brackets = NULL)
 
 \item{verbose}{An integer vector of length one. If 0, nothing is printed, if 1, only general progress is printed, if > 1,
 progress for each variable is printed. Defaults to 1.}
-
-\item{use_brackets}{Deprecated.}
 }
 \description{
 This function turns a table from compact format into wide format. Every column containing multiple entries will be turned into multiple columns.

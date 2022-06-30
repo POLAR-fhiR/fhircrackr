@@ -17,7 +17,9 @@ An object of class \code{fhir_resource_serialized} of length 290.
 An object of class \code{fhir_resource_serialized} of length 608.
 }
 \source{
-\strong{transaction_bundle_example}\preformatted{<Bundle>
+\strong{transaction_bundle_example}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{<Bundle>
    <type value='transaction'/>
 	  <entry>
 	     <resource>
@@ -71,18 +73,22 @@ An object of class \code{fhir_resource_serialized} of length 608.
 	     </request>
 	  </entry>
 </Bundle>
-}
+}\if{html}{\out{</div>}}
 
-\strong{example_resource1}\preformatted{<Patient>
+\strong{example_resource1}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{<Patient>
    <name>
 	     <given value = 'Marie'/>
 	  </name>
 	  <gender value = 'female'/>
 	  <birthDate value = '1970-01-01'/>
 </Patient>
-}
+}\if{html}{\out{</div>}}
 
-\strong{example_resource2}\preformatted{<Patient>
+\strong{example_resource2}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{<Patient>
    <id value = '1a2b3c'/>
    <name>
 	     <given value = 'Marie'/>
@@ -90,9 +96,11 @@ An object of class \code{fhir_resource_serialized} of length 608.
 	  <gender value = 'female'/>
 	  <birthDate value = '1970-01-01'/>
 </Patient>
-}
+}\if{html}{\out{</div>}}
 
-\strong{example_resource3}\preformatted{<Medication>
+\strong{example_resource3}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{<Medication>
     <code>
         <coding>
             <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
@@ -111,7 +119,7 @@ An object of class \code{fhir_resource_serialized} of length 608.
  		</itemReference>
     </ingredient>
 </Medication>
-}
+}\if{html}{\out{</div>}}
 }
 \usage{
 transaction_bundle_example

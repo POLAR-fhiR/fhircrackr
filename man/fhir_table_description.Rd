@@ -12,7 +12,7 @@ fhir_table_description(
   rm_empty_cols = FALSE,
   format = "compact",
   keep_attr = FALSE,
-  style = NULL
+  style = deprecated()
 )
 }
 \arguments{
@@ -35,14 +35,14 @@ Defaults to \code{character(0)}, i.e. no brackets, meaning that multiple entries
 
 \item{rm_empty_cols}{A logical of length one indicating whether empty columns should be removed from the resulting table or not. Defaults to \code{FALSE}.}
 
-\item{format}{A character of length one indicating whether the resulting table should be cracked to a \code{wide} or \code{compact} format.
-\code{wide} means multiple entries will be distributed over several columns with indexed names. \code{compact} means multiple entries will be pasted into one cell/column separated by \code{sep} .
-Defaults to \code{compact}.}
+\item{format}{A character of length one indicating whether the resulting table should be cracked to a \code{"wide"} or \code{"compact"} format.
+\code{"wide"} means multiple entries will be distributed over several columns with indexed names. \code{"compact"} means multiple entries will be pasted into one cell/column separated by \code{sep} .
+Defaults to \code{"compact"}.}
 
 \item{keep_attr}{A logical of length one indicating whether the attribute name of the respective element (\verb{@value} in most cases)
 should be attached to the name of the variable in the resulting table. Defaults to \code{FALSE}.}
 
-\item{style}{Deprecated since fhircrackr 2.0.0. Can at the moment still be used for backwards compatibility but will throw an warning.}
+\item{style}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 }
 \value{
 An object of class \linkS4class{fhir_table_description}.
@@ -72,7 +72,9 @@ Defaults to \code{compact}.
 should be attached to the name of the variable in the resulting table. Defaults to \code{FALSE}.
 }
 
-A full \code{fhir_table_description} looks for example like this:\preformatted{fhir_resource_type: Patient
+A full \code{fhir_table_description} looks for example like this:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{fhir_resource_type: Patient
 
 fhir_columns:
 column name | xpath expression
@@ -86,7 +88,7 @@ brackets:      '[', ']'
 rm_empty_cols: FALSE
 format:        'compact'
 keep_attr:     FALSE
-}
+}\if{html}{\out{</div>}}
 }
 \examples{
 # a minimal table description

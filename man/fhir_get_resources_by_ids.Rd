@@ -77,7 +77,7 @@ fhir_crack(
     cols     = list(
       ID      = "id",
       given   = "name/given",
-      family = "name/family")))
+      family  = "name/family")))
 }
 }
 \seealso{

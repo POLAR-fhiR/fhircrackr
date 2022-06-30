@@ -4,10 +4,12 @@
 \alias{fhir_build_resource}
 \title{Build a single FHIR resource}
 \usage{
-fhir_build_resource(row, resource_type)
+fhir_build_resource(row, brackets, resource_type)
 }
 \arguments{
 \item{row}{Single row from a wide table as produced by \code{\link[=fhir_crack]{fhir_crack()}} with \code{format="wide"}}
+
+\item{brackets}{A character vector of length one. The brackets used for cracking.}
 
 \item{resource_type}{A character vector of length one or \linkS4class{fhir_resource_type} object
 indicating which resource type the table is build from.}
@@ -35,12 +37,16 @@ Pat <- fhir_table_description(
 df <- fhir_crack(bundles = bundles, design = Pat)
 
 
-#build bundles
-resource <- fhir_build_resource(df[1,], "Patient")
+#build resource
+resource <- fhir_build_resource(
+                row           = df[1,],
+                brackets      = c('[', ']'),
+                resource_type = "Patient"
+            )
 
 #print to console
 resource
 }
 \seealso{
-\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_crack]{fhir_crack()}}, \code{\link[=fhir_build_bundle]{fhir_build_bundle()}}
+\code{\link[=fhir_cast]{fhir_cast()}}, \code{\link[=fhir_crack]{fhir_crack()}}, \code{\link[=fhir_build_bundle]{fhir_build_bundle()}}, \code{\link[=fhir_post]{fhir_post()}}, \code{\link[=fhir_put]{fhir_put()}}
 }

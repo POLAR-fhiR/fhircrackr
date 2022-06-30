@@ -51,7 +51,7 @@ patients <- fhir_table_description(
   resource = "Patient",
   brackets = c("[", "]"),
   sep      = " | ",
-  format = "wide"
+  format   = "wide"
 )
 
 table <- fhir_crack(bundles = bundles, design = patients, verbose = 0)
@@ -79,16 +79,18 @@ modified_table
 ```
 
 ## Recreate a single resource
-To create resources from this data, the `fhircrackr` makes use of the structure information inherent in the column names. If you want to get an overview over this structure before creating the actual xml-objects, you can use the function `fhir_show_tree()` that will print the tree structure of the first `nrow` resources in the table for you:
+To create resources from this data, the `fhircrackr` makes use of the structure information inherent in the column names. If you want to get an overview over this structure before creating the actual xml-objects, you can use the function `fhir_tree()` that creates a string reprenting the structure wich can be printed to the console using `cat()` or written to a text file:
 
 ```{r}
-cat(fhir_show_tree(modified_table, resource = "Patient", nrow = 1))
+cat(fhir_tree(modified_table, resource = "Patient", brackets = c("[", "]"), keep_ids = TRUE))
 ```
 
-To create a FHIR resource out of this first row of the table, you can use the function `fhir_build_resource()`. This function takes a single row of a cast table and the resource type you intend to create and builds an object of class `fhir_resource`, which is essentially an xml-object:
+To create a FHIR resource out of the first row of the table, you can use the function `fhir_build_resource()`. This function takes a single row of a cast table and the resource type you intend to create and builds an object of class `fhir_resource`, which is essentially an xml-object:
 
 ```{r}
-new_resource <- fhir_build_resource(modified_table[1,], resource_type = "Patient")
+new_resource <- fhir_build_resource(row           = modified_table[1,], 
+                                    resource_type = "Patient", 
+                                    brackets      = c("[", "]"))
 
 new_resource
 ```
@@ -100,7 +102,8 @@ We can create such a bundle from a wide table using the function `fhir_build_bun
 
 ```{r}
 bundle <- fhir_build_bundle(
-  modified_table,
+  table         = modified_table,
+  brackets      = c("[", "]"),
   resource_type = "Patient",
   bundle_type   = "transaction",
   verbose       = 0
@@ -136,9 +139,10 @@ Now when we build a transaction bundle, it has all the information we need:
 
 ```{r}
 bundle <- fhir_build_bundle(
-  request_table,
+  table         = request_table,
   resource_type = "Patient",
   bundle_type   = "transaction", 
+  brackets      = c("[", "]"),
   verbose       = 0
 )
 
@@ -162,8 +166,8 @@ As you can see, this example Medication has ingredient elements which have an `i
 ```{r}
 bundle <- fhir_unserialize(example_bundles4)
 med <- fhir_table_description(resource = "Medication", 
-                              cols = c("id", "ingredient", "ingredient/itemReference/reference"),
-                              format = "wide",
+                              cols     = c("id", "ingredient", "ingredient/itemReference/reference"),
+                              format   = "wide",
                               brackets = c("[", "]")
 )
 without_attribute <- fhir_crack(bundles = bundle, design = med, verbose = 0)
@@ -180,13 +184,13 @@ with_attribute
 This is important when you want to recreate the resources properly. If there is no attribute information in the column names, `fhir_build_resource()` will assume that all columns have `value` attributes, which is wrong in this case:
 
 ```{r}
-fhir_build_resource(row = without_attribute[1,], resource_type = "Medication")
+fhir_build_resource(row = without_attribute[1,], resource_type = "Medication", brackets = c("[", "]"))
 ```
 
 Instead one should build the resource from a table that contains the attribute information:
 
 ```{r}
-fhir_build_resource(row = with_attribute[1,], resource_type = "Medication")
+fhir_build_resource(row = with_attribute[1,], resource_type = "Medication", brackets = c("[", "]"))
 ```
 
 
@@ -210,7 +214,7 @@ Assuming that the resource `[base]/Patient/id1` exists on the server, we could f
 
 ```{r}
 #create resource
-new_resource_with_id <- fhir_build_resource(table[1,], resource_type = "Patient")
+new_resource_with_id <- fhir_build_resource(table[1,], resource_type = "Patient", brackets = c("[", "]"))
 
 new_resource_with_id
 ```
@@ -225,7 +229,7 @@ message("Ressource successfully updated.")
 If the no resource exists under the id you are trying to PUT your resource to, the FHIR server will perform something called *Update as create*, meaning the the resource you send to the server is newly created with the specified id (as opposed to a server generated id). In this case `fhir_put()` will inform you like this:
 
 ```{r, eval=FALSE}
-fhir_put(url = "http://hapi.fhir.org/baseR4/Patient/id1", body = new_resource_with_id)
+fhir_put(url = "http://hapi.fhir.org/baseR4/Patient/id1", body = new_resource_with_id, brackets = c("[", "]"))
 ```
 ```{r, echo=FALSE}
 message("Ressource successfully created.")
@@ -308,7 +312,8 @@ tables$Observation
 You can build a bundle from them by giving this list to `fhir_build_bundle()`:
 
 ```{r}
-bundle <- fhir_build_bundle(table = tables)
+bundle <- fhir_build_bundle(table    = tables,
+                            brackets = c("[","]"))
 ```
 
 The bundle looks like this:

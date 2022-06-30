@@ -12,7 +12,7 @@ fhir_capability_statement(
   brackets = NULL,
   sep = " ::: ",
   log_errors = NULL,
-  verbose = NULL
+  verbose = deprecated()
 )
 }
 \arguments{
@@ -33,7 +33,7 @@ If \code{NULL}, no indices will be added to multiple entries.}
 \item{log_errors}{Either \code{NULL} or a character vector of length one indicating the name of a file in which to save the http errors.
 \code{NULL} means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to \code{NULL}}
 
-\item{verbose}{Deprecated since fhircrackr 2.0.0.}
+\item{verbose}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 }
 \value{
 A list of data frames containing the information from the statement
