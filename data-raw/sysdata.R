@@ -47,4 +47,4 @@ female_pat_bundle <- fhir_sample_resources(
 
 female_pat_bundle <- fhir_serialize(female_pat_bundle)
 
-usethis::use_data(existing_resource_types,female_pat_bundle, internal = TRUE, overwrite = T)
+usethis::use_data(existing_resource_types,female_pat_bundle, internal = TRUE, overwrite = TRUE)

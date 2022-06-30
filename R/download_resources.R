@@ -600,14 +600,18 @@ fhir_load <- function(directory, indices = NULL) {
 		return(fhir_bundle_list(list()))
 	}
 
+	files <- grep('^[0-9]+\\.xml$', dir(directory), value = T)
+
 	if(is.null(indices)) {
 
-		indices <- sort(grep('^[0-9]+\\.xml$', dir(directory)))
+		indices <- seq_along(files)
 	}
 
-	xml.files <- paste0(indices, ".xml")
+	if(any(indices > length(files))){stop("Indices are greater than number of files available in the directory")}
 
-	if(length(xml.files) < 1) {
+	chosen.files <- files[indices]
+
+	if(length(chosen.files) < 1) {
 
 		warning("Cannot find any xml-files in the specified directory.")
 
@@ -616,7 +620,7 @@ fhir_load <- function(directory, indices = NULL) {
 
 	fhir_bundle_list(
 		bundles = lapply(
-			lst(xml.files),
+			lst(chosen.files),
 			function(x) {
 				xml2::read_xml(pastep(directory, x))
 			}
