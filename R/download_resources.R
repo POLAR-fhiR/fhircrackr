@@ -242,7 +242,14 @@ fhir_search <- function(
 			break
 		}
 
-		addr <- bundle@next_link
+		if(grepl("^/", bundle@next_link)){#when next links are relative
+			addr <- paste0(stringr::str_match(request, ".*:\\/\\/.*?\\/"),
+						   stringr::str_sub(bundle@next_link, start = 2))
+		}else{
+			addr <- bundle@next_link
+		}
+
+
 
 		if(0 < delay_between_bundles) {
 			Sys.sleep(delay_between_bundles)
