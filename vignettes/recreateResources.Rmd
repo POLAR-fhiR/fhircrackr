@@ -33,7 +33,7 @@ library(fhircrackr)
 
 ## Preparation
 In the other vignettes you saw how to download and flatten resources.
-Now we'll have a look at how to turn flattened tables back into FHIR resources. This allows you to extract resources from a server, manipulate their content in R and to upload them to a server again. One scenario where this might be useful is downloading data from one server, anonymizing it and uploading it to another server. If you are working with sensitive data please note that it is your responsibility alone to check that any resources you upload to a insecure server are sufficiently anonymized. 
+Now we'll have a look at how to turn flattened tables back into FHIR resources. This allows you to extract resources from a server, manipulate their content in R and to upload them to a server again. One scenario where this might be useful is downloading data from one server, anonymizing it and uploading it to another server. If you are working with sensitive data please note that it is your responsibility alone to check that any resources you upload to an insecure server are sufficiently anonymized. 
 
 For the rest of the vignette, we'll work with `example_bundles2` from `fhircrackr`, which can be made accessible like this:
 
@@ -72,7 +72,7 @@ You can now modify the data. For example, we could remove the name and id and ch
 modified_table <- subset(table, select = -c(`[1.1]name.given`, `[2.1]name.given`, `[1]id`))
 
 #anonymize city
-modified_table[,c(1,5,9)] <- sapply(modified_table[,c(1,5,9)], function(x){sub(".*", "xxx", x)})
+modified_table[,1:3] <- sapply(modified_table[,1:3], function(x){sub(".*", "xxx", x)})
 
 
 modified_table
@@ -96,12 +96,12 @@ new_resource
 ```
 
 ## Recreate a bundle of resources
-It is also possible to bundle together several resources to upload them to the server together. This is done using bundles of type transaction or batch (see <a href="https://www.hl7.org/fhir/bundle.html" target="_blank">https://www.hl7.org/fhir/bundle.html</a> and <a href="https://www.hl7.org/fhir/http.html" target="_blank">https://www.hl7.org/fhir/http.html</a>). 
+It is also possible to bundle several resources to upload them to the server together. This is done using bundles of type transaction or batch (see <a href="https://www.hl7.org/fhir/bundle.html" target="_blank">https://www.hl7.org/fhir/bundle.html</a> and <a href="https://www.hl7.org/fhir/http.html" target="_blank">https://www.hl7.org/fhir/http.html</a>). 
   
-We can create such a bundle from a wide table using the function `fhir_build_bundle`, which takes a wide table and the resource type represented in the table, as well as information on the type of bundle you want to create:
+We can create such a bundle from a wide table using the function `fhir_build_bundle()`, which takes a wide table and the resource type represented in the table, as well as information on the type of bundle you want to create:
 
 ```{r}
-bundle <- fhir_build_bundle(
+transaction_bundle <- fhir_build_bundle(
   table         = modified_table,
   brackets      = c("[", "]"),
   resource_type = "Patient",
@@ -114,10 +114,10 @@ You can have a look at the bundle like this:
 
 ```{r}
 #Overview
-bundle
+transaction_bundle
 
 #print complete string
-cat(toString(bundle))
+cat(toString(transaction_bundle))
 ```
 
 If you are familiar with transaction bundles, you'll notice that this bundle is lacking some information to be POSTable to a server: The `request` element. To be able to upload resources to a server, a transaction/batch bundle must have a `request` element for each resource which holds the url and the HTTP verb (usually `POST` or `PUT`) for the respective resource, otherwise the server will throw an error.
@@ -138,7 +138,7 @@ request_table
 Now when we build a transaction bundle, it has all the information we need:
 
 ```{r}
-bundle <- fhir_build_bundle(
+transaction_bundle <- fhir_build_bundle(
   table         = request_table,
   resource_type = "Patient",
   bundle_type   = "transaction", 
@@ -146,7 +146,7 @@ bundle <- fhir_build_bundle(
   verbose       = 0
 )
 
-cat(toString(bundle))
+cat(toString(transaction_bundle))
 ```
 
 ## Different attributes
@@ -161,7 +161,7 @@ In rare cases, however, there can be other types of attributes, namely `id` or `
 fhir_unserialize(example_resource3)
 ```
 
-As you can see, this example Medication has ingredient elements which have an `id` attribute. `fhir_crack()` will just extract all kinds of attributes, e.g. from this bundle containing the above Medication resource:
+As you can see, this example Medication has ingredient elements which have an `id` attribute. `fhir_crack()` will extract any kind of attributes, e.g. from this bundle containing the above Medication resource:
 
 ```{r}
 bundle <- fhir_unserialize(example_bundles4)
@@ -229,7 +229,9 @@ message("Ressource successfully updated.")
 If the no resource exists under the id you are trying to PUT your resource to, the FHIR server will perform something called *Update as create*, meaning the the resource you send to the server is newly created with the specified id (as opposed to a server generated id). In this case `fhir_put()` will inform you like this:
 
 ```{r, eval=FALSE}
-fhir_put(url = "http://hapi.fhir.org/baseR4/Patient/id1", body = new_resource_with_id, brackets = c("[", "]"))
+fhir_put(url = "http://hapi.fhir.org/baseR4/Patient/id1", 
+         body = new_resource_with_id, 
+         brackets = c("[", "]"))
 ```
 ```{r, echo=FALSE}
 message("Ressource successfully created.")
@@ -239,7 +241,7 @@ message("Ressource successfully created.")
 It is also possible to upload a bundle of resources together. The bundle in the we've created with `fhir_build_bundle()` is such a bundle:
 
 ```{r}
-bundle
+transaction_bundle
 ```
 
 The `request` element we've added before specifies for each resource which HTTP verb (`PUT` or `POST`) and which url to use. Note that the URL must match the HTTP action, i.e. with PUT the URL must contain a resource id, while with `POST` it cannot contain a resource id. 
@@ -247,7 +249,7 @@ The `request` element we've added before specifies for each resource which HTTP 
 You can `POST` the bundle to the server like this:
 
 ```{r, eval=FALSE}
-fhir_post("http://hapi.fhir.org/baseR4", body=bundle)
+fhir_post("http://hapi.fhir.org/baseR4", body = transaction_bundle)
 ```
 ```{r, echo=FALSE}
 message("Bundle sucessfully POSTed")

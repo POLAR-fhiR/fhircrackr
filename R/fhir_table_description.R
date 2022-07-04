@@ -1,8 +1,8 @@
 #' A S4 class describing the form of a table produced by [fhir_crack()]
 #'
-#' A `fhir_table_description` is part of a `fhir_design` and holds the information [fhir_crack()] needs to flatten (aka crack)
-#' FHIR resources from a FHIR bundle and is created with [fhir_table_description()].
-#' There should be one `fhir_table_description` per resource type as [fhir_crack()] will create one data.frame/data.table
+#' A `fhir_table_description` holds the information [fhir_crack()] needs to flatten (aka crack) FHIR resources from a FHIR bundle and
+#' is created with its constructor function [fhir_table_description()].
+#' Each `fhir_table_description` describes a table for a specific resource type as [fhir_crack()] will create one data.frame/data.table
 #' per resource type. See Details.
 #'
 #' @details
@@ -92,9 +92,9 @@ setValidity(
 
 #' Create [fhir_table_description-class] object
 #'
-#' A `fhir_table_description` is part of a `fhir_design` and holds the information [fhir_crack()] needs to flatten (aka crack)
+#' A `fhir_table_description` holds the information [fhir_crack()] needs to flatten (aka crack)
 #' FHIR resources from a FHIR bundle. There should be one `fhir_table_description` per resource type as
-#' [fhir_crack()] will create one data.frame/data.table per resource type. See Details.
+#' [fhir_crack()] will create one data.frame/data.table per resource type in a bundle. See Details.
 #'
 #' @details
 #' A `fhir_table_description` consists of
@@ -195,7 +195,7 @@ setValidity(
 #'     format        = "wide"
 #' )
 #'
-#' # no column arguments is given -> would create a column for all available elements
+#' # no column arguments is given -> creates a column for all available elements
 #' fhir_table_description(
 #'     resource = "Patient",
 #'     sep           = " <~> ",
