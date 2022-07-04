@@ -132,6 +132,10 @@ fhir_search <- function(
 			"for fhir_current_request()"
 		)
 	}
+
+	#Extract base URL
+	base <- stringr::str_match(request, ".*:\\/\\/.*?\\/")
+
 	#preparation for POST vs. GET
 	if(!is.null(body)) {
 		#filter out bad urls
@@ -160,7 +164,7 @@ fhir_search <- function(
 		if(0 < verbose) {
 			message(
 				"Initializing search via POST from FHIR base URL ",
-				gsub(pattern = "(^.+)(/.+\\?).*$", "\\1", replacement = request, perl = TRUE),
+				base,
 				".\n"
 			)
 		}
@@ -171,7 +175,7 @@ fhir_search <- function(
 			" bundles of resource type ",
 			stringr::str_extract(request, "(?<=/)([^/\\?]*)(?=\\?|$)"),
 			" from FHIR base URL ",
-			gsub("(^.+)(/.+\\?).*$", "\\1", request, perl = TRUE),
+			base,
 			".\n"
 		)
 		if(9 < max_bundles) {message("This may take a while...")}
@@ -242,7 +246,14 @@ fhir_search <- function(
 			break
 		}
 
-		addr <- bundle@next_link
+		if(grepl("^/", bundle@next_link)){#when next links are relative
+			addr <- paste0(base,
+						   stringr::str_sub(bundle@next_link, start = 2))
+		}else{
+			addr <- bundle@next_link
+		}
+
+
 
 		if(0 < delay_between_bundles) {
 			Sys.sleep(delay_between_bundles)
