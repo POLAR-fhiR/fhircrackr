@@ -58,7 +58,7 @@ library(fhircrackr)
 ```
 
 ## FHIR search requests
-To download data from a FHIR server, you need to specify which resources you want to get with a *FHIR search request*. You can just define your search request as a simple string that you provide to `fhir_search()`. In that case, however, no checking of spelling mistakes of resource types and URL encoding will be done for you. If you are comfortable with this, you can skip the following paragraph, as the first part of this vignette introduces the basics of FHIR search and some functions to build valid FHIR search requests with `fhircrackr`. 
+To download data from a FHIR server, you need to specify which resources you want to get with a *FHIR search request*. You can just define your search request as a simple string that you provide to `fhir_search()`. In that case, however, no checking of spelling mistakes of resource types and URL encoding will be done for you. If you are comfortable with this, you can skip the following paragraph, as the first part of this vignette introduces the basics of FHIR search and some functions to build valid FHIR search requests with the `fhircrackr`. 
 
 A FHIR search request will mostly have the form `[base]/[type]?parameter(s)`, where `[base]` is the base URL to the FHIR server you are trying to access, `[type]` refers to the type of resource you are looking for and `parameter(s)` characterize specific properties those resources should have. The function `fhir_url()` offers a solution to bring those three components together correctly, taking care of proper formatting. 
 
@@ -86,11 +86,11 @@ fhir_resource_type(string = "Hospital") #an unknown resource type, a warning is 
 # If you are sure the resource type is correct anyway, you can ignore this warning.
 ```
 
-Beside telling the server which resource type to give back, the resource type also determines the kinds of search parameters that are allowed. Search parameters are use to further qualify the resources you want to get back, e.g by restricting the search result to Patient resources of female patients only. 
+Besides telling the server which resource type to give back, the resource type also determines the kinds of search parameters that are allowed. Search parameters are used to further qualify the resources you want to download, e.g by restricting the search result to Patient resources of female patients only. 
 
-You can add several parameters to the search request. If you don't give any parameters, the search will just return all (if not explicitly limited by the `fhir_search()` parameter `max_bundles`) resources of the specified type from the server. Search parameters generally come in the form `key = value`. There are also a number of resource independent parameters that can be found under <a href="https://www.hl7.org/fhir/search.html#Summary" target="_blank">https://www.hl7.org/fhir/search.html#Summary</a>. These parameters usually have a `_` at the beginning. `"_sort" = "status"` for examples sorts the results by their status, `"_include" = "Observation:patient"` includes the linked Patient resources in a search for Observation resources.  
+You can add several parameters to the search request. If you don't give any parameters, the search will just return all resources (if not explicitly limited by the parameter `max_bundles`) of the specified type from the server. Search parameters generally come in the form `key = value`. There are also a number of resource independent parameters that can be found under <a href="https://www.hl7.org/fhir/search.html#Summary" target="_blank">https://www.hl7.org/fhir/search.html#Summary</a>. These parameters usually have a `_` at the beginning. `"_sort" = "status"` for examples sorts the results by their status, `"_include" = "Observation:patient"` includes the linked Patient resources in a search for Observation resources.  
 
-Apart from the resource independent parameters, there are also resource dependent parameters referring to elements specific to that resource. These parameters come without a `_` and you can find a list of them at the end of every resource site e.g. at <a href="https://www.hl7.org/fhir/patient.html#search" target="_blank">https://www.hl7.org/fhir/patient.html#search</a> for the Patient resource. An example of such a parameter would be `"birthdate" = "lt2000-01-01"` for patients born before the year 2000 or `"gender" = "female"` to get female patients only.
+Apart from the resource independent parameters, there are also resource dependent parameters referring to elements specific to that resource type. These parameters come without a `_` and you can find a list of them at the end of every resource site e.g. at <a href="https://www.hl7.org/fhir/patient.html#search" target="_blank">https://www.hl7.org/fhir/patient.html#search</a> for the Patient resource. An example of such a parameter would be `"birthdate" = "lt2000-01-01"` for patients born before the year 2000 or `"gender" = "female"` to get female patients only.
 
 You can add search parameters to your request via a named list or a named character vector:
 
@@ -129,11 +129,11 @@ patient_bundles <- fhir_unserialize(bundles = patient_bundles)
 ``` 
 
 In general, a FHIR search request returns a *bundle* of the resources you requested. If there are a lot of resources matching your request, the search result isn't returned in one big bundle but distributed over several of them, also called *pages*, the size of which is determined by the FHIR server. 
-If the argument `max_bundles` is not set, its default `Inf` will be applied. `fhir_search()` then will return all available bundles/pages, meaning all resources matching your request. If you set it to `2` as in the example above, the download will stop after the second bundle. Note that in this case, the result *may not contain all* the resources from the server matching your request, but it can be useful to first look at the first couple of search results before you download all of them.
+If the argument `max_bundles` is not set, its default `Inf` will be applied. `fhir_search()` will then return all available bundles/pages, meaning all resources matching your request. If you set it to `2` as in the example above, the download will stop after the second bundle. Note that in this case, the result *may not contain all* the resources from the server matching your request, but it can be useful to first look at the first couple of search results before you download all of them.
 
 If you want to connect to a FHIR server that uses basic authentication, you can supply the arguments `username` and `password`. If the server uses some bearer token authentication, you can provide the token in the argument `token`. See below for more information on authentication.
 
-Because servers can sometimes be hard to reach, `fhir_search()` will start five attempts to connect to the server before it gives up. With the arguments `max_attempts` and `delay_between_attempts` you can control this number as well the time interval between attempts.
+Because servers can sometimes be hard to reach, `fhir_search()` will start five attempts to connect to the server before it gives up. With the argument `delay_between_attempts` you can control the number of attempts as well the time interval between them.
 
 As you can see in the next block of code, `fhir_search()` returns an object of class `fhir_bundle_list` where each element represents one bundle of resources, so a list of two in our case:
 
@@ -274,7 +274,7 @@ bundles <- fhir_search(request = url, body = body)
 ## Deal with HTTP Errors
 `fhir_search()` internally sends a `GET` or `POST` request to the server. If anything goes wrong, e.g. because your request wasn't valid or the server caused an error, the result of you request will be a HTTP error. `fhir_search()` will print the error code along with some suggestions for the most common errors to the console. 
 
-To get more detailed information on the error response, you can pass a string with a file name to the argument `log_errors` . This will write a log with error information to the specified file.
+To get more detailed information on the error response, you can either call `fhir_recent_http_error()` to print more information into the console or you can pass a string with a file name to the argument `log_errors`. This will write a log with error information to the specified file:
 
 ```{r, eval=F}
 medication_bundles <- fhir_search(
@@ -537,7 +537,7 @@ To get a better overview, we can split this very long link along the `&`:
 strsplit(fhir_next_bundle_url(), "&")
 ``` 
 
-You can see two interesting numbers: `_count=20` tells you that the queried hapi server has a default bundle size of 20. ` getpagesoffset=200` tells you that the bundle referred to in this link starts after resource no. 200, which makes sense since the `fhir_search()` request above downloaded 10 bundles with 20 resources each, i.e. 200 resources. If you use this link in a new call to `fhir_search`, the download will start from this bundle (i.e. the 11th bundle with resources 201-220) and will go on to the following bundles from there. 
+You can see two interesting numbers: `_count=20` tells you that the queried hapi server has a default bundle size of 20. `getpagesoffset=200` tells you that the bundle referred to in this link starts after resource no. 200, which makes sense since the `fhir_search()` request above downloaded 10 bundles with 20 resources each, i.e. 200 resources. If you use this link in a new call to `fhir_search`, the download will start from this bundle (i.e. the 11th bundle with resources 201-220) and will go on to the following bundles from there. 
 
 When there is no next bundle (because all available resources have been downloaded), `fhir_next_bundle_url()` returns `NULL`.
 
@@ -578,7 +578,7 @@ while(!is.null(url)){
 
 ### Saving download time
 
-In most cases the bottle neck in your analysis will be the download time from the server, because most FHIR server are optimized for handling a lot of simultaneous small requests instead of a single big one. You can gain time by splitting up your request into chunks and sending it to the server in parallel using a parallelized version of `lapply()` but there are couple of issues to take care of.
+In most cases the bottle neck in your analysis will be the download time from the server, because most FHIR server are optimized for handling a lot of simultaneous small requests instead of a single big one. You can gain time by splitting up your request into chunks and sending it to the server in parallel using a parallelized version of `lapply()` but there are couple of issues to keep in mind.
 
 #### Operating system 
 The easiest to use version of parallelization is the function `parallel::mclapply()` which uses forking to process list elements from a `lapply()` call in parallel. As windows doesn't support forking, this solution only can only be used on osx or linux operating systems. 
@@ -664,7 +664,7 @@ result <- fhir_bundle_list(unlist(bundles_unserialized, recursive = FALSE))
 ```
 
 ## Download random samples from a server
-Sometimes it can be useful to download a random sample of resources from a server, e.g. when you want to to some kind case-control analysis. The fhircrackr offers a function `fhir_sample_resources()` which takes a base url, a resource type and (optionally) some FHIR Search parameters and returns a random sample with a given size of those resources.
+Sometimes it can be useful to download a random sample of resources from a server. The fhircrackr offers a function `fhir_sample_resources()` which takes a base url, a resource type and (optionally) some FHIR Search parameters and returns a random sample with a given size of those resources.
 For example you could download 10 random Patient resources of all female patients born before 1960 like this:
 
 ```{r, eval=F}
@@ -707,7 +707,7 @@ The <a href="https://www.hl7.org/fhir/capabilitystatement.html" target="_blank">
 cap <- fhir_capability_statement(url = "http://hapi.fhir.org/baseR4")
 ```
 
-`fhir_capability_statement()` takes the base URL of a FHIR server and returns a list of three data frames containing all information from the capability statement of this server. The first one is called `Meta` and contains some general server information. The second is called `Rest` and contains information on the operations the server implements. The third is called `resources` and gives information on the resource types and associated parameters the server supports. This information can be useful to determine, for example, which FHIR search parameters are implemented in you FHIR server.
+`fhir_capability_statement()` takes the base URL of a FHIR server and returns a list of three data frames containing all information from the capability statement of this server. The first one is called `Meta` and contains some general server information. The second is called `Rest` and contains information on the operations the server implements. The third is called `Resources` and gives information on the resource types and associated parameters the server supports. This information can be useful to determine, for example, which FHIR search parameters are implemented in you FHIR server.
 
 ## A note on HTML in resources
 FHIR resources can contain a considerable amount of HTML code (e.g. in a narrative object), which is often created by the server for example to provide a human-readable summary of the resource. This data is usually not the aim of structured statistical analysis, so in the default setting `fhir_search()` will remove the html parts immediately after download to reduce memory usage (on a hapi server typically by around 30%, see `fhir_rm_div()`). The memory gain is payed with a runtime increase of 10%-20%. The html removal can be disabled by setting rm_tag = NULL to increase speed at the cost of increased memory usage.

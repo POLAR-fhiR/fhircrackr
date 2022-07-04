@@ -48,9 +48,9 @@ should be attached to the name of the variable in the resulting table. Defaults 
 An object of class \linkS4class{fhir_table_description}.
 }
 \description{
-A \code{fhir_table_description} is part of a \code{fhir_design} and holds the information \code{\link[=fhir_crack]{fhir_crack()}} needs to flatten (aka crack)
+A \code{fhir_table_description} holds the information \code{\link[=fhir_crack]{fhir_crack()}} needs to flatten (aka crack)
 FHIR resources from a FHIR bundle. There should be one \code{fhir_table_description} per resource type as
-\code{\link[=fhir_crack]{fhir_crack()}} will create one data.frame/data.table per resource type. See Details.
+\code{\link[=fhir_crack]{fhir_crack()}} will create one data.frame/data.table per resource type in a bundle. See Details.
 }
 \details{
 A \code{fhir_table_description} consists of
@@ -129,7 +129,7 @@ fhir_table_description(
     format        = "wide"
 )
 
-# no column arguments is given -> would create a column for all available elements
+# no column arguments is given -> creates a column for all available elements
 fhir_table_description(
     resource = "Patient",
     sep           = " <~> ",

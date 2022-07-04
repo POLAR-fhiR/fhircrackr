@@ -45,7 +45,7 @@ See `?patient_bundles` and `?medication_bundles` for the FHIR search requests th
 There are two extraction scenarios when you want to flatten FHIR bundles: Either you want to extract just one resource type, or you want to extract several resource types. Because the structure of different resource types is quite dissimilar, it makes sense to create one table per resource type. Therefore the result of the flattening process in `fhircrackr` can be either a single table (when extracting just one resource type) or a list of tables (when extracting more than one resource type). Both scenarios are realized with a call to `fhir_crack()`. We will now explain the two scenarios individually.  
 
 ## Extracting one resource type
-We'll start with `pat_bundles`, which only contains Patient resources. To transform them into a table, we will use `fhir_crack()`. The most important argument `fhir_crack()` takes is `bundles`, an object of class `fhir_bundle_list` that is returned by `fhir_search()`. The second important argument is `design`, which tells the function which data to extract from the bundle. When we want to extract just one resource type, we can use a `fhir_table_description` in the argument `design`. `fhir_crack()` then returns a single data.frame or data.table (if argument `data.tables = TRUE`). 
+We'll start with `pat_bundles`, which only contains Patient resources. To transform them into a table, we will use `fhir_crack()`. The most important argument `fhir_crack()` takes is `bundles`, an object of class `fhir_bundle_list` that is returned by `fhir_search()`. The second important argument is `design`, which tells the function which data to extract from the bundle. When we want to extract just one resource type, we can use a `fhir_table_description` in the argument `design`. `fhir_crack()` then returns a single data.frame or data.table (if argument `data.table = TRUE`). 
 
 We'll show you an example of how it works first and then go on to explain the `fhir_table_description` in more detail.
 
@@ -80,7 +80,7 @@ This is basically a string that defines the resource type (e.g. Patient or Obser
 fhir_table_description(resource = "Patient")
 ```
 
-Internally, `fhir_table_description()` calls `fhir_resource_type()` which checks the type you provided against list of all currently available resource types can be found at <a href="https://hl7.org/FHIR/resourcelist.html" target="_blank">https://hl7.org/FHIR/resourcelist.html</a>. Case errors are corrected automatically and the function throws a warning, if the resource type doesn't match the list under hl7.org.
+Internally, `fhir_table_description()` calls `fhir_resource_type()` which checks the type you provided against list of all currently available resource types which can be found at <a href="https://hl7.org/FHIR/resourcelist.html" target="_blank">https://hl7.org/FHIR/resourcelist.html</a>. Case errors are corrected automatically and the function throws a warning if the resource type doesn't match the list under hl7.org.
 
 As you can see in the above output, there are more elements in a `fhir_table_description` which are filled automatically by `fhir_table_description()`.
 
@@ -98,7 +98,7 @@ fhir_table_description(
 )
 ```
 
-In this case a table with three columns called gender, name and city will be created. They will be filled with the element that can be found under the respective xpath expression in the resource. The element will be extracted regardless of the attribute that is used (in fhir this is mostly `@value` but can also be `@id` or `@url` in rare cases). If you are interested in keeping the attribute information, you can set `keep_attr = TRUE`, in which case the attribute will be attached to the column name.
+In this case a table with three columns called gender, name and city will be created. They will be filled with the element that can be found under the respective xpath expression in the resource. The element will be extracted regardless of the attribute that is used (in FHIR this is mostly `@value` but can also be `@id` or `@url` in rare cases). If you are interested in keeping the attribute information, you can set `keep_attr = TRUE`, in which case the attribute will be attached to the column name.
 
 Internally, `fhir_table_description()` calls `fhir_columns()` to check the validity of the XPath expressions and assign column names. You can provide the XPath expressions in a named or unnamed character vector or a named or unnamed list. If you choose the unnamed version, the names will be set automatically and reflect the respective XPath expression:
 
@@ -151,7 +151,7 @@ We will now work through examples using `fhir_table_descriptions` of different c
 ### Examples
 
 #### Extract all available attributes
-Lets start with an example where we only provide the (mandatory) `resource` component of the table_description.  In this case, `fhir_crack()` will extract all available attributes and use default values for the other elements:
+Lets start with an example where we only provide the (mandatory) `resource` component of the table_description. In this case, `fhir_crack()` will extract all available attributes and use default values for the other elements:
 
 ```{r}
 #define a table_description
@@ -162,7 +162,10 @@ table_description1 <- fhir_table_description(resource = "Patient")
 table <- fhir_crack(bundles = pat_bundles, design = table_description1, verbose = 0)
 
 #have look at part of the results
-table[1:5,1:5]
+table[1:5,1:5]#38:42
+
+#see the fill result with:
+#View(table)
 ```
 
 As you can see, this can easily become a rather wide and sparse data frame. This is due to the fact that every every element appearing in at least one of the resources will be turned into a variable (i.e. column), even if none of the other resources contain this element. For those resources, the value on that element will be set to `NA`. Depending on the variability of the resources, the resulting table can contain a lot of `NA` values. If a resource has multiple entries for an element (e.g. several addresses in a Patient resource), these entries will pasted together using the string provided in `sep` as a separator. The column names in this option are automatically generated by pasting together the path to the respective element, e.g. `name.given`.
@@ -192,7 +195,7 @@ head(table)
 ```
 This option will return more tidy and clear data frames, because you have full control over the extracted columns including their name in the resulting table. You should always extract the resource id, because this is used to link to other resources you might also extract. 
 
-If you are not sure which elements are available or where they are located in the resource, it can be helpful to start by extracting all available elements. If you are more comfortable with xml, you can also use `xml2::xml_structure` on one of the bundles from your bundle list, this will print the complete xml structure into your console. Then you can get an overview over the available element and their location and continue by doing a second, more targeted extraction to get your final data frame.
+If you are not sure which elements are available or where they are located in the resource, it can be helpful to start by extracting all available elements. If you are more comfortable with xml, you can also use `xml2::xml_structure` on one of the bundles from your bundle list, this will print the complete xml structure into your console. Then you can get an overview over the available element and their location and continue by doing a second, more targeted extraction to get your final table.
 
 If you want to have a look at how the design looked that was actually used in the last call to `fhir_crack()` you can retrieve it with `fhir_canonical_design()`. 
 
@@ -288,7 +291,7 @@ fhir_load_design(paste0(temp_dir, "/design.xml"))
 
 
 ## Multiple entries
-A particularly complicated problem in flattening FHIR resources is caused by the fact that there can be multiple entries to an element. The profile according to which your FHIR resources have been built defines how often a particular element can appear in a resource. This is called the *cardinality* of the element. For example the Patient resource defined <a href="https://www.hl7.org/fhir/patient.html#resource" target="_blank">here</a> can have zero or one birthdates but arbitrarily many addresses. In the default setting, `fhir_crack()` will paste multiple entries for the same element together in the table, using the separator provided by the `sep` argument. In most cases this will work just fine, but there are some special cases that require a little more attention.
+A particularly complicated problem in flattening FHIR resources is caused by the fact that there can be multiple entries to an element. The profile according to which your FHIR resources have been built defines how often a particular element can appear in a resource. This is called the *cardinality* of the element. For example the Patient resource defined <a href="https://www.hl7.org/fhir/patient.html#resource" target="_blank">here</a> can have zero or one birth dates but arbitrarily many addresses. In the default setting, `fhir_crack()` will paste multiple entries for the same element together in the table, using the separator provided by the `sep` argument. In most cases this will work just fine, but there are some special cases that require a little more attention.
 
 Let's have a look at an example bundle containing just three Patient resources. You can make it available in your workspace like this:
 

@@ -203,7 +203,7 @@ argument. The most important argument `fhir_crack()` takes is `bundles`,
 the list of bundles that is returned by `fhir_search()`. The second
 important argument is `design`, an object that tells the function which
 data to extract from the bundle and how. `fhir_crack()` returns (a list
-of) data.frames or data.tables (if argument `data.tables = TRUE`).
+of) data.frames or data.tables (if argument `data.table = TRUE`).
 
 The object that is passed to the `design` argument can be of class
 `fhir_table_description` or `fhir_design`. A `fhir_table_description` is
@@ -229,8 +229,8 @@ table_description <- fhir_table_description(
         gender      = "gender",
         birthday    = "birthDate"
     ),
-    sep           = "|",
-    brackets      = c("[", "]"),
+    sep           = " ~ ",
+    brackets      = c("<<", ">>"),
     rm_empty_cols = FALSE,
     format        = 'compact',
     keep_attr     = FALSE
@@ -254,22 +254,25 @@ table_description
 #> birthday    | birthDate
 #> ------------ -----------------
 #> 
-#> sep:           '|'
-#> brackets:      '[', ']'
+#> sep:           ' ~ '
+#> brackets:      '<<', '>>'
 #> rm_empty_cols: FALSE
 #> format:        'compact'
 #> keep_attr:     FALSE
 ```
 
-All five style elements of can also be controlled directly by the
-`fhir_crack()` arguments `sep`, `brackets`, `remove_empty_columns`,
-`format` and `keep_attr`. If the function arguments are `NULL` (their
-default), the values provided as style arguments are used, if they are
-not NULL, they will overwrite any values in `fhir_table_description`. If
-both the function arguments and the `fhir_table_description` components
-are NULL, default values(`sep = " "`, `brackets = NULL`,
-`rm_empty_cols = TRUE`, `format` = ‘compact’, `keep_attr` = FALSE) will
-be assumed.
+Each of the five style elements `sep`, `brackets`,
+`remove_empty_columns`, `format` and `keep_attr` in `table_description`
+can also be controlled directly by the argument of the same name of
+`fhir_crack()`. If one of these function arguments is `NULL` (the
+default value for each argument), the corresponding value specified from
+the `table_description` will be used. If the argument in `fhir_crack` is
+set, the corresponding value in `fhir_table_description` will be
+overruled. If both the `fhir_crack` function argument and the
+corresponding component in `fhir_table_description` are `NULL`, the
+respective default value (`sep = ':::'`, `brackets = NULL`,
+`rm_empty_cols = TRUE`, `format = 'compact'`, `keep_attr = FALSE`) will
+be applied.
 
 After it is defined, the `fhir_table_description` can be used in
 `fhir_crack()` like this:
@@ -280,27 +283,27 @@ patients <- fhir_crack(bundles = patient_bundles, design = table_description, ve
 
 #have look at the results
 head(patients)
-#>          PID                             use_name
-#> 1 [1]2072744                        [1.1]official
-#> 2 [1]2431578                        [1.1]official
-#> 3 [1]2431568 [1.1]official|[2.1]usual|[3.1]maiden
-#> 4 [1]2431577                        [1.1]official
-#> 5 [1]2431757                             [1.1]old
-#> 6 [1]2431759                        [1.1]official
-#>                                             given_name
-#> 1                                     [1.1]K|[1.2]Kari
-#> 2                                           [1.1]Roman
-#> 3 [1.1]Peter|[1.2]James|[2.1]Jim|[3.1]Peter|[3.2]James
-#> 4                             [1.1]Ganpat|[1.2]Malekar
-#> 5                                                 <NA>
-#> 6                                             [1.1]ABC
-#>                  family_name    gender      birthday
-#> 1              [1.1]Nordmann [1]female [1]2018-09-12
-#> 2                 [1.1]Smith   [1]male [1]2021-07-19
-#> 3 [1.1]Chalmers|[3.1]Windsor   [1]male [1]1974-12-25
-#> 4               [1.1]Malekar   [1]male [1]1996-02-07
-#> 5                [1.1]murali   [1]male          <NA>
-#> 6                   [1.1]XYZ   [1]male [1]1998-01-03
+#>            PID                                       use_name
+#> 1 <<1>>2072744                                <<1.1>>official
+#> 2 <<1>>2431578                                <<1.1>>official
+#> 3 <<1>>2431568 <<1.1>>official ~ <<2.1>>usual ~ <<3.1>>maiden
+#> 4 <<1>>2431577                                <<1.1>>official
+#> 5 <<1>>2431757                                     <<1.1>>old
+#> 6 <<1>>2431759                                <<1.1>>official
+#>                                                               given_name
+#> 1                                                 <<1.1>>K ~ <<1.2>>Kari
+#> 2                                                           <<1.1>>Roman
+#> 3 <<1.1>>Peter ~ <<1.2>>James ~ <<2.1>>Jim ~ <<3.1>>Peter ~ <<3.2>>James
+#> 4                                         <<1.1>>Ganpat ~ <<1.2>>Malekar
+#> 5                                                                   <NA>
+#> 6                                                             <<1.1>>ABC
+#>                        family_name      gender        birthday
+#> 1                  <<1.1>>Nordmann <<1>>female <<1>>2018-09-12
+#> 2                     <<1.1>>Smith   <<1>>male <<1>>2021-07-19
+#> 3 <<1.1>>Chalmers ~ <<3.1>>Windsor   <<1>>male <<1>>1974-12-25
+#> 4                   <<1.1>>Malekar   <<1>>male <<1>>1996-02-07
+#> 5                    <<1.1>>murali   <<1>>male            <NA>
+#> 6                       <<1.1>>XYZ   <<1>>male <<1>>1998-01-03
 ```
 
 ## Extract more than one resource type
@@ -361,9 +364,9 @@ Patients <- fhir_table_description(resource = "Patient")
 design <- fhir_design(MedicationStatements, Patients)
 ```
 
-In this example, we have spelled out the description MedicationStatement
-completely, while we have used a short form for Patients. The resulting
-design looks like this:
+In this example, we have spelled out the table description
+`MedicationStatement` completely, while we have used a short form for
+`Patients`. The resulting design looks like this:
 
 ``` r
 design
@@ -431,118 +434,126 @@ list_of_tables$MedicationStatements[1:5,]
 #> 4 2019-11-12T14:27:00.098+00:00
 #> 5 2019-11-16T16:51:50.759+00:00
 
-list_of_tables$Patients[1:5,]
-#>   address.city address.country address.district address.extension
-#> 1         <NA>            <NA>             <NA>              <NA>
-#> 2         <NA>            <NA>             <NA>              <NA>
-#> 3         <NA>            <NA>             <NA>              <NA>
-#> 4         <NA>            <NA>             <NA>              <NA>
-#> 5         <NA>            <NA>             <NA>              <NA>
-#>   address.extension.extension address.extension.extension.valueDecimal
-#> 1                        <NA>                                     <NA>
-#> 2                        <NA>                                     <NA>
-#> 3                        <NA>                                     <NA>
-#> 4                        <NA>                                     <NA>
-#> 5                        <NA>                                     <NA>
-#>   address.line address.postalCode address.state address.text address.type
-#> 1         <NA>               <NA>          <NA>         <NA>         <NA>
-#> 2         <NA>               <NA>          <NA>         <NA>         <NA>
-#> 3         <NA>               <NA>          <NA>         <NA>         <NA>
-#> 4         <NA>               <NA>          <NA>         <NA>         <NA>
-#> 5         <NA>               <NA>          <NA>         <NA>         <NA>
-#>   address.use  birthDate communication.language.coding.code
-#> 1        <NA> 2020-03-23                               <NA>
-#> 2        <NA> 2020-03-24                               <NA>
-#> 3        <NA> 1979-10-08                               <NA>
-#> 4        <NA> 2019-11-10                               <NA>
-#> 5        <NA> 1970-01-10                               <NA>
-#>   communication.language.coding.display communication.language.coding.system
-#> 1                                  <NA>                                 <NA>
-#> 2                                  <NA>                                 <NA>
-#> 3                                  <NA>                                 <NA>
-#> 4                                  <NA>                                 <NA>
-#> 5                                  <NA>                                 <NA>
-#>   communication.language.text extension extension.extension
-#> 1                        <NA>      <NA>                <NA>
-#> 2                        <NA>      <NA>                <NA>
-#> 3                        <NA>      <NA>                <NA>
-#> 4                        <NA>      <NA>                <NA>
-#> 5                        <NA>      <NA>                <NA>
-#>   extension.extension.valueCoding.code extension.extension.valueCoding.display
-#> 1                                 <NA>                                    <NA>
-#> 2                                 <NA>                                    <NA>
-#> 3                                 <NA>                                    <NA>
-#> 4                                 <NA>                                    <NA>
-#> 5                                 <NA>                                    <NA>
-#>   extension.extension.valueCoding.system extension.extension.valueString
-#> 1                                   <NA>                            <NA>
-#> 2                                   <NA>                            <NA>
-#> 3                                   <NA>                            <NA>
-#> 4                                   <NA>                            <NA>
-#> 5                                   <NA>                            <NA>
-#>   extension.valueAddress.city extension.valueAddress.country
-#> 1                        <NA>                           <NA>
-#> 2                        <NA>                           <NA>
-#> 3                        <NA>                           <NA>
-#> 4                        <NA>                           <NA>
-#> 5                        <NA>                           <NA>
-#>   extension.valueAddress.state extension.valueCode extension.valueDecimal
-#> 1                         <NA>                <NA>                   <NA>
-#> 2                         <NA>                <NA>                   <NA>
-#> 3                         <NA>                <NA>                   <NA>
-#> 4                         <NA>                <NA>                   <NA>
-#> 5                         <NA>                <NA>                   <NA>
-#>   extension.valueString gender generalPractitioner.reference      id
-#> 1                  <NA>   male                          <NA>  697738
-#> 2                  <NA>   male                          <NA>  697934
-#> 3                  <NA> female                          <NA>   42024
-#> 4                  <NA> female                          <NA>   59530
-#> 5                  <NA>   male                          <NA> 1162779
-#>   identifier.system identifier.type.coding.code identifier.type.coding.display
-#> 1              <NA>                        <NA>                           <NA>
-#> 2              <NA>                        <NA>                           <NA>
-#> 3              <NA>                        <NA>                           <NA>
-#> 4              <NA>                        <NA>                           <NA>
-#> 5              <NA>                        <NA>                           <NA>
-#>   identifier.type.coding.system identifier.type.text identifier.value
-#> 1                          <NA>                 <NA>             <NA>
-#> 2                          <NA>                 <NA>             <NA>
-#> 3                          <NA>                 <NA>             <NA>
-#> 4                          <NA>                 <NA>             <NA>
-#> 5                          <NA>                 <NA>             <NA>
-#>   managingOrganization.reference maritalStatus.coding.code
-#> 1                           <NA>                      <NA>
-#> 2                           <NA>                      <NA>
-#> 3                           <NA>                      <NA>
-#> 4                           <NA>                      <NA>
-#> 5                           <NA>                      <NA>
-#>   maritalStatus.coding.display maritalStatus.coding.system maritalStatus.text
-#> 1                         <NA>                        <NA>               <NA>
-#> 2                         <NA>                        <NA>               <NA>
-#> 3                         <NA>                        <NA>               <NA>
-#> 4                         <NA>                        <NA>               <NA>
-#> 5                         <NA>                        <NA>               <NA>
-#>                meta.lastUpdated       meta.source meta.versionId
-#> 1 2020-03-23T16:12:33.294+00:00 #LUrUNxAhdZrFHftu              1
-#> 2 2020-03-24T06:19:22.991+00:00 #F6KTacg6zpZSnNLM              1
-#> 3 2020-08-07T14:25:55.860+00:00 #S9uv5jD2iAAi5WFP              3
-#> 4 2021-07-13T08:44:06.580+00:00 #qWzI8wftDtgcB3LC              6
-#> 5 2021-10-15T09:10:37.409+00:00 #JnxgDwhILtrVk2uc              5
-#>   multipleBirthBoolean name.family name.given name.prefix     name.text
-#> 1                 <NA>      Cooper     Xavier        <NA> Xavier Cooper
-#> 2                 <NA>         Hay      Harry        <NA>     Harry Hay
-#> 3                 <NA>      Walker      Pippa        <NA>  Pippa Walker
-#> 4                 <NA>      Singh2      Anna         <NA>          <NA>
-#> 5                 <NA>         Doe       John        <NA>      John Doe
-#>   name.use telecom.system telecom.use telecom.value text.status
-#> 1 official           <NA>        <NA>          <NA>   generated
-#> 2 official           <NA>        <NA>          <NA>   generated
-#> 3 official           <NA>        <NA>          <NA>   generated
-#> 4     <NA>           <NA>        <NA>          <NA>   generated
-#> 5 official           <NA>        <NA>          <NA>   generated
+list_of_tables$Patients[18:20,]
+#>    address.city address.country address.district
+#> 18     Westford              US             <NA>
+#> 19     Westford              US             <NA>
+#> 20   Talad Kwan              TH            Muang
+#>                                      address.extension
+#> 18 http://hl7.org/fhir/StructureDefinition/geolocation
+#> 19 http://hl7.org/fhir/StructureDefinition/geolocation
+#> 20                                                <NA>
+#>    address.extension.extension address.extension.extension.valueDecimal
+#> 18        latitude:::longitude    42.58942256332994:::-71.3827654850569
+#> 19        latitude:::longitude    42.58942256332994:::-71.3827654850569
+#> 20                        <NA>                                     <NA>
+#>          address.line address.postalCode address.state
+#> 18  378 Krajcik Lodge               <NA> Massachusetts
+#> 19  378 Krajcik Lodge               <NA> Massachusetts
+#> 20 88/20 Tiwanon Road              11000    Nonthaburi
+#>                                                          address.text
+#> 18                                                               <NA>
+#> 19                                                               <NA>
+#> 20 88/20 Tiwanon Road, Talad Kwan, Muang, Nonthaburi, 11000, Thailand
+#>    address.type address.use  birthDate communication.language.coding.code
+#> 18         <NA>        <NA> 1946-03-29                              en-US
+#> 19         <NA>        <NA> 1946-03-29                              en-US
+#> 20       postal        work 1988-03-25                               <NA>
+#>    communication.language.coding.display communication.language.coding.system
+#> 18                               English                      urn:ietf:bcp:47
+#> 19                               English                      urn:ietf:bcp:47
+#> 20                                  <NA>                                 <NA>
+#>    communication.language.text
+#> 18                     English
+#> 19                     English
+#> 20                        <NA>
+#>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                extension
+#> 18 http://hl7.org/fhir/us/core/StructureDefinition/us-core-race:::http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity:::http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName:::http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex:::http://hl7.org/fhir/StructureDefinition/patient-birthPlace:::http://synthetichealth.github.io/synthea/disability-adjusted-life-years:::http://synthetichealth.github.io/synthea/quality-adjusted-life-years
+#> 19 http://hl7.org/fhir/us/core/StructureDefinition/us-core-race:::http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity:::http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName:::http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex:::http://hl7.org/fhir/StructureDefinition/patient-birthPlace:::http://synthetichealth.github.io/synthea/disability-adjusted-life-years:::http://synthetichealth.github.io/synthea/quality-adjusted-life-years
+#> 20                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <NA>
+#>                        extension.extension extension.extension.valueCoding.code
+#> 18 ombCategory:::text:::ombCategory:::text                      2106-3:::2186-5
+#> 19 ombCategory:::text:::ombCategory:::text                      2106-3:::2186-5
+#> 20                                    <NA>                                 <NA>
+#>    extension.extension.valueCoding.display
+#> 18          White:::Not Hispanic or Latino
+#> 19          White:::Not Hispanic or Latino
+#> 20                                    <NA>
+#>                               extension.extension.valueCoding.system
+#> 18 urn:oid:2.16.840.1.113883.6.238:::urn:oid:2.16.840.1.113883.6.238
+#> 19 urn:oid:2.16.840.1.113883.6.238:::urn:oid:2.16.840.1.113883.6.238
+#> 20                                                              <NA>
+#>    extension.extension.valueString extension.valueAddress.city
+#> 18  White:::Not Hispanic or Latino                      Boston
+#> 19  White:::Not Hispanic or Latino                      Boston
+#> 20                            <NA>                        <NA>
+#>    extension.valueAddress.country extension.valueAddress.state
+#> 18                             US                Massachusetts
+#> 19                             US                Massachusetts
+#> 20                           <NA>                         <NA>
+#>    extension.valueCode                extension.valueDecimal
+#> 18                   M 4.160702818392717:::67.83929718160728
+#> 19                   M 4.160702818392717:::67.83929718160728
+#> 20                <NA>                                  <NA>
+#>    extension.valueString gender generalPractitioner.reference     id
+#> 18   Kristyn560 Lesch175   male           Practitioner/634104 634102
+#> 19   Kristyn560 Lesch175   male           Practitioner/632760 632758
+#> 20                  <NA>   male                          <NA> 921009
+#>                                                                                                                                                                                                               identifier.system
+#> 18 https://github.com/synthetichealth/synthea:::http://hospital.smarthealthit.org:::http://hl7.org/fhir/sid/us-ssn:::urn:oid:2.16.840.1.113883.4.3.25:::http://standardhealthrecord.org/fhir/StructureDefinition/passportNumber
+#> 19 https://github.com/synthetichealth/synthea:::http://hospital.smarthealthit.org:::http://hl7.org/fhir/sid/us-ssn:::urn:oid:2.16.840.1.113883.4.3.25:::http://standardhealthrecord.org/fhir/StructureDefinition/passportNumber
+#> 20                                                                                                                                                                                                                         <NA>
+#>    identifier.type.coding.code
+#> 18          MR:::SS:::DL:::PPN
+#> 19          MR:::SS:::DL:::PPN
+#> 20                        <NA>
+#>                                                         identifier.type.coding.display
+#> 18 Medical Record Number:::Social Security Number:::Driver's License:::Passport Number
+#> 19 Medical Record Number:::Social Security Number:::Driver's License:::Passport Number
+#> 20                                                                                <NA>
+#>                                                                                                                                                                    identifier.type.coding.system
+#> 18 http://terminology.hl7.org/CodeSystem/v2-0203:::http://terminology.hl7.org/CodeSystem/v2-0203:::http://terminology.hl7.org/CodeSystem/v2-0203:::http://terminology.hl7.org/CodeSystem/v2-0203
+#> 19 http://terminology.hl7.org/CodeSystem/v2-0203:::http://terminology.hl7.org/CodeSystem/v2-0203:::http://terminology.hl7.org/CodeSystem/v2-0203:::http://terminology.hl7.org/CodeSystem/v2-0203
+#> 20                                                                                                                                                                                          <NA>
+#>                                                                   identifier.type.text
+#> 18 Medical Record Number:::Social Security Number:::Driver's License:::Passport Number
+#> 19 Medical Record Number:::Social Security Number:::Driver's License:::Passport Number
+#> 20                                                                                <NA>
+#>                                                                                                      identifier.value
+#> 18 41166989-975d-4d17-b9de-17f94cb3eec1:::41166989-975d-4d17-b9de-17f94cb3eec1:::999-17-8717:::S99933732:::X75257608X
+#> 19 41166989-975d-4d17-b9de-17f94cb3eec1:::41166989-975d-4d17-b9de-17f94cb3eec1:::999-17-8717:::S99933732:::X75257608X
+#> 20                                                                                                               <NA>
+#>    managingOrganization.reference maritalStatus.coding.code
+#> 18            Organization/634103                         M
+#> 19            Organization/632759                         M
+#> 20                           <NA>                      <NA>
+#>    maritalStatus.coding.display
+#> 18                            M
+#> 19                            M
+#> 20                         <NA>
+#>                               maritalStatus.coding.system maritalStatus.text
+#> 18 http://terminology.hl7.org/CodeSystem/v3-MaritalStatus                  M
+#> 19 http://terminology.hl7.org/CodeSystem/v3-MaritalStatus                  M
+#> 20                                                   <NA>               <NA>
+#>                 meta.lastUpdated       meta.source meta.versionId
+#> 18 2020-03-02T10:43:58.614+00:00 #uTFlWjr2fcHf62Xy              1
+#> 19 2020-02-29T18:47:48.754+00:00 #dM9HGNXA1F2Yo6lM              1
+#> 20 2020-04-01T13:01:17.522+00:00 #WYbX5i8RxFerjmgY              3
+#>    multipleBirthBoolean           name.family  name.given name.prefix
+#> 18                false         Stiedemann542    Aaron697         Mr.
+#> 19                false         Stiedemann542    Aaron697         Mr.
+#> 20                 <NA> Melonseed:::Melonseed Edward:::Ed        <NA>
+#>                          name.text         name.use telecom.system telecom.use
+#> 18                            <NA>         official          phone        home
+#> 19                            <NA>         official          phone        home
+#> 20 Edward Melonseed:::Ed Melonseed official:::usual          phone      mobile
+#>    telecom.value text.status
+#> 18  555-213-2064   generated
+#> 19  555-213-2064   generated
+#> 20  (08)97654321   generated
 ```
 
-As you can see, the result now contains two data frames, one for Patient
+As you can see, the result now contains two tables, one for Patient
 resources and one for MedicationStatement resources.
 
 ## Multiple entries
@@ -553,19 +564,19 @@ For a more detailed description of this problem, please see the vignette
 on flattening resources.
 
 In general, `fhir_crack()` will paste multiple entries for the same
-attribute together in the data frame, using the separator provided by
-the `sep` argument.
+attribute together in the table, using the separator provided by the
+`sep` argument.
 
 Let’s have a look at the following simple example, where we have a
 bundle containing just two Patient resources. The example is part of the
-`fhricrackr` package and you can make it available like this:
+`fhircrackr` package and you can make it available like this:
 
 ``` r
 bundles <- fhir_unserialize(bundles = example_bundles1)
 ```
 
-They represent a very simple bundle of just two Patient resources which
-looks like this:
+This represents a bundle list with only one very simple bundle of just
+two Patient resources which looks like this:
 
     <Bundle>
 
@@ -637,22 +648,23 @@ df
 #> 2 [2.1]postal | [3.1]postal [1.1]home | [3.1]work [1]id3 [1.1]Frank | [2.1]Max
 ```
 
-Multiple entries are pasted together with the specified separator in
-between and the indices (inside the specified brackets) display the
-entry the value belongs to. That way you can see that Patient resource 2
-had three entries for the attribute `address` and you can also see which
+Multiple entries are pasted together with the specified separator string
+(in this case: `" | "`) in between and the indices (inside the specified
+bracket strings (here: `"["` and `"]"`)) display the entry the value
+belongs to. That way you can see that Patient resource 2 had three
+entries for the attribute `address` and you can also see which
 attributes belong to which entry.
 
-## Process Data Frames with multiple Entries
+## Process Tables with multiple Entries
 
-### Melt data frames with multiple entries
+### Melt tables with multiple entries
 
-If the data frame produced by `fhir_crack()` contains multiple entries,
+If the table produced by `fhir_crack()` contains multiple entries,
 you’ll probably want to divide these entries into distinct observations
 at some point. This is where `fhir_melt()` comes into play.
-`fhir_melt()` takes an indexed data frame with multiple entries in one
-or several `columns` and spreads (aka melts) these entries over several
-rows:
+`fhir_melt()` takes an *indexed table* with multiple entries in one or
+several `columns` and spreads (aka melts) these entries over several
+rows.
 
 ``` r
 fhir_melt(
@@ -670,13 +682,13 @@ fhir_melt(
 ```
 
 The new variable `resource_identifier` maps which rows in the created
-data frame belong to which row (usually equivalent to one resource) in
-the original data frame. `brackets` and `sep` should be given the same
-character vectors that have been used to build the indices in
-`fhir_melt()`. `columns` is a character vector with the names of the
-variables you want to melt. You can provide more than one column here
-but it makes sense to only have variables from the same repeating
-attribute together in one call to `fhir_melt()`:
+table belong to which row (usually equivalent to one resource) in the
+original table. `brackets` and `sep` have to be the same character
+vectors that have been used to build the indices with `fhir_crack()`.
+`columns` is a character vector with the names of the variables/columns
+you want to melt. You can provide more than one column here but it makes
+sense to only have variables from the same repeating attribute together
+in one call to `fhir_melt()`:
 
 ``` r
 cols <- c("address.city", "address.use", "address.type", "address.country")
@@ -696,8 +708,8 @@ fhir_melt(
 ```
 
 With the argument `all_columns` you can control whether the resulting
-data frame contains only the molten columns or all columns of the
-original data frame:
+table contains only the molten columns or all columns of the original
+table:
 
 ``` r
 molten <- fhir_melt(
@@ -722,13 +734,13 @@ molten
 ```
 
 Values on the other variables will just repeat in the newly created
-rows. For more information, e.g. on how to melt all multiple entries in
-a data.frame at once, please see the vignette on flattening resources.
+rows. For more information please see the vignette on flattening
+resources.
 
 ### Remove indices
 
 Once you have sorted out the multiple entries, you might want to get rid
-of the indices in your data.frame. This can be achieved using
+of the indices in your data frame. This can be achieved using
 `fhir_rm_indices()`:
 
 ``` r
@@ -745,15 +757,15 @@ fhir_rm_indices(indexed_data_frame = molten, brackets = c("[", "]"))
 #> 4                   2
 ```
 
-Again, `brackets` and `sep` should be given the same character vector
-that was used for `fhir_crack()` and `fhir_melt()`respectively.
+Again, `brackets` should be given the same character vector that was
+used for `fhir_crack()` and `fhir_melt()` respectively.
 
 ## Save and load downloaded bundles
 
-Since `fhir_crack()` ignores all data not specified in `design`, it
-makes sense to store the original search result for reproducibility and
-in case you realize later on that you need elements from the resources
-that you haven’t extracted at first.
+Since `fhir_crack()` ignores all data that are not specified in
+`design`, it makes sense to store the original search result for
+reproducibility and in case you realize later on that you need elements
+from the resources that you haven’t extracted at first.
 
 There are two ways of saving the FHIR bundles you downloaded: Either you
 save them as R objects, or you write them to an xml file.
@@ -766,9 +778,9 @@ because this will break the external pointers in the xml objects
 representing your bundles. Instead, you have to serialize the bundles
 before saving and unserialize them after loading. For single xml objects
 the package `xml2` provides serialization functions. For convenience,
-however, `fhircrackr` provides the functions `fhir_serialize()` and
-`fhir_unserialize()` that can be used directly on the bundles returned
-by `fhir_search()`:
+however, `fhircrackr` provides the functions `fhir_serialize()` that can
+be used directly on the bundles returned by `fhir_search()` and
+`fhir_unserialize()`:
 
 ``` r
 #serialize bundles
@@ -784,7 +796,7 @@ head(serialized_bundles[[1]])
 temp_dir <- tempdir()
 
 #save
-save(serialized_bundles, file = paste0(temp_dir, "/bundles.rda"))
+saveRDS(serialized_bundles, file = paste0(temp_dir, "/bundles.rda"))
 ```
 
 If you reload this bundle, you have to unserialize it before you can
@@ -792,12 +804,12 @@ work with it:
 
 ``` r
 #load bundles
-load(paste0(temp_dir, "/bundles.rda"))
+serialized_bundles_reloaded <- readRDS(paste0(temp_dir, "/bundles.rda"))
 ```
 
 ``` r
 #unserialize
-bundles <- fhir_unserialize(bundles = serialized_bundles)
+bundles <- fhir_unserialize(bundles = serialized_bundles_reloaded)
 
 #have a look
 bundles

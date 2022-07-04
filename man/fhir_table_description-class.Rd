@@ -5,9 +5,9 @@
 \alias{fhir_table_description-class}
 \title{A S4 class describing the form of a table produced by \code{\link[=fhir_crack]{fhir_crack()}}}
 \description{
-A \code{fhir_table_description} is part of a \code{fhir_design} and holds the information \code{\link[=fhir_crack]{fhir_crack()}} needs to flatten (aka crack)
-FHIR resources from a FHIR bundle and is created with \code{\link[=fhir_table_description]{fhir_table_description()}}.
-There should be one \code{fhir_table_description} per resource type as \code{\link[=fhir_crack]{fhir_crack()}} will create one data.frame/data.table
+A \code{fhir_table_description} holds the information \code{\link[=fhir_crack]{fhir_crack()}} needs to flatten (aka crack) FHIR resources from a FHIR bundle and
+is created with its constructor function \code{\link[=fhir_table_description]{fhir_table_description()}}.
+Each \code{fhir_table_description} describes a table for a specific resource type as \code{\link[=fhir_crack]{fhir_crack()}} will create one data.frame/data.table
 per resource type. See Details.
 }
 \details{
