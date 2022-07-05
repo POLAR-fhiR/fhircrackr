@@ -5,6 +5,7 @@
 - `fhir_authenticate()` doesn't cache a `.httr-oauth` file anymore.
 - `fhir_url()` now url encodes string type parameter values too.
 - `fhir_search()` can now log errors from FHIR servers regardless of whether they are valid xml. 
+- `fhir_search()` can now handle relative next links when paging through bundles
 
 ## New functions
 - `fhir_build_bundle()`: Build a xml FHIR Bundle from a wide table.

@@ -2,7 +2,7 @@ Package: fhircrackr
 Type: Package
 Title: Handling HL7 FHIR Resources in R
 Version: 2.0.0
-Date: 2022-05-11
+Date: 2022-07-05
 Authors@R: c(
     person( given = "Thomas", 
             family = "Peschel", 
@@ -23,7 +23,7 @@ Authors@R: c(
             role = "aut",
             comment=c(ORCID = "0000-0002-9256-7543")))
 Description: Useful tools for conveniently downloading FHIR resources in xml format 
-    and converting them to R data frames. The package uses FHIR-search to download bundles 
+    and converting them to R data.frames. The package uses FHIR-search to download bundles 
     from a FHIR server, provides functions to save and read xml-files containing such bundles 
     and allows flattening the bundles to data.frames using XPath expressions.
 BugReports: https://github.com/POLAR-fhiR/fhircrackr/issues
