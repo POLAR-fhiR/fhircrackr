@@ -1,13 +1,17 @@
 ## Test environments
 
 * local Windows 10 (64-Bit), R 4.1.0
-* local Ubuntu Linux 18.04.04 LTS, R 4.1.0
+* local Ubuntu Linux 20.04.04 LTS, R 4.2.1
 
 ## CMD check results
 
 0 errors | 0 warnings | 0 notes
 
-When checking on Rhub, we sometimes get the message
+## Comments
+
+- We changed maintainership from Thomas Peschel to Julia Palm
+
+- When checking on Rhub, we sometimes get the message
 
 ```
   Found the following (possibly) invalid URLs:
