@@ -11,8 +11,6 @@
 
 - We changed maintainership from Thomas Peschel to Julia Palm
 
-- When checking with devtools::check()
-
 - When checking on Rhub, we sometimes get the message
 
 ```
