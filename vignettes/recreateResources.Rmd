@@ -79,7 +79,7 @@ modified_table
 ```
 
 ## Recreate a single resource
-To create resources from this data, the `fhircrackr` makes use of the structure information inherent in the column names. If you want to get an overview over this structure before creating the actual xml-objects, you can use the function `fhir_tree()` that creates a string reprenting the structure wich can be printed to the console using `cat()` or written to a text file:
+To create resources from this data, the `fhircrackr` makes use of the structure information inherent in the column names. If you want to get an overview over this structure before creating the actual xml-objects, you can use the function `fhir_tree()` that creates a string representing the structure which can be printed to the console using `cat()` or written to a text file:
 
 ```{r}
 cat(fhir_tree(modified_table, resource = "Patient", brackets = c("[", "]"), keep_ids = TRUE))

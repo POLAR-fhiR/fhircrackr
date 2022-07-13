@@ -60,7 +60,7 @@ fhir_build_resource <- function(row, brackets, resource_type) {
 #' assigning explicit column names in the [fhir_design-class]/[fhir_table_description-class] and the format has been set to `"wide"`.
 #'
 #' The typical use case would look like this:
-#' 1) Download resources from a server whith [fhir_search()]
+#' 1) Download resources from a server with [fhir_search()]
 #' 2) Crack to wide format them with [fhir_crack()]
 #' 3) Do something to values (e.g. some kind of anonymization)
 #' 4) Translate the data back into FHIR resources with [fhir_build_bundle()]

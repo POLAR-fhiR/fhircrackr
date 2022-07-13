@@ -6,7 +6,7 @@
 \alias{example_bundles2}
 \alias{example_bundles3}
 \alias{example_bundles4}
-\title{Toy example bundles for mulitple entries}
+\title{Toy example bundles for multiple entries}
 \format{
 An object of class \code{fhir_bundle_list} of length 1.
 

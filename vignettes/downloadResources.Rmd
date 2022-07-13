@@ -698,7 +698,7 @@ Internally `fhir_sample_resources()` performs the following steps:
 
 3) Download the resources belonging to the sampled IDs using `fhir_get_resources_by_ids()`
 
-If you want to sample resources based on another element then the logical ID, e.g. based on an identifier value or based on a reference, you can use the function `fhir_sample_resources_by_ids()` provided you have a vector of identifiers/references you want wo sample from. Note that in this case the number of actually returned resources won't necessarily match the number in `sample_size`, because as opposed to the logical ID, an identifier or reference doesn't have to be unique for each resource. 
+If you want to sample resources based on another element then the logical ID, e.g. based on an identifier value or based on a reference, you can use the function `fhir_sample_resources_by_ids()` provided you have a vector of identifiers/references you want to sample from. Note that in this case the number of actually returned resources won't necessarily match the number in `sample_size`, because as opposed to the logical ID, an identifier or reference doesn't have to be unique for each resource. 
 
 ## Download Capability Statement
 The <a href="https://www.hl7.org/fhir/capabilitystatement.html" target="_blank">capability statement</a> documents a set of capabilities (behaviors) of a FHIR Server for a particular version of FHIR. You can download this statement using the function `fhir_capability_statement()`:

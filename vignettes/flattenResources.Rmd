@@ -511,7 +511,7 @@ fhir_rm_indices(indexed_data_frame = molten_2, brackets = c("[", "]"))
 Again, `brackets` and `sep` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()` respectively.
 
 ### Cast tables with multiple entries
-Instead of spreading the entries across rows, you can also spread them across columns using `fhir_cast()`. As you've seen above this can be achieved by setting `format = "wide"` in `fhir_crack()`. There is, however, a function that turns a `compact` table into a `wide` table and this funtion is `fhir_cast()`. It takes a compact table with multiple entries and the brackets and separator that have been used in `fhir_crack()` as input:
+Instead of spreading the entries across rows, you can also spread them across columns using `fhir_cast()`. As you've seen above this can be achieved by setting `format = "wide"` in `fhir_crack()`. There is, however, a function that turns a `compact` table into a `wide` table and this function is `fhir_cast()`. It takes a compact table with multiple entries and the brackets and separator that have been used in `fhir_crack()` as input:
 
 ```{r}
 fhir_cast(df2, brackets = c("[", "]"), sep = " | ", verbose = 0)

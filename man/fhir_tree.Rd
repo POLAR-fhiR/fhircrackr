@@ -2,7 +2,7 @@
 % Please edit documentation in R/fhir_tree.R
 \name{fhir_tree}
 \alias{fhir_tree}
-\title{Represend wide cast table as a tree}
+\title{Represent a wide cast table as a tree}
 \usage{
 fhir_tree(
   table,
@@ -25,7 +25,7 @@ fhir_tree(
 \item{keep_attr}{A logical vector of length one indicating whether attributes should be displayed or not.
 Only used for formats \code{"plain"} and \code{"fancy"}.}
 
-\item{keep_ids}{A logical vector of length one indicating whether inidices should be displayed or not.
+\item{keep_ids}{A logical vector of length one indicating whether indices should be displayed or not.
 Only used for formats \code{"plain"} and \code{"fancy"}.}
 
 \item{skip_one}{A logical vector of length one indicating whether first index 1 should be displayed or not.

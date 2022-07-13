@@ -53,7 +53,7 @@ assigning explicit column names in the \linkS4class{fhir_design}/\linkS4class{fh
 \details{
 The typical use case would look like this:
 \enumerate{
-\item Download resources from a server whith \code{\link[=fhir_search]{fhir_search()}}
+\item Download resources from a server with \code{\link[=fhir_search]{fhir_search()}}
 \item Crack to wide format them with \code{\link[=fhir_crack]{fhir_crack()}}
 \item Do something to values (e.g. some kind of anonymization)
 \item Translate the data back into FHIR resources with \code{\link[=fhir_build_bundle]{fhir_build_bundle()}}

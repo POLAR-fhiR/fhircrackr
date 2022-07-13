@@ -413,7 +413,7 @@ fhir_ns_strip <- function(xml) {
 "patient_bundles"
 
 ##### Documentation for example_bundles1 data set ######
-#' Toy example bundles for mulitple entries
+#' Toy example bundles for multiple entries
 #'
 #' @description These data examples are bundles that contain very few very simple Patient resources
 #' that have multiple entries and can be used for demonstration purposes. See **Source** for how the

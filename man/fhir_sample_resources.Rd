@@ -21,7 +21,7 @@ fhir_sample_resources(
 
 \item{resource}{A character vector of length one or \linkS4class{fhir_resource_type} object with the resource type to be downloaded, e.g. \code{"Patient"}.}
 
-\item{parameters}{Optional. Either a length 1 character vectorcontaining properly formatted FHIR search parameters, e.g.
+\item{parameters}{Optional. Either a length 1 character vector containing properly formatted FHIR search parameters, e.g.
 \code{"gender=male&_summary=count"} or a named list or named character vector e.g. \code{list(gender="male", "_summary"="count")}
 or \code{c(gender="male", "_summary"="count")}. Note that parameter names beginning with \verb{_} have to be put in quotation marks!}
 

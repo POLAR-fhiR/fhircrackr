@@ -13,7 +13,7 @@
 - `fhir_bundle_list()`: Constructor function to create `fhir_bundle_list` objects is now exported.
 - `fhir_cast()`: Similar to `fhir_melt()` but spreads multiple entries across columns instead of rows.
 - `fhir_count_resource()`: Count resources matching a specific search request on a server.
-- `fhir_get_resource_ids()`: Extract the logical IDs of all FHIR resources matching a sepcific search request from a server.
+- `fhir_get_resource_ids()`: Extract the logical IDs of all FHIR resources matching a specific search request from a server.
 - `fhir_get_resources_by_ids()`: Extract a set of resources based on their logical IDs.
 - `fhir_post()`: POST an object to a FHIR server.
 - `fhir_put()`: PUT an object to a FHIR server.
@@ -47,7 +47,7 @@
 - `fhir_search()`: 
 	- New argument `rm_tag="div"` per default removes all html bits in the bundle immediately after download. Can be disabled by setting `rm_tag=NULL`.
 	
-	- `delay_between_attempts` can now be a vector with different waiting times betwwen retries of reaching the server. The length of `delay_between_attempts` determines the number of retries.
+	- `delay_between_attempts` can now be a vector with different waiting times between retries of reaching the server. The length of `delay_between_attempts` determines the number of retries.
 
 	- `max_attempts` is deprecated in favor of `delay_between_attempts`.
 
@@ -146,4 +146,4 @@ Other new functions or behavior are listed in the following:
 
 # fhircrackr 0.1.0
 
-First Release of R-Package fhirckrackr v0.1.0
+First Release of R-Package fhircrackr v0.1.0

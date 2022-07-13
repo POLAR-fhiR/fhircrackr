@@ -1,4 +1,4 @@
-#' Represend wide cast table as a tree
+#' Represent a wide cast table as a tree
 #'
 #' This function takes a wide table as created by [fhir_crack()] with `format="wide"`and creates the tree structure implicit in the
 #' column names of the tables. It is useful to get an overview over the implied structure when planning to create
@@ -10,7 +10,7 @@
 #' @param format The format of the tree. One of `"plain"`, `"fancy"` or `"xml"`.
 #' @param keep_attr A logical vector of length one indicating whether attributes should be displayed or not.
 #' Only used for formats `"plain"` and `"fancy"`.
-#' @param keep_ids A logical vector of length one indicating whether inidices should be displayed or not.
+#' @param keep_ids A logical vector of length one indicating whether indices should be displayed or not.
 #' Only used for formats `"plain"` and `"fancy"`.
 #' @param skip_one A logical vector of length one indicating whether first index 1 should be displayed or not.
 #' Only used for formats `"plain"` and `"fancy"`.
