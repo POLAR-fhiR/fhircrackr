@@ -12,6 +12,7 @@ fhir_sample_resources_by_ids(
   username = NULL,
   password = NULL,
   token = NULL,
+  cookies = NULL,
   sample_size = 20,
   seed = 1,
   verbose = 1
@@ -33,6 +34,8 @@ containing resource (aka logical) ids. Could be changed to \code{"identifier"} i
 
 \item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
 for how to create this.}
+
+\item{cookies}{Optional. A named character vector containing key value pairs for cookies, e.g. \code{c(mycookie = "d385se12394j")}.}
 
 \item{sample_size}{A integer of length 1 containing the number of resources to sample.}
 

@@ -29,6 +29,9 @@
 #' 2. Token Authentication: Provide a token in the argument `token`, either as a character vector of length one or as as an object of class
 #' [httr::Token-class]. You can use the function [fhir_authenticate()] to create this object.
 #'
+#' 3. Cookie Authentication: Provide the key value pair(s) as a named character vector to the `cookies` argument, e.g.
+#' `cookies = c(mycookie = "d385se12394j")`.
+#'
 #' ## HTML removal
 #' FHIR resources can contain a considerable amount of html code (e.g. in a [narrative](https://www.hl7.org/fhir/narrative.html#xhtml) object),
 #' which is often created by the server for example to provide a human-readable summary of the resource.
@@ -49,6 +52,7 @@
 #' @param password A character vector of length one containing the password for basic authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
+#' @param cookies Optional. A named character vector containing key value pairs for cookies, e.g. `c(mycookie = "d385se12394j")`.
 #' @param max_bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' downloading progress will be printed. Defaults to 1.
@@ -108,6 +112,7 @@ fhir_search <- function(
 	username               = NULL,
 	password               = NULL,
 	token                  = NULL,
+	cookies                = NULL,
 	max_bundles            = Inf,
 	verbose                = 1,
 	delay_between_attempts = c(1, 3, 9, 27, 81),
@@ -196,6 +201,7 @@ fhir_search <- function(
 			username = username,
 			password = password,
 			token = token,
+			cookies = cookies,
 			verbose = verbose,
 			max_attempts = max_attempts,
 			delay_between_attempts = delay_between_attempts,
@@ -383,6 +389,7 @@ fhir_recent_http_error <- function() {
 #' @param password A character vector of length one containing the password for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
+#' @param cookies Optional. A named character vector containing key value pairs for cookies, e.g. `c(mycookie = "d385se12394j")`.
 #' @param sep A character vector of length one to separate pasted multiple entries
 #' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "[", "]")`. Defaults to `NULL`.
 #' If `NULL`, no indices will be added to multiple entries.
@@ -420,6 +427,7 @@ fhir_capability_statement <- function(
 	username = NULL,
 	password = NULL,
 	token = NULL,
+	cookies = NULL,
 	brackets = NULL,
 	sep = " ::: ",
 	log_errors = NULL,
@@ -438,7 +446,7 @@ fhir_capability_statement <- function(
 		use_indices <- TRUE
 	}
 
-	auth <- auth_helper(username = username, password = password, token = token)
+	auth <- auth_helper(username = username, password = password, token = token, cookies = cookies)
 
 	response <- try(httr::GET(
 		url = pastep(url, "metadata?"),
@@ -446,7 +454,8 @@ fhir_capability_statement <- function(
 			Accept = "application/fhir+xml",
 			Authorization = auth$token
 		),
-		auth$basicAuth
+		auth$basicAuth,
+		auth$cookies
 	), silent = TRUE)
 
 	#check for http errors
@@ -884,6 +893,7 @@ fhir_authenticate <- function(
 #' @param username A character vector of length one containing the username for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param password A character vector of length one containing the password for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param token The token for token based auth, either a string or a httr token object
+#' @param cookies Optional. A named character vector containing key value pairs for cookies, e.g. `c(mycookie = "d385se12394j")`.
 #' @param max_attempts Deprecated. The number of maximal attempts is determined by the length of `delay_between_attempts`
 #' @param verbose An integer scalar. If > 1,  Downloading progress is printed. Defaults to 2.
 #' @param delay_between_attempts A numeric vector specifying the delay in seconds between attempts of reaching the server
@@ -907,6 +917,7 @@ get_bundle <- function(
 	username = NULL,
 	password = NULL,
 	token = NULL,
+	cookies = NULL,
 	verbose = 2,
 	max_attempts = NULL,
 	delay_between_attempts = c(1,3,9,27,81),
@@ -917,7 +928,7 @@ get_bundle <- function(
 	for(n in seq_along(delay_between_attempts)) {
 		if(1 < verbose) {message("(", n, "): ", request)}
 
-		auth <- auth_helper(username = username, password = password, token = token)
+		auth <- auth_helper(username = username, password = password, token = token, cookies = cookies)
 
 		#paging is implemented differently for Hapi/Vonk When initial request is POST
 		#VonK: Next-Links have to be POSTed, Hapi: Next-Links have to be GETed
@@ -931,6 +942,7 @@ get_bundle <- function(
 				),
 				httr::content_type(type = body@type),
 				auth$basicAuth,
+				auth$cookies,
 				body = body@content
 			), silent = TRUE)
 
@@ -941,7 +953,8 @@ get_bundle <- function(
 					Accept = "application/fhir+xml",
 					Authorization = auth$token
 				),
-				auth$basicAuth
+				auth$basicAuth,
+				auth$cookies
 			), silent = TRUE)
 		}
 		#check for errors

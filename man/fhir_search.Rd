@@ -10,6 +10,7 @@ fhir_search(
   username = NULL,
   password = NULL,
   token = NULL,
+  cookies = NULL,
   max_bundles = Inf,
   verbose = 1,
   delay_between_attempts = c(1, 3, 9, 27, 81),
@@ -37,6 +38,8 @@ to the url in \code{request}. See examples and \code{?fhir_body}.}
 
 \item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
 for how to create this.}
+
+\item{cookies}{Optional. A named character vector containing key value pairs for cookies, e.g. \code{c(mycookie = "d385se12394j")}.}
 
 \item{max_bundles}{Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
 
@@ -102,6 +105,8 @@ just leave the arguments described in the following at their default values of \
 \item Basic Authentication: Provide the \code{username} and the \code{password} for basic authentication in the respective arguments.
 \item Token Authentication: Provide a token in the argument \code{token}, either as a character vector of length one or as as an object of class
 \link[httr:Token-class]{httr::Token}. You can use the function \code{\link[=fhir_authenticate]{fhir_authenticate()}} to create this object.
+\item Cookie Authentication: Provide the key value pair(s) as a named character vector to the \code{cookies} argument, e.g.
+\code{cookies = c(mycookie = "d385se12394j")}.
 }
 }
 
