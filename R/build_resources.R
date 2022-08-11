@@ -313,6 +313,7 @@ setMethod(
 #' @param password A character vector of length one containing the password for basic authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
+#' @param cookies Optional. A named character vector containing key value pairs for cookies, e.g. `c(mycookie = "d385se12394j")`.
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if > 0 success message is printed. Defaults to 1.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`.
@@ -364,6 +365,7 @@ setGeneric(
 				   username   = NULL,
 				   password   = NULL,
 				   token      = NULL,
+				   cookies    = NULL,
 				   verbose    = 1,
 				   log_errors = NULL) {
 		standardGeneric("fhir_post")
@@ -380,12 +382,14 @@ setMethod(
 						  username   = NULL,
 						  password   = NULL,
 						  token      = NULL,
+						  cookies    = NULL,
 						  verbose    = 1,
 						  log_errors = NULL) {
 		auth <-
 			auth_helper(username = username,
 						password = password,
-						token = token)
+						token = token,
+						cookies = cookies)
 
 		response <- httr::POST(
 			url    = url,
@@ -393,6 +397,7 @@ setMethod(
 									   Authorization = auth$token),
 			httr::content_type(type = "xml"),
 			auth$basicAuth,
+			auth$cookies,
 			body = toString(body)
 		)
 
@@ -415,12 +420,14 @@ setMethod(
 						  username   = NULL,
 						  password   = NULL,
 						  token      = NULL,
+						  cookies    = NULL,
 						  verbose    = 1,
 						  log_errors = NULL) {
 		auth <-
 			auth_helper(username = username,
 						password = password,
-						token = token)
+						token = token,
+						cookies = cookies)
 
 		response <- httr::POST(
 			url = url,
@@ -428,6 +435,7 @@ setMethod(
 									   Authorization = auth$token),
 			httr::content_type(type = "xml"),
 			auth$basicAuth,
+			auth$cookies,
 			body = toString(body)
 		)
 
@@ -452,12 +460,14 @@ setMethod(
 						  username   = NULL,
 						  password   = NULL,
 						  token      = NULL,
+						  cookies    = NULL,
 						  verbose    = 1,
 						  log_errors = NULL) {
 		auth <-
 			auth_helper(username = username,
 						password = password,
-						token = token)
+						token = token,
+						cookies = cookies)
 
 		response <- httr::POST(
 			url    = url,
@@ -465,6 +475,7 @@ setMethod(
 									   Authorization = auth$token),
 			httr::content_type(type = body@type),
 			auth$basicAuth,
+			auth$cookies,
 			body = body@content
 		)
 
@@ -499,6 +510,7 @@ setMethod(
 #' @param password A character vector of length one containing the password for basic authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
+#' @param cookies Optional. A named character vector containing key value pairs for cookies, e.g. `c(mycookie = "d385se12394j")`.
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if > 0 success message is printed. Defaults to 1.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`.
@@ -532,12 +544,14 @@ fhir_put <- function(url,
 					 username   = NULL,
 					 password   = NULL,
 					 token      = NULL,
+					 cookies    = NULL,
 					 verbose    = 1,
 					 log_errors = NULL) {
 	auth <-
 		auth_helper(username = username,
 					password = password,
-					token = token)
+					token = token,
+					cookies = cookies)
 
 	if (is(body, "fhir_resource_xml")) {
 		response <- httr::PUT(
@@ -546,6 +560,7 @@ fhir_put <- function(url,
 									   Authorization = auth$token),
 			httr::content_type(type = "xml"),
 			auth$basicAuth,
+			auth$cookies,
 			body = toString(body)
 		)
 
@@ -566,6 +581,7 @@ fhir_put <- function(url,
 									   Authorization = auth$token),
 			httr::content_type(type = body@type),
 			auth$basicAuth,
+			auth$cookies,
 			body = body@content
 		)
 
