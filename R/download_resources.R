@@ -591,6 +591,8 @@ fhir_save <- function(bundles, directory) {
 #'
 #' @param directory A character vector of length one containing the path to the folder were the files are stored.
 #' @param indices A numeric vector of integers indicating which bundles from the specified directory should be loaded. Defaults to NULL meaning all bundles from the directory are loaded.
+#' @param pattern A character vector of length one with a regex expression defining the naming pattern of the xml files
+#' to be read. Defaults to the regex expression matching file names as produced by [fhir_save()].
 #' @return A [fhir_bundle_list-class].
 #' @export
 #'
@@ -611,7 +613,7 @@ fhir_save <- function(bundles, directory) {
 #' loaded_bundles <- fhir_load(dir, indices = c(2,3))
 #' length(loaded_bundles)
 
-fhir_load <- function(directory, indices = NULL) {
+fhir_load <- function(directory, indices = NULL, pattern = '^[0-9]+\\.xml$') {
 
 	if(!dir.exists(directory)) {
 
@@ -620,7 +622,7 @@ fhir_load <- function(directory, indices = NULL) {
 		return(fhir_bundle_list(list()))
 	}
 
-	files <- grep('^[0-9]+\\.xml$', dir(directory), value = T)
+	files <- grep(pattern, dir(directory), value = T)
 
 	if(is.null(indices)) {
 
