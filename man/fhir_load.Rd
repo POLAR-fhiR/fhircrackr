@@ -4,12 +4,15 @@
 \alias{fhir_load}
 \title{Load bundles from xml-files}
 \usage{
-fhir_load(directory, indices = NULL)
+fhir_load(directory, indices = NULL, pattern = "^[0-9]+\\\\.xml$")
 }
 \arguments{
 \item{directory}{A character vector of length one containing the path to the folder were the files are stored.}
 
 \item{indices}{A numeric vector of integers indicating which bundles from the specified directory should be loaded. Defaults to NULL meaning all bundles from the directory are loaded.}
+
+\item{pattern}{A character vector of length one with a regex expression defining the naming pattern of the xml files
+to be read. Defaults to the regex expression matching file names as produced by \code{\link[=fhir_save]{fhir_save()}}.}
 }
 \value{
 A \linkS4class{fhir_bundle_list}.
