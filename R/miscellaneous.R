@@ -1160,9 +1160,8 @@ frame_string <- function(
 #' @param username A string with the username for basic auth
 #' @param password A string with the password for basic auth
 #' @param token The token for token based auth, either a string or a httr token object
-#' @param cookies A named character vector containing key value pairs for cookies
 #' @noRd
-auth_helper <- function(username, password, token, cookies){
+auth_helper <- function(username, password, token){
 
 	#prepare token authorization
 	if(!is.null(token)) {
@@ -1190,11 +1189,7 @@ auth_helper <- function(username, password, token, cookies){
 		auth <- NULL
 	}
 
-	if(!is.null(cookies)){
-		cookies <- httr::set_cookies(.cookies = cookies)
-	}
-
-	list(basicAuth = auth, token = bearerToken, cookies = cookies)
+	list(basicAuth = auth, token = bearerToken)
 }
 
 #' Order Strings with Numbers correctly

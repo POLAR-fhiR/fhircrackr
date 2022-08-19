@@ -17,7 +17,7 @@ fhir_post(
   username = NULL,
   password = NULL,
   token = NULL,
-  cookies = NULL,
+  add_headers = NULL,
   verbose = 1,
   log_errors = NULL
 )
@@ -28,7 +28,7 @@ fhir_post(
   username = NULL,
   password = NULL,
   token = NULL,
-  cookies = NULL,
+  add_headers = NULL,
   verbose = 1,
   log_errors = NULL
 )
@@ -39,7 +39,7 @@ fhir_post(
   username = NULL,
   password = NULL,
   token = NULL,
-  cookies = NULL,
+  add_headers = NULL,
   verbose = 1,
   log_errors = NULL
 )
@@ -50,7 +50,7 @@ fhir_post(
   username = NULL,
   password = NULL,
   token = NULL,
-  cookies = NULL,
+  add_headers = NULL,
   verbose = 1,
   log_errors = NULL
 )
@@ -68,7 +68,7 @@ See details for how to generate them.}
 \item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
 for how to create this.}
 
-\item{cookies}{Optional. A named character vector containing key value pairs for cookies, e.g. \code{c(mycookie = "d385se12394j")}.}
+\item{add_headers}{A named character vector of custom headers to add to the GET/POST request.}
 
 \item{verbose}{An integer vector of length one. If 0, nothing is printed, if > 0 success message is printed. Defaults to 1.}
 
