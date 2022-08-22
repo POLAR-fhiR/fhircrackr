@@ -73,7 +73,8 @@ paste_parameters <- function(parameters = NULL, parameters2add = NULL, add_quest
 #' @param password A character vector of length one containing the password for basic authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
-#' @param add_headers A named character vector of custom headers to add to the GET/POST request.
+#' @param add_headers A named character vector of custom headers to add to the HTTP request, e.g. `c(myHeader = "somevalue")` or
+#' `c(firstHeader = "value1", secondHeader = "value2")`.
 #' @return An integer of length 1 containing the number of resources matching the type and search parameters specified in `resource` and `parameters`.
 #' @export
 #'
@@ -139,7 +140,8 @@ fhir_count_resource <- function(
 #' @param password A character vector of length one containing the password for basic authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
-#' @param add_headers A named character vector of custom headers to add to the GET/POST request.
+#' @param add_headers A named character vector of custom headers to add to the HTTP request, e.g. `c(myHeader = "somevalue")` or
+#' `c(firstHeader = "value1", secondHeader = "value2")`.
 #' @param verbose An integer of length 1 containing the level of verbosity. Defaults to 0.
 #'
 #' @return A character vector containing the resource (aka logical) IDs of all requested resources.
@@ -255,7 +257,8 @@ fhir_get_resource_ids <- function(
 #' @param password A character vector of length one containing the password for basic authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
-#' @param add_headers A named character vector of custom headers to add to the GET/POST request.
+#' @param add_headers A named character vector of custom headers to add to the HTTP request, e.g. `c(myHeader = "somevalue")` or
+#' `c(firstHeader = "value1", secondHeader = "value2")`.
 #' @param verbose An integer vector of length 1 containing the level of verbosity. Defaults to 0.
 #'
 #' @return A [fhir_bundle_list-class] containing the downloaded resources.
@@ -432,7 +435,8 @@ fhir_get_resources_by_ids <- function(
 #' @param password A character vector of length one containing the password for basic authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
-#' @param add_headers A named character vector of custom headers to add to the GET/POST request.
+#' @param add_headers A named character vector of custom headers to add to the HTTP request, e.g. `c(myHeader = "somevalue")` or
+#' `c(firstHeader = "value1", secondHeader = "value2")`.
 #' @param sample_size A integer of length 1 containing the number of resources to sample.
 #' @param seed A integer of length 1 containing the seed for the random generator.
 #' @param verbose An integer of length 1 containing the level of verbosity. Defaults to 1.
@@ -538,7 +542,8 @@ fhir_sample_resources_by_ids <- function(
 #' @param password A character vector of length one containing the password for basic authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
-#' @param add_headers A named character vector of custom headers to add to the GET/POST request.
+#' @param add_headers A named character vector of custom headers to add to the HTTP request, e.g. `c(myHeader = "somevalue")` or
+#' `c(firstHeader = "value1", secondHeader = "value2")`.
 #' @param sample_size A integer of length 1 containing the number of resources to sample.
 #' @param seed A integer of length 1 containing the seed for the random generator.
 #' @param verbose An integer of length 1 containing the level of verbosity. Defaults to 1.

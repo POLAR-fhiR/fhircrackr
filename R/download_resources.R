@@ -29,6 +29,11 @@
 #' 2. Token Authentication: Provide a token in the argument `token`, either as a character vector of length one or as as an object of class
 #' [httr::Token-class]. You can use the function [fhir_authenticate()] to create this object.
 #'
+#' ## Additional headers
+#' Per default, the underlying HTTP requests are equipped with *Accept* and *Authorization* headers. If you need to pass additional headers,
+#' e.g. cookies for authentication or other custom headers, you can add these to the request as a named character vector using the
+#' `add_headers` argument.
+#'
 #' ## HTML removal
 #' FHIR resources can contain a considerable amount of html code (e.g. in a [narrative](https://www.hl7.org/fhir/narrative.html#xhtml) object),
 #' which is often created by the server for example to provide a human-readable summary of the resource.
@@ -49,7 +54,8 @@
 #' @param password A character vector of length one containing the password for basic authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
-#' @param add_headers A named character vector of custom headers to add to the GET/POST request.
+#' @param add_headers A named character vector of custom headers to add to the HTTP request, e.g. `c(myHeader = "somevalue")` or
+#' `c(firstHeader = "value1", secondHeader = "value2")`.
 #' @param max_bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' downloading progress will be printed. Defaults to 1.
@@ -386,7 +392,8 @@ fhir_recent_http_error <- function() {
 #' @param password A character vector of length one containing the password for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
-#' @param add_headers A named character vector of custom headers to add to the GET/POST request.
+#' @param add_headers A named character vector of custom headers to add to the HTTP request, e.g. `c(myHeader = "somevalue")` or
+#' `c(firstHeader = "value1", secondHeader = "value2")`.
 #' @param sep A character vector of length one to separate pasted multiple entries
 #' @param brackets A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. `c( "[", "]")`. Defaults to `NULL`.
 #' If `NULL`, no indices will be added to multiple entries.
@@ -892,7 +899,8 @@ fhir_authenticate <- function(
 #' @param username A character vector of length one containing the username for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param password A character vector of length one containing the password for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param token The token for token based auth, either a string or a httr token object
-#' @param add_headers A named character vector of custom headers to add to the GET/POST request.
+#' @param add_headers A named character vector of custom headers to add to the HTTP request, e.g. `c(myHeader = "somevalue")` or
+#' `c(firstHeader = "value1", secondHeader = "value2")`.
 #' @param max_attempts Deprecated. The number of maximal attempts is determined by the length of `delay_between_attempts`
 #' @param verbose An integer scalar. If > 1,  Downloading progress is printed. Defaults to 2.
 #' @param delay_between_attempts A numeric vector specifying the delay in seconds between attempts of reaching the server

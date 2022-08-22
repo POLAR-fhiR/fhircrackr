@@ -313,7 +313,8 @@ setMethod(
 #' @param password A character vector of length one containing the password for basic authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
-#' @param add_headers A named character vector of custom headers to add to the GET/POST request.
+#' @param add_headers A named character vector of custom headers to add to the HTTP request, e.g. `c(myHeader = "somevalue")` or
+#' `c(firstHeader = "value1", secondHeader = "value2")`.
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if > 0 success message is printed. Defaults to 1.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`.
@@ -507,7 +508,8 @@ setMethod(
 #' @param password A character vector of length one containing the password for basic authentication.
 #' @param token A character vector of length one or object of class [httr::Token-class], for bearer token authentication (e.g. OAuth2). See [fhir_authenticate()]
 #' for how to create this.
-#' @param add_headers A named character vector of custom headers to add to the GET/POST request.
+#' @param add_headers A named character vector of custom headers to add to the HTTP request, e.g. `c(myHeader = "somevalue")` or
+#' `c(firstHeader = "value1", secondHeader = "value2")`.
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if > 0 success message is printed. Defaults to 1.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`.

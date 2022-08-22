@@ -39,7 +39,8 @@ to the url in \code{request}. See examples and \code{?fhir_body}.}
 \item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
 for how to create this.}
 
-\item{add_headers}{A named character vector of custom headers to add to the GET/POST request.}
+\item{add_headers}{A named character vector of custom headers to add to the HTTP request, e.g. \code{c(myHeader = "somevalue")} or
+\code{c(firstHeader = "value1", secondHeader = "value2")}.}
 
 \item{max_bundles}{Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.}
 
@@ -106,6 +107,13 @@ just leave the arguments described in the following at their default values of \
 \item Token Authentication: Provide a token in the argument \code{token}, either as a character vector of length one or as as an object of class
 \link[httr:Token-class]{httr::Token}. You can use the function \code{\link[=fhir_authenticate]{fhir_authenticate()}} to create this object.
 }
+}
+
+\subsection{Additional headers}{
+
+Per default, the underlying HTTP requests are equipped with \emph{Accept} and \emph{Authorization} headers. If you need to pass additional headers,
+e.g. cookies for authentication or other custom headers, you can add these to the request as a named character vector using the
+\code{add_headers} argument.
 }
 
 \subsection{HTML removal}{

@@ -30,7 +30,8 @@ or \code{c(gender="male", "_summary"="count")}. Note that parameter names beginn
 \item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
 for how to create this.}
 
-\item{add_headers}{A named character vector of custom headers to add to the GET/POST request.}
+\item{add_headers}{A named character vector of custom headers to add to the HTTP request, e.g. \code{c(myHeader = "somevalue")} or
+\code{c(firstHeader = "value1", secondHeader = "value2")}.}
 }
 \value{
 An integer of length 1 containing the number of resources matching the type and search parameters specified in \code{resource} and \code{parameters}.

@@ -39,7 +39,8 @@ the IDs provided in \code{ids}.}
 \item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
 for how to create this.}
 
-\item{add_headers}{A named character vector of custom headers to add to the GET/POST request.}
+\item{add_headers}{A named character vector of custom headers to add to the HTTP request, e.g. \code{c(myHeader = "somevalue")} or
+\code{c(firstHeader = "value1", secondHeader = "value2")}.}
 
 \item{verbose}{An integer vector of length 1 containing the level of verbosity. Defaults to 0.}
 }
