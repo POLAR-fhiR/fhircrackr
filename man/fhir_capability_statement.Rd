@@ -9,7 +9,7 @@ fhir_capability_statement(
   username = NULL,
   password = NULL,
   token = NULL,
-  cookies = NULL,
+  add_headers = NULL,
   brackets = NULL,
   sep = " ::: ",
   log_errors = NULL,
@@ -26,7 +26,8 @@ fhir_capability_statement(
 \item{token}{A character vector of length one or object of class \link[httr:Token-class]{httr::Token}, for bearer token authentication (e.g. OAuth2). See \code{\link[=fhir_authenticate]{fhir_authenticate()}}
 for how to create this.}
 
-\item{cookies}{Optional. A named character vector containing key value pairs for cookies, e.g. \code{c(mycookie = "d385se12394j")}.}
+\item{add_headers}{A named character vector of custom headers to add to the HTTP request, e.g. \code{c(myHeader = "somevalue")} or
+\code{c(firstHeader = "value1", secondHeader = "value2")}.}
 
 \item{brackets}{A character vector of length two defining the brackets surrounding indices for multiple entries, e.g. \code{c( "[", "]")}. Defaults to \code{NULL}.
 If \code{NULL}, no indices will be added to multiple entries.}
