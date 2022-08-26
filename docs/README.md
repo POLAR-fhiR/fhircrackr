@@ -50,6 +50,8 @@ look the other vignettes. This introduction covers the following topics:
 
 -   Saving and loading downloaded bundles
 
+If you prefer Python to R, you might want to check out a Python package with similar functionalities, the [FHIR-PYrate](https://github.com/UMEssen/FHIR-PYrate).
+
 ## Prerequisites
 
 The complexity of the problem requires a couple of prerequisites both
