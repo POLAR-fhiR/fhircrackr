@@ -146,14 +146,16 @@ fhir_search <- function(
 
 	#preparation for POST vs. GET
 	if(!is.null(body)) {
-		#filter out bad urls
-		if(grepl("\\?", request)) {
-			stop(
-				"The url in argument request should only consist of base url and resource type. ",
-				"The one you provided has a `?` which indicates the presence of parameters. ",
-				"If your request just ends with a `?`, please remove it to remove this error.\n",
-				"If you want to perform search via GET, please set body to NULL."
-			)
+		if(grepl("\\?", request)) {#if there are any params in the URL, move them to body
+			params <- stringr::str_match(request, "(?<=\\?).+")[1]
+			request <- stringr::str_remove(request,"\\?.*")
+			body@content <- paste(body@content, params, sep = "&")
+			# stop(
+			# 	"The url in argument request should only consist of base url and resource type. ",
+			# 	"The one you provided has a `?` which indicates the presence of parameters. ",
+			# 	"If your request just ends with a `?`, please remove it to remove this error.\n",
+			# 	"If you want to perform search via GET, please set body to NULL."
+			# )
 		}
 		if(!grepl("_search", request)) {request <- paste(request, "_search", sep = "/")}
 
@@ -941,6 +943,12 @@ get_bundle <- function(
 		#VonK: Next-Links have to be POSTed, Hapi: Next-Links have to be GETed
 		#search via POST
 		if(grepl("_search", request)) {
+			if(grepl("_search\\?.+", request)){#when the next link has parameters (e.g. _count), move them to body
+				params <- paste0("&",stringr::str_match(request, "(?<=\\?).+")[1])
+				request <- stringr::str_remove(request,"\\?.*")
+			}else{
+				params <- NULL
+			}
 			response <- try(httr::POST(
 				url = request,
 				config = httr::add_headers(
@@ -950,7 +958,7 @@ get_bundle <- function(
 				),
 				httr::content_type(type = body@type),
 				auth$basicAuth,
-				body = body@content
+				body = paste(unique(strsplit(paste0(body@content, params), "&")[[1]]), collapse = "&") #gets rid of double params
 			), silent = TRUE)
 
 		} else {#search via GET
