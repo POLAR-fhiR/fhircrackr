@@ -142,7 +142,7 @@ fhir_search <- function(
 	}
 
 	#Extract base URL
-	base <- stringr::str_match(request, ".*:\\/\\/.*?\\/")
+	base <- stringr::str_match(request, ".*?:\\/\\/.*?\\/")
 
 	#preparation for POST vs. GET
 	if(!is.null(body)) {
