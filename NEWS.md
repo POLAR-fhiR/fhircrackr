@@ -1,3 +1,18 @@
+# fhircrackr 2.1.0
+
+## Bugs fixed
+- Relative next links for Paging: Bugs in connection with POST search and http-type search parameter values have been fixed.
+- Examples querying a FHIR Server have been wrapped in `try()` to stop them from crashing during CRAN checks
+
+## New functions/arguments
+- `fhir_search()` has a new argument `add_headers` that allows adding custom headers to the HTTP request.
+- `fhir_load()` can now load FHIR bundles with arbitrary file names from a given directory.
+
+
+
+
+## New behavious
+
 # fhircrackr 2.0.0
 
 ## Bugs fixed 

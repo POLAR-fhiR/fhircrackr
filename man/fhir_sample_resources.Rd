@@ -69,6 +69,12 @@ For more information on authentication options, please see the help page of \cod
 }
 \examples{
 \donttest{
+
+#the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#you can skip it when the server is reachable
+
+try({
+
 #how many resources are on the server?
 count <- fhir_count_resource(
   base_url    = 'https://hapi.fhir.org/baseR4',
@@ -84,6 +90,8 @@ bundles <- fhir_sample_resources(
   seed        = 1)
 
 bundles
+
+}, silent = TRUE)
 }
 }
 \seealso{

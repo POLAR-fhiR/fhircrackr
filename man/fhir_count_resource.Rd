@@ -46,10 +46,17 @@ For more information on authentication options, please see the help page of \cod
 }
 \examples{
 \donttest{
+
+#the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#you can skip it when the server is reachable
+
+try({
+
 #number of female Patient resources on the server
 fhir_count_resource(
   base_url = 'https://vonk.fire.ly/R4',
   resource = "Patient",
   parameters = c(gender = "female"))
+}, silent = TRUE)
 }
 }

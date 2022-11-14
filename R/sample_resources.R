@@ -80,11 +80,18 @@ paste_parameters <- function(parameters = NULL, parameters2add = NULL, add_quest
 #'
 #' @examples
 #' \donttest{
+#'
+#' #the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#' #you can skip it when the server is reachable
+#'
+#' try({
+#'
 #' #number of female Patient resources on the server
 #' fhir_count_resource(
 #'   base_url = 'https://vonk.fire.ly/R4',
 #'   resource = "Patient",
 #'   parameters = c(gender = "female"))
+#' }, silent = TRUE)
 #'}
 fhir_count_resource <- function(
 	base_url,
@@ -149,10 +156,19 @@ fhir_count_resource <- function(
 #' @seealso [fhir_search()], [fhir_get_resources_by_ids()]
 #' @examples
 #' \donttest{
+#'
+#' #the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#' #you can skip it when the server is reachable
+#'
+#' try({
+#'
 #' fhir_get_resource_ids(
 #'   base_url   = 'https://vonk.fire.ly/R4',
 #'   resource   = "Patient",
 #'   parameters = "gender=female", verbose=1)
+#'
+#'   }, silent = TRUE)
+#'
 #'   }
 fhir_get_resource_ids <- function(
 	base_url,
@@ -266,6 +282,12 @@ fhir_get_resource_ids <- function(
 #' @seealso [fhir_search()], [fhir_get_resource_ids()]
 #' @examples
 #' \donttest{
+#'
+#' #the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#' #you can skip it when the server is reachable
+#'
+#' try({
+#'
 #' #find IDs of Patient resources representing Homer Simpson
 #' ids <- fhir_get_resource_ids(
 #'   base_url   = 'https://hapi.fhir.org/baseR4',
@@ -287,6 +309,8 @@ fhir_get_resource_ids <- function(
 #'       ID      = "id",
 #'       given   = "name/given",
 #'       family  = "name/family")))
+#'
+#' }, silent = TRUE)
 #'}
 fhir_get_resources_by_ids <- function(
 	base_url,
@@ -446,6 +470,12 @@ fhir_get_resources_by_ids <- function(
 #' @seealso [fhir_search()], [fhir_sample_resources()], [fhir_get_resources_by_ids()], [fhir_count_resource()]
 #' @examples
 #' \donttest{
+#'
+#' #the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#' #you can skip it when the server is reachable
+#'
+#' try({
+#'
 #' #find IDs of all resources representing Homer Simpson
 #' ids <- fhir_get_resource_ids(
 #'   base_url   = 'https://hapi.fhir.org/baseR4',
@@ -469,6 +499,8 @@ fhir_get_resources_by_ids <- function(
 #'       ID     = "id",
 #'       given  = "name/given",
 #'       family = "name/family")))
+#'
+#' }, silent = TRUE)
 #'}
 fhir_sample_resources_by_ids <- function(
 	base_url,
@@ -554,6 +586,12 @@ fhir_sample_resources_by_ids <- function(
 #'
 #' @examples
 #' \donttest{
+#'
+#' #the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#' #you can skip it when the server is reachable
+#'
+#' try({
+#'
 #' #how many resources are on the server?
 #' count <- fhir_count_resource(
 #'   base_url    = 'https://hapi.fhir.org/baseR4',
@@ -569,6 +607,8 @@ fhir_sample_resources_by_ids <- function(
 #'   seed        = 1)
 #'
 #' bundles
+#'
+#' }, silent = TRUE)
 #'}
 
 fhir_sample_resources <- function(
