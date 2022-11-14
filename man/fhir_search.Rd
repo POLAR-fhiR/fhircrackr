@@ -128,16 +128,26 @@ to increase speed at the cost of increased memory usage.
 }
 \examples{
 \donttest{
-#Search with GET
+#the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#you can skip it when the server is reachable
+
+try({
+
+### Search with GET
+
 #create fhir search url
+
 request <- fhir_url(url = "https://server.fire.ly",
                     resource = "Patient",
                     parameters = c(gender="female"))
+
 #download bundles
 bundles <- fhir_search(request, max_bundles = 5)
 
 
-#Search with POST (should actually be used for longer requests)
+
+### Search with POST (should actually be used for longer requests)
+
 request <- fhir_url(url = "https://server.fire.ly",
                     resource = "Patient")
 
@@ -146,7 +156,10 @@ body <- fhir_body(content = list(gender = "female"))
 bundles <- fhir_search(request = request,
                        body = body,
                        max_bundles = 5)
-}
+
+
+ }, silent = TRUE)
+ }
 }
 \seealso{
 \itemize{

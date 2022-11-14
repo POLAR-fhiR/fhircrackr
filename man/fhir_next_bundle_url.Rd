@@ -25,6 +25,13 @@ See details in the example.
 }
 \examples{
 \donttest{
+
+#' #the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#you can skip it when the server is reachable
+
+try({
+
+
 # workflow for small memory environments, downloading small batches of bundles
 # for really small memory environments consider also using the `_count` option in
 # your FHIR search request.
@@ -43,6 +50,9 @@ while(length(url)>0 && count < 5){
 }
 #you can see the saved tables here:
 dir(tempdir())
+
+
+}, silent = TRUE)
 }
 
 }

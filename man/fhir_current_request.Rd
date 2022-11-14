@@ -14,11 +14,21 @@ Return FHIR search request used in last call to \code{\link[=fhir_search]{fhir_s
 }
 \examples{
 \donttest{
+#the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#you can skip it when the server is reachable
+
+try({
+
+
 request <- fhir_url(url = "https://server.fire.ly", resource = "Patient")
 fhir_current_request()
 
 fhir_search("https://server.fire.ly/Medication", max_bundles = 1)
 fhir_current_request()
+
+
+},silent = TRUE)
+
 }
 
 

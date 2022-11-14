@@ -89,16 +89,26 @@
 #' @importFrom lifecycle deprecated
 #' @examples
 #' \donttest{
-#' #Search with GET
+#' #the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#' #you can skip it when the server is reachable
+#'
+#' try({
+#'
+#' ### Search with GET
+#'
 #' #create fhir search url
+#'
 #' request <- fhir_url(url = "https://server.fire.ly",
 #'                     resource = "Patient",
 #'                     parameters = c(gender="female"))
+#'
 #' #download bundles
 #' bundles <- fhir_search(request, max_bundles = 5)
 #'
 #'
-#' #Search with POST (should actually be used for longer requests)
+#'
+#' ### Search with POST (should actually be used for longer requests)
+#'
 #' request <- fhir_url(url = "https://server.fire.ly",
 #'                     resource = "Patient")
 #'
@@ -107,7 +117,11 @@
 #' bundles <- fhir_search(request = request,
 #'                        body = body,
 #'                        max_bundles = 5)
-#' }
+#'
+#'
+#'  }, silent = TRUE)
+#'  }
+
 
 fhir_search <- function(
 	request                = fhir_current_request(),
@@ -295,6 +309,13 @@ fhir_search <- function(
 #'
 #' @examples
 #' \donttest{
+#'
+#' #' #the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#' #you can skip it when the server is reachable
+#'
+#' try({
+#'
+#'
 #' # workflow for small memory environments, downloading small batches of bundles
 #' # for really small memory environments consider also using the `_count` option in
 #' # your FHIR search request.
@@ -313,6 +334,9 @@ fhir_search <- function(
 #' }
 #' #you can see the saved tables here:
 #' dir(tempdir())
+#'
+#'
+#' }, silent = TRUE)
 #'}
 #'
 fhir_next_bundle_url <- function(bundle = NULL) {
@@ -341,11 +365,21 @@ fhir_next_bundle_url <- function(bundle = NULL) {
 #'
 #' @examples
 #' \donttest{
+#' #the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#' #you can skip it when the server is reachable
+#'
+#' try({
+#'
+#'
 #' request <- fhir_url(url = "https://server.fire.ly", resource = "Patient")
 #' fhir_current_request()
 #'
 #' fhir_search("https://server.fire.ly/Medication", max_bundles = 1)
 #' fhir_current_request()
+#'
+#'
+#' },silent = TRUE)
+#'
 #' }
 #'
 #'
@@ -916,7 +950,15 @@ fhir_authenticate <- function(
 #'
 #' @examples
 #' \donttest{
+#'
+#' #' #the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#' #you can skip it when the server is reachable
+#'
+#' try({
+#'
 #' bundle<-fhircrackr:::get_bundle(request = "https://hapi.fhir.org/baseR4/Patient?")
+#'
+#' }, silent = TRUE)
 #' }
 #'
 

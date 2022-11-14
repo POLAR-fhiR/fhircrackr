@@ -61,6 +61,12 @@ For more information on authentication options, please see the help page of \cod
 }
 \examples{
 \donttest{
+
+#the try({}, silent = TRUE) statement is only there to catch errors when the server is down
+#you can skip it when the server is reachable
+
+try({
+
 #find IDs of Patient resources representing Homer Simpson
 ids <- fhir_get_resource_ids(
   base_url   = 'https://hapi.fhir.org/baseR4',
@@ -82,6 +88,8 @@ fhir_crack(
       ID      = "id",
       given   = "name/given",
       family  = "name/family")))
+
+}, silent = TRUE)
 }
 }
 \seealso{
