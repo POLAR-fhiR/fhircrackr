@@ -9,11 +9,8 @@
 - `fhir_search()` has a new argument `add_headers` that allows adding custom headers to the HTTP request.
 - `fhir_load()` can now load FHIR bundles with arbitrary file names from a given directory.
 
-## New behaviour
-- `fhir_search()` will not url encode next links for paging anymore, as servers are expected to deliver a URL that can be sent back to them without any preprocessing steps. On all tested server types (HAPI, Vonk, Blaze) this change of code doesn't affect the paging behaviour in any way.
-
-
-## New behavious
+## New behavior
+- `fhir_search()` will not url encode next links for paging anymore, as servers are expected to deliver a URL that can be sent back to them without any preprocessing steps. On all tested server types (HAPI, Vonk, Blaze) this change of code doesn't affect the paging behavior in any way.
 
 # fhircrackr 2.0.0
 
@@ -46,7 +43,7 @@
 
 
 
-## New behaviour
+## New behavior
 - `fhir_melt()` has been rewritten to be faster and more memory efficient.
 
 - `fhir_style`: This class is now deprecated, all the information contained in the `fhir_style` object has been moved to the `fhir_table_description`. 

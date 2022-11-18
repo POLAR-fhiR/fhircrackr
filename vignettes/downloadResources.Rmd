@@ -543,7 +543,7 @@ When there is no next bundle (because all available resources have been download
 
 If a download with `fhir_search()` is interrupted due to a server error somewhere in between, you can use `fhir_next_bundle_url()` to see where the download was interrupted.
 
-You can also use this function to avoid memory issues. Th following block of code utilizes `fhir_next_bundle_url()` to download all available Observation resources in small batches of 10 bundles that are immediately cracked and saved before the next batch of bundles is downloaded. Note that this example can be very time consuming if there are a lot of resources on the server. To limit the number of iterations uncomment the `if` statement at the end of the `while` loop:
+You can also use this function to avoid memory issues. The following block of code utilizes `fhir_next_bundle_url()` to download all available Observation resources in small batches of 10 bundles that are immediately cracked and saved before the next batch of bundles is downloaded. Note that this example can be very time consuming if there are a lot of resources on the server. To limit the number of iterations uncomment the `if` statement at the end of the `while` loop:
 
 ```{r, eval=F}
 #Starting fhir search request
