@@ -3,12 +3,14 @@
 ## Bugs fixed
 - Relative next links for Paging: Bugs in connection with POST search and http-type search parameter values have been fixed.
 - Examples querying a FHIR Server have been wrapped in `try()` to stop them from crashing during CRAN checks
+- `fhir_search()` now prints the correct base URL in downloading messages even when `http://` type CodeSystems occur in search params.
 
 ## New functions/arguments
 - `fhir_search()` has a new argument `add_headers` that allows adding custom headers to the HTTP request.
 - `fhir_load()` can now load FHIR bundles with arbitrary file names from a given directory.
 
-
+## New behaviour
+- `fhir_search()` will not url encode next links for paging anymore, as servers are expected to deliver a URL that can be sent back to them without any preprocessing steps. On all tested server types (HAPI, Vonk, Blaze) this change of code doesn't affect the paging behaviour in any way.
 
 
 ## New behavious
