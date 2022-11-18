@@ -582,7 +582,7 @@ In most cases the bottle neck in your analysis will be the download time from th
 
 #### Operating system 
 The easiest to use version of parallelization is the function `parallel::mclapply()` which uses forking to process list elements from a `lapply()` call in parallel. As windows doesn't support forking, this solution only can only be used on osx or linux operating systems. 
-If you want to achieve similar results on a windows machine, you can either run the fhircrackr in an R installation/RStudio Server that you set up in WSL2 (see [here](https://support.rstudio.com/hc/en-us/articles/360049776974-Using-RStudio-Server-in-Windows-WSL2) for an installation guide) or you can try out the [windows mclapply hack](https://github.com/nathanvan/parallelsugar) written by Nathan vanHoudnos.
+If you want to achieve similar results on a windows machine, you can either run the fhircrackr in an R installation/RStudio Server that you set up in WSL2 (see [here](https://support.posit.co/hc/en-us/articles/360049776974-Using-RStudio-Server-in-Windows-WSL2) for an installation guide) or you can try out the [windows mclapply hack](https://github.com/nathanvan/parallelsugar) written by Nathan vanHoudnos.
 
 #### Breaking pointers
 
