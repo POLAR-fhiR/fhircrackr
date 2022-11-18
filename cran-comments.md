@@ -1,7 +1,7 @@
 ## Test environments
 
-* local Windows 10 (64-Bit), R 4.1.0
-* local Ubuntu Linux 20.04.04 LTS, R 4.2.1
+* local Windows 10 (64-Bit), R 4.2.1
+* local Ubuntu Linux 20.04.5 LTS, R 4.2.1
 
 ## CMD check results
 
@@ -9,14 +9,12 @@
 
 ## Comments
 
-- We changed maintainership from Thomas Peschel to Julia Palm
-
 - When checking on Rhub, we sometimes get the message
 
 ```
   Found the following (possibly) invalid URLs:
        From: inst/doc/downloadResources.html
-     URL: https://support.rstudio.com/hc/en-us/articles/360049776974-Using-RStudio-Server-in-Windows-WSL2
+     URL: https://support.posit.co/hc/en-us/articles/360049776974-Using-RStudio-Server-in-Windows-WSL2
        Status: 403
        Message: Forbidden
 ```
