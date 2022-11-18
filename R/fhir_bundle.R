@@ -57,7 +57,11 @@ fhir_bundle_xml <- function(bundle) {
 	rels.nxt <-	xml2::xml_text(x = xml2::xml_find_first(x = links, xpath = "./relation/@value")) == "next"
 	rels.self <- xml2::xml_text(x = xml2::xml_find_first(x = links,xpath = "./relation/@value")) == "self"
 	urls <- xml2::xml_attr(x = xml2::xml_find_all(x = links, xpath = "url"), attr = "value")
-	new(Class = "fhir_bundle_xml", bundle, next_link = fhir_url(url = urls[rels.nxt]), self_link = fhir_url(url = urls[rels.self]))
+
+	new(Class = "fhir_bundle_xml",
+		bundle,
+		next_link = fhir_url(url = urls[rels.nxt], url_enc = FALSE),
+		self_link = fhir_url(url = urls[rels.self], url_enc = FALSE))
 }
 
 setMethod(
