@@ -1,17 +1,20 @@
 citHeader("To cite fhircrackr in publications use:")
 
-citEntry(entry = "Manual",
-  title        = "Handling HL7 FHIR resources in R with {fhircrackr}",
-  author       = personList(as.person("Thomas Peschel"),
-                   as.person("Julia Palm"),
-                   as.person("Jens Przybilla"),
-                   as.person("Frank Meineke")),
-  note		     = "R package version 2.0.1",
-  url		       = "https://CRAN.R-project.org/package=fhircrackr",
-  year		     = "2022",
-  textVersion  =
-  paste("Peschel, T., Palm, J., Przybilla, J., Meineke, F. (2022).",
-        "Handling HL7 FHIR resources in R with fhircrackr.",
-        "R package version 2.0.1")
+## R package reference generated from DESCRIPTION metadata
+citation(auto = meta)
 
-)
+## Journal aricle
+bibentry(bibtype = "Article",
+         title = "'fhircrackr': An R Package Unlocking Fast Healthcare Interoperability Resources for Statistical Analysis",
+         author = personList(as.person("Julia Palm"),
+                   as.person("Frank Meineke"),
+                   as.person("Jens Przybilla"),
+                   as.person("Thomas Peschel")),
+         journal = "Applied Clinical Informatics",
+         volume = "14",
+         number = "01",
+         pages = "54-64",
+         year = "2023",
+         publisher = "Georg Thieme Verlag KG",
+         doi = "10.1055/s-0042-1760436")
+
