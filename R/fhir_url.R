@@ -172,7 +172,7 @@ setMethod(
 
 		request <- build_request(url = url, resource = resource)
 
-		if(length(parameters) == 1 && grepl("=", parameters)) {
+		if(length(parameters) == 1 && grepl("=", parameters) && is.null(names(parameters))) {
 			request <- paste0(request, "?", parameters)
 			return(new(
 				Class = "fhir_url",
