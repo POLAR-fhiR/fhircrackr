@@ -6,7 +6,7 @@ citation(auto = meta)
 ## Journal aricle
 bibentry(bibtype = "Article",
          title = "'fhircrackr': An R Package Unlocking Fast Healthcare Interoperability Resources for Statistical Analysis",
-         author = personList(as.person("Julia Palm"),
+         author = c(as.person("Julia Palm"),
                    as.person("Frank Meineke"),
                    as.person("Jens Przybilla"),
                    as.person("Thomas Peschel")),
