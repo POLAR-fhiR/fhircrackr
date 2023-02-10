@@ -1,3 +1,14 @@
+# fhircrackr 2.1.1
+
+## General
+
+- Citation information now contains reference to ACI article
+- Added HL7 trademark information to package description
+
+## Bugs fixed
+
+- `fhir_url()` now properly formats requests containing `=`, e.g. when searching for snomed expressions in coding elements
+
 # fhircrackr 2.1.0
 
 ## Bugs fixed
