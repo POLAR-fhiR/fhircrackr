@@ -400,6 +400,42 @@ bundles <- fhir_load(directory = temp_dir)
 
 `fhir_load()` takes the name of the directory (or path to it) as its only argument. All xml-files in this directory will be read into R and returned as a list of bundles in xml format just as returned by `fhir_search()`.
 
+If for some reason your bundles are stored as a character vector containing xml strings (e.g. because you extracted them from somewhere other than a FHIR API), you can use the function `as_fhir()` to coerce this character vector to a `fhir_bundle_list`:
+
+```{r}
+#character vector containing fhir bundles
+bundle_strings <- c(
+"<Bundle>
+ <type value='searchset'/>
+ <entry>
+  <resource>
+    <Patient>
+       <id value='id1'/>
+	      <name>
+	         <given value='Marie'/>
+	      </name>
+    </Patient>
+  </resource>
+ </entry>
+</Bundle>",
+"<Bundle>
+ <type value='searchset'/>
+ <entry>
+  <resource>
+    <Patient>
+       <id value='id2'/>
+	      <name>
+	         <given value='Max'/>
+	      </name>
+    </Patient>
+  </resource>
+ </entry>
+</Bundle>"
+)
+
+#convert to FHIR bundle list
+bundles <- as_fhir(bundle_strings)
+```
 ## Dealing with large data sets
 If you need to download a particularly large data set from a FHIR server this can lead to challenges in two areas: computation time and memory usage. Downloading the FHIR Bundles will be time consuming because the paging mechanism leading from one bundle to the next is not optimized for speed in most FHIR server implementations and neither is the execution of complex search queries. Keeping a lot of bundles in the working memory is memory consuming because the xml structures contain a lot of overhead that will be removed, once the relevant bits of information will be transferred into a table.
 

@@ -1,3 +1,8 @@
+# fhircrackr 2.1.1.9000
+
+# New functions
+`as_fhir()` coerces a character vector with xml strings representing FHIR bundles to a fhir_bundles_list object.
+
 # fhircrackr 2.1.1
 
 ## General
