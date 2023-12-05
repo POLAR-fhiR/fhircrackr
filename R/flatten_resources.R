@@ -443,7 +443,7 @@ crack_bundles_to_one_table <- function(
 					regexpr_ids <- stringr::str_c(esc(table_description@brackets[1]), "([0-9]+(\\.[0-9]+)*)", esc(table_description@brackets[2]))
 					names <- unique(gsub(regexpr_ids, "", names))
 				}
-				empty_cols <- setdiff(names(table_description@cols), gsub("@.*$", "", names))
+				empty_cols <- setdiff(gsub("\\[.*\\]", "",names(table_description@cols)), gsub("@.*$", "", gsub("\\[.*\\]", "", names)))
 				if(0 < length(empty_cols)){table[,(empty_cols):=NA]}
 			}
 			#rm_empty_cols=TRUE
@@ -636,7 +636,7 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 						  [, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
 						  [, id       := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')] # extract ids
 						  [, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')] # remove ids
-						  [, column   := stringr::str_c(bra, id, ket, names(table_description@cols)[match(xpath, table_description@cols)]) |>
+						  [, column   := stringr::str_c(bra, id, ket, names(table_description@cols)[match(xpath, gsub("\\[.*\\]", "", table_description@cols))]) |>
 						  		busg('/', '.') |>
 						  		stringr::str_c(if(table_description@keep_attr) stringr::str_c('@', attrib) else '')
 						  ] # create column name
@@ -711,7 +711,7 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 						 [, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
 						 [, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
 						 [, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')]
-						 [, column   := stringr::str_c(names(table_description@cols)[match(xpath, table_description@cols)]) |>
+						 [, column   := stringr::str_c(names(table_description@cols)[match(xpath, gsub("\\[.*\\]", "",table_description@cols))]) |>
 						 		busg('/', '.') |>
 						 		stringr::str_c(if(table_description@keep_attr) stringr::str_c('@', attrib) else '')
 						 ] # create column name
