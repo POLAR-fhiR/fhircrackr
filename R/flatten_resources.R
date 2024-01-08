@@ -610,22 +610,21 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 		parallel::mclapply(
 			seq_along(bundles),
 			function(bundle_id) {# bundle_id <- 1
-				nodes <- xml_nodeset(
-					unlist(
-						recursive = FALSE,
-						lapply(
-							table_description@cols,
-							function(xpath) {# xpath <- table_description@cols[[2]]
-								xml2::xml_find_all(
-									bundles[[bundle_id]],
-									stringr::str_c('./entry/resource/', table_description@resource, '/', xpath, '/@*')
-								)
-							}
-						)
+				nodelist <-	unlist(
+					recursive = FALSE,
+					lapply(
+						table_description@cols,
+						function(xpath) {# xpath <- table_description@cols[[1]]
+							xml2::xml_find_all(
+								bundles[[bundle_id]],
+								stringr::str_c('./entry/resource/', table_description@resource, '/', xpath, '/@*')
+							)
+						}
 					)
 				)
 				d <- data.table(
-					node   = nodes # intermediate save entries
+					node   = xml_nodeset(nodelist),
+					column = stringr::str_match(names(nodelist), paste(esc(names(table_description@cols)), collapse = "|"))[,1]
 				)
 				if(0 < nrow(d)){
 					d <- (d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '') |> busg('([^]])/', '\\1[1]/')] # add missing indices
@@ -636,8 +635,8 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 						  [, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
 						  [, id       := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')] # extract ids
 						  [, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')] # remove ids
-						  [, column   := stringr::str_c(bra, id, ket, names(table_description@cols)[match(xpath, gsub("\\[.*\\]", "", table_description@cols))]) |>
-						  		busg('/', '.') |>
+						  [, column   := stringr::str_c(bra, id, ket, column) |>
+						  		#busg('/', '.') |>
 						  		stringr::str_c(if(table_description@keep_attr) stringr::str_c('@', attrib) else '')
 						  ] # create column name
 						  [, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary columns
@@ -686,22 +685,21 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 			parallel::mclapply(
 				seq_along(bundles),
 				function(bundle_id) {# bundle_id <- 1
-					nodes <- xml_nodeset(
-						unlist(
-							recursive = FALSE,
-							lapply(
-								table_description@cols,
-								function(xpath) {# xpath <- table_description@cols[[1]]
-									xml2::xml_find_all(
-										bundles[[bundle_id]],
-										stringr::str_c('./entry/resource/', table_description@resource, '/', xpath, '/@*')
-									)
-								}
-							)
+					nodelist <-	unlist(
+						recursive = FALSE,
+						lapply(
+							table_description@cols,
+							function(xpath) {# xpath <- table_description@cols[[1]]
+								xml2::xml_find_all(
+									bundles[[bundle_id]],
+									stringr::str_c('./entry/resource/', table_description@resource, '/', xpath, '/@*')
+								)
+							}
 						)
 					)
 					d <- data.table(
-						node   = nodes
+						node   = xml_nodeset(nodelist),
+						column = stringr::str_match(names(nodelist), paste(esc(names(table_description@cols)), collapse = "|"))[,1]
 					)
 					if(0 < nrow(d)){
 						(d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
@@ -711,10 +709,11 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 						 [, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
 						 [, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
 						 [, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')]
-						 [, column   := stringr::str_c(names(table_description@cols)[match(xpath, gsub("\\[.*\\]", "",table_description@cols))]) |>
-						 		busg('/', '.') |>
-						 		stringr::str_c(if(table_description@keep_attr) stringr::str_c('@', attrib) else '')
-						 ] # create column name
+						 [, column   := column |> stringr::str_c(if(table_description@keep_attr) stringr::str_c('@', attrib) else '')] #attach attribute to column name
+						 # [, column   := stringr::str_c(names(table_description@cols)[match(xpath, gsub("\\[.*\\]", "",table_description@cols))]) |>
+						 # 		busg('/', '.') |>
+						 # 		stringr::str_c(if(table_description@keep_attr) stringr::str_c('@', attrib) else '')
+						 # ] # create column name
 						)
 						if(use_indices) {
 							d <- (d[, id := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')][, stringr::str_c(bra, id, ket, value, collapse = table_description@sep), by=c('entry', 'column')] |>

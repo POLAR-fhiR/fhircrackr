@@ -6,7 +6,7 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["address[use[@value='home']].city", "address.use", "address.country"]
+          "value": ["address[use[@value='home']].city", "address[use[@value='work']].city", "address.use", "address.country"]
         },
         "row.names": {
           "type": "integer",
@@ -24,6 +24,11 @@
           "type": "character",
           "attributes": {},
           "value": ["Amsterdam", "Rome", "Berlin"]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": [null, "Stockholm", "London"]
         },
         {
           "type": "character",
@@ -46,7 +51,7 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["city", "use", "country"]
+          "value": ["home_city", "work_city", "use", "country"]
         },
         "row.names": {
           "type": "integer",
@@ -64,6 +69,11 @@
           "type": "character",
           "attributes": {},
           "value": ["Amsterdam", "Rome", "Berlin"]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": [null, "Stockholm", "London"]
         },
         {
           "type": "character",
@@ -86,7 +96,7 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["address[use[@value='home']].city", "address.use", "address.country"]
+          "value": ["address[use[@value='home']].city", "address[use[@value='work']].city", "address.use", "address.country"]
         },
         "row.names": {
           "type": "integer",
@@ -104,6 +114,11 @@
           "type": "character",
           "attributes": {},
           "value": ["[1.1]Amsterdam", "[1.1]Rome", "[1.1]Berlin"]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": [null, "[2.1]Stockholm", "[3.1]London"]
         },
         {
           "type": "character",
@@ -136,7 +151,7 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["[1.1]address[use[@value='home']].city", "[1.1]address.use", "[2.1]address.use", "[3.1]address.use", "[1.1]address.country", "[2.1]address.country", "[3.1]address.country"]
+          "value": ["[1.1]address[use[@value='home']].city", "[2.1]address[use[@value='work']].city", "[3.1]address[use[@value='work']].city", "[1.1]address.use", "[2.1]address.use", "[3.1]address.use", "[1.1]address.country", "[2.1]address.country", "[3.1]address.country"]
         }
       },
       "value": [
@@ -144,6 +159,16 @@
           "type": "character",
           "attributes": {},
           "value": ["Amsterdam", "Rome", "Berlin"]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": [null, "Stockholm", null]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": [null, null, "London"]
         },
         {
           "type": "character",
@@ -186,7 +211,7 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["address.country@value", "address.use@value", "address[use[@value='home']].city@value"]
+          "value": ["address.country@value", "address.use@value", "address[use[@value='home']].city@value", "address[use[@value='work']].city@value"]
         },
         "row.names": {
           "type": "integer",
@@ -214,6 +239,11 @@
           "type": "character",
           "attributes": {},
           "value": ["[1.1]Amsterdam", "[1.1]Rome", "[1.1]Berlin"]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": [null, "[2.1]Stockholm", "[3.1]London"]
         }
       ]
     }
@@ -226,7 +256,7 @@
         "names": {
           "type": "character",
           "attributes": {},
-          "value": ["address[use[@value='home']].city", "address.use", "address.country"]
+          "value": ["address[use[@value='home']].city", "address[use[@value='work']].city", "address.use", "address.country"]
         },
         "row.names": {
           "type": "integer",
@@ -244,6 +274,11 @@
           "type": "character",
           "attributes": {},
           "value": ["Amsterdam", "Rome", "Berlin"]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": [null, "Stockholm", "London"]
         },
         {
           "type": "character",

@@ -7,6 +7,7 @@ testthat::test_that(
 				resource = "Patient",
 				cols = c(
 					"address[use[@value='home']]/city",
+					"address[use[@value='work']]/city",
 					"address/use",
 					"address/country"
 				)
@@ -24,7 +25,8 @@ testthat::test_that(
 			fhir_crack(b, fhir_table_description(
 				resource = "Patient",
 				cols = c(
-					city = "address[use[@value='home']]/city",
+					home_city = "address[use[@value='home']]/city",
+					work_city = "address[use[@value='work']]/city",
 					 use = "address/use",
 					country = "address/country"
 				)
@@ -43,6 +45,7 @@ testthat::test_that(
 				resource = "Patient",
 				cols = c(
 					"address[use[@value='home']]/city",
+					"address[use[@value='work']]/city",
 					"address/use",
 					 "address/country"
 				),
@@ -64,6 +67,7 @@ testthat::test_that(
 					resource = "Patient",
 					cols = c(
 						"address[use[@value='home']]/city",
+						"address[use[@value='work']]/city",
 						"address/use",
 						"address/country"
 					)
@@ -81,10 +85,11 @@ testthat::test_that(
 	"fhir_crack compact with filtered values and keep_attr produces correct output",{
 		expect_snapshot_value({
 			b <- fhir_unserialize(bundles = example_bundles3)
-			fhir_crack(bl, fhir_table_description(
+			fhir_crack(b, fhir_table_description(
 				resource = "Patient",
 				cols = c(
 					"address[use[@value='home']]/city",
+					"address[use[@value='work']]/city",
 					"address/use",
 					"address/country"
 				),
@@ -102,10 +107,11 @@ testthat::test_that(
 	"fhir_crack compact with filtered values produces correct output",{
 		expect_snapshot_value({
 			b <- fhir_unserialize(bundles = example_bundles3)
-			fhir_crack(bl, fhir_table_description(
+			fhir_crack(b, fhir_table_description(
 				resource = "Patient",
 				cols = c(
 					"address[use[@value='home']]/city",
+					"address[use[@value='work']]/city",
 					"address/use",
 					"address/country"
 				)
