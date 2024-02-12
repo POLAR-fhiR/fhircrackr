@@ -177,9 +177,10 @@ setMethod(
 		}
 
 		validObject(object = design, complete = TRUE)
+
 		#Check for dangerous XPath expressions ins cols
 		cols <- design@cols
-		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
+		dangerCols <- sapply(cols, function(x) {any(grepl("(?<!:)//", x, perl=T))})
 
 		if(any(dangerCols)) {
 			warning(
