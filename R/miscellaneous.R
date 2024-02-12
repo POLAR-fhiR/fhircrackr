@@ -415,7 +415,7 @@ fhir_ns_strip <- function(xml) {
 ##### Documentation for example_bundles1 data set ######
 #' Toy example bundles for multiple entries
 #'
-#' @description These data examples are bundles that contain very few very simple Patient resources
+#' @description These data examples are bundles that contain very few, very simple resources
 #' that have multiple entries and can be used for demonstration purposes. See **Source** for how the
 #' xml versions look.
 #'
@@ -490,7 +490,7 @@ fhir_ns_strip <- function(xml) {
 #'
 #' @examples
 #' #unserialize xml objects before doing anything else with them!
-#' fhir_unserialize(example_bundles2)
+#' fhir_unserialize(bundles = example_bundles2)
 #' @rdname datasets_selfmade
 #' @source
 #' **example_bundles2**
@@ -753,6 +753,73 @@ fhir_ns_strip <- function(xml) {
 #'
 
 "example_bundles4"
+
+##### Documentation for example_bundles5 data set ######
+#' @details
+#' `example_bundles5` contains 1 bundle with 2 Observation resources.
+#'
+#' @examples
+#' #unserialize xml objects before doing anything else with them!
+#' fhir_unserialize(bundles = example_bundles5)
+#' @rdname datasets_selfmade
+#' @source
+#' **example_bundles5**
+#'
+#'```
+#' <Bundle>
+#'  <type value='searchset'/>
+#'  <entry>
+#'   <resource>
+#'     <Observation>
+#'        <id value = 'obs1'/>
+#'        <code>
+#'           <coding>
+#'              <system value='http://loinc.org'/>
+#'              <code value='29463-7'/>
+#'              <display value='Body Weight'/>
+#'           </coding>
+#'           <coding>
+#'              <system value='http://snomed.info/sct'/>
+#'              <code value='27113001'/>
+#'              <display value='Body weight'/>
+#'           </coding>
+#'        </code>
+#'        <subject>
+#'           <reference value='Patient/id3'/>
+#'        </subject>
+#'     </Observation>
+#'   </resource>
+#'  </entry>
+#'
+#'  <entry>
+#'   <resource>
+#'     <Observation>
+#'        <id value = 'obs2'/>
+#'        <code>
+#'           <coding>
+#'              <system value='http://loinc.org'/>
+#'              <code value='8302-2'/>
+#'              <display value='Body Height'/>
+#'           </coding>
+#'           <coding>
+#'              <system value='http://snomed.info/sct'/>
+#'              <code value='50373000'/>
+#'              <display value='Body height measure'/>
+#'           </coding>
+#'        </code>
+#'        <subject>
+#'           <reference value='Patient/id3'/>
+#'        </subject>
+#'     </Observation>
+#'   </resource>
+#'  </entry>
+#' </Bundle>"
+#'
+#'```
+#'
+
+"example_bundles5"
+
 ##### Documentation for transaction_bundle_example data set ######
 #' Toy examples to POST/PUT on a server
 #'
