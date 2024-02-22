@@ -88,6 +88,46 @@
       ]
     }
 
+# fhir_crack compact with similar colnames produces correct output
+
+    {
+      "type": "list",
+      "attributes": {
+        "names": {
+          "type": "character",
+          "attributes": {},
+          "value": ["x", "x1", "x12"]
+        },
+        "row.names": {
+          "type": "integer",
+          "attributes": {},
+          "value": [1, 2, 3]
+        },
+        "class": {
+          "type": "character",
+          "attributes": {},
+          "value": ["data.frame"]
+        }
+      },
+      "value": [
+        {
+          "type": "character",
+          "attributes": {},
+          "value": ["id1", "id2", "id3"]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": ["Amsterdam", "Rome:::Stockholm", "Berlin:::London"]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": ["home", "home:::work", "home:::work"]
+        }
+      ]
+    }
+
 # fhir_crack compact with filtered values and brackets produces correct output
 
     {
@@ -199,6 +239,66 @@
           "type": "character",
           "attributes": {},
           "value": [null, null, "England"]
+        }
+      ]
+    }
+
+# fhir_crack wide with similar colnames produces correct output
+
+    {
+      "type": "list",
+      "attributes": {
+        "row.names": {
+          "type": "integer",
+          "attributes": {},
+          "value": [1, 2, 3]
+        },
+        "class": {
+          "type": "character",
+          "attributes": {},
+          "value": ["data.frame"]
+        },
+        "names": {
+          "type": "character",
+          "attributes": {},
+          "value": ["[1]x", "[1.1]x1", "[2.1]x1", "[3.1]x1", "[1.1]x12", "[2.1]x12", "[3.1]x12"]
+        }
+      },
+      "value": [
+        {
+          "type": "character",
+          "attributes": {},
+          "value": ["id1", "id2", "id3"]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": ["Amsterdam", "Rome", "Berlin"]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": [null, "Stockholm", null]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": [null, null, "London"]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": ["home", "home", "home"]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": [null, "work", null]
+        },
+        {
+          "type": "character",
+          "attributes": {},
+          "value": [null, null, "work"]
         }
       ]
     }

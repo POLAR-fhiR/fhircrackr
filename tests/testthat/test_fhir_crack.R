@@ -38,6 +38,24 @@ testthat::test_that(
 )
 
 testthat::test_that(
+	"fhir_crack compact with similar colnames produces correct output",{
+		expect_snapshot_value({
+			b <- fhir_unserialize(bundles = example_bundles3)
+			fhir_crack(b, fhir_table_description(
+				resource = "Patient",
+				cols = c(
+					x = "id",
+					x1 = "address/city",
+					x12 = "address/use"
+				)
+			), verbose = 0)
+		},
+		style = "json2"
+		)
+	}
+)
+
+testthat::test_that(
 	"fhir_crack compact with filtered values and brackets produces correct output",{
 		expect_snapshot_value({
 			b <- fhir_unserialize(bundles = example_bundles3)
@@ -80,6 +98,27 @@ testthat::test_that(
 		)
 	}
 )
+
+testthat::test_that(
+	"fhir_crack wide with similar colnames produces correct output",{
+		expect_snapshot_value({
+			b <- fhir_unserialize(bundles = example_bundles3)
+			fhir_crack(b, fhir_table_description(
+				resource = "Patient",
+				cols = c(
+					x = "id",
+					x1 = "address/city",
+					x12 = "address/use"
+				),
+				brackets = c("[", "]"),
+				format = "wide"
+			), verbose = 0)
+		},
+		style = "json2"
+		)
+	}
+)
+
 
 testthat::test_that(
 	"fhir_crack compact with filtered values and keep_attr produces correct output",{

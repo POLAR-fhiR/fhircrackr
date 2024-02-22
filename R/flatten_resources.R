@@ -611,21 +611,24 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 		parallel::mclapply(
 			seq_along(bundles),
 			function(bundle_id) {# bundle_id <- 1
-				nodelist <-	unlist(
-					recursive = FALSE,
-					lapply(
-						table_description@cols,
-						function(xpath) {# xpath <- table_description@cols[[1]]
-							xml2::xml_find_all(
-								bundles[[bundle_id]],
-								stringr::str_c('./entry/resource/', table_description@resource, '/', xpath, '/@*')
-							)
-						}
-					)
+				colwise_list <- lapply(
+					table_description@cols,
+					function(xpath) {# xpath <- table_description@cols[[1]]
+						xml2::xml_find_all(
+							bundles[[bundle_id]],
+							stringr::str_c('./entry/resource/', table_description@resource, '/', xpath, '/@*')
+						)
+					}
 				)
+				nodelist <-	unlist(
+					colwise_list,
+					recursive = FALSE,
+					use.names = FALSE
+				)
+
 				d <- data.table(
 					node   = xml_nodeset(nodelist),
-					column = stringr::str_match(names(nodelist), paste(esc(names(table_description@cols)), collapse = "|"))[,1]
+					column = rep(names(colwise_list), lengths(colwise_list))
 				)
 				if(0 < nrow(d)){
 					d <- (d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '') |> busg('([^]])/', '\\1[1]/')] # add missing indices
@@ -680,27 +683,29 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 		ket <- table_description@brackets[[2]]
 		use_indices <- TRUE
 	}
-
 	result <- unique(
 		data.table::rbindlist(
 			parallel::mclapply(
 				seq_along(bundles),
 				function(bundle_id) {# bundle_id <- 1
-					nodelist <-	unlist(
-						recursive = FALSE,
-						lapply(
-							table_description@cols,
-							function(xpath) {# xpath <- table_description@cols[[1]]
-								xml2::xml_find_all(
-									bundles[[bundle_id]],
-									stringr::str_c('./entry/resource/', table_description@resource, '/', xpath, '/@*')
-								)
-							}
-						)
+					colwise_list <- lapply(
+						table_description@cols,
+						function(xpath) {# xpath <- table_description@cols[[1]]
+							xml2::xml_find_all(
+								bundles[[bundle_id]],
+								stringr::str_c('./entry/resource/', table_description@resource, '/', xpath, '/@*')
+							)
+						}
 					)
+					nodelist <-	unlist(
+						colwise_list,
+						recursive = FALSE,
+						use.names = FALSE
+					)
+
 					d <- data.table(
 						node   = xml_nodeset(nodelist),
-						column = stringr::str_match(names(nodelist), paste(esc(names(table_description@cols)), collapse = "|"))[,1]
+						column = rep(names(colwise_list), lengths(colwise_list))
 					)
 					if(0 < nrow(d)){
 						(d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
