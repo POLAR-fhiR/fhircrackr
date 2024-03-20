@@ -1,3 +1,9 @@
+# fhircrackr 2.2.0
+
+## New functionalities
+- `fhir_crack()` can now deal with XPath expressions using predicates, e.g. `code/coding[system[@value='http://loinc.org']]/code`
+- deprecated argument `fhir_remove_empty_cols` fully removed
+
 # fhircrackr 2.1.1
 
 ## General

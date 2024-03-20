@@ -19,8 +19,7 @@ fhir_crack(
   data.table = FALSE,
   format = NULL,
   keep_attr = NULL,
-  ncores = 1,
-  remove_empty_columns = deprecated()
+  ncores = 1
 )
 
 \S4method{fhir_crack}{ANY,fhir_table_description}(
@@ -33,8 +32,7 @@ fhir_crack(
   data.table = FALSE,
   format = NULL,
   keep_attr = NULL,
-  ncores = 1,
-  remove_empty_columns = deprecated()
+  ncores = 1
 )
 
 \S4method{fhir_crack}{ANY,fhir_design}(
@@ -47,8 +45,7 @@ fhir_crack(
   data.table = FALSE,
   format = NULL,
   keep_attr = NULL,
-  ncores = 1,
-  remove_empty_columns = deprecated()
+  ncores = 1
 )
 }
 \arguments{
@@ -82,8 +79,6 @@ should be attached to the name of the variable in the resulting table. Will over
 
 \item{ncores}{Either NULL (no parallelisation) or an integer of length 1 containing the number of
 cpu cores that should be used for parallelised cracking. Defaults to NULL.}
-
-\item{remove_empty_columns}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use argument \code{rm_empty_cols} instead.}
 }
 \value{
 If a \linkS4class{fhir_design} was used, the result is a list of data.frames, i.e. a \linkS4class{fhir_df_list} object, or a list of data.tables,
@@ -111,25 +106,22 @@ bundles <- fhir_unserialize(medication_bundles)
 #Extract just one resource type
 
 #define attributes to extract
-medications <- fhir_table_description(
+med_desc <- fhir_table_description(
    resource = "MedicationStatement",
    cols     = c(
-   	MS.ID              = "id",
-   	STATUS.TEXT        = "text/status",
-   	STATUS             = "status",
-   	MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-   	MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-   	MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-   	DOSAGE             = "dosage/text",
-    	PATIENT            = "subject/reference",
-    	LAST.UPDATE        = "meta/lastUpdated"
+   	id              = "id",
+   	status          = "status",
+   	system          = "medicationCodeableConcept/coding/system",
+   	code            = "medicationCodeableConcept/coding/code",
+   	display         = "medicationCodeableConcept/coding/display",
+   	dosage          = "dosage/text",
+    	patient         = "subject/reference",
+    	last.update     = "meta/lastUpdated"
   ),
-  sep           = " ",
-  brackets      = c("[", "]"),
   rm_empty_cols = FALSE
 )
 
-med_df <- fhir_crack(bundles = bundles, design = medications)
+med_df <- fhir_crack(bundles = bundles, design = med_desc)
 
 head(med_df) #data.frame
 
@@ -137,17 +129,17 @@ head(med_df) #data.frame
 ###Example 2###
 #extract more resource types
 
-patients <- fhir_table_description(
+pat_desc <- fhir_table_description(
    resource = "Patient"
 )
 
-design <- fhir_design(medications, patients)
+design <- fhir_design(med_desc, pat_desc)
 
 df_list <- fhir_crack(bundles = bundles, design = design)
 
 #list of data.frames/fhir_df_list
-head(df_list$medications)
-head(df_list$patients)
+head(df_list$med_desc)
+head(df_list$pat_desc)
 
 #The design that was used can be extracted from a fhir_df_list
 fhir_design(df_list)

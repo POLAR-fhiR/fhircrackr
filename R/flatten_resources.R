@@ -32,8 +32,6 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- du
 #' @param rm_empty_cols Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
 #' `design`. If `rm_empty_cols = NULL`, it is looked up in `design`, where the default is `FALSE`.
 #'
-#' @param remove_empty_columns `r lifecycle::badge("deprecated")` Use argument `rm_empty_cols` instead.
-#'
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
 #'
@@ -69,25 +67,22 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- du
 #' #Extract just one resource type
 #'
 #' #define attributes to extract
-#' medications <- fhir_table_description(
+#' med_desc <- fhir_table_description(
 #'    resource = "MedicationStatement",
 #'    cols     = c(
-#'    	MS.ID              = "id",
-#'    	STATUS.TEXT        = "text/status",
-#'    	STATUS             = "status",
-#'    	MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-#'    	MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-#'    	MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-#'    	DOSAGE             = "dosage/text",
-#'     	PATIENT            = "subject/reference",
-#'     	LAST.UPDATE        = "meta/lastUpdated"
+#'    	id              = "id",
+#'    	status          = "status",
+#'    	system          = "medicationCodeableConcept/coding/system",
+#'    	code            = "medicationCodeableConcept/coding/code",
+#'    	display         = "medicationCodeableConcept/coding/display",
+#'    	dosage          = "dosage/text",
+#'     	patient         = "subject/reference",
+#'     	last.update     = "meta/lastUpdated"
 #'   ),
-#'   sep           = " ",
-#'   brackets      = c("[", "]"),
 #'   rm_empty_cols = FALSE
 #' )
 #'
-#' med_df <- fhir_crack(bundles = bundles, design = medications)
+#' med_df <- fhir_crack(bundles = bundles, design = med_desc)
 #'
 #' head(med_df) #data.frame
 #'
@@ -95,17 +90,17 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- du
 #' ###Example 2###
 #' #extract more resource types
 #'
-#' patients <- fhir_table_description(
+#' pat_desc <- fhir_table_description(
 #'    resource = "Patient"
 #' )
 #'
-#' design <- fhir_design(medications, patients)
+#' design <- fhir_design(med_desc, pat_desc)
 #'
 #' df_list <- fhir_crack(bundles = bundles, design = design)
 #'
 #' #list of data.frames/fhir_df_list
-#' head(df_list$medications)
-#' head(df_list$patients)
+#' head(df_list$med_desc)
+#' head(df_list$pat_desc)
 #'
 #' #The design that was used can be extracted from a fhir_df_list
 #' fhir_design(df_list)
@@ -123,8 +118,7 @@ setGeneric(
 		data.table           = FALSE,
 		format               = NULL,
 		keep_attr            = NULL,
-		ncores               = 1,
-		remove_empty_columns = deprecated()
+		ncores               = 1
 	) {
 		standardGeneric("fhir_crack")
 	}
@@ -145,14 +139,8 @@ setMethod(
 		data.table           = FALSE,
 		format               = NULL,
 		keep_attr            = NULL,
-		ncores               = 1,
-		remove_empty_columns = deprecated()
+		ncores               = 1
 	) {
-
-		if(lifecycle::is_present(remove_empty_columns)){
-			lifecycle::deprecate_warn(when = "2.0.0", what = "fhir_crack(remove_empty_columns)", with = "fhir_crack(rm_empty_cols)")
-			design@rm_empty_cols <- remove_empty_columns
-		}
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
@@ -219,8 +207,7 @@ setMethod(
 		data.table           = FALSE,
 		format               = NULL,
 		keep_attr            = NULL,
-		ncores               = 1,
-		remove_empty_columns = deprecated()
+		ncores               = 1
 	) {
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
@@ -245,21 +232,6 @@ setMethod(
 				)
 			)
 		}
-
-		##### remove at some point #####
-		if(lifecycle::is_present(remove_empty_columns)){
-			lifecycle::deprecate_warn(when = "2.0.0", what = "fhir_crack(remove_empty_columns)", with = "fhir_crack(rm_empty_cols)")
-			design <- fhir_design(
-				lapply(
-					design,
-					function(x) {
-						x@rm_empty_cols <- remove_empty_columns
-						x
-					}
-				)
-			)
-		}
-		############################
 
 		if(!is.null(rm_empty_cols)) {
 			design <- fhir_design(
