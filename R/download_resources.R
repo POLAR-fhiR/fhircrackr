@@ -583,7 +583,7 @@ fhir_capability_statement <- function(
 	list(Meta = META, Rest = REST, Resources = RESOURCE)
 }
 
-####Saving Bundles####
+####Saving/Loading Bundles####
 
 #' Save FHIR bundles as xml-files
 #' @description Writes a list of FHIR bundles as numbered xml files into a directory.
@@ -690,6 +690,72 @@ fhir_load <- function(directory, indices = NULL, pattern = '^[0-9]+\\.xml$') {
 	)
 }
 
+#' Coerce character vector to [fhir_bundle_list-class]
+#' @description Tries to convert a character vector containing xml strings representing FHIR bundles to an object of
+#' class [fhir_bundle_list-class].
+#'
+#' @param x A character vector where each element is a string representing an xml FHIR bundle.
+#' @export
+#'
+#' @examples
+#'
+#' #character vector containing fhir bundles
+#' bundle_strings <- c(
+#' "<Bundle>
+#'  <type value='searchset'/>
+#'  <entry>
+#'   <resource>
+#'     <Patient>
+#'        <id value='id1'/>
+#' 	      <name>
+#' 	         <given value='Marie'/>
+#' 	      </name>
+#'     </Patient>
+#'   </resource>
+#'  </entry>
+#' </Bundle>",
+#' "<Bundle>
+#'  <type value='searchset'/>
+#'  <entry>
+#'   <resource>
+#'     <Patient>
+#'        <id value='id2'/>
+#' 	      <name>
+#' 	         <given value='Max'/>
+#' 	      </name>
+#'     </Patient>
+#'   </resource>
+#'  </entry>
+#' </Bundle>"
+#' )
+#'
+#' #convert to FHIR bundle list
+#' bundles <- as_fhir(bundle_strings)
+#'
+as_fhir <- function(x) {
+
+	invalid_bundles <- numeric()
+
+	bundles = lapply(
+		seq_along(x),
+		function(i) {
+			res <- try(fhir_bundle_xml(xml2::read_xml(x[i])), silent = T)
+			if(is(res, "try-error")){
+				invalid_bundles <<- c(invalid_bundles, i)
+				NULL
+			}else{
+				res
+			}
+		}
+	)
+
+	if(length(invalid_bundles) > 0){
+		warning ("Skipped the following elements because they don't seem to be xml-bundles: ",
+				 paste(invalid_bundles, collapse = ", "))
+	}
+
+	fhir_bundle_list(bundles[!sapply(bundles,is.null)])
+}
 
 
 #' Serialize a [fhir_bundle-class], [fhir_bundle_list-class] or [fhir_resource-class]

@@ -4,6 +4,9 @@
 - `fhir_crack()` can now deal with XPath expressions using predicates, e.g. `code/coding[system[@value='http://loinc.org']]/code`
 - deprecated argument `fhir_remove_empty_cols` fully removed
 
+# New functions
+- `as_fhir()` coerces a character vector with xml strings representing FHIR bundles to a fhir_bundles_list object.
+
 # fhircrackr 2.1.1
 
 ## General
