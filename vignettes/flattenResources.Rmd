@@ -118,6 +118,8 @@ fhir_columns(xpaths = c("gender", "name/family", "address/city"))
 A `fhir_columns` object that is created explicitly like this can of course also be used in the `columns` argument of `fhir_table_description`. 
 We strongly advise to only use fully specified relative XPath expressions here, e.g. `"ingredient/strength/numerator/code"` and not search paths like `"//code"`, as those can generate unexpected results especially if the searched element appears on different levels of the resource.
 
+In the XPath expression it is also possible to use so-called predicates to find elements that contain a specific value. When your resources for example contain several `code/coding` elements and you are interested in loinc codes only, the expression `code/coding[system[@value='http://loinc.org']]/code` will extract the code only from code elements with a loinc system. A more detailed example of this can be found in the paragraph on multiple entries further down. 
+
 #### Other arguments
 While the `resource` and `cols` control *what* is extracted from the bundles, the remaining elements of a `fhir_table_description` control *how* the resulting table looks. These elements for example control how `fhir_crack()` deals with multiple entries for the same element and with columns that are completely empty, i.e. have only `NA` values. Furthermore you can select the shape of the output tables and how column names are generated:
 
@@ -210,6 +212,7 @@ Of course the previous example is using just one resource type. If you are inter
 The design to extract both resource types could look like this:
 
 ```{r}
+#all attributes defined explicitly
 meds <- fhir_table_description(
 	resource = "MedicationStatement",
 	cols     = list(
@@ -217,11 +220,7 @@ meds <- fhir_table_description(
 		status_text = "text/status",
 		status      = "status",
 		med_system  = "medicationCodeableConcept/coding/system",
-		med_code    = "medicationCodeableConcept/coding/code",
-		med_display = "medicationCodeableConcept/coding/display",
-		dosage      = "dosage/text",
-		patient     = "subject/reference",
-		last_update = "meta/lastUpdated"
+		med_code    = "medicationCodeableConcept/coding/code"
 	),
 	sep           = "|",
 	brackets      = NULL,
@@ -230,8 +229,10 @@ meds <- fhir_table_description(
 	keep_attr     = FALSE 
 )
 
+#automatic extraction/default values
 pat <- fhir_table_description(resource = "Patient")
 
+#combine both table_descriptions
 design <- fhir_design(meds, pat)
 ```
 
@@ -291,7 +292,9 @@ fhir_load_design(paste0(temp_dir, "/design.xml"))
 
 
 ## Multiple entries
-A particularly complicated problem in flattening FHIR resources is caused by the fact that there can be multiple entries to an element. The profile according to which your FHIR resources have been built defines how often a particular element can appear in a resource. This is called the *cardinality* of the element. For example the Patient resource defined <a href="https://www.hl7.org/fhir/patient.html#resource" target="_blank">here</a> can have zero or one birth dates but arbitrarily many addresses. In the default setting, `fhir_crack()` will paste multiple entries for the same element together in the table, using the separator provided by the `sep` argument. In most cases this will work just fine, but there are some special cases that require a little more attention.
+A particularly complicated problem in flattening FHIR resources is caused by the fact that there can be multiple entries to an element. The profile according to which your FHIR resources have been built defines how often a particular element can appear in a resource. This is called the *cardinality* of the element. For example the Patient resource defined <a href="https://www.hl7.org/fhir/patient.html#resource" target="_blank">here</a> can have zero or one birth dates but arbitrarily many addresses. 
+
+In the default setting, `fhir_crack()` will paste multiple entries for the same element together in the table, using the separator provided by the `sep` argument. In most cases this will work just fine, but there are some special cases that require a little more attention.
 
 Let's have a look at an example bundle containing just three Patient resources. You can make it available in your workspace like this:
 
@@ -412,8 +415,103 @@ df3
 
 Of course the above example is a very specific case that only occurs if your resources have multiple entries with complementary elements. In the majority of cases multiple entries in one resource will have the same structure, thus making numbering of those entries superfluous. But the indices also help to disentangle those entries and put them in separate rows, as you'll see in the next paragraph.
 
-## Process tables with multiple entries
-If the table produced by `fhir_crack()` contains multiple entries, you'll probably want to divide these entries into distinct observations at some point. Apart from directly spreading those values over multiple columns by using a `wide` cracking format, the fhircrackr gives you two options to get from a compact table to either a long or a wide format: `fhir_melt()` and `fhir_cast()`. The former spreads the entries across rows, creating a long format, the latter spreads them across columns, creating a wide format.
+## Process resources with multiple entries
+
+### Select values using predicates in XPath expression
+To avoid multiple entries in your table altogether, you can select which of the multiple elements you want to keep during the cracking process. You can achieve this using predicates in your Xpath expressions.
+
+In the following table description, all address elements are only taken from addresses that have the value "physical" for in `address/type` and the value "home" in `address/use`.
+
+```{r}
+desc3 <- fhir_table_description(
+	resource = "Patient",
+	cols = c(id = "id",
+			 name = "name/given",
+			 address.city = "address[type[@value='physical'] and use[@value='home']]/city",
+			 address.country = "address[type[@value='physical'] and use[@value='home']]/country"
+			 )
+)
+
+df_selected <- fhir_crack(bundles = bundle, design = desc3, verbose = 0)
+df_selected
+```
+
+The general formulation is `element[filterChildElement[@value="filterValue"]]/childElement`, where 
+
+- `element` is the fhir element that occurs multiple times (here `address`)
+- `filterChildElement` is a child of `element` that is used for filtering (here `address/type` and `address/use`)
+- `filterValue` is the value to filter by (here `'physical'` and `'home'`) 
+- `childElement` is the element that is actually extracted (here `address/city` and `address/country`)
+
+Another example is the following Observation resources bundle that has loinc and snomed codes, that can be cracked into a table that only contains loinc codes:
+
+```
+<Bundle>
+  <type value="searchset"/>
+  <entry>
+    <resource>
+      <Observation>
+        <id value="obs1"/>
+        <code>
+          <coding>
+            <system value="http://loinc.org"/>
+            <code value="29463-7"/>
+            <display value="Body Weight"/>
+          </coding>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="27113001"/>
+            <display value="Body weight"/>
+          </coding>
+        </code>
+        <subject>
+          <reference value="Patient/id2"/>
+        </subject>
+      </Observation>
+    </resource>
+  </entry>
+  <entry>
+    <resource>
+      <Observation>
+        <id value="obs2"/>
+        <code>
+          <coding>
+            <system value="http://loinc.org"/>
+            <code value="8302-2"/>
+            <display value="Body Height"/>
+          </coding>
+          <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="50373000"/>
+            <display value="Body height measure"/>
+          </coding>
+        </code>
+        <subject>
+          <reference value="Patient/id2"/>
+        </subject>
+      </Observation>
+    </resource>
+  </entry>
+</Bundle>
+```
+
+```{r}
+bundle2 <- fhir_unserialize(bundles = example_bundles5)
+desc4 <- fhir_table_description(resource = "Observation",
+								cols = c(
+									id = "id",
+									code = "code/coding[system[@value='http://loinc.org']]/code",
+								 	display = "code/coding[system[@value='http://loinc.org']]/display")
+									 )
+df_selected2 <- fhir_crack(bundles = bundle2,
+					design = desc4,
+					verbose = F)
+
+df_selected2
+```
+
+In some cases, you won't be able to filter elements during the cracking process, e.g. because you don't know what to filter for beforehand. 
+In that case, the table produced by `fhir_crack()` will contain multiple entries, which you'll probably want to divide into distinct cells at some point. Apart from directly spreading those values over multiple columns by using a `wide` cracking format, the fhircrackr gives you two options to get from a compact table with multiple entries to either a long or a wide format: `fhir_melt()` and `fhir_cast()`. The former spreads the entries across rows, creating a long format, the latter spreads them across columns, creating a wide format.
 
 ### Melt tables with multiple entries
 `fhir_melt()` takes an indexed data frame with multiple entries in one or several `columns` and spreads (aka melts) the entries in `columns` over several rows:

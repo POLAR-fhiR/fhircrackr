@@ -3,7 +3,7 @@ fhircrackr Intro: Handling HL7® FHIR® Resources in R
 
 ## Introduction
 
-`fhircrackr` is a package designed to help analyzing HL7 FHIR[1]
+`fhircrackr` is a package designed to help analyzing HL7 FHIR[^1]
 resources.
 
 FHIR stands for *Fast Healthcare Interoperability Resources* and is a
@@ -40,17 +40,15 @@ This vignette is an introduction on the basic functionalities of the
 can do. For more detailed instructions on each subtopic please have a
 look the other vignettes. This introduction covers the following topics:
 
--   Prerequisites
+- Prerequisites
 
--   Downloading resources from a FHIR server
+- Downloading resources from a FHIR server
 
--   Flattening resources
+- Flattening resources
 
--   Multiple entries
+- Multiple entries
 
--   Saving and loading downloaded bundles
-
-If you prefer Python to R, you might want to check out a Python package with similar functionalities, the [FHIR-PYrate](https://github.com/UMEssen/FHIR-PYrate).
+- Saving and loading downloaded bundles
 
 ## Prerequisites
 
@@ -76,7 +74,7 @@ preconditions for using the `fhircrackr` package here:
     want in your data frame, you should have at least some familiarity
     with XPath expressions. A good tutorial on XPath expressions can be
     found here:
-    <a href="https://www.w3schools.com/xml/xpath_intro.asp" target="_blank">https://www.w3schools.com/xml/xpath\_intro.asp</a>.
+    <a href="https://www.w3schools.com/xml/xpath_intro.asp" target="_blank">https://www.w3schools.com/xml/xpath_intro.asp</a>.
 
 In the following we’ll go through a typical workflow with `fhircrackr`
 step by step. The first and foremost step is of course, to install and
@@ -224,7 +222,7 @@ will just use one simple example here.
 table_description <- fhir_table_description(
     resource = "Patient",
     cols     = c(
-        PID         = "id",
+        id        = "id",
         use_name    = "name/use",
         given_name  = "name/given",
         family_name = "name/family",
@@ -248,7 +246,7 @@ table_description
 #> ------------ -----------------
 #> column name | xpath expression
 #> ------------ -----------------
-#> PID         | id
+#> id          | id
 #> use_name    | name/use
 #> given_name  | name/given
 #> family_name | name/family
@@ -285,7 +283,7 @@ patients <- fhir_crack(bundles = patient_bundles, design = table_description, ve
 
 #have look at the results
 head(patients)
-#>            PID                                       use_name
+#>             id                                       use_name
 #> 1 <<1>>2072744                                <<1.1>>official
 #> 2 <<1>>2431578                                <<1.1>>official
 #> 3 <<1>>2431568 <<1.1>>official ~ <<2.1>>usual ~ <<3.1>>maiden
@@ -308,262 +306,12 @@ head(patients)
 #> 6                       <<1.1>>XYZ   <<1>>male <<1>>1998-01-03
 ```
 
-## Extract more than one resource type
-
-Of course the previous example is using just one resource type. If you
-are interested in several types of resources, you use a `fhir_design`
-containing several `fhir_table_descriptions`.
-
-Consider the following example where we want to download
-MedicationStatements referring to a certain medication we specify with
-its SNOMED CT code and also the Patient resources these
-MedicationStatements are linked to.
-
-We can build the request like this:
-
-``` r
-request  <- fhir_url(
-    url        = "https://hapi.fhir.org/baseR4", 
-    resource   = "MedicationStatement", 
-    parameters = c(
-         "code"    = "http://snomed.info/ct|429374003",
-        "_include" = "MedicationStatement:subject"))
-```
-
-Then we can download the resources:
-
-``` r
-medication_bundles <- fhir_search(request = request, max_bundles = 3)
-```
-
-Now our `design` needs two `table_descriptions` (called
-`MedicationStatements` and `Patients` in our example), one for the
-MedicationStatement resources and one for the Patient resources:
-
-``` r
-MedicationStatements <- fhir_table_description(
-    resource = "MedicationStatement",
-    cols     = c(
-        MS.ID              = "id",
-        STATUS.TEXT        = "text/status",
-        STATUS             = "status",
-        MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-        MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-        MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-        DOSAGE             = "dosage/text",
-        PATIENT            = "subject/reference",
-        LAST.UPDATE        = "meta/lastUpdated"
-    ),
-    sep           = "|",
-    brackets      = NULL,
-    rm_empty_cols = FALSE,
-    format        = "compact",
-    keep_attr     = FALSE
-)
-
-Patients <- fhir_table_description(resource = "Patient")
-
-design <- fhir_design(MedicationStatements, Patients)
-```
-
-In this example, we have spelled out the table description
-`MedicationStatement` completely, while we have used a short form for
-`Patients`. The resulting design looks like this:
-
-``` r
-design
-#> A fhir_design with 2 table descriptions:
-#> A fhir_table_description with the following elements: 
-#> 
-#> resource: MedicationStatement
-#> 
-#> cols: 
-#> ------------------- -----------------------------------------
-#> column name        | xpath expression
-#> ------------------- -----------------------------------------
-#> MS.ID              | id
-#> STATUS.TEXT        | text/status
-#> STATUS             | status
-#> MEDICATION.SYSTEM  | medicationCodeableConcept/coding/system
-#> MEDICATION.CODE    | medicationCodeableConcept/coding/code
-#> MEDICATION.DISPLAY | medicationCodeableConcept/coding/display
-#> DOSAGE             | dosage/text
-#> PATIENT            | subject/reference
-#> LAST.UPDATE        | meta/lastUpdated
-#> ------------------- -----------------------------------------
-#> 
-#> sep:           '|'
-#> brackets:      no brackets
-#> rm_empty_cols: FALSE
-#> format:        'compact'
-#> keep_attr:     FALSE
-#> A fhir_table_description with the following elements: 
-#> 
-#> resource: Patient
-#> 
-#> cols: 
-#> An empty fhir_columns object
-#> 
-#> sep:           ':::'
-#> brackets:      no brackets
-#> rm_empty_cols: FALSE
-#> format:        'compact'
-#> keep_attr:     FALSE
-```
-
-We can now use this `design` for `fhir_crack()`:
-
-``` r
-list_of_tables <- fhir_crack(bundles = medication_bundles, design = design, verbose = 0)
-
-list_of_tables$MedicationStatements[1:5,]
-#>   MS.ID STATUS.TEXT STATUS     MEDICATION.SYSTEM MEDICATION.CODE
-#> 1 30233   generated active http://snomed.info/ct       429374003
-#> 2 42091   generated active http://snomed.info/ct       429374003
-#> 3 45724   generated active http://snomed.info/ct       429374003
-#> 4 59597   generated active http://snomed.info/ct       429374003
-#> 5 69117   generated active http://snomed.info/ct       429374003
-#>   MEDICATION.DISPLAY           DOSAGE       PATIENT
-#> 1   simvastatin 40mg 1 tab once daily Patient/30163
-#> 2   simvastatin 40mg 1 tab once daily Patient/42024
-#> 3   simvastatin 40mg 1 tab once daily Patient/45657
-#> 4   simvastatin 40mg 1 tab once daily Patient/59530
-#> 5   simvastatin 40mg 1 tab once daily Patient/69050
-#>                     LAST.UPDATE
-#> 1 2019-09-26T14:34:44.543+00:00
-#> 2 2019-10-09T22:44:05.728+00:00
-#> 3 2019-10-11T16:30:24.411+00:00
-#> 4 2019-11-12T14:27:00.098+00:00
-#> 5 2019-11-16T16:51:50.759+00:00
-
-list_of_tables$Patients[18:20,]
-#>    address.city address.country address.district
-#> 18     Westford              US             <NA>
-#> 19     Westford              US             <NA>
-#> 20   Talad Kwan              TH            Muang
-#>                                      address.extension
-#> 18 http://hl7.org/fhir/StructureDefinition/geolocation
-#> 19 http://hl7.org/fhir/StructureDefinition/geolocation
-#> 20                                                <NA>
-#>    address.extension.extension address.extension.extension.valueDecimal
-#> 18        latitude:::longitude    42.58942256332994:::-71.3827654850569
-#> 19        latitude:::longitude    42.58942256332994:::-71.3827654850569
-#> 20                        <NA>                                     <NA>
-#>          address.line address.postalCode address.state
-#> 18  378 Krajcik Lodge               <NA> Massachusetts
-#> 19  378 Krajcik Lodge               <NA> Massachusetts
-#> 20 88/20 Tiwanon Road              11000    Nonthaburi
-#>                                                          address.text
-#> 18                                                               <NA>
-#> 19                                                               <NA>
-#> 20 88/20 Tiwanon Road, Talad Kwan, Muang, Nonthaburi, 11000, Thailand
-#>    address.type address.use  birthDate communication.language.coding.code
-#> 18         <NA>        <NA> 1946-03-29                              en-US
-#> 19         <NA>        <NA> 1946-03-29                              en-US
-#> 20       postal        work 1988-03-25                               <NA>
-#>    communication.language.coding.display communication.language.coding.system
-#> 18                               English                      urn:ietf:bcp:47
-#> 19                               English                      urn:ietf:bcp:47
-#> 20                                  <NA>                                 <NA>
-#>    communication.language.text
-#> 18                     English
-#> 19                     English
-#> 20                        <NA>
-#>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                extension
-#> 18 http://hl7.org/fhir/us/core/StructureDefinition/us-core-race:::http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity:::http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName:::http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex:::http://hl7.org/fhir/StructureDefinition/patient-birthPlace:::http://synthetichealth.github.io/synthea/disability-adjusted-life-years:::http://synthetichealth.github.io/synthea/quality-adjusted-life-years
-#> 19 http://hl7.org/fhir/us/core/StructureDefinition/us-core-race:::http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity:::http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName:::http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex:::http://hl7.org/fhir/StructureDefinition/patient-birthPlace:::http://synthetichealth.github.io/synthea/disability-adjusted-life-years:::http://synthetichealth.github.io/synthea/quality-adjusted-life-years
-#> 20                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <NA>
-#>                        extension.extension extension.extension.valueCoding.code
-#> 18 ombCategory:::text:::ombCategory:::text                      2106-3:::2186-5
-#> 19 ombCategory:::text:::ombCategory:::text                      2106-3:::2186-5
-#> 20                                    <NA>                                 <NA>
-#>    extension.extension.valueCoding.display
-#> 18          White:::Not Hispanic or Latino
-#> 19          White:::Not Hispanic or Latino
-#> 20                                    <NA>
-#>                               extension.extension.valueCoding.system
-#> 18 urn:oid:2.16.840.1.113883.6.238:::urn:oid:2.16.840.1.113883.6.238
-#> 19 urn:oid:2.16.840.1.113883.6.238:::urn:oid:2.16.840.1.113883.6.238
-#> 20                                                              <NA>
-#>    extension.extension.valueString extension.valueAddress.city
-#> 18  White:::Not Hispanic or Latino                      Boston
-#> 19  White:::Not Hispanic or Latino                      Boston
-#> 20                            <NA>                        <NA>
-#>    extension.valueAddress.country extension.valueAddress.state
-#> 18                             US                Massachusetts
-#> 19                             US                Massachusetts
-#> 20                           <NA>                         <NA>
-#>    extension.valueCode                extension.valueDecimal
-#> 18                   M 4.160702818392717:::67.83929718160728
-#> 19                   M 4.160702818392717:::67.83929718160728
-#> 20                <NA>                                  <NA>
-#>    extension.valueString gender generalPractitioner.reference     id
-#> 18   Kristyn560 Lesch175   male           Practitioner/634104 634102
-#> 19   Kristyn560 Lesch175   male           Practitioner/632760 632758
-#> 20                  <NA>   male                          <NA> 921009
-#>                                                                                                                                                                                                               identifier.system
-#> 18 https://github.com/synthetichealth/synthea:::http://hospital.smarthealthit.org:::http://hl7.org/fhir/sid/us-ssn:::urn:oid:2.16.840.1.113883.4.3.25:::http://standardhealthrecord.org/fhir/StructureDefinition/passportNumber
-#> 19 https://github.com/synthetichealth/synthea:::http://hospital.smarthealthit.org:::http://hl7.org/fhir/sid/us-ssn:::urn:oid:2.16.840.1.113883.4.3.25:::http://standardhealthrecord.org/fhir/StructureDefinition/passportNumber
-#> 20                                                                                                                                                                                                                         <NA>
-#>    identifier.type.coding.code
-#> 18          MR:::SS:::DL:::PPN
-#> 19          MR:::SS:::DL:::PPN
-#> 20                        <NA>
-#>                                                         identifier.type.coding.display
-#> 18 Medical Record Number:::Social Security Number:::Driver's License:::Passport Number
-#> 19 Medical Record Number:::Social Security Number:::Driver's License:::Passport Number
-#> 20                                                                                <NA>
-#>                                                                                                                                                                    identifier.type.coding.system
-#> 18 http://terminology.hl7.org/CodeSystem/v2-0203:::http://terminology.hl7.org/CodeSystem/v2-0203:::http://terminology.hl7.org/CodeSystem/v2-0203:::http://terminology.hl7.org/CodeSystem/v2-0203
-#> 19 http://terminology.hl7.org/CodeSystem/v2-0203:::http://terminology.hl7.org/CodeSystem/v2-0203:::http://terminology.hl7.org/CodeSystem/v2-0203:::http://terminology.hl7.org/CodeSystem/v2-0203
-#> 20                                                                                                                                                                                          <NA>
-#>                                                                   identifier.type.text
-#> 18 Medical Record Number:::Social Security Number:::Driver's License:::Passport Number
-#> 19 Medical Record Number:::Social Security Number:::Driver's License:::Passport Number
-#> 20                                                                                <NA>
-#>                                                                                                      identifier.value
-#> 18 41166989-975d-4d17-b9de-17f94cb3eec1:::41166989-975d-4d17-b9de-17f94cb3eec1:::999-17-8717:::S99933732:::X75257608X
-#> 19 41166989-975d-4d17-b9de-17f94cb3eec1:::41166989-975d-4d17-b9de-17f94cb3eec1:::999-17-8717:::S99933732:::X75257608X
-#> 20                                                                                                               <NA>
-#>    managingOrganization.reference maritalStatus.coding.code
-#> 18            Organization/634103                         M
-#> 19            Organization/632759                         M
-#> 20                           <NA>                      <NA>
-#>    maritalStatus.coding.display
-#> 18                            M
-#> 19                            M
-#> 20                         <NA>
-#>                               maritalStatus.coding.system maritalStatus.text
-#> 18 http://terminology.hl7.org/CodeSystem/v3-MaritalStatus                  M
-#> 19 http://terminology.hl7.org/CodeSystem/v3-MaritalStatus                  M
-#> 20                                                   <NA>               <NA>
-#>                 meta.lastUpdated       meta.source meta.versionId
-#> 18 2020-03-02T10:43:58.614+00:00 #uTFlWjr2fcHf62Xy              1
-#> 19 2020-02-29T18:47:48.754+00:00 #dM9HGNXA1F2Yo6lM              1
-#> 20 2020-04-01T13:01:17.522+00:00 #WYbX5i8RxFerjmgY              3
-#>    multipleBirthBoolean           name.family  name.given name.prefix
-#> 18                false         Stiedemann542    Aaron697         Mr.
-#> 19                false         Stiedemann542    Aaron697         Mr.
-#> 20                 <NA> Melonseed:::Melonseed Edward:::Ed        <NA>
-#>                          name.text         name.use telecom.system telecom.use
-#> 18                            <NA>         official          phone        home
-#> 19                            <NA>         official          phone        home
-#> 20 Edward Melonseed:::Ed Melonseed official:::usual          phone      mobile
-#>    telecom.value text.status
-#> 18  555-213-2064   generated
-#> 19  555-213-2064   generated
-#> 20  (08)97654321   generated
-```
-
-As you can see, the result now contains two tables, one for Patient
-resources and one for MedicationStatement resources.
-
 ## Multiple entries
 
 A particularly complicated problem in flattening FHIR resources is
-caused by the fact that there can be multiple entries to an attribute.
-For a more detailed description of this problem, please see the vignette
-on flattening resources.
+caused by the fact that there can be multiple occurrences of the same
+FHIR element within one resource. For a more detailed description of
+this problem, please see the vignette on flattening resources.
 
 In general, `fhir_crack()` will paste multiple entries for the same
 attribute together in the table, using the separator provided by the
@@ -656,6 +404,33 @@ bracket strings (here: `"["` and `"]"`)) display the entry the value
 belongs to. That way you can see that Patient resource 2 had three
 entries for the attribute `address` and you can also see which
 attributes belong to which entry.
+
+If you know beforehand that you only need home addresses, you can use
+predicates in your XPath expressions that filter for that and avoid
+multiple entries in your table:
+
+``` r
+table_description <- fhir_table_description(
+    resource = "Patient",
+    cols = c(
+        id = "id",
+        city = "address[use[@value='home']]/city",
+        type = "address[use[@value='home']]/type",
+        country = "address[use[@value='home']]/country",
+        name = "name/given"
+    )
+)
+
+df_filtered <- fhir_crack(bundles = bundles, design = table_description, verbose = 0)
+
+df_filtered
+#>    id      city     type     country        name
+#> 1 id1 Amsterdam physical Netherlands       Marie
+#> 2 id3    Berlin     <NA>        <NA> Frank:::Max
+```
+
+If you can’t filter during cracking, there are several options to deal
+with the resulting multiple entries in your table.
 
 ## Process Tables with multiple Entries
 
@@ -910,14 +685,14 @@ only argument. All xml-files in this directory are read into R and
 returned as a list of bundles in xml format just as returned by
 `fhir_search()`.
 
-## Acknowledgements
+## Acknowledgments
 
 This work was carried out by the SMITH consortium and the
-cross-consortium use case POLAR\_MI; both are part of the German
+cross-consortium use case POLAR_MI; both are part of the German
 Initiative for Medical Informatics and funded by the German Federal
 Ministry of Education and Research (BMBF), grant no. 01ZZ1803A ,
 01ZZ1803C and 01ZZ1910A.
 
-[1] FHIR is the registered trademark of HL7 and is used with the
-permission of HL7. Use of the FHIR trademark does not constitute
-endorsement of this product by HL7
+[^1]: FHIR is the registered trademark of HL7 and is used with the
+    permission of HL7. Use of the FHIR trademark does not constitute
+    endorsement of this product by HL7

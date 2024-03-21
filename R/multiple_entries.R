@@ -10,7 +10,7 @@
 #' be filled with NA values.
 #'
 #' For [fhir_cast()] to work properly, column names of the input data must reflect the Xpath to the corresponding resource element
-#' with {.} as a separator, e.g. `code.coding.system`. These names are produced automatically by [fhir_crack()]
+#' with `.` as a separator, e.g. `code.coding.system`. These names are produced automatically by [fhir_crack()]
 #' when the names are not explicitly set in the `cols` element of the [fhir_table_description()]/[fhir_design()].
 #'
 #' In the names of the newly created columns the indices will be added in front of the column names, similar to the result of [fhir_crack()] with

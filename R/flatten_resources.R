@@ -5,14 +5,13 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- du
 
 
 #' Flatten list of FHIR bundles
-#' @description Converts a [fhir_bundle_list-class] (the result of [fhir_search()] to a list of data.frames/data.tables,
-#' i.e. a [fhir_df_list-class]/[fhir_dt_list-class] if a [fhir_design-class] is given in the argument `design`.
-#' Creates a single data.frame/data.table, if only a [fhir_table_description-class] is given in the argument `design`.
+#' @description Converts a [fhir_bundle_list-class] (the result of [fhir_search()]) to a data.frame/data.table or list of df/dt,
+#' if more than one resource type is extracted at once.
 #'
-#' There are two main output formats for the table: compact and wide. They differ regarding their handling of multiple entries for
-#' the same FHIR element (e.g. `Patient.adress`). In the compact format multiple entries are pasted together into one cell/column,
-#' in the wide format multiple entries are distributed over several (indexed) columns. If none of the resources contains any multiple
-#' values on the extracted elements, the two formats will result in the same basic structure.
+#' There are two main output formats for the table: compact and wide. They differ regarding their handling of multiple occurrences of
+#' the same FHIR element (e.g. `Patient.adress`). In the compact format multiple occurrences are pasted together into one cell/column,
+#' in the wide format multiple occurrences are distributed over several (indexed) columns. If none of the resources contains any multiple
+#' values on the extracted elements, the two formats will result in the same structure.
 #'
 #' To increase speed with larger amounts of data the cracking process can be parallelised over a number of cores defined in the
 #' `ncores` argument.
@@ -32,13 +31,11 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- du
 #' @param rm_empty_cols Optional. Remove empty columns? Logical scalar which will overwrite the `rm_empty_cols` defined in
 #' `design`. If `rm_empty_cols = NULL`, it is looked up in `design`, where the default is `FALSE`.
 #'
-#' @param remove_empty_columns `r lifecycle::badge("deprecated")` Use argument `rm_empty_cols` instead.
-#'
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
 #'
-#' @param data.table A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
-#' Defaults to FALSE.
+#' @param data.table A logical vector of length one. If it is set to `TRUE` the fhir_crack-function returns a data.table, otherwise a data.frame.
+#' Defaults to `FALSE`.
 #'
 #' @param format Optional. A character of length one indicating whether the resulting table should be cracked to a `wide` or `compact` format. Will overwrite the `format` defined
 #' in `design` which defaults to `compact`. `wide` means multiple entries will be distributed over several columns with indexed names. `compact` means multiple entries will be pasted into one cell/column separated by `sep`.
@@ -46,8 +43,9 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- du
 #' @param keep_attr Optional. A logical of length one indicating whether the attribute name of the respective element (`@value` in most cases)
 #' should be attached to the name of the variable in the resulting table. Will overwrite `keep_attr` in `design` which defaults to `FALSE`.
 #'
-#' @param ncores Either NULL (no parallelisation) or an integer of length 1 containing the number of
-#'  cpu cores that should be used for parallelised cracking. Defaults to NULL.
+#' @param ncores Either `NULL` (no parallelisation) or an integer of length 1 containing the number of
+#'  cpu cores that should be used for parallelised cracking. Parallelisation currently only works on linux systems.
+#'  Defaults to `NULL`.
 #'
 #' @return If a [fhir_design-class] was used, the result is a list of data.frames, i.e. a [fhir_df_list-class] object, or a list of data.tables,
 #' i.e. a [fhir_dt_list-class] object. If a [fhir_table_description-class] was used, the result is a single data.frame/data.table.
@@ -69,47 +67,61 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- du
 #' #Extract just one resource type
 #'
 #' #define attributes to extract
-#' medications <- fhir_table_description(
+#' med_desc <- fhir_table_description(
 #'    resource = "MedicationStatement",
 #'    cols     = c(
-#'    	MS.ID              = "id",
-#'    	STATUS.TEXT        = "text/status",
-#'    	STATUS             = "status",
-#'    	MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-#'    	MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-#'    	MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-#'    	DOSAGE             = "dosage/text",
-#'     	PATIENT            = "subject/reference",
-#'     	LAST.UPDATE        = "meta/lastUpdated"
-#'   ),
-#'   sep           = " ",
-#'   brackets      = c("[", "]"),
-#'   rm_empty_cols = FALSE
+#'    	id              = "id",
+#'    	status          = "status",
+#'    	system          = "medicationCodeableConcept/coding/system",
+#'    	code            = "medicationCodeableConcept/coding/code",
+#'    	display         = "medicationCodeableConcept/coding/display"
+#'   )
 #' )
 #'
-#' med_df <- fhir_crack(bundles = bundles, design = medications)
+#' med_df <- fhir_crack(bundles = bundles, design = med_desc)
 #'
 #' head(med_df) #data.frame
 #'
 #'
 #' ###Example 2###
-#' #extract more resource types
+#' #extract two resource types at once
 #'
-#' patients <- fhir_table_description(
+#' pat_desc <- fhir_table_description(
 #'    resource = "Patient"
 #' )
 #'
-#' design <- fhir_design(medications, patients)
+#' design <- fhir_design(med_desc, pat_desc)
 #'
 #' df_list <- fhir_crack(bundles = bundles, design = design)
 #'
 #' #list of data.frames/fhir_df_list
-#' head(df_list$medications)
-#' head(df_list$patients)
+#' head(df_list$med_desc)
+#' head(df_list$pat_desc)
 #'
 #' #The design that was used can be extracted from a fhir_df_list
 #' fhir_design(df_list)
 #'
+#'
+#' ###Example 3###
+#' #Filter values before extracting
+#'
+#' #unserialize example bundle
+#' b <- fhir_unserialize(bundles = example_bundles5)
+#'
+#' #only extract codings with loinc system
+#' table_desc <- fhir_table_description(
+#'                     resource = "Observation",
+#'                     cols = c(
+#'                       id = "id",
+#' 		                 loinc = "code/coding[system[@value='http://loinc.org']]/code",
+#'		                 display = "code/coding[system[@value='http://loinc.org']]/display"
+#'		                 )
+#' )
+#'
+#' table <- fhir_crack(bundles = b,
+#'					    design = table_desc)
+#'
+#' table
 
 setGeneric(
 	name = "fhir_crack",
@@ -123,8 +135,7 @@ setGeneric(
 		data.table           = FALSE,
 		format               = NULL,
 		keep_attr            = NULL,
-		ncores               = 1,
-		remove_empty_columns = deprecated()
+		ncores               = 1
 	) {
 		standardGeneric("fhir_crack")
 	}
@@ -145,14 +156,8 @@ setMethod(
 		data.table           = FALSE,
 		format               = NULL,
 		keep_attr            = NULL,
-		ncores               = 1,
-		remove_empty_columns = deprecated()
+		ncores               = 1
 	) {
-
-		if(lifecycle::is_present(remove_empty_columns)){
-			lifecycle::deprecate_warn(when = "2.0.0", what = "fhir_crack(remove_empty_columns)", with = "fhir_crack(rm_empty_cols)")
-			design@rm_empty_cols <- remove_empty_columns
-		}
 
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
@@ -177,9 +182,10 @@ setMethod(
 		}
 
 		validObject(object = design, complete = TRUE)
+
 		#Check for dangerous XPath expressions ins cols
 		cols <- design@cols
-		dangerCols <- sapply(cols, function(x) {any(grepl(esc("//"), x))})
+		dangerCols <- sapply(cols, function(x) {any(grepl("(?<!:)//", x, perl=T))})
 
 		if(any(dangerCols)) {
 			warning(
@@ -218,8 +224,7 @@ setMethod(
 		data.table           = FALSE,
 		format               = NULL,
 		keep_attr            = NULL,
-		ncores               = 1,
-		remove_empty_columns = deprecated()
+		ncores               = 1
 	) {
 		#overwrite design with function arguments
 		if(!is.null(sep)) {
@@ -244,21 +249,6 @@ setMethod(
 				)
 			)
 		}
-
-		##### remove at some point #####
-		if(lifecycle::is_present(remove_empty_columns)){
-			lifecycle::deprecate_warn(when = "2.0.0", what = "fhir_crack(remove_empty_columns)", with = "fhir_crack(rm_empty_cols)")
-			design <- fhir_design(
-				lapply(
-					design,
-					function(x) {
-						x@rm_empty_cols <- remove_empty_columns
-						x
-					}
-				)
-			)
-		}
-		############################
 
 		if(!is.null(rm_empty_cols)) {
 			design <- fhir_design(
@@ -443,7 +433,7 @@ crack_bundles_to_one_table <- function(
 					regexpr_ids <- stringr::str_c(esc(table_description@brackets[1]), "([0-9]+(\\.[0-9]+)*)", esc(table_description@brackets[2]))
 					names <- unique(gsub(regexpr_ids, "", names))
 				}
-				empty_cols <- setdiff(names(table_description@cols), gsub("@.*$", "", names))
+				empty_cols <- setdiff(gsub("\\[.*\\]", "",names(table_description@cols)), gsub("@.*$", "", gsub("\\[.*\\]", "", names)))
 				if(0 < length(empty_cols)){table[,(empty_cols):=NA]}
 			}
 			#rm_empty_cols=TRUE
@@ -610,22 +600,24 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 		parallel::mclapply(
 			seq_along(bundles),
 			function(bundle_id) {# bundle_id <- 1
-				nodes <- xml_nodeset(
-					unlist(
-						recursive = FALSE,
-						lapply(
-							table_description@cols,
-							function(xpath) {# xpath <- table_description@cols[[2]]
-								xml2::xml_find_all(
-									bundles[[bundle_id]],
-									stringr::str_c('./entry/resource/', table_description@resource, '/', xpath, '/@*')
-								)
-							}
+				colwise_list <- lapply(
+					table_description@cols,
+					function(xpath) {# xpath <- table_description@cols[[1]]
+						xml2::xml_find_all(
+							bundles[[bundle_id]],
+							stringr::str_c('./entry/resource/', table_description@resource, '/', xpath, '/@*')
 						)
-					)
+					}
 				)
+				nodelist <-	unlist(
+					colwise_list,
+					recursive = FALSE,
+					use.names = FALSE
+				)
+
 				d <- data.table(
-					node   = nodes # intermediate save entries
+					node   = xml_nodeset(nodelist),
+					column = rep(names(colwise_list), lengths(colwise_list))
 				)
 				if(0 < nrow(d)){
 					d <- (d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '') |> busg('([^]])/', '\\1[1]/')] # add missing indices
@@ -636,8 +628,8 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 						  [, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
 						  [, id       := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')] # extract ids
 						  [, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')] # remove ids
-						  [, column   := stringr::str_c(bra, id, ket, names(table_description@cols)[match(xpath, table_description@cols)]) |>
-						  		busg('/', '.') |>
+						  [, column   := stringr::str_c(bra, id, ket, column) |>
+						  		#busg('/', '.') |>
 						  		stringr::str_c(if(table_description@keep_attr) stringr::str_c('@', attrib) else '')
 						  ] # create column name
 						  [, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary columns
@@ -680,28 +672,29 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 		ket <- table_description@brackets[[2]]
 		use_indices <- TRUE
 	}
-
 	result <- unique(
 		data.table::rbindlist(
 			parallel::mclapply(
 				seq_along(bundles),
 				function(bundle_id) {# bundle_id <- 1
-					nodes <- xml_nodeset(
-						unlist(
-							recursive = FALSE,
-							lapply(
-								table_description@cols,
-								function(xpath) {# xpath <- table_description@cols[[1]]
-									xml2::xml_find_all(
-										bundles[[bundle_id]],
-										stringr::str_c('./entry/resource/', table_description@resource, '/', xpath, '/@*')
-									)
-								}
+					colwise_list <- lapply(
+						table_description@cols,
+						function(xpath) {# xpath <- table_description@cols[[1]]
+							xml2::xml_find_all(
+								bundles[[bundle_id]],
+								stringr::str_c('./entry/resource/', table_description@resource, '/', xpath, '/@*')
 							)
-						)
+						}
 					)
+					nodelist <-	unlist(
+						colwise_list,
+						recursive = FALSE,
+						use.names = FALSE
+					)
+
 					d <- data.table(
-						node   = nodes
+						node   = xml_nodeset(nodelist),
+						column = rep(names(colwise_list), lengths(colwise_list))
 					)
 					if(0 < nrow(d)){
 						(d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
@@ -711,10 +704,11 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 						 [, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
 						 [, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
 						 [, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')]
-						 [, column   := stringr::str_c(names(table_description@cols)[match(xpath, table_description@cols)]) |>
-						 		busg('/', '.') |>
-						 		stringr::str_c(if(table_description@keep_attr) stringr::str_c('@', attrib) else '')
-						 ] # create column name
+						 [, column   := column |> stringr::str_c(if(table_description@keep_attr) stringr::str_c('@', attrib) else '')] #attach attribute to column name
+						 # [, column   := stringr::str_c(names(table_description@cols)[match(xpath, gsub("\\[.*\\]", "",table_description@cols))]) |>
+						 # 		busg('/', '.') |>
+						 # 		stringr::str_c(if(table_description@keep_attr) stringr::str_c('@', attrib) else '')
+						 # ] # create column name
 						)
 						if(use_indices) {
 							d <- (d[, id := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')][, stringr::str_c(bra, id, ket, value, collapse = table_description@sep), by=c('entry', 'column')] |>

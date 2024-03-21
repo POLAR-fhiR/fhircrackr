@@ -6,8 +6,11 @@
 \alias{example_bundles2}
 \alias{example_bundles3}
 \alias{example_bundles4}
+\alias{example_bundles5}
 \title{Toy example bundles for multiple entries}
 \format{
+An object of class \code{fhir_bundle_list} of length 1.
+
 An object of class \code{fhir_bundle_list} of length 1.
 
 An object of class \code{fhir_bundle_list} of length 1.
@@ -298,6 +301,59 @@ An object of class \code{fhir_bundle_list} of length 1.
 </Bundle>
 
 }\if{html}{\out{</div>}}
+
+\strong{example_bundles5}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{<Bundle>
+ <type value='searchset'/>
+ <entry>
+  <resource>
+    <Observation>
+       <id value = 'obs1'/>
+       <code>
+          <coding>
+             <system value='http://loinc.org'/>
+             <code value='29463-7'/>
+             <display value='Body Weight'/>
+          </coding>
+          <coding>
+             <system value='http://snomed.info/sct'/>
+             <code value='27113001'/>
+             <display value='Body weight'/>
+          </coding>
+       </code>
+       <subject>
+          <reference value='Patient/id3'/>
+       </subject>
+    </Observation>
+  </resource>
+ </entry>
+
+ <entry>
+  <resource>
+    <Observation>
+       <id value = 'obs2'/>
+       <code>
+          <coding>
+             <system value='http://loinc.org'/>
+             <code value='8302-2'/>
+             <display value='Body Height'/>
+          </coding>
+          <coding>
+             <system value='http://snomed.info/sct'/>
+             <code value='50373000'/>
+             <display value='Body height measure'/>
+          </coding>
+       </code>
+       <subject>
+          <reference value='Patient/id3'/>
+       </subject>
+    </Observation>
+  </resource>
+ </entry>
+</Bundle>"
+
+}\if{html}{\out{</div>}}
 }
 \usage{
 example_bundles1
@@ -307,9 +363,11 @@ example_bundles2
 example_bundles3
 
 example_bundles4
+
+example_bundles5
 }
 \description{
-These data examples are bundles that contain very few very simple Patient resources
+These data examples are bundles that contain very few, very simple resources
 that have multiple entries and can be used for demonstration purposes. See \strong{Source} for how the
 xml versions look.
 }
@@ -321,15 +379,19 @@ xml versions look.
 \code{example_bundles3} contains 1 bundle with 3 Patient resources and 1 Observation resource.
 
 \code{example_bundles4} contains 1 bundle with 2 Medication resources, one of which has some \verb{@id} xml attributes
+
+\code{example_bundles5} contains 1 bundle with 2 Observation resources.
 }
 \examples{
 #unserialize xml objects before doing anything else with them!
 fhir_unserialize(bundles = example_bundles1)
 #unserialize xml objects before doing anything else with them!
-fhir_unserialize(example_bundles2)
+fhir_unserialize(bundles = example_bundles2)
 #unserialize xml objects before doing anything else with them!
 fhir_unserialize(bundles = example_bundles3)
 #unserialize xml objects before doing anything else with them!
 fhir_unserialize(bundles = example_bundles4)
+#unserialize xml objects before doing anything else with them!
+fhir_unserialize(bundles = example_bundles5)
 }
 \keyword{datasets}
