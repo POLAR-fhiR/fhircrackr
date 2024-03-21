@@ -5,14 +5,13 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- du
 
 
 #' Flatten list of FHIR bundles
-#' @description Converts a [fhir_bundle_list-class] (the result of [fhir_search()] to a list of data.frames/data.tables,
-#' i.e. a [fhir_df_list-class]/[fhir_dt_list-class] if a [fhir_design-class] is given in the argument `design`.
-#' Creates a single data.frame/data.table, if only a [fhir_table_description-class] is given in the argument `design`.
+#' @description Converts a [fhir_bundle_list-class] (the result of [fhir_search()]) to a data.frame/data.table or list of df/dt,
+#' if more than one resource type is extracted at once.
 #'
-#' There are two main output formats for the table: compact and wide. They differ regarding their handling of multiple entries for
-#' the same FHIR element (e.g. `Patient.adress`). In the compact format multiple entries are pasted together into one cell/column,
-#' in the wide format multiple entries are distributed over several (indexed) columns. If none of the resources contains any multiple
-#' values on the extracted elements, the two formats will result in the same basic structure.
+#' There are two main output formats for the table: compact and wide. They differ regarding their handling of multiple occurrences of
+#' the same FHIR element (e.g. `Patient.adress`). In the compact format multiple occurrences are pasted together into one cell/column,
+#' in the wide format multiple occurrences are distributed over several (indexed) columns. If none of the resources contains any multiple
+#' values on the extracted elements, the two formats will result in the same structure.
 #'
 #' To increase speed with larger amounts of data the cracking process can be parallelised over a number of cores defined in the
 #' `ncores` argument.
@@ -35,8 +34,8 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- du
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' extraction progress will be printed. Defaults to 2.
 #'
-#' @param data.table A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
-#' Defaults to FALSE.
+#' @param data.table A logical vector of length one. If it is set to `TRUE` the fhir_crack-function returns a data.table, otherwise a data.frame.
+#' Defaults to `FALSE`.
 #'
 #' @param format Optional. A character of length one indicating whether the resulting table should be cracked to a `wide` or `compact` format. Will overwrite the `format` defined
 #' in `design` which defaults to `compact`. `wide` means multiple entries will be distributed over several columns with indexed names. `compact` means multiple entries will be pasted into one cell/column separated by `sep`.
@@ -44,8 +43,9 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- du
 #' @param keep_attr Optional. A logical of length one indicating whether the attribute name of the respective element (`@value` in most cases)
 #' should be attached to the name of the variable in the resulting table. Will overwrite `keep_attr` in `design` which defaults to `FALSE`.
 #'
-#' @param ncores Either NULL (no parallelisation) or an integer of length 1 containing the number of
-#'  cpu cores that should be used for parallelised cracking. Defaults to NULL.
+#' @param ncores Either `NULL` (no parallelisation) or an integer of length 1 containing the number of
+#'  cpu cores that should be used for parallelised cracking. Parallelisation currently only works on linux systems.
+#'  Defaults to `NULL`.
 #'
 #' @return If a [fhir_design-class] was used, the result is a list of data.frames, i.e. a [fhir_df_list-class] object, or a list of data.tables,
 #' i.e. a [fhir_dt_list-class] object. If a [fhir_table_description-class] was used, the result is a single data.frame/data.table.
@@ -74,12 +74,8 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- du
 #'    	status          = "status",
 #'    	system          = "medicationCodeableConcept/coding/system",
 #'    	code            = "medicationCodeableConcept/coding/code",
-#'    	display         = "medicationCodeableConcept/coding/display",
-#'    	dosage          = "dosage/text",
-#'     	patient         = "subject/reference",
-#'     	last.update     = "meta/lastUpdated"
-#'   ),
-#'   rm_empty_cols = FALSE
+#'    	display         = "medicationCodeableConcept/coding/display"
+#'   )
 #' )
 #'
 #' med_df <- fhir_crack(bundles = bundles, design = med_desc)
@@ -88,7 +84,7 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- du
 #'
 #'
 #' ###Example 2###
-#' #extract more resource types
+#' #extract two resource types at once
 #'
 #' pat_desc <- fhir_table_description(
 #'    resource = "Patient"
@@ -105,6 +101,27 @@ path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- du
 #' #The design that was used can be extracted from a fhir_df_list
 #' fhir_design(df_list)
 #'
+#'
+#' ###Example 3###
+#' #Filter values before extracting
+#'
+#' #unserialize example bundle
+#' b <- fhir_unserialize(bundles = example_bundles5)
+#'
+#' #only extract codings with loinc system
+#' table_desc <- fhir_table_description(
+#'                     resource = "Observation",
+#'                     cols = c(
+#'                       id = "id",
+#' 		                 loinc = "code/coding[system[@value='http://loinc.org']]/code",
+#'		                 display = "code/coding[system[@value='http://loinc.org']]/display"
+#'		                 )
+#' )
+#'
+#' table <- fhir_crack(bundles = b,
+#'					    design = table_desc)
+#'
+#' table
 
 setGeneric(
 	name = "fhir_crack",

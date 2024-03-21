@@ -159,7 +159,7 @@ The details of what the different elements of a `fhir_table_description` or `fhi
 table_description <- fhir_table_description(
 	resource = "Patient",
 	cols     = c(
-		PID         = "id",
+		id        = "id",
 		use_name    = "name/use",
 		given_name  = "name/given",
 		family_name = "name/family",
@@ -189,82 +189,11 @@ patients <- fhir_crack(bundles = patient_bundles, design = table_description, ve
 head(patients)
 ```
 
-## Extract more than one resource type
-Of course the previous example is using just one resource type. If you are interested in several types of resources, you use a `fhir_design` containing several `fhir_table_descriptions`.
-
-Consider the following example where we want to download MedicationStatements referring to a certain medication we specify with its SNOMED CT code and also the Patient resources these MedicationStatements are linked to.
-
-We can build the request like this:
-
-```{r}
-request  <- fhir_url(
-	url        = "https://hapi.fhir.org/baseR4", 
-	resource   = "MedicationStatement", 
-	parameters = c(
-		 "code"    = "http://snomed.info/ct|429374003",
-		"_include" = "MedicationStatement:subject"))
-```
-
-Then we can download the resources:
-
-```{r, eval=F}
-medication_bundles <- fhir_search(request = request, max_bundles = 3)
-```
-
-```{r, include=F}
-medication_bundles <- fhir_unserialize(bundles = medication_bundles)
-```
-
-Now our `design` needs two `table_descriptions` (called `MedicationStatements` and `Patients` in our example), one for the MedicationStatement resources and one for the Patient resources:
-
-```{r}
-MedicationStatements <- fhir_table_description(
-	resource = "MedicationStatement",
-	cols     = c(
-		MS.ID              = "id",
-		STATUS.TEXT        = "text/status",
-		STATUS             = "status",
-		MEDICATION.SYSTEM  = "medicationCodeableConcept/coding/system",
-		MEDICATION.CODE    = "medicationCodeableConcept/coding/code",
-		MEDICATION.DISPLAY = "medicationCodeableConcept/coding/display",
-		DOSAGE             = "dosage/text",
-		PATIENT            = "subject/reference",
-		LAST.UPDATE        = "meta/lastUpdated"
-	),
-	sep           = "|",
-	brackets      = NULL,
-	rm_empty_cols = FALSE,
-	format        = "compact",
-	keep_attr     = FALSE
-)
-
-Patients <- fhir_table_description(resource = "Patient")
-
-design <- fhir_design(MedicationStatements, Patients)
-
-```
-In this example, we have spelled out the table description `MedicationStatement` completely, while we have used a short form for `Patients`. The resulting design looks like this:
-```{r}
-design
-```
-
-We can now use this `design` for `fhir_crack()`:
-
-```{r}
-list_of_tables <- fhir_crack(bundles = medication_bundles, design = design, verbose = 0)
-
-list_of_tables$MedicationStatements[1:5,]
-
-list_of_tables$Patients[18:20,]
-```
-
-As you can see, the result now contains two tables, one for Patient resources and one for MedicationStatement resources.
 
 ## Multiple entries
-A particularly complicated problem in flattening FHIR resources is caused by the fact that there can be multiple entries to an attribute. For a more detailed description of this problem, please see the vignette on flattening resources. 
+A particularly complicated problem in flattening FHIR resources is caused by the fact that there can be multiple occurrences of the same FHIR element within one resource. For a more detailed description of this problem, please see the vignette on flattening resources. 
 
 In general, `fhir_crack()` will paste multiple entries for the same attribute together in the table, using the separator provided by the `sep` argument. 
-
 
 Let's have a look at the following simple example, where we have a bundle containing just two Patient resources. The example is part of the `fhircrackr` package and you can make it available like this:
 
@@ -335,6 +264,27 @@ df <- fhir_crack(bundles = bundles, design = table_description, verbose = 0)
 df
 ```
 Multiple entries are pasted together with the specified separator string (in this case: `" | "`) in between and the indices (inside the specified bracket strings (here: `"["` and `"]"`)) display the entry the value belongs to. That way you can see that Patient resource 2 had three entries for the attribute `address` and you can also see which attributes belong to which entry.
+
+If you know beforehand that you only need home addresses, you can use predicates in your XPath expressions that filter for that and avoid multiple entries in your table:
+
+```{r}
+table_description <- fhir_table_description(
+	resource = "Patient",
+	cols = c(
+		id = "id",
+		city = "address[use[@value='home']]/city",
+		type = "address[use[@value='home']]/type",
+		country = "address[use[@value='home']]/country",
+		name = "name/given"
+	)
+)
+
+df_filtered <- fhir_crack(bundles = bundles, design = table_description, verbose = 0)
+
+df_filtered
+
+```
+If you can't filter during cracking, there are several options to deal with the resulting multiple entries in your table. 
 
 ## Process Tables with multiple Entries
 
@@ -508,7 +458,7 @@ bundles <- fhir_load(directory = temp_dir)
 
 `fhir_load()` takes the name of the directory (or path to it) as its only argument. All xml-files in this directory are read into R and returned as a list of bundles in xml format just as returned by `fhir_search()`.
 
-## Acknowledgements
+## Acknowledgments
 This work was carried out by the SMITH consortium and the cross-consortium use case POLAR_MI; both are part of the German Initiative for Medical Informatics and funded by the German Federal Ministry of Education and Research (BMBF), grant no. 01ZZ1803A , 01ZZ1803C and 01ZZ1910A.
 
 ```{r, include=F}

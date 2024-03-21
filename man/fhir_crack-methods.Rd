@@ -68,8 +68,8 @@ Empty strings (\code{""}) are not allowed.}
 \item{verbose}{An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 extraction progress will be printed. Defaults to 2.}
 
-\item{data.table}{A logical vector of length one. If it is set to TRUE the fhir_crack-function returns a data.table, otherwise a data.frame.
-Defaults to FALSE.}
+\item{data.table}{A logical vector of length one. If it is set to \code{TRUE} the fhir_crack-function returns a data.table, otherwise a data.frame.
+Defaults to \code{FALSE}.}
 
 \item{format}{Optional. A character of length one indicating whether the resulting table should be cracked to a \code{wide} or \code{compact} format. Will overwrite the \code{format} defined
 in \code{design} which defaults to \code{compact}. \code{wide} means multiple entries will be distributed over several columns with indexed names. \code{compact} means multiple entries will be pasted into one cell/column separated by \code{sep}.}
@@ -77,22 +77,22 @@ in \code{design} which defaults to \code{compact}. \code{wide} means multiple en
 \item{keep_attr}{Optional. A logical of length one indicating whether the attribute name of the respective element (\verb{@value} in most cases)
 should be attached to the name of the variable in the resulting table. Will overwrite \code{keep_attr} in \code{design} which defaults to \code{FALSE}.}
 
-\item{ncores}{Either NULL (no parallelisation) or an integer of length 1 containing the number of
-cpu cores that should be used for parallelised cracking. Defaults to NULL.}
+\item{ncores}{Either \code{NULL} (no parallelisation) or an integer of length 1 containing the number of
+cpu cores that should be used for parallelised cracking. Parallelisation currently only works on linux systems.
+Defaults to \code{NULL}.}
 }
 \value{
 If a \linkS4class{fhir_design} was used, the result is a list of data.frames, i.e. a \linkS4class{fhir_df_list} object, or a list of data.tables,
 i.e. a \linkS4class{fhir_dt_list} object. If a \linkS4class{fhir_table_description} was used, the result is a single data.frame/data.table.
 }
 \description{
-Converts a \linkS4class{fhir_bundle_list} (the result of \code{\link[=fhir_search]{fhir_search()}} to a list of data.frames/data.tables,
-i.e. a \linkS4class{fhir_df_list}/\linkS4class{fhir_dt_list} if a \linkS4class{fhir_design} is given in the argument \code{design}.
-Creates a single data.frame/data.table, if only a \linkS4class{fhir_table_description} is given in the argument \code{design}.
+Converts a \linkS4class{fhir_bundle_list} (the result of \code{\link[=fhir_search]{fhir_search()}}) to a data.frame/data.table or list of df/dt,
+if more than one resource type is extracted at once.
 
-There are two main output formats for the table: compact and wide. They differ regarding their handling of multiple entries for
-the same FHIR element (e.g. \code{Patient.adress}). In the compact format multiple entries are pasted together into one cell/column,
-in the wide format multiple entries are distributed over several (indexed) columns. If none of the resources contains any multiple
-values on the extracted elements, the two formats will result in the same basic structure.
+There are two main output formats for the table: compact and wide. They differ regarding their handling of multiple occurrences of
+the same FHIR element (e.g. \code{Patient.adress}). In the compact format multiple occurrences are pasted together into one cell/column,
+in the wide format multiple occurrences are distributed over several (indexed) columns. If none of the resources contains any multiple
+values on the extracted elements, the two formats will result in the same structure.
 
 To increase speed with larger amounts of data the cracking process can be parallelised over a number of cores defined in the
 \code{ncores} argument.
@@ -113,12 +113,8 @@ med_desc <- fhir_table_description(
    	status          = "status",
    	system          = "medicationCodeableConcept/coding/system",
    	code            = "medicationCodeableConcept/coding/code",
-   	display         = "medicationCodeableConcept/coding/display",
-   	dosage          = "dosage/text",
-    	patient         = "subject/reference",
-    	last.update     = "meta/lastUpdated"
-  ),
-  rm_empty_cols = FALSE
+   	display         = "medicationCodeableConcept/coding/display"
+  )
 )
 
 med_df <- fhir_crack(bundles = bundles, design = med_desc)
@@ -127,7 +123,7 @@ head(med_df) #data.frame
 
 
 ###Example 2###
-#extract more resource types
+#extract two resource types at once
 
 pat_desc <- fhir_table_description(
    resource = "Patient"
@@ -144,6 +140,27 @@ head(df_list$pat_desc)
 #The design that was used can be extracted from a fhir_df_list
 fhir_design(df_list)
 
+
+###Example 3###
+#Filter values before extracting
+
+#unserialize example bundle
+b <- fhir_unserialize(bundles = example_bundles5)
+
+#only extract codings with loinc system
+table_desc <- fhir_table_description(
+                    resource = "Observation",
+                    cols = c(
+                      id = "id",
+		                 loinc = "code/coding[system[@value='http://loinc.org']]/code",
+	                 display = "code/coding[system[@value='http://loinc.org']]/display"
+	                 )
+)
+
+table <- fhir_crack(bundles = b,
+				    design = table_desc)
+
+table
 }
 \seealso{
 \itemize{
