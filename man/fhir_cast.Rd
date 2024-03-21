@@ -25,7 +25,7 @@ be filled with NA values.
 }
 \details{
 For \code{\link[=fhir_cast]{fhir_cast()}} to work properly, column names of the input data must reflect the Xpath to the corresponding resource element
-with {.} as a separator, e.g. \code{code.coding.system}. These names are produced automatically by \code{\link[=fhir_crack]{fhir_crack()}}
+with \code{.} as a separator, e.g. \code{code.coding.system}. These names are produced automatically by \code{\link[=fhir_crack]{fhir_crack()}}
 when the names are not explicitly set in the \code{cols} element of the \code{\link[=fhir_table_description]{fhir_table_description()}}/\code{\link[=fhir_design]{fhir_design()}}.
 
 In the names of the newly created columns the indices will be added in front of the column names, similar to the result of \code{\link[=fhir_crack]{fhir_crack()}} with

@@ -1,7 +1,6 @@
 ## Test environments
 
 * local Windows 10 (64-Bit), R 4.2.1
-* local Ubuntu Linux 20.04.5 LTS, R 4.2.1
 
 ## CMD check results
 
