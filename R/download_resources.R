@@ -155,6 +155,8 @@ fhir_search <- function(
 		)
 	}
 
+	warn_div_removal <- FALSE
+
 	#Extract base URL
 	base <- stringr::str_match(request, ".*?:\\/\\/.*?\\/")
 
@@ -286,8 +288,11 @@ fhir_search <- function(
 	}
 
 	fhircrackr_env$current_request <- request
+	if(warn_div_removal){warning("In some of downloaded bundles the specified tag (default 'div') could not be removed",
+								 " to save memory. Set rm_tag = NULL to get rid of this warning."
+	)}
+	if(is.null(save_to_disc)) {fhir_bundle_list(bundles)} else {NULL}
 
-	if(is.null(save_to_disc)) {fhir_bundle_list(bundles)} else {NULL} #brauchts eigentlich auch nicht
 }
 
 
@@ -1085,11 +1090,20 @@ get_bundle <- function(
 
 		#extract payload
 		payload <- try(httr::content(x = response, as = "text", encoding = "UTF-8"), silent = TRUE)
-		if(class(payload)[1] != "try-error") {
+		if(!inherits(payload, "try-error")) {
 			xml <- try(xml2::read_xml(x = payload), silent = TRUE)
-			if(class(xml)[1] != "try-error") {
+			if(!inherits(xml, "try-error")) {
 				bundle <- fhir_bundle_xml(bundle = xml)
-				if(!is.null(rm_tag)){bundle <- fhir_rm_tag(x = bundle, tag = rm_tag)}
+				#try to remove tag/div
+				if(!is.null(rm_tag)){
+					tag_removed_bundle <-try(fhir_rm_tag(x = bundle, tag = rm_tag), silent = TRUE)
+					if(!inherits(tag_removed_bundle, "try-error")){
+						bundle <- tag_removed_bundle
+					}else{
+						parent <- parent.frame()
+						parent$warn_div_removal <- TRUE
+					}
+				}
 				return(bundle)
 			}
 		}
