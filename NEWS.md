@@ -1,3 +1,8 @@
+# fhircrackr 2.2.1
+
+## Big fixes
+- Errors when removing tags in `fhir_search()` (e.g. with `rm_tag = "div"`) now get caught and converted to a warning.
+
 # fhircrackr 2.2.0
 
 ## New functionalities
