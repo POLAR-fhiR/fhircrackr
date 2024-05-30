@@ -1,7 +1,10 @@
 # fhircrackr 2.2.1
 
-## Big fixes
+## Bug fixes
 - Errors when removing tags in `fhir_search()` (e.g. with `rm_tag = "div"`) now get caught and converted to a warning.
+
+## New functions
+`fhir_collapse()` collapses multiple entries that belong to the same higher level FHIR element and should be kept together, e.g. name.given or address.line
 
 # fhircrackr 2.2.0
 

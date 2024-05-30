@@ -820,6 +820,124 @@ fhir_ns_strip <- function(xml) {
 
 "example_bundles5"
 
+##### Documentation for example_bundles6 data set ######
+#' @details
+#' `example_bundles6` contains 1 bundle with 2 Patient resources.
+#'
+#' @examples
+#' #unserialize xml objects before doing anything else with them!
+#' fhir_unserialize(bundles = example_bundles6)
+#' @rdname datasets_selfmade
+#' @source
+#' **example_bundles6**
+#'
+#'```
+#'"<Bundle>
+#'     <type value='searchset'/>
+#'     <entry>
+#'    	<resource>
+#'			<Patient>
+#'				<id value='id1'/>
+#'				<address>
+#'					<line value='Example Street 1'/>
+#'					<line value='c/o Baker'/>
+#'					<city value = 'London'/>
+#'					<use value = 'home'/>
+#'				</address>
+#'				<address>
+#'					<line value = 'Some firm'/>
+#'					<line value = 'Some Department'/>
+#'					<line value = 'Some Lane 1'/>
+#'					<city value = 'London'/>
+#'					<use value = 'work'/>
+#'				</address>
+#'			</Patient>
+#'		 </resource>
+#'	  </entry>
+#'	  <entry>
+#'		<resource>
+#'			<Patient>
+#'				<id value='id2'/>
+#'				<address>
+#'					<line value='Rue example 3'/>
+#'					<city value = 'Paris'/>
+#'					<use value = 'home'/>
+#'				</address>
+#'				<address>
+#'					<line value = 'La fabrique'/>
+#'					<line value = 'Avenue 33'/>
+#'					<city value = 'Paris'/>
+#'					<use value = 'work'/>
+#'				</address>
+#'			</Patient>
+#'		</resource>
+#'	  </entry>
+#'</Bundle>"
+#'
+#'```
+#'
+
+"example_bundles6"
+
+##### Documentation for example_bundles7 data set ######
+#' @details
+#' `example_bundles7` contains 1 bundle with 2 Patient resources.
+#'
+#' @examples
+#' #unserialize xml objects before doing anything else with them!
+#' fhir_unserialize(bundles = example_bundles7)
+#' @rdname datasets_selfmade
+#' @source
+#' **example_bundles7**
+#'
+#'```
+#'"<Bundle>
+#'     <type value='searchset'/>
+#'     <entry>
+#'    	<resource>
+#'			<Patient>
+#'				<id value='id1'/>
+#'				<name>
+#'					<given value='Marie'/>
+#'					<given value='Luise'/>
+#'					<family value = 'Smith'/>
+#'					<use value = 'official'/>
+#'				</name>
+#'				<name>
+#'					<given value = 'Lea'/>
+#'					<given value = 'Sophie'/>
+#'					<given value = 'Anna'/>
+#'					<family value = 'Baker'/>
+#'					<use value = 'nickname'/>
+#'				</name>
+#'			</Patient>
+#'		 </resource>
+#'	  </entry>
+#'	  <entry>
+#'		<resource>
+#'			<Patient>
+#'				<id value='id2'/>
+#'				<name>
+#'					<given value='Max'/>
+#'					<family value = 'Brown'/>
+#'					<use value = 'official'/>
+#'				</name>
+#'				<name>
+#'					<given value = 'Anton'/>
+#'					<given value = 'John'/>
+#'					<family value = 'Jones'/>
+#'					<use value = 'nickname'/>
+#'				</name>
+#'			</Patient>
+#'		</resource>
+#'	  </entry>
+#'</Bundle>"
+#'
+#'```
+#'
+
+"example_bundles7"
+
 ##### Documentation for transaction_bundle_example data set ######
 #' Toy examples to POST/PUT on a server
 #'

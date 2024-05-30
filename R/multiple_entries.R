@@ -360,6 +360,122 @@ fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), columns 
 	indexed_dt
 }
 
+#' Collapse multiple entries
+#'
+#' This function collapses multiple entries that belong to the same higher level FHIR element (see examples).
+#'
+#' Currently this function is only needed for very few FHIR elements where multiple values should be kept together
+#' in the melting process. To our knowledge, this is only true for address.line elements and name.given elements.
+#' Rather than building the cross product with all other elements in the resource as done by [fhir_melt()], these
+#' elements should be collapsed into a single entry before melting. See examples to get a better idea of this.
+#'
+#' @param indexed_data_frame A data.frame/data.table with indexed multiple entries.
+#' @param columns A character vector of column names where values should be collapsed
+#' @param brackets A character vector of length two, defining the brackets used for the indices.
+#' @param sep A character vector of length one defining the separator that was used when pasting together multiple entries in [fhir_crack()].
+#' @param collapse A character vector of length one used to separate the collapsed fields. Defaults to blank space.
+#' @return The modified data.table/data.frame with collapsed multiple entries
+#' @export
+
+#' @examples
+#' ### First example: Keep name.given elements together
+#' #unserialize example
+#' bundles <- fhir_unserialize(bundles = example_bundles7)
+#'
+#' #Have a look at the structure of example_bundles7
+#' ?example_bundles7
+#'
+#' #Define sep and brackets
+#' sep <- "|"
+#' brackets <- c("[", "]")
+#'
+#' #crack fhir resources
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = brackets,
+#'     sep = sep
+#' )
+#'
+#' df <- fhir_crack(bundles = bundles, design = table_desc)
+#' df
+#'
+#' #name.given elements from the same name (i.e. the official vs. the nickname)
+#' #should be collapsed
+#'
+#' df2 <- fhir_collapse(df, columns = "name.given", sep = sep, brackets = brackets)
+#' df2
+#'
+#' #Next the name can be molten
+#' fhir_melt(df2, brackets = brackets, sep = sep, columns = fhir_common_columns(df2,"name"))
+#'
+#'
+#' ### Second: Keep address line elements together
+#' #unserialize example
+#' bundles <- fhir_unserialize(bundles = example_bundles6)
+#'
+#' #Have a look at the structure of example_bundles6
+#' ?example_bundles6
+#'
+#' #Define sep and brackets
+#' sep <- "|"
+#' brackets <- c("[", "]")
+#'
+#' #crack fhir resources
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = brackets,
+#'     sep = sep
+#' )
+#'
+#' df <- fhir_crack(bundles = bundles, design = table_desc)
+#' df
+#'
+#' #Address.line elements from the same address (i.e. the work vs. the home address)
+#' #should be collapsed
+#'
+#' df2 <- fhir_collapse(df, columns = "address.line", sep = sep, brackets = brackets, collapse = ", ")
+#' df2
+#'
+#' #Next the address can be molten
+#' fhir_melt(df2, brackets = brackets, sep = sep, columns = fhir_common_columns(df2,"address"))
+#'
+#'
+#' @seealso [fhir_melt()]
+
+fhir_collapse <- function(indexed_data_frame, columns, sep, brackets, collapse = " ") {
+	for (column_name in columns) {
+		for (i in 1:nrow(indexed_data_frame)) {
+			# Check if the cell is not empty
+			if (length(indexed_data_frame[[column_name]][i])) {
+				# Check if the cell starts with sep
+				if (grepl("^\\[", indexed_data_frame[[column_name]][i])) {
+					#split the string by sep
+					split_string <- strsplit(indexed_data_frame[[column_name]][i], sep, fixed = TRUE)[[1]]
+					# Initialize the index vector and previous index
+					indices <- c()
+					prev_index <- NULL
+					# Iterate through the vector and find the first indices for each new pattern
+					for (vec in seq_along(split_string)) {
+						index <- as.numeric(stringr::str_extract(split_string[vec], paste0("(?<=\\", brackets[1], ")\\d")))
+						if (is.null(prev_index) || is.na(prev_index) || index != prev_index) {
+							indices <- c(indices, vec)
+							prev_index <- index
+						}
+					}
+					# Remove brackets for all subsequent elements except the first occurrence an collapse values
+					result <- paste(ifelse(seq_along(split_string) %in% indices, split_string,
+										   gsub(paste0("^\\", brackets[1], ".*\\", brackets[2]), "",
+										   	 split_string, perl = TRUE)), collapse = collapse)
+					# Replace the original cell value with the modified result
+					indexed_data_frame[[column_name]][i] <- result
+				}
+			}
+		}
+	}
+	return(indexed_data_frame)
+}
+
+
 ########################################################################################
 ########################################################################################
 
