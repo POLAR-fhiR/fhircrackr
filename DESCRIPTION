@@ -40,7 +40,8 @@ Imports:
     data.table,
     methods,
     parallel,
-    lifecycle
+    lifecycle,
+    rlang
 Suggests: 
     knitr,
     rmarkdown

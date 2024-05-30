@@ -310,6 +310,97 @@ fhir_melt <- function(
 	result
 }
 
+#' Melt all columns with multiple entries
+#'
+#' This function divides all multiple entries in an indexed data frame as produced by [fhir_crack()]
+#' into separate rows. It repeatedly calls [fhir_melt()] on groups of columns that belong to the same
+#' FHIR element (e.g. `address.city`, `address.country` and `address.type`) until every cell contains a single value.
+#' If there is more than one FHIR element with multiple values (e.g. multiple address elements and multiple name
+#' elements), every possible combination of the two elements will appear in the resulting table.
+#'
+#' Caution! This creates something like a cross product of all values and can multiply the number of rows from the original
+#' table considerably.
+#'
+#' @param indexed_data_frame A data.frame/data.table with indexed multiple entries.
+#' @param brackets A character vector of length two, defining the brackets used for the indices.
+#' @param sep A character vector of length one defining the separator that was used when pasting together multiple entries in [fhir_crack()].
+#' @param column_name_separator A character string that separates element levels column names. Defaults to ".", which is used when
+#' column names were generated automatically with [fhir_crack()].
+#'
+#' @return A completely molten data.table.
+#'
+#' @examples
+#' #unserialize example
+#' bundles <- fhir_unserialize(bundles = example_bundles1)
+#'
+#' #crack fhir resources
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = c("[", "]"),
+#'     sep = " "
+#' )
+#'
+#' df <- fhir_crack(bundles = bundles, design = table_desc)
+#'
+#' #original data frame
+#' df
+#'
+#' #melt all multiple entries
+#' fhir_melt_all(
+#'      indexed_data_frame = df,
+#'      brackets           = c("[", "]"),
+#'      sep = " "
+#'  )
+#' @export
+fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separator = ".") {
+
+	getColumns <- function(prefix) {
+		grep(paste0("^", prefix, "$|^", prefix, esc(column_name_separator)), column_names, value = TRUE)
+	}
+
+	melted_data <- indexed_data_frame
+	column_names <- names(indexed_data_frame)
+
+	getUniquePrefixes <- function(step) {
+		# Split each column name by the separator
+		split_names <- strsplit(column_names, esc(column_name_separator))
+
+		# Initialize a vector to store the prefixes
+		prefixes <- c()
+
+		for (name_parts in split_names) {
+			# Check if the number of parts is sufficient for the given step
+			if (length(name_parts) >= step) {
+				# Create the prefix by joining the first `step` parts with the separator
+				prefix <- paste(name_parts[1:step], collapse = column_name_separator)
+				prefixes <- c(prefixes, prefix)
+			}
+		}
+		# Get unique prefixes
+		prefixes <- unique(prefixes)
+		return(prefixes)
+	}
+
+	step <- 1
+	repeat {
+		prefixes <- getUniquePrefixes(step)
+		if (!rlang::is_empty(prefixes)) {
+			for (prefix in prefixes) {
+				columns <- getColumns(prefix)
+				melted_data <- fhir_melt(melted_data, columns, brackets, sep, all_columns = TRUE)
+			}
+		} else {
+			break
+		}
+		step <- step + 1
+	}
+
+	melted_data <- fhir_rm_indices(melted_data, brackets, column_names)
+	melted_data$resource_identifier <- NULL
+	return(melted_data)
+}
+
+
 #' Remove indices from data.frame/data.table
 #'
 #' Removes the indices in front of multiple entries as produced by [fhir_crack()] when brackets are provided in
