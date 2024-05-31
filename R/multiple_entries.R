@@ -313,11 +313,12 @@ fhir_melt <- function(
 #' Melt all columns with multiple entries
 #'
 #' This function divides all multiple entries in an indexed data frame as produced by [fhir_crack()]
-#' into separate rows. It repeatedly calls [fhir_melt()] on groups of columns that belong to the same
+#' into separate rows.
+#'
+#' The function repeatedly calls [fhir_melt()] on groups of columns that belong to the same
 #' FHIR element (e.g. `address.city`, `address.country` and `address.type`) until every cell contains a single value.
 #' If there is more than one FHIR element with multiple values (e.g. multiple address elements and multiple name
 #' elements), every possible combination of the two elements will appear in the resulting table.
-#'
 #' Caution! This creates something like a cross product of all values and can multiply the number of rows from the original
 #' table considerably.
 #'

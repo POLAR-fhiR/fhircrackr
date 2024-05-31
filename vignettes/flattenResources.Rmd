@@ -608,6 +608,17 @@ fhir_rm_indices(indexed_data_frame = molten_2, brackets = c("[", "]"))
 ```
 Again, `brackets` and `sep` should be given the same character vector that was used for `fhir_crack()` and `fhir_melt()` respectively.
 
+### Melt all multiple entries at once
+If you want to melt all multiple entries in a table regardless of their origin, you can use the function `fhir_melt_all()`:
+
+```{r}
+fhir_melt_all(indexed_data_frame = df2, brackets = c("[", "]"), sep = " | ")
+```
+
+This function performs the above steps automatically and repeatedly calls `fhir_melt()` on groups of columns that belong to the same FHIR element (e.g. `address.city`, `address.country` and `address.type`) until every cell contains a single value. If there is more than one FHIR element with multiple values (e.g. multiple address elements and multiple name elements), every possible combination of the two elements will appear in the resulting table.
+
+*Caution!* This creates something like a cross product of all values and can multiply the number of rows from the original table considerably.
+
 ### Cast tables with multiple entries
 Instead of spreading the entries across rows, you can also spread them across columns using `fhir_cast()`. As you've seen above this can be achieved by setting `format = "wide"` in `fhir_crack()`. There is, however, a function that turns a `compact` table into a `wide` table and this function is `fhir_cast()`. It takes a compact table with multiple entries and the brackets and separator that have been used in `fhir_crack()` as input:
 
@@ -621,3 +632,98 @@ The tables produced by `fhir_crack(..., format = "wide")` and `fhir_cast()` can 
 ```{r, include=F}
 file.remove(paste0(temp_dir, "/design.xml"))
 ``` 
+
+### Collapse multiple entries
+In some cases, you don't want to split up multiple entries but collapse them into one value in a suitable way. Consider the following example bundle:
+
+```
+<Bundle>
+    <type value='searchset'/>
+    <entry>
+   	<resource>
+		<Patient>
+			<id value='id1'/>
+			<name>
+				<given value='Marie'/>
+				<given value='Luise'/>
+				<family value = 'Smith'/>
+				<use value = 'official'/>
+			</name>
+			<name>
+				<given value = 'Lea'/>
+				<given value = 'Sophie'/>
+				<given value = 'Anna'/>
+				<family value = 'Baker'/>
+				<use value = 'nickname'/>
+			</name>
+		</Patient>
+	 </resource>
+  </entry>
+  <entry>
+	<resource>
+		<Patient>
+			<id value='id2'/>
+			<name>
+				<given value='Max'/>
+				<family value = 'Brown'/>
+				<use value = 'official'/>
+			</name>
+			<name>
+				<given value = 'Anton'/>
+				<given value = 'John'/>
+				<family value = 'Jones'/>
+				<use value = 'nickname'/>
+			</name>
+		</Patient>
+	</resource>
+  </entry>
+</Bundle>
+```
+
+In this example, you would want to collapse all given names into one value instead of dividing them across multiple rows. The official name and the nickname, however, should stay separated. This can be achieved with the function `fhir_collapse()`. First we crack the example resources:
+
+```{r}
+#unserialize example
+bundles <- fhir_unserialize(bundles = example_bundles7)
+
+#Define sep and brackets
+sep <- "|"
+brackets <- c("[", "]")
+
+#crack fhir resources
+table_desc <- fhir_table_description(
+    resource = "Patient",
+    brackets = brackets,
+    sep = sep
+)
+
+df <- fhir_crack(bundles = bundles, design = table_desc, verbose = 0)
+df
+```
+
+Then we collapse the given names. The function uses the information in the indices to make sure it only collapses given names within the same name element (official vs. nickname):
+
+```{r}
+#name.given elements from the same name (i.e. the official vs. the nickname) 
+#should be collapsed
+
+df2 <- fhir_collapse(df, columns = "name.given", sep = sep, brackets = brackets)
+df2
+```
+
+After collapsing the given names, we can melt the table to split apart the official and the nickname:
+
+```{r}
+df2_molten <- fhir_melt(indexed_data_frame =  df2, 
+						brackets = brackets, 
+						sep = sep, 
+						columns = fhir_common_columns(df2,"name"),
+						all_columns = TRUE
+						)
+df2_molten
+```
+
+And finish off by removing the indices:
+
+```{r}
+fhir_rm_indices(df2_molten, brackets = brackets)
