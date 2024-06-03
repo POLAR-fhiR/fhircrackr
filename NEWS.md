@@ -8,6 +8,8 @@
 
 - `fhir_melt_all()` divides all multiple entries into separate rows by repeatedly calling `fhir_melt()`.
 
+Thanks to [@atruebi](https://github.com/astruebi) and [@Flow191](https://github.com/Flow191) who contributed the code for these functions!
+
 # fhircrackr 2.2.0
 
 ## New functionalities
