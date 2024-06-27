@@ -310,6 +310,98 @@ fhir_melt <- function(
 	result
 }
 
+#' Melt all columns with multiple entries
+#'
+#' This function divides all multiple entries in an indexed data frame as produced by [fhir_crack()]
+#' into separate rows.
+#'
+#' The function repeatedly calls [fhir_melt()] on groups of columns that belong to the same
+#' FHIR element (e.g. `address.city`, `address.country` and `address.type`) until every cell contains a single value.
+#' If there is more than one FHIR element with multiple values (e.g. multiple address elements and multiple name
+#' elements), every possible combination of the two elements will appear in the resulting table.
+#' Caution! This creates something like a cross product of all values and can multiply the number of rows from the original
+#' table considerably.
+#'
+#' @param indexed_data_frame A data.frame/data.table with indexed multiple entries.
+#' @param brackets A character vector of length two, defining the brackets used for the indices.
+#' @param sep A character vector of length one defining the separator that was used when pasting together multiple entries in [fhir_crack()].
+#' @param column_name_separator A character string that separates element levels column names. Defaults to ".", which is used when
+#' column names were generated automatically with [fhir_crack()].
+#'
+#' @return A completely molten data.table.
+#'
+#' @examples
+#' #unserialize example
+#' bundles <- fhir_unserialize(bundles = example_bundles1)
+#'
+#' #crack fhir resources
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = c("[", "]"),
+#'     sep = " "
+#' )
+#'
+#' df <- fhir_crack(bundles = bundles, design = table_desc)
+#'
+#' #original data frame
+#' df
+#'
+#' #melt all multiple entries
+#' fhir_melt_all(
+#'      indexed_data_frame = df,
+#'      brackets           = c("[", "]"),
+#'      sep = " "
+#'  )
+#' @export
+fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separator = ".") {
+
+	getColumns <- function(prefix) {
+		grep(paste0("^", prefix, "$|^", prefix, esc(column_name_separator)), column_names, value = TRUE)
+	}
+
+	melted_data <- indexed_data_frame
+	column_names <- names(indexed_data_frame)
+
+	getUniquePrefixes <- function(step) {
+		# Split each column name by the separator
+		split_names <- strsplit(column_names, esc(column_name_separator))
+
+		# Initialize a vector to store the prefixes
+		prefixes <- c()
+
+		for (name_parts in split_names) {
+			# Check if the number of parts is sufficient for the given step
+			if (length(name_parts) >= step) {
+				# Create the prefix by joining the first `step` parts with the separator
+				prefix <- paste(name_parts[1:step], collapse = column_name_separator)
+				prefixes <- c(prefixes, prefix)
+			}
+		}
+		# Get unique prefixes
+		prefixes <- unique(prefixes)
+		return(prefixes)
+	}
+
+	step <- 1
+	repeat {
+		prefixes <- getUniquePrefixes(step)
+		if (!rlang::is_empty(prefixes)) {
+			for (prefix in prefixes) {
+				columns <- getColumns(prefix)
+				melted_data <- fhir_melt(melted_data, columns, brackets, sep, all_columns = TRUE)
+			}
+		} else {
+			break
+		}
+		step <- step + 1
+	}
+
+	melted_data <- fhir_rm_indices(melted_data, brackets, column_names)
+	melted_data$resource_identifier <- NULL
+	return(melted_data)
+}
+
+
 #' Remove indices from data.frame/data.table
 #'
 #' Removes the indices in front of multiple entries as produced by [fhir_crack()] when brackets are provided in
@@ -359,6 +451,122 @@ fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), columns 
 	if(!is_DT) {data.table::setDF(x = indexed_dt)}
 	indexed_dt
 }
+
+#' Collapse multiple entries
+#'
+#' This function collapses multiple entries that belong to the same higher level FHIR element (see examples).
+#'
+#' Currently this function is only needed for very few FHIR elements where multiple values should be kept together
+#' in the melting process. To our knowledge, this is only true for address.line elements and name.given elements.
+#' Rather than building the cross product with all other elements in the resource as done by [fhir_melt()], these
+#' elements should be collapsed into a single entry before melting. See examples to get a better idea of this.
+#'
+#' @param indexed_data_frame A data.frame/data.table with indexed multiple entries.
+#' @param columns A character vector of column names where values should be collapsed
+#' @param brackets A character vector of length two, defining the brackets used for the indices.
+#' @param sep A character vector of length one defining the separator that was used when pasting together multiple entries in [fhir_crack()].
+#' @param collapse A character vector of length one used to separate the collapsed fields. Defaults to blank space.
+#' @return The modified data.table/data.frame with collapsed multiple entries
+#' @export
+
+#' @examples
+#' ### First example: Keep name.given elements together
+#' #unserialize example
+#' bundles <- fhir_unserialize(bundles = example_bundles7)
+#'
+#' #Have a look at the structure of example_bundles7
+#' ?example_bundles7
+#'
+#' #Define sep and brackets
+#' sep <- "|"
+#' brackets <- c("[", "]")
+#'
+#' #crack fhir resources
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = brackets,
+#'     sep = sep
+#' )
+#'
+#' df <- fhir_crack(bundles = bundles, design = table_desc)
+#' df
+#'
+#' #name.given elements from the same name (i.e. the official vs. the nickname)
+#' #should be collapsed
+#'
+#' df2 <- fhir_collapse(df, columns = "name.given", sep = sep, brackets = brackets)
+#' df2
+#'
+#' #Next the name can be molten
+#' fhir_melt(df2, brackets = brackets, sep = sep, columns = fhir_common_columns(df2,"name"))
+#'
+#'
+#' ### Second: Keep address line elements together
+#' #unserialize example
+#' bundles <- fhir_unserialize(bundles = example_bundles6)
+#'
+#' #Have a look at the structure of example_bundles6
+#' ?example_bundles6
+#'
+#' #Define sep and brackets
+#' sep <- "|"
+#' brackets <- c("[", "]")
+#'
+#' #crack fhir resources
+#' table_desc <- fhir_table_description(
+#'     resource = "Patient",
+#'     brackets = brackets,
+#'     sep = sep
+#' )
+#'
+#' df <- fhir_crack(bundles = bundles, design = table_desc)
+#' df
+#'
+#' #Address.line elements from the same address (i.e. the work vs. the home address)
+#' #should be collapsed
+#'
+#' df2 <- fhir_collapse(df, columns = "address.line", sep = sep, brackets = brackets, collapse = ", ")
+#' df2
+#'
+#' #Next the address can be molten
+#' fhir_melt(df2, brackets = brackets, sep = sep, columns = fhir_common_columns(df2,"address"))
+#'
+#'
+#' @seealso [fhir_melt()]
+
+fhir_collapse <- function(indexed_data_frame, columns, sep, brackets, collapse = " ") {
+	for (column_name in columns) {
+		for (i in 1:nrow(indexed_data_frame)) {
+			# Check if the cell is not empty
+			if (length(indexed_data_frame[[column_name]][i])) {
+				# Check if the cell starts with sep
+				if (grepl("^\\[", indexed_data_frame[[column_name]][i])) {
+					#split the string by sep
+					split_string <- strsplit(indexed_data_frame[[column_name]][i], sep, fixed = TRUE)[[1]]
+					# Initialize the index vector and previous index
+					indices <- c()
+					prev_index <- NULL
+					# Iterate through the vector and find the first indices for each new pattern
+					for (vec in seq_along(split_string)) {
+						index <- as.numeric(stringr::str_extract(split_string[vec], paste0("(?<=\\", brackets[1], ")\\d")))
+						if (is.null(prev_index) || is.na(prev_index) || index != prev_index) {
+							indices <- c(indices, vec)
+							prev_index <- index
+						}
+					}
+					# Remove brackets for all subsequent elements except the first occurrence an collapse values
+					result <- paste(ifelse(seq_along(split_string) %in% indices, split_string,
+										   gsub(paste0("^\\", brackets[1], ".*\\", brackets[2]), "",
+										   	 split_string, perl = TRUE)), collapse = collapse)
+					# Replace the original cell value with the modified result
+					indexed_data_frame[[column_name]][i] <- result
+				}
+			}
+		}
+	}
+	return(indexed_data_frame)
+}
+
 
 ########################################################################################
 ########################################################################################
