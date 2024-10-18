@@ -342,6 +342,7 @@ fhir_melt <- function(
 #' @export
 fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separator = ".") {
 
+	# brackets should be something like c("[", "]")
 	brackets <- fix_brackets(brackets = brackets)
 	brackets.escaped <- esc(s = brackets)
 	non_number_one_indices_pattern <- paste0(brackets.escaped[1], "(\\d+(?:\\.\\d+)*)", brackets.escaped[2])
@@ -468,6 +469,51 @@ fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separat
 #'
 #' @seealso [fhir_melt()], [fhir_rm_indices()]
 fhir_melt_internal <- function(indexed_dt, columns, brackets, sep, id_name, all_columns) {
+
+	brackets.escaped <- esc(s = brackets)
+	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
+	pattern.rows <- paste0(brackets.escaped[1], "([0-9]+)\\.*.*")
+	pattern.rows.next.start <- paste0(esc(sep), "$")
+	pattern.ids_2 <- paste0("(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")")
+
+	melt_row <- function(row, columns, brackets = c("<", ">"), sep = " ") {
+		row <- as.data.frame(row)
+		ids <- stringr::str_extract_all(string = row, pattern = pattern.ids)
+		names(ids) <- columns
+		items <- stringr::str_split(string = row, pattern = pattern.ids)
+		items <- lapply(
+			items,
+			function(i) {
+				if (!all(is.na(i)) && i[1] == "") i[2:length(i)] else i
+			}
+		)
+		names(items) <- columns
+		d <- row[0, , drop = FALSE]
+		data.table::setDF(d)
+
+		for(i in names(ids)) {
+			id <- ids[[i]]
+			if (!all(is.na(id))) {
+				it <- items[[i]]
+				new.rows <- gsub(pattern.rows, "\\1", id)
+				new.ids <- gsub(pattern.ids_2, "\\1\\3", id)
+				unique.new.rows <- unique(new.rows)
+				set <- paste0(new.ids, it)
+				f <- sapply(
+					unique.new.rows,
+					function(unr) {
+						fltr <- unr == new.rows
+						paste0(set[fltr], collapse = "")
+					}
+				)
+				for (n in unique.new.rows) {
+					d[as.numeric(n), i]<- gsub(pattern = pattern.rows.next.start, replacement = "", x = f[names(f) == n], perl = TRUE)
+				}
+			}
+		}
+		data.table::setDT(d)
+	}
+
 	# this setDT() must be in any case (even if it is already a data.table!) to force a complete
 	# loading of the table into memory and to avoid potential warnings, even if it is already a
 	# data.table
@@ -657,56 +703,3 @@ fhir_collapse <- function(indexed_data_frame, columns, sep, brackets, collapse =
 ########################################################################################
 ########################################################################################
 
-#' Turn a row with multiple entries into a data frame
-#'
-#' @param row One row of an indexed data frame
-#' @param columns A character vector specifying the names of all columns that should be molten simultaneously.
-#' It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!
-#' @param brackets A character vector of length 2, defining the brackets used for the indices.
-#' @param sep A character vector of length one, the separator.
-#' @param all_columns Return all columns? Defaults to `FALSE`, meaning only those specified in `columns` are returned.
-#' @return A data frame with nrow > 1.
-#' @noRd
-melt_row <- function(row, columns, brackets = c("<", ">"), sep = " ") {
-	row <- as.data.frame(row)
-	brackets.escaped <- esc(s = brackets)
-	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
-	ids <- stringr::str_extract_all(string = row, pattern = pattern.ids)
-	names(ids) <- columns
-	items <- stringr::str_split(string = row, pattern = pattern.ids)
-	items <- lapply(
-		items,
-		function(i) {
-			if (!all(is.na(i)) && i[1] == "") i[2:length(i)] else i
-		}
-	)
-	names(items) <- columns
-	d <- row[0, , drop = FALSE]
-	data.table::setDF(d)
-
-	pattern.rows <- paste0(brackets.escaped[1], "([0-9]+)\\.*.*")
-	pattern.ids <- paste0("(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")")
-	pattern.rows.start <- paste0(esc(sep), "$")
-
-	for(i in names(ids)) {
-		id <- ids[[i]]
-		if(!all(is.na(id))) {
-			it <- items[[i]]
-			new.rows <- gsub(pattern.rows, "\\1", id)
-			new.ids <- gsub(pattern.ids, "\\1\\3", id)
-			unique.new.rows <- unique(new.rows)
-			set <- paste0(new.ids, it)
-			f <- sapply(
-				unique.new.rows,
-				function(unr) {
-					fltr <- unr == new.rows
-					paste0(set[fltr], collapse = "")
-				}
-			)
-			for(n in unique.new.rows) {
-				d[as.numeric(n), i]<- gsub(pattern = pattern.rows.start, replacement = "", x = f[names(f) == n], perl = TRUE)
-			}
-		}
-	}
-	data.table::setDT(d)
-}
