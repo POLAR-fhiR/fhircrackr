@@ -670,11 +670,10 @@ fhir_collapse <- function(indexed_data_frame, columns, sep, brackets, collapse =
 melt_row <- function(row, columns, brackets = c("<", ">"), sep = " ") {
 	row <- as.data.frame(row)
 	brackets.escaped <- esc(s = brackets)
-	pattern.ids <- stringr::str_c(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
+	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
 	ids <- stringr::str_extract_all(string = row, pattern = pattern.ids)
 	names(ids) <- columns
-	pattern.items <- stringr::str_c(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
-	items <- stringr::str_split(string = row, pattern = pattern.items)
+	items <- stringr::str_split(string = row, pattern = pattern.ids)
 	items <- lapply(
 		items,
 		function(i) {
@@ -685,23 +684,27 @@ melt_row <- function(row, columns, brackets = c("<", ">"), sep = " ") {
 	d <- row[0, , drop = FALSE]
 	data.table::setDF(d)
 
+	pattern.rows <- paste0(brackets.escaped[1], "([0-9]+)\\.*.*")
+	pattern.ids <- paste0("(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")")
+	pattern.rows.start <- paste0(esc(sep), "$")
+
 	for(i in names(ids)) {
 		id <- ids[[i]]
 		if(!all(is.na(id))) {
 			it <- items[[i]]
-			new.rows <- gsub(stringr::str_c(brackets.escaped[1], "([0-9]+)\\.*.*"), "\\1", id)
-			new.ids <- gsub(stringr::str_c("(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")"), "\\1\\3", id)
+			new.rows <- gsub(pattern.rows, "\\1", id)
+			new.ids <- gsub(pattern.ids, "\\1\\3", id)
 			unique.new.rows <- unique(new.rows)
-			set <- stringr::str_c(new.ids, it)
+			set <- paste0(new.ids, it)
 			f <- sapply(
 				unique.new.rows,
 				function(unr) {
 					fltr <- unr == new.rows
-					stringr::str_c(set[fltr], collapse = "")
+					paste0(set[fltr], collapse = "")
 				}
 			)
 			for(n in unique.new.rows) {
-				d[as.numeric(n), i]<- gsub(pattern = stringr::str_c(esc(sep), "$"), replacement = "", x = f[names(f) == n], perl = TRUE)
+				d[as.numeric(n), i]<- gsub(pattern = pattern.rows.start, replacement = "", x = f[names(f) == n], perl = TRUE)
 			}
 		}
 	}
