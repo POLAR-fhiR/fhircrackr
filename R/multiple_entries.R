@@ -476,7 +476,7 @@ fhir_melt_internal <- function(indexed_dt, columns, brackets, sep, id_name, all_
 	pattern.rows.next.start <- paste0(esc(sep), "$")
 	pattern.ids_2 <- paste0("(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")")
 
-	melt_row <- function(row, columns, brackets = c("<", ">"), sep = " ") {
+	melt_row <- function(row, columns, brackets, sep) {
 		row <- as.data.frame(row)
 		ids <- stringr::str_extract_all(string = row, pattern = pattern.ids)
 		names(ids) <- columns
