@@ -1,3 +1,6 @@
+brackets <- c("[", "]")
+sep <- "|"
+
 testthat::test_that(
 	"fhir_collapse works on address.line",{
 		expect_snapshot_value({
@@ -5,12 +8,12 @@ testthat::test_that(
 		d <- fhir_crack(bundles,
 						design = fhir_table_description(
 							resource = "Patient",
-							brackets = c("[", "]"),
-							sep = "|"),
+							brackets = brackets,
+							sep = sep),
 						verbose = 0
 		)
 
-		fhir_collapse(d, columns = "address.line", sep = "|", brackets = brackets)
+		fhir_collapse(d, columns = "address.line", sep = sep, brackets = brackets)
 		}, style = "json2")
 
 	})
