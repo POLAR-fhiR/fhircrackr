@@ -287,7 +287,8 @@ fhir_melt <- function(
 	if (!is_DT) data.table::setDT(x = table)
 	brackets <- fix_brackets(brackets = brackets)
 
-	table <- fhir_melt_internal(table, columns, brackets, sep, id_name, all_columns)
+	table <- fhir_melt_internal(indexed_dt = table, columns = columns, brackets = brackets,
+								sep = sep, id_name = id_name, all_columns = all_columns)
 
 	if (nrow(table) == 0) warning("The brackets you specified don't seem to appear in the indices of the provided data.frame. Returning NULL.")
 
@@ -348,7 +349,8 @@ fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separat
 	non_number_one_indices_pattern <- paste0(brackets.escaped[1], "(\\d+(?:\\.\\d+)*)", brackets.escaped[2])
 	split_brackets_pattern <- paste0(brackets.escaped[1], "|", brackets.escaped[2])
 
-	hasNonOneNumberIndex <- function(cell) {
+	# Any cell where the index does not consist exclusively of the digit 1 is meltable.
+	is_meltable_cell <- function(cell) {
 		if (is.na(cell)) return(FALSE)  # Ignore NA values
 
 		# Regular expression to extract numbers inside square brackets
@@ -370,20 +372,20 @@ fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separat
 	}
 
 	# Function that terminates immediately if a number != 1 is found in a column index
-	columnHasNonOneNumberIndex <- function(col) {
+	is_meltable_column <- function(col) {
 		for (cell in col) {
-			if (hasNonOneNumberIndex(cell)) {
+			if (is_meltable_cell(cell)) {
 				return(TRUE)
 			}
 		}
 		return(FALSE)
 	}
 
-	getMeltableColumns <- function(indexed_data_frame) {
+	get_meltable_columns <- function(indexed_data_frame) {
 		# Apply the function to each column and find the relevant columns
-		cols_with_non_one_numbers <- sapply(indexed_data_frame, columnHasNonOneNumberIndex)
+		meltable_column <- sapply(indexed_data_frame, is_meltable_column)
 		# Names of the columns that fulfill the condition
-		selected_columns <- names(indexed_data_frame)[cols_with_non_one_numbers]
+		selected_columns <- names(indexed_data_frame)[meltable_column]
 	}
 
 	column_name_separator_escaped <- esc(column_name_separator)
@@ -402,15 +404,15 @@ fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separat
 	column_names <- names(table)
 
 	# Split each column name by the separator
-	meltable_column_names <- getMeltableColumns(indexed_data_frame)
+	meltable_column_names <- get_meltable_columns(indexed_data_frame)
 	split_names <- strsplit(meltable_column_names, column_name_separator_escaped)
 
-	getColumns <- function(prefix) {
+	get_columns <- function(prefix) {
 		pattern <- paste0("^", prefix, "($|", column_name_separator_escaped, ")")
 		grep(pattern, column_names, value = TRUE)
 	}
 
-	getUniquePrefixes <- function(step) {
+	get_unique_prefixes <- function(step) {
 
 		# Initialize a vector to store the prefixes
 		prefixes <- c()
@@ -430,10 +432,10 @@ fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separat
 
 	step <- 1
 	repeat {
-		prefixes <- getUniquePrefixes(step)
+		prefixes <- get_unique_prefixes(step)
 		if (!rlang::is_empty(prefixes)) {
 			for (prefix in prefixes) {
-				columns <- getColumns(prefix)
+				columns <- get_columns(prefix)
 				table <- fhir_melt_internal(table, columns, brackets, sep, id_name = "resource_identifier", all_columns = TRUE)
 			}
 		} else {
