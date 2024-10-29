@@ -1,6 +1,6 @@
 ## This file contains all functions dealing with multiple entries/indices##
 ## Exported functions are on top, internal functions below ##
-
+resource_identifier <- NULL #To stop "no visible binding" NOTE in check()
 #' Cast table with multiple entries
 #' This function divides multiple entries in a compact indexed table as produced by [fhir_crack()] into separate columns.
 #'
@@ -437,6 +437,7 @@ fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separat
 			for (prefix in prefixes) {
 				columns <- get_columns(prefix)
 				table <- fhir_melt_internal(table, columns, brackets, sep, id_name = "resource_identifier", all_columns = TRUE)
+				table[, resource_identifier := NULL]
 			}
 		} else {
 			break
@@ -550,8 +551,6 @@ fhir_melt_internal <- function(indexed_dt, columns, brackets, sep, id_name, all_
 		)
 		data.table::setcolorder(expanded, names(indexed_dt))
 	}
-
-	expanded[[id_name]] <- NULL
 
 	return(expanded)
 }
