@@ -24,6 +24,39 @@ testthat::test_that(
 	}
 )
 
+testthat::test_that(
+	"fhir_melt_all has the same result as multiple fhir_melt: example1. Here we have the column 'id' without any brackets.
+	Check for presents of column 'id' after fhir_melt and fhir_melt_all",{
+		bundles <- fhir_unserialize(example_bundles1)
+		d <- fhir_crack(bundles,
+						design = fhir_table_description(
+							resource = "Patient",
+							brackets = brackets,
+							sep = sep),
+						data.table = T,
+						verbose = 0
+		)
+
+		# Create a regular expression using the brackets
+		pattern <- paste0("\\", brackets[1], ".*\\", brackets[2])
+		# Remove the content inside brackets in column 'id', including the brackets themselves
+		d[, id := gsub(pattern, "", id)]
+
+		d1 <- fhir_melt(d, columns = fhir_common_columns(d, "address"), brackets = brackets, sep = sep, all_columns = T)
+		d1 <- fhir_melt(d1, columns = "name.given", brackets = brackets, sep = sep, all_columns = T)
+		d1 <- fhir_rm_indices(d1, brackets = brackets)
+		d1[, resource_identifier:=NULL]
+
+		# Verify that 'id' column is still present after multiple melts
+		testthat::expect_true("id" %in% colnames(d1), info = "Column 'id' should still be present after multiple fhir_melt operations.")
+
+		# Apply fhir_melt_all and check that 'id' is preserved
+		d2 <- fhir_melt_all(d, brackets = brackets, sep = sep)
+		testthat::expect_true("id" %in% colnames(d2), info = "Column 'id' should be present after fhir_melt_all operation.")
+
+		testthat::expect_identical(d1, d2)
+	}
+)
 
 testthat::test_that(
 	"fhir_melt_all has the same result as multiple fhir_melt: example5",{
