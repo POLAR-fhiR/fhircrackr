@@ -452,6 +452,59 @@ fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separat
 	return(table)
 }
 
+#' Turn a row with multiple entries into a data frame
+#'
+#' @param row One row of an indexed data frame. Each cell in the row may contain multiple values,
+#' indexed by identifiers that follow a specific pattern.
+#' @param columns A character vector specifying the names of all columns that should be molten simultaneously.
+#' It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!
+#' @param pattern.rows A regular expression pattern to identify row indices within the `row` cells.
+#' @param pattern.rows.next.start A regular expression pattern to identify the delimiter or end of
+#' each entry within a cell.
+#' @param pattern.ids A regular expression defining the structure of unique identifiers in the `row`
+#' cells, used to extract individual entry IDs.
+#' @param pattern.ids_2 A regular expression pattern defining an alternative ID structure used within
+#' the `row` cells.
+#' @return A data frame with nrow > 1.
+#' @noRd
+melt_row <- function(row, columns, pattern.rows, pattern.rows.next.start, pattern.ids, pattern.ids_2) {
+	row <- as.data.frame(row)
+	ids <- stringr::str_extract_all(string = row, pattern = pattern.ids)
+	names(ids) <- columns
+	items <- stringr::str_split(string = row, pattern = pattern.ids)
+	items <- lapply(
+		items,
+		function(i) {
+			if (!all(is.na(i)) && i[1] == "") i[2:length(i)] else i
+		}
+	)
+	names(items) <- columns
+	d <- row[0, , drop = FALSE]
+	data.table::setDF(d)
+
+	for(i in names(ids)) {
+		id <- ids[[i]]
+		if (!all(is.na(id))) {
+			it <- items[[i]]
+			new.rows <- gsub(pattern.rows, "\\1", id)
+			new.ids <- gsub(pattern.ids_2, "\\1\\3", id)
+			unique.new.rows <- unique(new.rows)
+			set <- paste0(new.ids, it)
+			f <- sapply(
+				unique.new.rows,
+				function(unr) {
+					fltr <- unr == new.rows
+					paste0(set[fltr], collapse = "")
+				}
+			)
+			for (n in unique.new.rows) {
+				d[as.numeric(n), i]<- gsub(pattern = pattern.rows.next.start, replacement = "", x = f[names(f) == n], perl = TRUE)
+			}
+		}
+	}
+	data.table::setDT(d)
+}
+
 #' Internal function to melt multiple entries in a data.table
 #'
 #' This function handles the core melting operation for multiple entries in an indexed data.table.
@@ -478,51 +531,14 @@ fhir_melt_internal <- function(indexed_dt, columns, brackets, sep, id_name, all_
 	pattern.rows.next.start <- paste0(esc(sep), "$")
 	pattern.ids_2 <- paste0("(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")")
 
-	melt_row <- function(row, columns, brackets, sep) {
-		row <- as.data.frame(row)
-		ids <- stringr::str_extract_all(string = row, pattern = pattern.ids)
-		names(ids) <- columns
-		items <- stringr::str_split(string = row, pattern = pattern.ids)
-		items <- lapply(
-			items,
-			function(i) {
-				if (!all(is.na(i)) && i[1] == "") i[2:length(i)] else i
-			}
-		)
-		names(items) <- columns
-		d <- row[0, , drop = FALSE]
-		data.table::setDF(d)
-
-		for(i in names(ids)) {
-			id <- ids[[i]]
-			if (!all(is.na(id))) {
-				it <- items[[i]]
-				new.rows <- gsub(pattern.rows, "\\1", id)
-				new.ids <- gsub(pattern.ids_2, "\\1\\3", id)
-				unique.new.rows <- unique(new.rows)
-				set <- paste0(new.ids, it)
-				f <- sapply(
-					unique.new.rows,
-					function(unr) {
-						fltr <- unr == new.rows
-						paste0(set[fltr], collapse = "")
-					}
-				)
-				for (n in unique.new.rows) {
-					d[as.numeric(n), i]<- gsub(pattern = pattern.rows.next.start, replacement = "", x = f[names(f) == n], perl = TRUE)
-				}
-			}
-		}
-		data.table::setDT(d)
-	}
-
 	# this setDT() must be in any case (even if it is already a data.table!) to force a complete
 	# loading of the table into memory and to avoid potential warnings, even if it is already a
 	# data.table
 	data.table::setDT(indexed_dt)
 	# add column with column index to separate each row
 	data.table::set(indexed_dt, j = id_name, value = 1:nrow(indexed_dt))
-	expanded <- indexed_dt[, melt_row(.SD, columns = columns, brackets = brackets, sep = sep), by = eval((id_name)), .SDcols = columns]
+	expanded <- indexed_dt[, melt_row(.SD, columns = columns, pattern.rows, pattern.rows.next.start, pattern.ids, pattern.ids_2),
+						   by = eval((id_name)), .SDcols = columns]
 
 	if (all_columns) {
 		rest <- setdiff(names(indexed_dt), columns)
