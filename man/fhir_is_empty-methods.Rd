@@ -17,7 +17,7 @@ fhir_is_empty(bundles)
 \item{bundles}{A FHIR search result as returned by \code{\link[=fhir_search]{fhir_search()}}}
 }
 \value{
-\code{TRUE} if the bundle/bundlelist is empty, \code{FALSE} if it is not empty.
+\code{TRUE} if the bundle/bundle list is empty, \code{FALSE} if it is not empty.
 }
 \description{
 Checks if a \linkS4class{fhir_bundle_xml} or \linkS4class{fhir_bundle_list} is empty, i.e. does not contain any resources.
@@ -25,10 +25,24 @@ Checks if a \linkS4class{fhir_bundle_xml} or \linkS4class{fhir_bundle_list} is e
 \details{
 Empty bundles are returned when a search on a FHIR server does not yield any resources,
 such as when no resources on the server match the specified search criteria. In this case,
-the server responds with a searchset bundle that includes a count attribute with a value of 0.
-This function verifies whether:
+the server responds with an empty searchset bundle.
+This function checks whether:
 \itemize{
-\item For objects of type \linkS4class{fhir_bundle_xml}, the bundle contains a count attribute with a value of 0.
-\item For objects of type \linkS4class{fhir_bundle_list}, the first bundle in the list contains a count attribute with a value of 0
+\item For objects of type \linkS4class{fhir_bundle_xml}, the bundle contains at least one "entry" element
+(if not, the bundle is empty and the functions returns \code{TRUE})
+\item For objects of type \linkS4class{fhir_bundle_list}, the first bundle in the list contains at least one "entry" element
+(if not, the bundle is empty and the functions returns \code{TRUE})
 }
+}
+\examples{
+#Load empty example bundles
+bundles <- fhir_unserialize(example_bundles_empty)
+bundles
+fhir_is_empty(bundles)
+
+#Load non-empty example bundles
+bundles <- fhir_unserialize(patient_bundles)
+bundles
+fhir_is_empty(bundles)
+
 }
