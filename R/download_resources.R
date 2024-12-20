@@ -61,8 +61,8 @@
 #' downloading progress will be printed. Defaults to 1.
 #' @param max_attempts `r lifecycle::badge("deprecated")` The number of maximal attempts is now determined by the length of `delay_between_attempts`
 #' @param delay_between_attempts A numeric vector specifying the delay in seconds between attempts of reaching the server
-#' that `fhir_search()` will make. The length of this vector determines the number of attempts that will be made before stopping with an error.
-#' Defaults to `c(1,3,9,27,81)`.
+#' that `fhir_search()` will make. The length of this vector determines the number of attempts that will be made when the server can't be reached
+#' before stopping with an error. Defaults to `c(1,3,9,27,81)`.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`.
 #' Regardless of the value of `log_errors` the most recent http error message within the current R session is saved internally and can
@@ -231,9 +231,7 @@ fhir_search <- function(
 		)
 
 		if(is.null(bundle)) {
-			if(0 < verbose) {
-				message("Download interrupted.")
-			}
+			message("Download interrupted.")
 			break
 		}
 
@@ -1139,12 +1137,13 @@ check_response <- function(response, log_errors, append = FALSE) {
 	#Error in curl
 	if(is(response, "try-error")){
 		if(!is.null(log_errors)){
-			write(x = response, file = log_errors)
-			stop("The server could not be reached:\n", response, ".\n",
-				 "This has been logged in the generated error file.")
-		}else{
-			stop("The server could not be reached:\n", response, ".\n")
+			write(x = response, file = log_errors, append = TRUE)
 		}
+		message("The server could not be reached:\n")
+		cat(response)
+		cat("\n")
+
+		return(NULL)
 	}
 
 	#http error

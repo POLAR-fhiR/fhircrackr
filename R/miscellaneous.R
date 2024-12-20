@@ -1001,6 +1001,38 @@ fhir_ns_strip <- function(xml) {
 
 "example_bundles7"
 
+##### Documentation for example_bundles_empty data set ######
+#' @details
+#' `example_bundles_empty` contains one empty bundle.
+#'
+#' @examples
+#' #unserialize xml objects before doing anything else with them!
+#' fhir_unserialize(bundles = example_bundles_empty)
+#' @rdname datasets_selfmade
+#' @source
+#' **example_bundles_empty**
+#'
+#' ```
+#' <Bundle>
+#'     <id value="c9edcd82-092c-4f63-8c8d-fdfd03e38d64"/>
+#'     <meta>
+#'         <versionId value="23558aa5-aeba-4145-89a3-195bb6ec5401"/>
+#'         <lastUpdated value="2024-11-19T13:43:34.556+00:00"/>
+#'     </meta>
+#'     <type value="searchset"/>
+#'     <timestamp value="2024-11-19T13:43:34.556+00:00"/>
+#'     <total value="0"/>
+#'     <link>
+#'         <relation value="self"/>
+#'         <url value="https://server.fire.ly/Patient?gender=bla&amp;_total=accurate&amp;_count=0&amp;_skip=0"/>
+#'     </link>
+#' </Bundle>
+#'
+#' ```
+#'
+
+"example_bundles_empty"
+
 ##### Documentation for transaction_bundle_example data set ######
 #' Toy examples to POST/PUT on a server
 #'
@@ -1077,6 +1109,7 @@ fhir_ns_strip <- function(xml) {
 #'
 
 "transaction_bundle_example"
+
 
 ##### Documentation for example_resource1 ######
 #' Toy examples to POST on a server
@@ -1171,6 +1204,7 @@ fhir_ns_strip <- function(xml) {
 #'
 
 "example_resource3"
+
 
 #################################################################################
 #################################################################################

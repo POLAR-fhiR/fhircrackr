@@ -9,8 +9,11 @@
 \alias{example_bundles5}
 \alias{example_bundles6}
 \alias{example_bundles7}
+\alias{example_bundles_empty}
 \title{Toy example bundles for multiple entries}
 \format{
+An object of class \code{fhir_bundle_list} of length 1.
+
 An object of class \code{fhir_bundle_list} of length 1.
 
 An object of class \code{fhir_bundle_list} of length 1.
@@ -452,6 +455,25 @@ An object of class \code{fhir_bundle_list} of length 1.
 </Bundle>"
 
 }\if{html}{\out{</div>}}
+
+\strong{example_bundles_empty}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{<Bundle>
+    <id value="c9edcd82-092c-4f63-8c8d-fdfd03e38d64"/>
+    <meta>
+        <versionId value="23558aa5-aeba-4145-89a3-195bb6ec5401"/>
+        <lastUpdated value="2024-11-19T13:43:34.556+00:00"/>
+    </meta>
+    <type value="searchset"/>
+    <timestamp value="2024-11-19T13:43:34.556+00:00"/>
+    <total value="0"/>
+    <link>
+        <relation value="self"/>
+        <url value="https://server.fire.ly/Patient?gender=bla&amp;_total=accurate&amp;_count=0&amp;_skip=0"/>
+    </link>
+</Bundle>
+
+}\if{html}{\out{</div>}}
 }
 \usage{
 example_bundles1
@@ -467,6 +489,8 @@ example_bundles5
 example_bundles6
 
 example_bundles7
+
+example_bundles_empty
 }
 \description{
 These data examples are bundles that contain very few, very simple resources
@@ -487,6 +511,8 @@ xml versions look.
 \code{example_bundles6} contains 1 bundle with 2 Patient resources.
 
 \code{example_bundles7} contains 1 bundle with 2 Patient resources.
+
+\code{example_bundles_empty} contains one empty bundle.
 }
 \examples{
 #unserialize xml objects before doing anything else with them!
@@ -503,5 +529,7 @@ fhir_unserialize(bundles = example_bundles5)
 fhir_unserialize(bundles = example_bundles6)
 #unserialize xml objects before doing anything else with them!
 fhir_unserialize(bundles = example_bundles7)
+#unserialize xml objects before doing anything else with them!
+fhir_unserialize(bundles = example_bundles_empty)
 }
 \keyword{datasets}
