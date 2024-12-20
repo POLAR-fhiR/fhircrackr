@@ -14,7 +14,7 @@ fhir_columns(xpaths, colnames)
 
 \S4method{fhir_columns}{missing,missing}()
 
-\S4method{fhir_columns}{`NULL`,missing}(xpaths)
+\S4method{fhir_columns}{NULL,missing}(xpaths)
 
 \S4method{fhir_columns}{character,character}(xpaths, colnames)
 
