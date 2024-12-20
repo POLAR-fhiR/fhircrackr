@@ -20,6 +20,69 @@ xml_nodeset <- utils::getFromNamespace("xml_nodeset", "xml2")
 #To stop devtools::check( from warning about no visible global function definition)
 globalVariables(".")
 
+
+#' Check if Bundle/Bundlelist is empty
+#'
+#' Checks if a [fhir_bundle_xml-class] or [fhir_bundle_list-class] is empty, i.e. does not contain any resources.
+#'
+#' Empty bundles are returned when a search on a FHIR server does not yield any resources,
+#' such as when no resources on the server match the specified search criteria. In this case,
+#' the server responds with an empty searchset bundle.
+#' This function checks whether:
+#' - For objects of type [fhir_bundle_xml-class], the bundle contains at least one "entry" element
+#' (if not, the bundle is empty and the functions returns `TRUE`)
+#'
+#' - For objects of type [fhir_bundle_list-class], the first bundle in the list contains at least one "entry" element
+#' (if not, the bundle is empty and the functions returns `TRUE`)
+#' @param bundles A FHIR search result as returned by [fhir_search()]
+#' @return `TRUE` if the bundle/bundle list is empty, `FALSE` if it is not empty.
+#' @export
+#' @rdname fhir_is_empty-methods
+#' @docType methods
+#' @examples
+#' #Load empty example bundles
+#' bundles <- fhir_unserialize(example_bundles_empty)
+#' bundles
+#' fhir_is_empty(bundles)
+#'
+#' #Load non-empty example bundles
+#' bundles <- fhir_unserialize(patient_bundles)
+#' bundles
+#' fhir_is_empty(bundles)
+#'
+setGeneric(
+	name = "fhir_is_empty",
+	def = function(
+		bundles
+	) {
+		standardGeneric("fhir_is_empty")
+	}
+)
+
+#' @rdname fhir_is_empty-methods
+#' @aliases fhir_is_empty,fhir_bundle_list-method
+
+setMethod(
+	f = "fhir_is_empty",
+	signature = c(bundles = "fhir_bundle_list"),
+	definition = function(
+		bundles
+	) {
+		length(xml2::xml_find_first(bundles[[1]], "entry"))==0
+	}
+	)
+
+#' @rdname fhir_is_empty-methods
+#' @aliases fhir_is_empty,fhir_bundle_xml-method
+setMethod(
+	f = "fhir_is_empty",
+	signature = c(bundles = "fhir_bundle_xml"),
+	definition = function(
+		bundles
+	) {
+		length(xml2::xml_find_first(bundles, "entry"))==0
+	}
+)
 #' Remove a certain xml tag
 #'
 #' Removes a given xml tag from xml objects represented in a [fhir_bundle_xml-class], [fhir_bundle_list-class]
