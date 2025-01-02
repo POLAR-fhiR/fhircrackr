@@ -62,7 +62,8 @@
 #' @param max_attempts `r lifecycle::badge("deprecated")` The number of maximal attempts is now determined by the length of `delay_between_attempts`
 #' @param delay_between_attempts A numeric vector specifying the delay in seconds between attempts of reaching the server
 #' that `fhir_search()` will make. The length of this vector determines the number of attempts that will be made when the server can't be reached
-#' before stopping with an error. Defaults to `c(1,3,9,27,81)`.
+#' before stopping with an error. Defaults to `c(1,3,9,27,81)`. If you want the function to stop immediately after the first error when trying to
+#' reach the server, set this argument to `1`.
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
 #' `NULL` means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to `NULL`.
 #' Regardless of the value of `log_errors` the most recent http error message within the current R session is saved internally and can
@@ -1203,13 +1204,13 @@ check_response <- function(response, log_errors, append = FALSE) {
 	}
 	if(400 <= code && code < 500) {
 		if(!is.null(log_errors)) {
-			stop(
+			warning(
 				"Your request generated a client error, HTTP code ",
 				code,
 				". For more information see the generated error file."
 			)
 		} else {
-			stop(
+			warning(
 				"Your request generated a client error, HTTP code ",
 				code,
 				". To print more detailed error information, run fhir_recent_http_error() or set argument log_errors to a filename and rerun you request."
@@ -1218,13 +1219,13 @@ check_response <- function(response, log_errors, append = FALSE) {
 	}
 	if(500 <= code && code < 600) {
 		if(!is.null(log_errors)) {
-			stop(
+			warning(
 				"Your request generated a server error, HTTP code ",
 				code,
 				". For more information see the generated error file."
 			)
 		} else {
-			stop(
+			warning(
 				"Your request generated a server error, HTTP code ",
 				code,
 				". To print more detailed error information, run fhir_recent_http_error() or set argument log_errors to a filename and rerun you request."
