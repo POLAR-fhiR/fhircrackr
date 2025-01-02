@@ -49,7 +49,8 @@ downloading progress will be printed. Defaults to 1.}
 
 \item{delay_between_attempts}{A numeric vector specifying the delay in seconds between attempts of reaching the server
 that \code{fhir_search()} will make. The length of this vector determines the number of attempts that will be made when the server can't be reached
-before stopping with an error. Defaults to \code{c(1,3,9,27,81)}.}
+before stopping with an error. Defaults to \code{c(1,3,9,27,81)}. If you want the function to stop immediately after the first error when trying to
+reach the server, set this argument to \code{1}.}
 
 \item{log_errors}{Either \code{NULL} or a character vector of length one indicating the name of a file in which to save the http errors.
 \code{NULL} means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to \code{NULL}.
