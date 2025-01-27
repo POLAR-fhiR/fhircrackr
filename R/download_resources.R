@@ -59,7 +59,6 @@
 #' @param max_bundles Maximal number of bundles to get. Defaults to Inf meaning all available bundles are downloaded.
 #' @param verbose An integer vector of length one. If 0, nothing is printed, if 1, only finishing message is printed, if > 1,
 #' downloading progress will be printed. Defaults to 1.
-#' @param max_attempts `r lifecycle::badge("deprecated")` The number of maximal attempts is now determined by the length of `delay_between_attempts`
 #' @param delay_between_attempts A numeric vector specifying the delay in seconds between attempts of reaching the server
 #' that `fhir_search()` will make. The length of this vector determines the number of attempts that will be made when the server can't be reached
 #' before stopping with an error. Defaults to `c(1,3,9,27,81)`. If you want the function to stop immediately after the first error when trying to
@@ -79,6 +78,11 @@
 #' @param rm_tag Character vector of length 1 defining an xml tag of elements that will removed from the bundle automatically.
 #' Defaults to `"div"`,leading to the removal of all html parts (see Details). Set to `NULL` to keep the bundles untouched.
 #' See [fhir_rm_div()] and [fhir_rm_tag()] for more info.
+#' @param stop_on_error Controls error handling for server requests
+#' - `stop_on_error = 0`: Issues warning and retries requests as defined by `delay_between_attempts`. Returns empty bundle_list if all attempts fail
+#' - `stop_on_error = 1`: Stops immediately on any error. Overrides `delay_between_attempts`, as no retries will be attempted.
+#' - `stop_on_error = <vector of HTTP codes>`: Stops on specified codes (e.g. c(401, 404)), warns for others
+#'
 #' @return A [fhir_bundle_list-class] when `save_to_disc = NULL` (the default),  else `NULL`.
 #' @export
 #'
@@ -138,15 +142,9 @@ fhir_search <- function(
 	save_to_disc           = NULL,
 	delay_between_bundles  = 0,
 	rm_tag                 = "div",
-	max_attempts           = deprecated()
-) {
-	if(lifecycle::is_present(max_attempts)) {
-		lifecycle::deprecate_warn(
-			when = "2.0.0",
-			what = "fhir_search(max_attempts)",
-			details = "The number of maximal attempts is now controlled by the length of the argument delay_between_attempts."
-		)
-	}
+	stop_on_error	       = 0
+	) {
+
 
 	if(is.null(request)) {
 		stop(
@@ -215,7 +213,7 @@ fhir_search <- function(
 	cnt <- 0
 	repeat {
 		cnt <- cnt + 1
-		if(1 < verbose) {message("bundle[", cnt, "]", appendLF = FALSE)}
+		if(1 < verbose) {message("bundle[", cnt, "]")}
 
 		bundle <- get_bundle(
 			request = addr,
@@ -225,10 +223,10 @@ fhir_search <- function(
 			token = token,
 			add_headers = add_headers,
 			verbose = verbose,
-			max_attempts = max_attempts,
 			delay_between_attempts = delay_between_attempts,
 			log_errors = log_errors,
-			rm_tag = rm_tag
+			rm_tag = rm_tag,
+			stop_on_error = stop_on_error
 		)
 
 		if(is.null(bundle)) {
@@ -1007,7 +1005,6 @@ fhir_authenticate <- function(
 #' @param token The token for token based auth, either a string or a httr token object
 #' @param add_headers A named character vector of custom headers to add to the HTTP request, e.g. `c(myHeader = "somevalue")` or
 #' `c(firstHeader = "value1", secondHeader = "value2")`.
-#' @param max_attempts Deprecated. The number of maximal attempts is determined by the length of `delay_between_attempts`
 #' @param verbose An integer scalar. If > 1,  Downloading progress is printed. Defaults to 2.
 #' @param delay_between_attempts A numeric vector specifying the delay in seconds between attempts of reaching the server
 #' that `fhir_search()` will make. The length of this vector determines the number of attempts that will be made before stopping with an error.
@@ -1040,10 +1037,10 @@ get_bundle <- function(
 	token = NULL,
 	add_headers = NULL,
 	verbose = 2,
-	max_attempts = NULL,
 	delay_between_attempts = c(1,3,9,27,81),
 	log_errors = NULL,
-	rm_tag = "div") {
+	rm_tag = "div",
+	stop_on_error = 0) {
 
 	#download response
 	for(n in seq_along(delay_between_attempts)) {
@@ -1084,8 +1081,22 @@ get_bundle <- function(
 				auth$basicAuth
 			), silent = TRUE)
 		}
-		#check for errors
-		check_response(response = response, log_errors = log_errors)
+
+		#check for errors: Upgrade warning to error depending on stop_on_error
+		tryCatch(
+			expr = check_response(response = response, log_errors = log_errors),
+			warning = function(w){
+				if(any(stop_on_error==1)){
+					message("Stopping because stop_on_error = 1. Set stop_on_error=0 to continue with a warning instead.")
+					stop(w$message)
+				}else if(!is(response, "try-error") && response$status_code %in% stop_on_error){
+					message("Stopping because of HTTP code ", response$status_code,
+							".\nSet stop_on_error=0 to continue with a warning instead.")
+					stop(w$message)
+				}else{
+					warning(w)
+				}
+			})
 
 		#extract payload
 		payload <- try(httr::content(x = response, as = "text", encoding = "UTF-8"), silent = TRUE)
@@ -1124,7 +1135,7 @@ error_to_file <- function(response, log_errors, append) {
 }
 #' Check http response
 #'
-#' Checks the http response and issues an error or warning if necessary
+#' Checks the http response and issues a warning if
 #'
 #' @param response A http response
 #' @param log_errors Either `NULL` or a character vector of length one indicating the name of a file in which to save the http errors.
@@ -1140,29 +1151,28 @@ check_response <- function(response, log_errors, append = FALSE) {
 		if(!is.null(log_errors)){
 			write(x = response, file = log_errors, append = TRUE)
 		}
-		message("The server could not be reached:\n")
-		cat(response)
-		cat("\n")
-
-		return(NULL)
+		warning("The server could not be reached:\n", response, "\n")
 	}
 
-	#http error
+	#http error: Any code >=400 is an error and needs to be logged
 	code <- response$status_code
+
 	if(code >= 400){
 		fhircrackr_env$recent_http_error <- httr::content(x = response, as = "text", encoding = "UTF-8")
+		if(!is.null(log_errors)){
+			error_to_file(response = response, log_errors = log_errors, append = append)
+		}
 	}
-	if(code >= 400 && !is.null(log_errors)) {
-		error_to_file(response = response, log_errors = log_errors, append = append)
-	}
+
+	#give specific warnings for certain error types
 	if(code == 400) {
 		if (!is.null(log_errors)) {
-			stop(
+			warning(
 				"HTTP code 400 - This can be caused by an invalid request or a server issue. ",
 				"For more information see the generated error file."
 			)
 		} else {
-			stop(
+			warning(
 				"HTTP code 400 - This can be caused by an invalid request or a server issue. ",
 				"To print more detailed error information, run fhir_recent_http_error() or set argument log_errors to a filename and rerun you request."
 			)
@@ -1170,9 +1180,9 @@ check_response <- function(response, log_errors, append = FALSE) {
 	}
 	if(code == 401) {
 		if(!is.null(log_errors)) {
-			stop("HTTP code 401 - Authentication needed. For more information see the generated error file.")
+			warning("HTTP code 401 - Authentication needed. For more information see the generated error file.")
 		} else {
-			stop(
+			warning(
 				"HTTP code 401 - Authentication needed. To print more detailed error information,",
 				"run fhir_recent_http_error() or set argument log_errors to a filename and rerun you request."
 			)
@@ -1180,9 +1190,9 @@ check_response <- function(response, log_errors, append = FALSE) {
 	}
 	if(code == 404) {
 		if(!is.null(log_errors)) {
-			stop("HTTP code 404 - Not found. Did you misspell the resource? For more information see the generated error file.")
+			warning("HTTP code 404 - Not found. Did you misspell the resource? For more information see the generated error file.")
 		} else {
-			stop(
+			warning(
 				"HTTP code 404 - Not found. Did you misspell the resource? To print more detailed error information, ",
 				"run fhir_recent_http_error() or set argument log_errors to a filename and rerun you request."
 			)

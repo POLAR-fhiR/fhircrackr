@@ -3,8 +3,16 @@
 ## Bug fixes
 - Errors when removing tags in `fhir_search()` (e.g. with `rm_tag = "div"`) now get caught and converted to a warning.
 
-- When the server is down, `fhir_search()` will now actually try again as specified in the argument `delay_between_attempts` instead of throwing an error at the first attempt.
+## New functionalities
 
+- New Argument `stop_on_error` in `fhir_search()` explicitly controls error handling for server requests: 
+	- stop_on_error = 0: Issues warning and retries requests as defined by delay_between_attempts. Returns empty
+	bundle_list if all attempts fail
+
+	- stop_on_error = 1: Stops immediately on any error
+
+	- ⁠stop_on_error = <vector of HTTP codes>⁠: Stops on specified codes (e.g. c(401, 404)), warns for others
+	
 ## New functions
 - `fhir_is_empty()` checks if a bundle or bundlelist is empty
 - `fhir_collapse()` collapses multiple entries that belong to the same higher level FHIR element and should be kept together, e.g. `name.given` or `address.line`

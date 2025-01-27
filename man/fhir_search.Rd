@@ -18,7 +18,7 @@ fhir_search(
   save_to_disc = NULL,
   delay_between_bundles = 0,
   rm_tag = "div",
-  max_attempts = deprecated()
+  stop_on_error = 0
 )
 }
 \arguments{
@@ -71,7 +71,12 @@ too many requests to quickly. Defaults to zero.}
 Defaults to \code{"div"},leading to the removal of all html parts (see Details). Set to \code{NULL} to keep the bundles untouched.
 See \code{\link[=fhir_rm_div]{fhir_rm_div()}} and \code{\link[=fhir_rm_tag]{fhir_rm_tag()}} for more info.}
 
-\item{max_attempts}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} The number of maximal attempts is now determined by the length of \code{delay_between_attempts}}
+\item{stop_on_error}{Controls error handling for server requests
+\itemize{
+\item \code{stop_on_error = 0}: Issues warning and retries requests as defined by \code{delay_between_attempts}. Returns empty bundle_list if all attempts fail
+\item \code{stop_on_error = 1}: Stops immediately on any error. Overrides \code{delay_between_attempts}, as no retries will be attempted.
+\item \verb{stop_on_error = <vector of HTTP codes>}: Stops on specified codes (e.g. c(401, 404)), warns for others
+}}
 }
 \value{
 A \linkS4class{fhir_bundle_list} when \code{save_to_disc = NULL} (the default),  else \code{NULL}.
