@@ -717,7 +717,6 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 							d <- (d[, stringr::str_c(value, collapse = table_description@sep), by=c('entry', 'column')] |> dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
 						}
 					}
-					d
 				},
 				mc.cores = ncores
 			),
