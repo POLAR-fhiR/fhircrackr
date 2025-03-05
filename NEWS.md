@@ -2,6 +2,7 @@
 
 ## Bug fixes
 - Errors when removing tags in `fhir_search()` (e.g. with `rm_tag = "div"`) now get caught and converted to a warning.
+- `fhir_crack() doesn't crash anymore when some of the bundles don't contain the searched resources.
 
 ## New functionalities
 
