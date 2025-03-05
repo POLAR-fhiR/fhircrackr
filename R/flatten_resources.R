@@ -638,7 +638,6 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 					d <- dcast(d, entry ~ column) # cast columns by bundle and entry
 					data.table::setcolorder(x = d, neworder = cols)
 				}
-				d
 			},
 			mc.cores = ncores
 		),
@@ -717,7 +716,6 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 							d <- (d[, stringr::str_c(value, collapse = table_description@sep), by=c('entry', 'column')] |> dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
 						}
 					}
-					d
 				},
 				mc.cores = ncores
 			),
