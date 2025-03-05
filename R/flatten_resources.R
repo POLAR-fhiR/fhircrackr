@@ -638,7 +638,6 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 					d <- dcast(d, entry ~ column) # cast columns by bundle and entry
 					data.table::setcolorder(x = d, neworder = cols)
 				}
-				d
 			},
 			mc.cores = ncores
 		),
