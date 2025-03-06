@@ -1,8 +1,8 @@
 Package: fhircrackr
 Type: Package
 Title: Handling HL7 FHIR® Resources in R
-Version: 2.2.0.9000
-Date: 2024-03-21
+Version: 2.2.0.9003
+Date: 2025-03-05
 Authors@R: c(
     person( given = "Thomas", 
             family = "Peschel", 
@@ -31,7 +31,7 @@ BugReports: https://github.com/POLAR-fhiR/fhircrackr/issues
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports: 
     xml2,
     stringr,

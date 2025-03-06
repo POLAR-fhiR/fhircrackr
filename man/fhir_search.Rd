@@ -18,7 +18,7 @@ fhir_search(
   save_to_disc = NULL,
   delay_between_bundles = 0,
   rm_tag = "div",
-  max_attempts = deprecated()
+  stop_on_error = 0
 )
 }
 \arguments{
@@ -48,8 +48,9 @@ for how to create this.}
 downloading progress will be printed. Defaults to 1.}
 
 \item{delay_between_attempts}{A numeric vector specifying the delay in seconds between attempts of reaching the server
-that \code{fhir_search()} will make. The length of this vector determines the number of attempts that will be made before stopping with an error.
-Defaults to \code{c(1,3,9,27,81)}.}
+that \code{fhir_search()} will make. The length of this vector determines the number of attempts that will be made when the server can't be reached
+before stopping with an error. Defaults to \code{c(1,3,9,27,81)}. If you want the function to stop immediately after the first error when trying to
+reach the server, set this argument to \code{1}.}
 
 \item{log_errors}{Either \code{NULL} or a character vector of length one indicating the name of a file in which to save the http errors.
 \code{NULL} means no error logging. When a file name is provided, the errors are saved in the specified file. Defaults to \code{NULL}.
@@ -70,7 +71,12 @@ too many requests to quickly. Defaults to zero.}
 Defaults to \code{"div"},leading to the removal of all html parts (see Details). Set to \code{NULL} to keep the bundles untouched.
 See \code{\link[=fhir_rm_div]{fhir_rm_div()}} and \code{\link[=fhir_rm_tag]{fhir_rm_tag()}} for more info.}
 
-\item{max_attempts}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} The number of maximal attempts is now determined by the length of \code{delay_between_attempts}}
+\item{stop_on_error}{Controls error handling for server requests
+\itemize{
+\item \code{stop_on_error = 0}: Issues warning and retries requests as defined by \code{delay_between_attempts}. Returns empty bundle_list if all attempts fail
+\item \code{stop_on_error = 1}: Stops immediately on any error. Overrides \code{delay_between_attempts}, as no retries will be attempted.
+\item \verb{stop_on_error = <vector of HTTP codes>}: Stops on specified codes (e.g. c(401, 404)), warns for others
+}}
 }
 \value{
 A \linkS4class{fhir_bundle_list} when \code{save_to_disc = NULL} (the default),  else \code{NULL}.
