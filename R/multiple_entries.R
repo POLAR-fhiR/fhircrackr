@@ -1,6 +1,6 @@
 ## This file contains all functions dealing with multiple entries/indices##
 ## Exported functions are on top, internal functions below ##
-
+resource_identifier <- NULL #To stop "no visible binding" NOTE in check()
 #' Cast table with multiple entries
 #' This function divides multiple entries in a compact indexed table as produced by [fhir_crack()] into separate columns.
 #'
@@ -43,17 +43,18 @@
 #' fhir_cast(df, brackets=c('[', ']'), sep = ' ', verbose = 0)
 #'
 #' @seealso [fhir_crack()], [fhir_melt()], [fhir_build_bundle()]
+#'
 fhir_cast <- function(
-	indexed_df,
-	brackets,
-	sep,
-	verbose = 1) {
+		indexed_df,
+		brackets,
+		sep,
+		verbose = 1) {
 
-	if(is.null(indexed_df)) {stop("indexed_df is NULL.")}
-	if(nrow(indexed_df) < 1) {stop("indexed_df doesn't contain any data.")}
+	if (is.null(indexed_df)) stop("indexed_df is NULL.")
+	if (nrow(indexed_df) < 1) stop("indexed_df doesn't contain any data.")
 
 	is_DT <- data.table::is.data.table(x = indexed_df)
-	if(!is_DT) {data.table::setDT(x = indexed_df)}
+	if (!is_DT) data.table::setDT(x = indexed_df)
 
 	col_names <- names(indexed_df)
 	sep_ <- esc(sep)
@@ -62,32 +63,32 @@ fhir_cast <- function(
 	ket_ <- esc(brackets[2])
 	regexpr_ids <- stringr::str_c(bra_, "([0-9]+(\\.[0-9]+)*)", ket_, "(.*$)")
 
-	if(!any(grepl(regexpr_ids, indexed_df[1,]))){
+	if (!any(grepl(regexpr_ids, indexed_df[1, ]))) {
 		stop("Cannot find ids with the specified brackets in the table.")
 	}
 
-	if(0 < verbose) {message("Expanding table...\n")}
+	if (0 < verbose) message("Expanding table...\n")
 
 	map <- sapply(
 		col_names,
 		function(name) {
 			#name <- names(indexed_df)[[6]]
-			if(1 < verbose) {message(name)}
+			if (1 < verbose) {message(name)}
 
 			warning_given <- FALSE
 			entries <- strsplit(indexed_df[[name]], sep_)
-			ids <- lapply(entries, function(entry){gsub(regexpr_ids, "\\1", entry)})
+			ids <- lapply(entries, function(entry) gsub(regexpr_ids, "\\1", entry))
 			name_vec <- strsplit(name, "\\.")[[1]]
 
 			name_expanded <- unlist(
 				lapply(
-					ids[sapply(ids, function(i){all(!is.na(i))})],
-					function(id){
+					ids[sapply(ids, function(i) all(!is.na(i)))],
+					function(id) {
 						#id <- ids[sapply(ids, function(i) all(!is.na(i)))][[1]]
 						id_ <- strsplit(id, "\\.")
 						names(id_) <- id
 
-						if(length(id_[[1]])!=length(name_vec) && !warning_given){
+						if (length(id_[[1]]) != length(name_vec) && !warning_given) {
 							warning(
 								"Column name '", stringr::str_c(name_vec, collapse = "."),
 								"' doesn't fit the id pattern found in this column.",
@@ -97,7 +98,7 @@ fhir_cast <- function(
 							warning_given <<- TRUE
 						}
 
-						if(1 < length(name_vec)) {
+						if (1 < length(name_vec)) {
 							sapply(
 								id_,
 								function(i_) {
@@ -126,18 +127,18 @@ fhir_cast <- function(
 	d <- data.table(matrix(data = rep_len(character(), nrow(indexed_df) * length(df_new_names)), nrow = nrow(indexed_df), ncol = length(df_new_names)))
 	setnames(d, df_new_names)
 
-	if(0 < verbose) {message("\nFilling table...\n")}
+	if (0 < verbose) message("\nFilling table...\n")
 
-	for(name in names(map)) {
+	for (name in names(map)) {
 		#name <- names(map)[[1]]
-		if(1 < verbose) {message(name, ":")}
+		if (1 < verbose) message(name, ":")
 
-		for(id in names(map[[name]])) {
+		for (id in names(map[[name]])) {
 			#id <- names(map[[name]])[[1]]
 			sname <- map[[name]][[id]]
-			if(1 < verbose) {message("   ", sname)}
+			if (1 < verbose) message("   ", sname)
 			id_str <- stringr::str_c(bra_, id, ket_)
-			row_with_id <- grep(id_str, indexed_df[[name]], perl = T)
+			row_with_id <- grep(id_str, indexed_df[[name]], perl = TRUE)
 			entries <- strsplit(indexed_df[[name]][row_with_id], sep_)
 			values <- gsub(
 				id_str,
@@ -145,7 +146,7 @@ fhir_cast <- function(
 				sapply(
 					entries,
 					function(entry) {
-						entry[grep(id_str, entry, perl = T)]
+						entry[grep(id_str, entry, perl = TRUE)]
 					},
 					simplify = FALSE
 				)
@@ -153,7 +154,7 @@ fhir_cast <- function(
 			d[row_with_id, (sname) := values]
 		}
 	}
-	if(!is_DT) {setDF(d)}
+	if (!is_DT) data.table::setDF(d)
 	d[]#to avoid problems with printing
 	d
 }
@@ -191,7 +192,7 @@ fhir_cast <- function(
 #' @seealso [fhir_melt()], [fhir_rm_indices()]
 #'
 fhir_common_columns <- function(data_frame, column_names_prefix) {
-	if(!is.data.frame(data_frame)) {
+	if (!is.data.frame(data_frame)) {
 		stop(
 			"You need to supply a data.frame or data.table to the argument indexed_data_frame.",
 			"The object you supplied is of type ", class(data_frame), "."
@@ -200,7 +201,7 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 	pattern_column_names  <- stringr::str_c("^", column_names_prefix, "($|\\.+)")
 	column_names <- names(data_frame)
 	hits <- grepl(pattern_column_names, column_names)
-	if(!any(hits)) {stop("The column prefix you gave doesn't appear in any of the column names.")}
+	if (!any(hits)) stop("The column prefix you gave doesn't appear in any of the column names.")
 	column_names[hits]
 }
 
@@ -261,54 +262,41 @@ fhir_common_columns <- function(data_frame, column_names_prefix) {
 #'           brackets = c("[","]"), sep = " ", all_columns = TRUE)
 #' @export
 #' @seealso [fhir_common_columns()], [fhir_rm_indices()]
-
-
+#'
 fhir_melt <- function(
-	indexed_data_frame,
-	columns,
-	brackets = c("<", ">"),
-	sep = " ",
-	id_name = "resource_identifier",
-	all_columns = FALSE) {
+		indexed_data_frame,
+		columns,
+		brackets = c("<", ">"),
+		sep = " ",
+		id_name = "resource_identifier",
+		all_columns = FALSE) {
 
-	if(!is.data.frame(indexed_data_frame)) {
+	if (!is.data.frame(indexed_data_frame)) {
 		stop(
 			"You need to supply a data.frame or data.table to the argument indexed_data_frame.",
 			"The object you supplied is of type ", class(indexed_data_frame), "."
 		)
 	}
 
-	if(!all(columns %in% names(indexed_data_frame))) {
+	if (!all(columns %in% names(indexed_data_frame))) {
 		stop("Not all column names you gave match with the column names in the data frame.")
 	}
 
-	indexed_dt <- copy(indexed_data_frame) #copy to avoid side effects
-	is_DT <- data.table::is.data.table(x = indexed_dt)
-	if(!is_DT) {data.table::setDT(x = indexed_dt)}
+	table <- copy(indexed_data_frame) #copy to avoid side effects
+	is_DT <- data.table::is.data.table(x = table)
+	if (!is_DT) data.table::setDT(x = table)
 	brackets <- fix_brackets(brackets = brackets)
 
-	indexed_dt[,(id_name):=1:nrow(indexed_dt)]
+	table <- fhir_melt_internal(indexed_dt = table, columns = columns, brackets = brackets,
+								sep = sep, id_name = id_name, all_columns = all_columns)
 
-	expanded <- indexed_dt[, melt_row(.SD, columns = columns, brackets = brackets, sep = sep), by = eval((id_name)), .SDcols = columns]
+	if (nrow(table) == 0) warning("The brackets you specified don't seem to appear in the indices of the provided data.frame. Returning NULL.")
 
-	if(all_columns){
-		rest <- setdiff(names(indexed_dt), columns)
-		result <- merge.data.table(
-			x = expanded,
-			y = indexed_dt[, rest, with=FALSE],
-			by = id_name,
-			all = T
-		)
-		data.table::setcolorder(result, names(indexed_dt))
-	}else{
-		result <- expanded
-	}
+	if (!is_DT) data.table::setDF(table)
 
-	if(nrow(result) == 0) {warning("The brackets you specified don't seem to appear in the indices of the provided data.frame. Returning NULL.")}
-
-	if(!is_DT) {setDF(result)}
-	result
+	return(table)
 }
+
 
 #' Melt all columns with multiple entries
 #'
@@ -355,16 +343,76 @@ fhir_melt <- function(
 #' @export
 fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separator = ".") {
 
-	getColumns <- function(prefix) {
-		grep(paste0("^", prefix, "$|^", prefix, esc(column_name_separator)), column_names, value = TRUE)
+	# brackets should be something like c("[", "]")
+	brackets <- fix_brackets(brackets = brackets)
+	brackets.escaped <- esc(s = brackets)
+	non_number_one_indices_pattern <- paste0(brackets.escaped[1], "(\\d+(?:\\.\\d+)*)", brackets.escaped[2])
+	split_brackets_pattern <- paste0(brackets.escaped[1], "|", brackets.escaped[2])
+
+	# Any cell where the index does not consist exclusively of the digit 1 is meltable.
+	is_meltable_cell <- function(cell) {
+		if (is.na(cell)) return(FALSE)  # Ignore NA values
+
+		# Regular expression to extract numbers inside square brackets
+		matches <- regmatches(cell, gregexpr(non_number_one_indices_pattern, cell))[[1]]
+		if (length(matches) == 0) return(FALSE)  # Return FALSE if no matches are found
+
+		# Extract and check all numbers
+		for (match in matches) {
+			# Remove square brackets and split by periods
+			numbers <- unlist(strsplit(gsub(split_brackets_pattern, "", match), "\\."))
+
+			# Check if any number is not equal to 1
+			if (any(as.numeric(numbers) != 1)) {
+				return(TRUE)
+			}
+		}
+
+		return(FALSE)
 	}
 
-	melted_data <- indexed_data_frame
-	column_names <- names(indexed_data_frame)
+	# Function that terminates immediately if a number != 1 is found in a column index
+	is_meltable_column <- function(col) {
+		for (cell in col) {
+			if (is_meltable_cell(cell)) {
+				return(TRUE)
+			}
+		}
+		return(FALSE)
+	}
 
-	getUniquePrefixes <- function(step) {
-		# Split each column name by the separator
-		split_names <- strsplit(column_names, esc(column_name_separator))
+	get_meltable_columns <- function(indexed_data_frame) {
+		# Apply the function to each column and find the relevant columns
+		meltable_column <- sapply(indexed_data_frame, is_meltable_column)
+		# Names of the columns that fulfill the condition
+		selected_columns <- names(indexed_data_frame)[meltable_column]
+	}
+
+	column_name_separator_escaped <- esc(column_name_separator)
+
+	if (!is.data.frame(indexed_data_frame)) {
+		stop(
+			"You need to supply a data.frame or data.table to the argument indexed_data_frame.",
+			"The object you supplied is of type ", class(indexed_data_frame), "."
+		)
+	}
+
+	table <- copy(indexed_data_frame) #copy to avoid side effects
+	is_DT <- data.table::is.data.table(x = table)
+	if (!is_DT) data.table::setDT(x = table)
+
+	column_names <- names(table)
+
+	# Split each column name by the separator
+	meltable_column_names <- get_meltable_columns(indexed_data_frame)
+	split_names <- strsplit(meltable_column_names, column_name_separator_escaped)
+
+	get_columns <- function(prefix) {
+		pattern <- paste0("^", prefix, "($|", column_name_separator_escaped, ")")
+		grep(pattern, column_names, value = TRUE)
+	}
+
+	get_unique_prefixes <- function(step) {
 
 		# Initialize a vector to store the prefixes
 		prefixes <- c()
@@ -384,11 +432,12 @@ fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separat
 
 	step <- 1
 	repeat {
-		prefixes <- getUniquePrefixes(step)
+		prefixes <- get_unique_prefixes(step)
 		if (!rlang::is_empty(prefixes)) {
 			for (prefix in prefixes) {
-				columns <- getColumns(prefix)
-				melted_data <- fhir_melt(melted_data, columns, brackets, sep, all_columns = TRUE)
+				columns <- get_columns(prefix)
+				table <- fhir_melt_internal(table, columns, brackets, sep, id_name = "resource_identifier", all_columns = TRUE)
+				table[, resource_identifier := NULL]
 			}
 		} else {
 			break
@@ -396,11 +445,115 @@ fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separat
 		step <- step + 1
 	}
 
-	melted_data <- fhir_rm_indices(melted_data, brackets, column_names)
-	melted_data$resource_identifier <- NULL
-	return(melted_data)
+	if (nrow(table) == 0) warning("The brackets you specified don't seem to appear in the indices of the provided data.frame. Returning NULL.")
+
+	if (!is_DT) data.table::setDF(table)
+	table <- fhir_rm_indices(table, brackets, names(table))
+
+	return(table)
 }
 
+#' Turn a row with multiple entries into a data frame
+#'
+#' @param row One row of an indexed data frame. Each cell in the row may contain multiple values,
+#' indexed by identifiers that follow a specific pattern.
+#' @param columns A character vector specifying the names of all columns that should be molten simultaneously.
+#' It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!
+#' @param pattern.rows A regular expression pattern to identify row indices within the `row` cells.
+#' @param pattern.rows.next.start A regular expression pattern to identify the delimiter or end of
+#' each entry within a cell.
+#' @param pattern.ids A regular expression defining the structure of unique identifiers in the `row`
+#' cells, used to extract individual entry IDs.
+#' @param pattern.ids_2 A regular expression pattern defining an alternative ID structure used within
+#' the `row` cells.
+#' @return A data frame with nrow > 1.
+#' @noRd
+melt_row <- function(row, columns, pattern.rows, pattern.rows.next.start, pattern.ids, pattern.ids_2) {
+	row <- as.data.frame(row)
+	ids <- stringr::str_extract_all(string = row, pattern = pattern.ids)
+	names(ids) <- columns
+	items <- stringr::str_split(string = row, pattern = pattern.ids)
+	items <- lapply(
+		items,
+		function(i) {
+			if (!all(is.na(i)) && i[1] == "") i[2:length(i)] else i
+		}
+	)
+	names(items) <- columns
+	d <- row[0, , drop = FALSE]
+	data.table::setDF(d)
+
+	for(i in names(ids)) {
+		id <- ids[[i]]
+		if (!all(is.na(id))) {
+			it <- items[[i]]
+			new.rows <- gsub(pattern.rows, "\\1", id)
+			new.ids <- gsub(pattern.ids_2, "\\1\\3", id)
+			unique.new.rows <- unique(new.rows)
+			set <- paste0(new.ids, it)
+			f <- sapply(
+				unique.new.rows,
+				function(unr) {
+					fltr <- unr == new.rows
+					paste0(set[fltr], collapse = "")
+				}
+			)
+			for (n in unique.new.rows) {
+				d[as.numeric(n), i]<- gsub(pattern = pattern.rows.next.start, replacement = "", x = f[names(f) == n], perl = TRUE)
+			}
+		}
+	}
+	data.table::setDT(d)
+}
+
+#' Internal function to melt multiple entries in a data.table
+#'
+#' This function handles the core melting operation for multiple entries in an indexed data.table.
+#' It is used internally by [fhir_melt()] to separate multiple entries in a given set of columns
+#' into individual rows.
+#'
+#' @param indexed_dt A data.table with indexed multiple entries.
+#' @param columns A character vector specifying the names of all columns that should be melted simultaneously.
+#' It is advisable to only melt columns that belong to the same repeating attribute.
+#' @param brackets A character vector of length two, defining the brackets used for the indices.
+#' @param sep A character vector of length one, the separator that was used when pasting together multiple entries.
+#' @param id_name A character vector of length one, the name of the column that will hold the identification
+#' of the origin of the new rows.
+#' @param all_columns A boolean indicating whether all columns should be returned (default is FALSE).
+#'
+#' @return A data.table where each entry from the variables in `columns` appears in a separate row.
+#'
+#' @seealso [fhir_melt()], [fhir_rm_indices()]
+fhir_melt_internal <- function(indexed_dt, columns, brackets, sep, id_name, all_columns) {
+
+	brackets.escaped <- esc(s = brackets)
+	pattern.ids <- paste0(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
+	pattern.rows <- paste0(brackets.escaped[1], "([0-9]+)\\.*.*")
+	pattern.rows.next.start <- paste0(esc(sep), "$")
+	pattern.ids_2 <- paste0("(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")")
+
+	# this setDT() must be in any case (even if it is already a data.table!) to force a complete
+	# loading of the table into memory and to avoid potential warnings, even if it is already a
+	# data.table
+	data.table::setDT(indexed_dt)
+	# add column with column index to separate each row
+	data.table::set(indexed_dt, j = id_name, value = 1:nrow(indexed_dt))
+	expanded <- indexed_dt[, melt_row(.SD, columns = columns, pattern.rows, pattern.rows.next.start, pattern.ids, pattern.ids_2),
+						   by = eval((id_name)), .SDcols = columns]
+
+	if (all_columns) {
+		rest <- setdiff(names(indexed_dt), columns)
+		expanded <- merge.data.table(
+			x = expanded,
+			y = indexed_dt[, rest, with = FALSE],
+			by = id_name,
+			all = TRUE
+		)
+		data.table::setcolorder(expanded, names(indexed_dt))
+	}
+
+	return(expanded)
+}
 
 #' Remove indices from data.frame/data.table
 #'
@@ -428,27 +581,25 @@ fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separat
 #' df_indices_removed <- fhir_rm_indices(indexed_data_frame = df, brackets=c("[", "]"))
 #'
 #' @seealso [fhir_melt()]
-
-
-fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), columns = names( indexed_data_frame )) {
-	if(!is.data.frame(indexed_data_frame)) {
+fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), columns = names(indexed_data_frame)) {
+	if (!is.data.frame(indexed_data_frame)) {
 		stop(
 			"You need to supply a data.frame or data.table to the argument indexed_data_frame.",
 			"The object you supplied is of type ", class(indexed_data_frame), "."
 		)
 	}
-	indexed_dt <- copy(indexed_data_frame) #copy to avoid side effects
+	indexed_dt <- copy(indexed_data_frame) # copy to avoid side effects
 	is_DT <- data.table::is.data.table(x = indexed_dt)
-	if(!is_DT) {data.table::setDT(x = indexed_dt)}
+	if (!is_DT) data.table::setDT(x = indexed_dt)
 	brackets <- fix_brackets(brackets = brackets)
 	brackets.escaped <- esc(s = brackets)
 	pattern.ids <- stringr::str_c(brackets.escaped[1], "([0-9]+\\.*)*", brackets.escaped[2])
-	if(!any(grepl(pattern.ids, indexed_dt))) {
+	if (!any(grepl(pattern.ids, indexed_dt))) {
 		warning("The brackets you specified don't seem to appear in the data.frame.")
 	}
 	result <- data.table::data.table(gsub(pattern = pattern.ids, replacement = "", x = as.matrix(indexed_dt[,columns, with = FALSE])))
 	indexed_dt[,columns] <- result
-	if(!is_DT) {data.table::setDF(x = indexed_dt)}
+	if (!is_DT) data.table::setDF(x = indexed_dt)
 	indexed_dt
 }
 
@@ -468,7 +619,6 @@ fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), columns 
 #' @param collapse A character vector of length one used to separate the collapsed fields. Defaults to blank space.
 #' @return The modified data.table/data.frame with collapsed multiple entries
 #' @export
-
 #' @examples
 #' ### First example: Keep name.given elements together
 #' #unserialize example
@@ -533,7 +683,6 @@ fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), columns 
 #'
 #'
 #' @seealso [fhir_melt()]
-
 fhir_collapse <- function(indexed_data_frame, columns, sep, brackets, collapse = " ") {
 	for (column_name in columns) {
 		for (i in 1:nrow(indexed_data_frame)) {
@@ -571,56 +720,3 @@ fhir_collapse <- function(indexed_data_frame, columns, sep, brackets, collapse =
 ########################################################################################
 ########################################################################################
 
-
-#' Turn a row with multiple entries into a data frame
-#'
-#' @param row One row of an indexed data frame
-#' @param columns A character vector specifying the names of all columns that should be molten simultaneously.
-#' It is advisable to only melt columns simultaneously that belong to the same (repeating) attribute!
-#' @param brackets A character vector of length 2, defining the brackets used for the indices.
-#' @param sep A character vector of length one, the separator.
-#' @param all_columns Return all columns? Defaults to `FALSE`, meaning only those specified in `columns` are returned.
-#' @return A data frame with nrow > 1.
-#' @noRd
-
-
-melt_row <- function(row, columns, brackets = c("<", ">"), sep = " ") {
-	row <- as.data.frame(row)
-	brackets.escaped <- esc(s = brackets)
-	pattern.ids <- stringr::str_c(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
-	ids <- stringr::str_extract_all(string = row, pattern = pattern.ids)
-	names(ids) <- columns
-	pattern.items <- stringr::str_c(brackets.escaped[1], "([0-9]+\\.*)+", brackets.escaped[2])
-	items <- stringr::str_split(string = row, pattern = pattern.items)
-	items <- lapply(
-		items,
-		function(i) {
-			if(!all(is.na(i)) && i[1] == "") {i[2:length(i)]} else {i}
-		}
-	)
-	names(items) <- columns
-	d <- row[0,,drop=FALSE]
-	data.table::setDF(d)
-
-	for(i in names(ids)) {
-		id <- ids[[i]]
-		if(!all(is.na(id))) {
-			it <- items[[i]]
-			new.rows <- gsub(stringr::str_c(brackets.escaped[1], "([0-9]+)\\.*.*"), "\\1", id)
-			new.ids <- gsub(stringr::str_c("(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")" ), "\\1\\3", id)
-			unique.new.rows <- unique(new.rows)
-			set <- stringr::str_c(new.ids, it)
-			f <- sapply(
-				unique.new.rows,
-				function(unr) {
-					fltr <- unr == new.rows
-					stringr::str_c(set[fltr], collapse = "")
-				}
-			)
-			for(n in unique.new.rows) {
-				d[as.numeric(n), i]<- gsub(pattern = stringr::str_c(esc(sep), "$"), replacement = "", x = f[names(f) == n], perl = TRUE)
-			}
-		}
-	}
-	data.table::setDT(d)
-}
