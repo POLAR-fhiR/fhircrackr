@@ -1042,6 +1042,12 @@ get_bundle <- function(
 	rm_tag = "div",
 	stop_on_error = 0) {
 
+	message10 <- function(...) {
+		if (verbose > 10) {
+			message(..., "\n")
+		}
+	}
+
 	#download response
 	for(n in seq_along(delay_between_attempts)) {
 		if(1 < verbose) {message("(", n, "): ", request)}
@@ -1069,7 +1075,7 @@ get_bundle <- function(
 				auth$basicAuth,
 				body = paste(unique(strsplit(paste0(body@content, params), "&")[[1]]), collapse = "&") #gets rid of double params
 			), silent = TRUE)
-
+			message10("FHIR-search response for POST-Request:", paste0(response))
 		} else {#search via GET
 			response <- try(httr::GET(
 				url = request,
@@ -1080,6 +1086,7 @@ get_bundle <- function(
 				),
 				auth$basicAuth
 			), silent = TRUE)
+			message10("FHIR-search response for GET-Request:", paste0(response))
 		}
 
 		#check for errors: Upgrade warning to error depending on stop_on_error
@@ -1100,8 +1107,10 @@ get_bundle <- function(
 
 		#extract payload
 		payload <- try(httr::content(x = response, as = "text", encoding = "UTF-8"), silent = TRUE)
+		message10("FHIR-search Payload:", paste0(payload))
 		if(!inherits(payload, "try-error")) {
 			xml <- try(xml2::read_xml(x = payload), silent = TRUE)
+			message10("FHIR-search XML:", paste0(xml))
 			if(!inherits(xml, "try-error")) {
 				bundle <- fhir_bundle_xml(bundle = xml)
 				#try to remove tag/div
@@ -1114,6 +1123,7 @@ get_bundle <- function(
 						parent$warn_div_removal <- TRUE
 					}
 				}
+				message10("FHIR-search Bundle:", paste0(bundle))
 				return(bundle)
 			}
 		}
