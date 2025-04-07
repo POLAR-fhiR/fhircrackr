@@ -11,3 +11,4 @@
 ^fhircrackr\.pdf
 ^\.httr-oauth$
 ^CRAN-SUBMISSION$
+^\.github
