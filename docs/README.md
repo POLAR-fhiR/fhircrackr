@@ -50,6 +50,11 @@ look the other vignettes. This introduction covers the following topics:
 
 - Saving and loading downloaded bundles
 
+To cite the fhircrackr package, please use the following citation:
+
+Palm J, Meineke FA, Przybilla J, Peschel T. *"fhircrackr": An R Package Unlocking Fast Healthcare Interoperability Resources for Statistical Analysis.* Appl Clin Inform. 2023 Jan;14(1):54-64. doi: 10.1055/s-0042-1760436.
+
+
 ## Prerequisites
 
 The complexity of the problem requires a couple of prerequisites both
