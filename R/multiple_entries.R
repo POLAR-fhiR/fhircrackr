@@ -346,44 +346,25 @@ fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separat
 	# brackets should be something like c("[", "]")
 	brackets <- fix_brackets(brackets = brackets)
 	brackets.escaped <- esc(s = brackets)
-	non_number_one_indices_pattern <- paste0(brackets.escaped[1], "(\\d+(?:\\.\\d+)*)", brackets.escaped[2])
-	split_brackets_pattern <- paste0(brackets.escaped[1], "|", brackets.escaped[2])
-
-	# Any cell where the index does not consist exclusively of the digit 1 is meltable.
-	is_meltable_cell <- function(cell) {
-		if (is.na(cell)) return(FALSE)  # Ignore NA values
-
-		# Regular expression to extract numbers inside square brackets
-		matches <- regmatches(cell, gregexpr(non_number_one_indices_pattern, cell))[[1]]
-		if (length(matches) == 0) return(FALSE)  # Return FALSE if no matches are found
-
-		# Extract and check all numbers
-		for (match in matches) {
-			# Remove square brackets and split by periods
-			numbers <- unlist(strsplit(gsub(split_brackets_pattern, "", match), "\\."))
-
-			# Check if any number is not equal to 1
-			if (any(as.numeric(numbers) != 1)) {
-				return(TRUE)
-			}
-		}
-
-		return(FALSE)
-	}
-
-	# Function that terminates immediately if a number != 1 is found in a column index
-	is_meltable_column <- function(col) {
-		for (cell in col) {
-			if (is_meltable_cell(cell)) {
-				return(TRUE)
-			}
-		}
-		return(FALSE)
-	}
+	non_one_index_pattern <- paste0(
+		brackets.escaped[1],
+		"(?:1[.])*(?:0|[2-9][0-9]*|1[0-9]+)(?:[.][0-9]+)*",
+		brackets.escaped[2]
+	)
+	first_row_gt_one_pattern <- paste0(
+		brackets.escaped[1],
+		"(?:0|[2-9][0-9]*|1[0-9]+)(?:[.]|",
+		brackets.escaped[2],
+		")"
+	)
 
 	get_meltable_columns <- function(indexed_data_frame) {
 		# Apply the function to each column and find the relevant columns
-		meltable_column <- sapply(indexed_data_frame, is_meltable_column)
+		meltable_column <- vapply(
+			indexed_data_frame,
+			function(col) any(grepl(non_one_index_pattern, col, perl = TRUE), na.rm = TRUE),
+			logical(1)
+		)
 		# Names of the columns that fulfill the condition
 		selected_columns <- names(indexed_data_frame)[meltable_column]
 	}
@@ -436,8 +417,12 @@ fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separat
 		if (!rlang::is_empty(prefixes)) {
 			for (prefix in prefixes) {
 				columns <- get_columns(prefix)
-				table <- fhir_melt_internal(table, columns, brackets, sep, id_name = "resource_identifier", all_columns = TRUE)
-				table[, resource_identifier := NULL]
+				skip_leaf_strip <- length(columns) == 1L &&
+					!any(grepl(non_one_index_pattern, table[[columns]], perl = TRUE), na.rm = TRUE)
+				if (!skip_leaf_strip) {
+					table <- fhir_melt_internal(table, columns, brackets, sep, id_name = "resource_identifier", all_columns = TRUE)
+					table[, resource_identifier := NULL]
+				}
 			}
 		} else {
 			break
@@ -470,20 +455,29 @@ fhir_melt_all <- function(indexed_data_frame, brackets, sep, column_name_separat
 #' @noRd
 melt_row <- function(row, columns, pattern.rows, pattern.rows.next.start, pattern.ids, pattern.ids_2) {
 	row <- as.data.frame(row)
+
+	# Extract IDs per column
 	ids <- stringr::str_extract_all(string = row, pattern = pattern.ids)
 	names(ids) <- columns
-	items <- stringr::str_split(string = row, pattern = pattern.ids)
-	items <- lapply(
-		items,
-		function(i) {
-			if (!all(is.na(i)) && i[1] == "") i[2:length(i)] else i
-		}
-	)
-	names(items) <- columns
-	d <- row[0, , drop = FALSE]
-	data.table::setDF(d)
 
-	for(i in names(ids)) {
+	# Split values per column (removing empty prefix if present)
+	items <- stringr::str_split(string = row, pattern = pattern.ids)
+	items <- lapply(items, function(i) {
+		if (!all(is.na(i)) && i[1] == "") i[2:length(i)] else i
+	})
+	names(items) <- columns
+
+	# Compute max required row index
+	row_ids_all <- as.integer(gsub(pattern.rows, "\\1", unlist(ids)))
+	row_ids_all <- row_ids_all[!is.na(row_ids_all)]
+	max_row_index <- if (length(row_ids_all) == 0) 0 else max(row_ids_all)
+
+	# Create empty result data.table
+	d <- data.table::as.data.table(matrix(NA_character_, nrow = max_row_index, ncol = ncol(row)))
+	data.table::setnames(d, names(row))
+
+	# Fill result table
+	for (i in names(ids)) {
 		id <- ids[[i]]
 		if (!all(is.na(id))) {
 			it <- items[[i]]
@@ -491,19 +485,27 @@ melt_row <- function(row, columns, pattern.rows, pattern.rows.next.start, patter
 			new.ids <- gsub(pattern.ids_2, "\\1\\3", id)
 			unique.new.rows <- unique(new.rows)
 			set <- paste0(new.ids, it)
-			f <- sapply(
-				unique.new.rows,
-				function(unr) {
-					fltr <- unr == new.rows
-					paste0(set[fltr], collapse = "")
-				}
-			)
+			f <- sapply(unique.new.rows, function(unr) {
+				fltr <- unr == new.rows
+				paste0(set[fltr], collapse = "")
+			})
 			for (n in unique.new.rows) {
-				d[as.numeric(n), i]<- gsub(pattern = pattern.rows.next.start, replacement = "", x = f[names(f) == n], perl = TRUE)
+				data.table::set(
+					d,
+					i = as.integer(n),
+					j = i,
+					value = gsub(
+						pattern = pattern.rows.next.start,
+						replacement = "",
+						x = f[names(f) == n],
+						perl = TRUE
+					)
+				)
 			}
 		}
 	}
-	data.table::setDT(d)
+
+	return(d)
 }
 
 #' Internal function to melt multiple entries in a data.table
@@ -531,6 +533,8 @@ fhir_melt_internal <- function(indexed_dt, columns, brackets, sep, id_name, all_
 	pattern.rows <- paste0(brackets.escaped[1], "([0-9]+)\\.*.*")
 	pattern.rows.next.start <- paste0(esc(sep), "$")
 	pattern.ids_2 <- paste0("(", brackets.escaped[1], ")([0-9]+)\\.*(.*", brackets.escaped[2], ")")
+	pattern.first.row.gt.one <- paste0(brackets.escaped[1], "(?:0|[2-9][0-9]*|1[0-9]+)(?:[.]|", brackets.escaped[2], ")")
+	pattern.first.index <- paste0(brackets.escaped[1], "[0-9]+[.]?")
 
 	# this setDT() must be in any case (even if it is already a data.table!) to force a complete
 	# loading of the table into memory and to avoid potential warnings, even if it is already a
@@ -538,11 +542,203 @@ fhir_melt_internal <- function(indexed_dt, columns, brackets, sep, id_name, all_
 	data.table::setDT(indexed_dt)
 	# add column with column index to separate each row
 	data.table::set(indexed_dt, j = id_name, value = 1:nrow(indexed_dt))
-	expanded <- indexed_dt[, melt_row(.SD, columns = columns, pattern.rows, pattern.rows.next.start, pattern.ids, pattern.ids_2),
-						   by = eval((id_name)), .SDcols = columns]
+
+	has_indices <- vapply(
+		indexed_dt[, columns, with = FALSE],
+		function(col) any(grepl(pattern.ids, col), na.rm = TRUE),
+		logical(1)
+	)
+	indexed_columns <- columns[has_indices]
+	if (length(indexed_columns) == 0) {
+		if (all_columns) {
+			return(data.table::copy(indexed_dt))
+		}
+		return(data.table::copy(indexed_dt[, c(id_name, columns), with = FALSE]))
+	}
+	has_multiple_rows <- vapply(
+		indexed_dt[, indexed_columns, with = FALSE],
+		function(col) any(grepl(pattern.first.row.gt.one, col, perl = TRUE), na.rm = TRUE),
+		logical(1)
+	)
+	strip_first_index <- function(dt) {
+		if (nrow(dt) == 0) return(dt)
+		result <- data.table::as.data.table(lapply(
+			dt[, indexed_columns, with = FALSE],
+			stringr::str_replace_all,
+			pattern = pattern.first.index,
+			replacement = brackets[[1]]
+		))
+		data.table::setnames(result, indexed_columns)
+		dt[, indexed_columns] <- result
+		data.table::setkeyv(dt, id_name)
+		dt
+	}
+	parse_entry_ids <- function(extracted_ids) {
+		open_length <- nchar(brackets[[1]], type = "chars")
+		close_length <- nchar(brackets[[2]], type = "chars")
+		inner_ids <- substr(
+			x = extracted_ids,
+			start = open_length + 1L,
+			stop = nchar(extracted_ids, type = "chars") - close_length
+		)
+		dot_position <- regexpr(".", inner_ids, fixed = TRUE)
+		has_dot <- dot_position > 0L
+
+		melted_row <- integer(length(inner_ids))
+		melted_row[has_dot] <- as.integer(substr(
+			x = inner_ids[has_dot],
+			start = 1L,
+			stop = dot_position[has_dot] - 1L
+		))
+		melted_row[!has_dot] <- as.integer(inner_ids[!has_dot])
+
+		remaining_id <- rep.int(paste0(brackets[[1]], brackets[[2]]), length(inner_ids))
+		remaining_id[has_dot] <- paste0(
+			brackets[[1]],
+			substr(
+				x = inner_ids[has_dot],
+				start = dot_position[has_dot] + 1L,
+				stop = nchar(inner_ids[has_dot], type = "chars")
+			),
+			brackets[[2]]
+		)
+
+		list(melted_row = melted_row, remaining_id = remaining_id)
+	}
+	if (!any(has_multiple_rows)) {
+		expanded <- if (all_columns) {
+			data.table::copy(indexed_dt)
+		} else {
+			data.table::copy(indexed_dt[, c(id_name, indexed_columns), with = FALSE])
+		}
+		return(strip_first_index(expanded))
+	}
+
+	row_has_multiple_rows <- Reduce(
+		`|`,
+		lapply(
+			indexed_columns[has_multiple_rows],
+			function(column) {
+				hits <- grepl(pattern.first.row.gt.one, indexed_dt[[column]], perl = TRUE)
+				hits[is.na(hits)] <- FALSE
+				hits
+			}
+		)
+	)
+	if (any(!row_has_multiple_rows)) {
+		fast_rows <- if (all_columns) {
+			data.table::copy(indexed_dt[!row_has_multiple_rows])
+		} else {
+			data.table::copy(indexed_dt[!row_has_multiple_rows, c(id_name, indexed_columns), with = FALSE])
+		}
+		fast_rows <- strip_first_index(fast_rows)
+
+		slow_rows <- data.table::copy(indexed_dt[row_has_multiple_rows])
+		original_ids <- slow_rows[[id_name]]
+		slow_rows <- fhir_melt_internal(
+			indexed_dt = slow_rows,
+			columns = columns,
+			brackets = brackets,
+			sep = sep,
+			id_name = id_name,
+			all_columns = all_columns
+		)
+		slow_rows[, (id_name) := original_ids[get(id_name)]]
+
+		expanded <- data.table::rbindlist(
+			list(fast_rows, slow_rows),
+			use.names = TRUE,
+			fill = TRUE
+		)
+		data.table::setkeyv(expanded, id_name)
+		return(expanded)
+	}
+
+	column_entries <- lapply(indexed_columns, function(column) {
+		ids <- stringr::str_extract_all(string = indexed_dt[[column]], pattern = pattern.ids)
+		items <- stringr::str_split(string = indexed_dt[[column]], pattern = pattern.ids)
+		items <- Map(function(item, id) {
+			if (length(id) == 0 || all(is.na(id))) return(character())
+			if (!all(is.na(item)) && item[1] == "") item[2:length(item)] else item
+		}, item = items, id = ids)
+		ids <- lapply(ids, function(id) {
+			if (length(id) == 0 || all(is.na(id))) character() else id
+		})
+
+		entries_per_row <- lengths(ids)
+		if (sum(entries_per_row) == 0) {
+			return(list(
+				max_rows = integer(nrow(indexed_dt)),
+				values = data.table::setnames(
+					data.table::data.table(
+						resource_row = integer(),
+						melted_row = integer(),
+						column_value = character()
+					),
+					"column_value",
+					column
+				)
+			))
+		}
+
+		resource_row <- rep.int(indexed_dt[[id_name]], entries_per_row)
+		extracted_ids <- unlist(ids, use.names = FALSE)
+		extracted_items <- unlist(items[entries_per_row > 0], use.names = FALSE)
+		parsed_ids <- parse_entry_ids(extracted_ids)
+
+		values <- data.table::data.table(
+			resource_row = resource_row,
+			melted_row = parsed_ids$melted_row,
+			value = paste0(parsed_ids$remaining_id, extracted_items)
+		)
+		values <- values[
+			,
+			.(value = paste0(value, collapse = "")),
+			by = .(resource_row, melted_row)
+		]
+		has_trailing_sep <- endsWith(values$value, sep)
+		if (any(has_trailing_sep)) {
+			values[
+				has_trailing_sep,
+				value := substr(value, 1L, nchar(value, type = "chars") - nchar(sep, type = "chars"))
+			]
+		}
+
+		max_rows_by_resource <- values[, .(max_row = max(melted_row)), by = resource_row]
+
+		list(
+			max_rows = max_rows_by_resource[
+				match(indexed_dt[[id_name]], resource_row),
+				max_row
+			],
+			values = data.table::setnames(values, "value", column)
+		)
+	})
+
+	max_rows <- do.call(pmax, c(lapply(column_entries, `[[`, "max_rows"), list(na.rm = TRUE)))
+	max_rows[is.na(max_rows)] <- 0L
+	expanded <- data.table::data.table(
+		resource_row = rep.int(indexed_dt[[id_name]], max_rows),
+		melted_row = sequence(max_rows)
+	)
+
+	for (column_entry in column_entries) {
+		expanded <- merge.data.table(
+			x = expanded,
+			y = column_entry$values,
+			by = c("resource_row", "melted_row"),
+			all.x = TRUE,
+			sort = FALSE
+		)
+	}
+	for (column in setdiff(indexed_columns, names(expanded))) {
+		expanded[, (column) := NA_character_]
+	}
+	data.table::setnames(expanded, "resource_row", id_name)
+	expanded[, melted_row := NULL]
 
 	if (all_columns) {
-		rest <- setdiff(names(indexed_dt), columns)
+		rest <- setdiff(names(indexed_dt), indexed_columns)
 		expanded <- merge.data.table(
 			x = expanded,
 			y = indexed_dt[, rest, with = FALSE],
@@ -594,11 +790,37 @@ fhir_rm_indices <- function(indexed_data_frame, brackets = c("<", ">"), columns 
 	brackets <- fix_brackets(brackets = brackets)
 	brackets.escaped <- esc(s = brackets)
 	pattern.ids <- stringr::str_c(brackets.escaped[1], "([0-9]+\\.*)*", brackets.escaped[2])
-	if (!any(grepl(pattern.ids, indexed_dt))) {
+	columns_with_indices <- columns[vapply(
+		indexed_dt[, columns, with = FALSE],
+		function(col) any(grepl(brackets[[1]], col, fixed = TRUE), na.rm = TRUE),
+		logical(1)
+	)]
+	if (length(columns_with_indices) == 0) {
 		warning("The brackets you specified don't seem to appear in the data.frame.")
+		if (!is_DT) data.table::setDF(x = indexed_dt)
+		return(indexed_dt)
 	}
-	result <- data.table::data.table(gsub(pattern = pattern.ids, replacement = "", x = as.matrix(indexed_dt[,columns, with = FALSE])))
-	indexed_dt[,columns] <- result
+	indexed_columns_dt <- indexed_dt[,columns_with_indices, with = FALSE]
+	result <- lapply(
+		indexed_columns_dt,
+		stringr::str_replace_all,
+		pattern = pattern.ids,
+		replacement = ""
+	)
+	names(result) <- columns_with_indices
+	indices_removed <- FALSE
+	for (column in columns_with_indices) {
+		if (!identical(indexed_columns_dt[[column]], result[[column]])) {
+			indices_removed <- TRUE
+			break
+		}
+	}
+	if (!indices_removed) {
+		warning("The brackets you specified don't seem to appear in the data.frame.")
+		if (!is_DT) data.table::setDF(x = indexed_dt)
+		return(indexed_dt)
+	}
+	indexed_dt[,(columns_with_indices) := result]
 	if (!is_DT) data.table::setDF(x = indexed_dt)
 	indexed_dt
 }
@@ -719,4 +941,3 @@ fhir_collapse <- function(indexed_data_frame, columns, sep, brackets, collapse =
 
 ########################################################################################
 ########################################################################################
-

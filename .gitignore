@@ -51,3 +51,5 @@ tmp/*
 inst/doc
 doc
 Meta
+.positai
+.claude

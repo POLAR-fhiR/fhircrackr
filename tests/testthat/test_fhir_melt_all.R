@@ -103,6 +103,113 @@ testthat::test_that(
 	}
 )
 
+testthat::test_that(
+	"fhir_melt_all supports FHIR path column names with slash separators",{
+		d <- data.table::data.table(
+			id = c("[1]resource-a", "[1]resource-b"),
+			`meta/profile` = c("[1]profile-a", "[1]profile-b"),
+			`identifier/system` = c("[1]system-a|[2]system-b", "[1]system-c"),
+			`identifier/value` = c("[1]value-a|[2]value-b", "[1]value-c"),
+			`component/code/coding/system` = c("[1.1]loinc|[1.2]snomed|[2.1]ucum", "[1.1]loinc"),
+			`component/code/coding/code` = c("[1.1]code-a|[1.2]code-b|[2.1]code-c", "[1.1]code-d"),
+			`component/valueQuantity/value` = c("[1]1.0|[2]2.0", "[1]3.0")
+		)
+
+		get_path_columns <- function(data_frame, column_names_prefix) {
+			pattern <- paste0("^", column_names_prefix, "($|/)")
+			grep(pattern, names(data_frame), value = TRUE)
+		}
+
+		d1 <- fhir_melt(d, columns = get_path_columns(d, "identifier"), brackets = brackets, sep = sep, all_columns = T)
+		d1 <- fhir_melt(d1, columns = get_path_columns(d1, "component"), brackets = brackets, sep = sep, all_columns = T)
+		d1 <- fhir_melt(d1, columns = get_path_columns(d1, "component/code"), brackets = brackets, sep = sep, all_columns = T)
+		d1 <- fhir_melt(d1, columns = get_path_columns(d1, "component/code/coding"), brackets = brackets, sep = sep, all_columns = T)
+		d1 <- fhir_rm_indices(d1, brackets = brackets)
+		d1[, resource_identifier:=NULL]
+
+		d2 <- fhir_melt_all(d, brackets = brackets, sep = sep, column_name_separator = "/")
+
+		testthat::expect_identical(d1, d2)
+	}
+)
+
+testthat::test_that(
+	"fhir_melt_all handles single slash-separated leaf columns",{
+		repeating_leaf <- data.table::data.table(
+			id = c("[1]resource-a", "[1]resource-b"),
+			`note/text` = c("[1]note-a|[2]note-b", "[1]note-c")
+		)
+		expected_repeating_leaf <- data.table::data.table(
+			id = c("resource-a", "resource-a", "resource-b"),
+			`note/text` = c("note-a", "note-b", "note-c")
+		)
+
+		nested_leaf <- data.table::data.table(
+			id = c("[1]resource-a", "[1]resource-b"),
+			`component/code/coding/code` = c("[1.1]code-a|[1.2]code-b", "[1.1]code-c")
+		)
+		expected_nested_leaf <- data.table::data.table(
+			id = c("resource-a", "resource-a", "resource-b"),
+			`component/code/coding/code` = c("code-a", "code-b", "code-c")
+		)
+
+		testthat::expect_identical(
+			fhir_melt_all(repeating_leaf, brackets = brackets, sep = sep, column_name_separator = "/"),
+			expected_repeating_leaf
+		)
+		testthat::expect_identical(
+			fhir_melt_all(nested_leaf, brackets = brackets, sep = sep, column_name_separator = "/"),
+			expected_nested_leaf
+		)
+	}
+)
+
+testthat::test_that(
+	"fhir_melt_all preserves sparse coding attributes by index",{
+		d <- data.table::data.table(
+			id = "[1]resource-a",
+			`code/coding/code` = "[1.1]code-a|[1.2]code-b",
+			`code/coding/system` = "[1.2]system-b",
+			`code/coding/display` = "[1.1]display-a"
+		)
+		expected <- data.table::data.table(
+			id = c("resource-a", "resource-a"),
+			`code/coding/code` = c("code-a", "code-b"),
+			`code/coding/system` = c(NA_character_, "system-b"),
+			`code/coding/display` = c("display-a", NA_character_)
+		)
+
+		testthat::expect_identical(
+			fhir_melt_all(d, brackets = brackets, sep = sep, column_name_separator = "/"),
+			expected
+		)
+	}
+)
+
+testthat::test_that(
+	"fhir_melt_all preserves collapsed slash-separated patient names",{
+		d <- data.table::data.table(
+			id = "[1]patient-a",
+			`name/family` = "[1.1]Smith|[2.1]Baker",
+			`name/given` = "[1.1]Marie|[1.2]Luise|[2.1]Lea|[2.2]Sophie|[2.3]Anna",
+			`name/use` = "[1.1]official|[2.1]nickname"
+		)
+		expected <- data.table::data.table(
+			id = c("patient-a", "patient-a"),
+			`name/family` = c("Smith", "Baker"),
+			`name/given` = c("Marie Luise ", "Lea Sophie Anna"),
+			`name/use` = c("official", "nickname")
+		)
+
+		d <- fhir_collapse(d, columns = "name/given", sep = sep, brackets = brackets)
+
+		testthat::expect_identical(
+			fhir_melt_all(d, brackets = brackets, sep = sep, column_name_separator = "/"),
+			expected
+		)
+	}
+)
+
 ## longer examples
 
 bundle1 <- fhir_bundle_list(list(fhir_bundle_xml(xml2::read_xml(
