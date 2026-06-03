@@ -1,6 +1,6 @@
 ## This file contains all functions dealing with multiple entries/indices##
 ## Exported functions are on top, internal functions below ##
-resource_identifier <- NULL #To stop "no visible binding" NOTE in check()
+resource_identifier <- melted_row <- max_row <- NULL #To stop "no visible binding" NOTE in check()
 #' Cast table with multiple entries
 #' This function divides multiple entries in a compact indexed table as produced by [fhir_crack()] into separate columns.
 #'
