@@ -1338,7 +1338,8 @@ get_ncores <- function(os) {
 limit_ncores <- function(ncores) {
 	os <- get_os()
 	available_cores <- get_ncores(os)
-	if(is.null(ncores)) 1 else min(c(available_cores, ncores))
+	if (is.na(available_cores)) available_cores <- 1
+	if (is.null(ncores)) 1 else max(1, min(c(available_cores, ncores), na.rm = TRUE))
 }
 
 #' Escape characters reserved in xml

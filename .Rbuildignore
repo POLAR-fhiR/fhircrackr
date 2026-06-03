@@ -12,3 +12,5 @@
 ^\.httr-oauth$
 ^CRAN-SUBMISSION$
 ^\.github
+^\.positai$
+^\.claude$
