@@ -5,8 +5,8 @@ testthat::test_that(
 		d <- fhir_crack(bundles,
 						design = fhir_table_description(
 							resource = "Patient",
-							brackets = brackets,
-							sep = sep),
+							brackets = c("[", "]"),
+							sep = "|"),
 						verbose = 0
 		)
 		fhir_collapse(d, columns = "address.line", sep = "|", brackets = c("[", "]"))

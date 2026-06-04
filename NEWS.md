@@ -1,3 +1,9 @@
+# fhircrackr 2.4.0
+
+## Optimizations
+- Optimized `fhir_melt_all()` and internal functions for `fhir_melt()`. Both functions should now run considerably faster.
+
+
 # fhircrackr 2.3.0
 
 ## Bug fixes

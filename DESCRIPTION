@@ -1,8 +1,8 @@
 Package: fhircrackr
 Type: Package
 Title: Handling HL7 FHIR® Resources in R
-Version: 2.3.9000
-Date: 2025-04-07
+Version: 2.4.0
+Date: 2026-06-04
 Authors@R: c(
     person( given = "Thomas", 
             family = "Peschel", 
@@ -23,7 +23,7 @@ Authors@R: c(
             role = "aut",
             comment=c(ORCID = "0000-0002-9256-7543")))
 Description: Useful tools for conveniently downloading FHIR resources in xml format 
-    and converting them to R data.frames. The package uses FHIR-search to download bundles 
+    and converting them to R data.frames. Uses FHIR-search to download bundles 
     from a FHIR server, provides functions to save and read xml-files containing such bundles 
     and allows flattening the bundles to data.frames using XPath expressions. FHIR® is the registered trademark 
     of HL7 and is used with the permission of HL7. Use of the FHIR trademark does not constitute endorsement of this product by HL7.
