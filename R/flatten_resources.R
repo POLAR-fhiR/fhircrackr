@@ -623,24 +623,70 @@ crack_given_columns_nodes_to_long <- function(nodes, columns, table_description,
 #' @param ket Closing bracket for indices
 #' @noRd
 cast_compact_given_columns <- function(d, table_description, use_indices, bra, ket) {
+	entries <- sort(unique(d$entry))
+	cols <- sort(unique(d$column))
+	values <- matrix(NA_character_, nrow = length(entries), ncol = length(cols))
+
+	# Dense repeated columns are faster with data.table's grouped collapse.
+	if(nrow(d) / (length(entries) * length(table_description@cols)) > 2) {
+		if(use_indices) {
+			d <- d[
+				,
+				paste0(bra, id, ket, value, collapse = table_description@sep),
+				by = c('entry', 'column')
+			]
+		} else {
+			d <- d[
+				,
+				paste0(value, collapse = table_description@sep),
+				by = c('entry', 'column')
+			]
+		}
+		values[cbind(match(d$entry, entries), match(d$column, cols))] <- d$V1
+		return(data.table::setnames(data.table::as.data.table(values), cols))
+	}
+
+	data.table::setorder(d, entry, column)
+	group_start <- c(TRUE, d$entry[-1L] != d$entry[-nrow(d)] | d$column[-1L] != d$column[-nrow(d)])
+	group_start <- which(group_start)
+	group_end <- c(group_start[-1L] - 1L, nrow(d))
+	group_size <- group_end - group_start + 1L
+	singleton_group <- group_size == 1L
+
 	if(use_indices) {
-		d <- d[
-			,
-			paste0(bra, id, ket, value, collapse = table_description@sep),
-			by = c('entry', 'column')
-		]
+		group_values <- paste0(bra, d$id, ket, d$value)
 	} else {
-		d <- d[
+		group_values <- d$value
+	}
+
+	if(any(singleton_group)) {
+		singleton_start <- group_start[singleton_group]
+		values[
+			cbind(
+				match(d$entry[singleton_start], entries),
+				match(d$column[singleton_start], cols)
+			)
+		] <- group_values[singleton_start]
+	}
+
+	if(any(!singleton_group)) {
+		multi_rows <- rep(!singleton_group, group_size)
+		multi_values <- data.table(
+			entry = d$entry[multi_rows],
+			column = d$column[multi_rows],
+			value = group_values[multi_rows]
+		)[
 			,
 			paste0(value, collapse = table_description@sep),
 			by = c('entry', 'column')
 		]
+		values[
+			cbind(
+				match(multi_values$entry, entries),
+				match(multi_values$column, cols)
+			)
+		] <- multi_values$V1
 	}
-
-	entries <- sort(unique(d$entry))
-	cols <- sort(unique(d$column))
-	values <- matrix(NA_character_, nrow = length(entries), ncol = length(cols))
-	values[cbind(match(d$entry, entries), match(d$column, cols))] <- d$V1
 	data.table::setnames(data.table::as.data.table(values), cols)
 }
 
