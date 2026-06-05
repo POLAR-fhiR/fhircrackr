@@ -590,10 +590,6 @@ crack_given_columns_nodes_to_long <- function(nodes, columns, table_description,
 		columns <- paste0(columns, "@", substring(paths, attr_start + 2L))
 	}
 
-	resource_start <- entry_close + nchar("]/resource/")
-	slash_after_resource <- regexpr("/", substring(paths, resource_start), fixed = TRUE)
-	spath_start <- resource_start + slash_after_resource
-	spath <- substr(paths, spath_start, attr_start - 1L)
 	d <- data.table(
 		entry  = as.integer(substr(paths, nchar("/Bundle/entry[") + 1L, entry_close - 1L)),
 		column = columns,
@@ -601,6 +597,10 @@ crack_given_columns_nodes_to_long <- function(nodes, columns, table_description,
 	)
 
 	if(use_indices) {
+		resource_start <- entry_close + nchar("]/resource/")
+		slash_after_resource <- regexpr("/", substring(paths, resource_start), fixed = TRUE)
+		spath_start <- resource_start + slash_after_resource
+		spath <- substr(paths, spath_start, attr_start - 1L)
 		unique_spath <- unique(spath)
 		indexed_spath <- gsub(
 			pattern = "(^|/)([^/[]+)(?=/|$)",
