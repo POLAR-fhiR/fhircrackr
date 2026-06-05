@@ -615,6 +615,35 @@ crack_given_columns_nodes_to_long <- function(nodes, columns, table_description,
 	d
 }
 
+#' Cast compact given-column values to one row per resource entry
+#' @param d A long data.table with entry, column, value and optional id columns
+#' @param table_description A fhir_table_description
+#' @param use_indices Whether FHIR path indices should be prepended to values
+#' @param bra Opening bracket for indices
+#' @param ket Closing bracket for indices
+#' @noRd
+cast_compact_given_columns <- function(d, table_description, use_indices, bra, ket) {
+	if(use_indices) {
+		d <- d[
+			,
+			paste0(bra, id, ket, value, collapse = table_description@sep),
+			by = c('entry', 'column')
+		]
+	} else {
+		d <- d[
+			,
+			paste0(value, collapse = table_description@sep),
+			by = c('entry', 'column')
+		]
+	}
+
+	entries <- sort(unique(d$entry))
+	cols <- sort(unique(d$column))
+	values <- matrix(NA_character_, nrow = length(entries), ncol = length(cols))
+	values[cbind(match(d$entry, entries), match(d$column, cols))] <- d$V1
+	data.table::setnames(data.table::as.data.table(values), cols)
+}
+
 #' Convert Bundles to a wide table when only some elements should be extracted
 #' @param bundles A fhir_bundle_list
 #' @param table_description A fhir_table_description with a non-empty cols element
@@ -742,11 +771,21 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 							use_indices       = use_indices
 						)
 						if(use_indices) {
-							d[, indexed_value := paste0(bra, id, ket, value)]
-							d <- (d[, paste0(indexed_value, collapse = table_description@sep), by=c('entry', 'column')] |>
-								  	dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
+							d <- cast_compact_given_columns(
+								d                 = d,
+								table_description = table_description,
+								use_indices       = TRUE,
+								bra               = bra,
+								ket               = ket
+							)
 						} else {
-							d <- (d[, paste0(value, collapse = table_description@sep), by=c('entry', 'column')] |> dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
+							d <- cast_compact_given_columns(
+								d                 = d,
+								table_description = table_description,
+								use_indices       = FALSE,
+								bra               = bra,
+								ket               = ket
+							)
 						}
 					}
 				},
