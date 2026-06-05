@@ -787,60 +787,69 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 		paste0('./entry/resource/', table_description@resource, '/', table_description@cols, '/@*'),
 		names(table_description@cols)
 	)
-	result <- unique(
-		data.table::rbindlist(
-			parallel::mclapply(
-				seq_along(bundles),
-				function(bundle_id) {# bundle_id <- 1
-					bundle_ns <- xml2::xml_ns(bundles[[bundle_id]])
-					colwise_list <- lapply(
-						xpaths,
-						function(xpath) {# xpath <- table_description@cols[[1]]
-							xml2::xml_find_all(
-								bundles[[bundle_id]],
-								xpath,
-								ns = bundle_ns
-							)
-						}
-					)
-					nodelist <-	unlist(
-						colwise_list,
-						recursive = FALSE,
-						use.names = FALSE
-					)
-
-					if(0 < length(nodelist)){
-						d <- crack_given_columns_nodes_to_long(
-							nodes             = xml_nodeset(nodelist, deduplicate = FALSE),
-							columns           = rep(names(colwise_list), lengths(colwise_list)),
-							table_description = table_description,
-							use_indices       = use_indices
+	result <- data.table::rbindlist(
+		parallel::mclapply(
+			seq_along(bundles),
+			function(bundle_id) {# bundle_id <- 1
+				bundle_ns <- xml2::xml_ns(bundles[[bundle_id]])
+				colwise_list <- lapply(
+					xpaths,
+					function(xpath) {# xpath <- table_description@cols[[1]]
+						xml2::xml_find_all(
+							bundles[[bundle_id]],
+							xpath,
+							ns = bundle_ns
 						)
-						if(use_indices) {
-							d <- cast_compact_given_columns(
-								d                 = d,
-								table_description = table_description,
-								use_indices       = TRUE,
-								bra               = bra,
-								ket               = ket
-							)
-						} else {
-							d <- cast_compact_given_columns(
-								d                 = d,
-								table_description = table_description,
-								use_indices       = FALSE,
-								bra               = bra,
-								ket               = ket
-							)
-						}
 					}
-				},
-				mc.cores = ncores
-			),
-			use.names = TRUE,
-			fill = TRUE
-		)
+				)
+				nodelist <-	unlist(
+					colwise_list,
+					recursive = FALSE,
+					use.names = FALSE
+				)
+
+				if(0 < length(nodelist)){
+					d <- crack_given_columns_nodes_to_long(
+						nodes             = xml_nodeset(nodelist, deduplicate = FALSE),
+						columns           = rep(names(colwise_list), lengths(colwise_list)),
+						table_description = table_description,
+						use_indices       = use_indices
+					)
+					if(use_indices) {
+						d <- cast_compact_given_columns(
+							d                 = d,
+							table_description = table_description,
+							use_indices       = TRUE,
+							bra               = bra,
+							ket               = ket
+						)
+					} else {
+						d <- cast_compact_given_columns(
+							d                 = d,
+							table_description = table_description,
+							use_indices       = FALSE,
+							bra               = bra,
+							ket               = ket
+						)
+					}
+				}
+			},
+			mc.cores = ncores
+		),
+		use.names = TRUE,
+		fill = TRUE
 	)
+	resource_id_col <- names(table_description@cols)[table_description@cols == "id"]
+	if(
+		nrow(result) != 0 &&
+		(
+			length(resource_id_col) != 1 ||
+			!resource_id_col %in% names(result) ||
+			anyDuplicated(result[[resource_id_col]]) != 0
+		)
+	) {
+		result <- unique(result)
+	}
 	if(rm_dummy){result[,grep("^dummy", names(result)):=NULL]}
 	result
 }

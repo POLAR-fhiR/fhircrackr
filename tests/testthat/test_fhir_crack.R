@@ -237,6 +237,30 @@ testthat::test_that(
 )
 
 testthat::test_that(
+	"fhir_crack compact given columns deduplicates repeated resource ids", {
+		bundles <- fhir_unserialize(example_bundles3)
+		duplicated_bundles <- fhir_bundle_list(c(bundles, bundles))
+
+		compact <- fhir_crack(
+			bundles = duplicated_bundles,
+			design = fhir_table_description(
+				resource = "Patient",
+				cols = c(id = "id", city = "address/city")
+			),
+			verbose = 0,
+			data.table = TRUE
+		)
+
+		testthat::expect_equal(nrow(compact), 3L)
+		testthat::expect_equal(compact$id, c("id1", "id2", "id3"))
+		testthat::expect_equal(
+			compact$city,
+			c("Amsterdam", "Rome:::Stockholm", "Berlin:::London")
+		)
+	}
+)
+
+testthat::test_that(
 	"fhir_crack wide given columns produces correct output",{
 		expect_snapshot_value({
 			bundles <- fhir_unserialize(example_bundles3)
