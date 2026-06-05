@@ -1,7 +1,7 @@
 ## This file contains all functions needed for flattening ##
 ## Exported functions are on top, internal functions below ##
 
-path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- dummy <- NULL #To stop "no visible binding" NOTE in check()
+path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- dummy <- indexed_value <- NULL #To stop "no visible binding" NOTE in check()
 
 
 #' Flatten list of FHIR bundles
@@ -601,13 +601,15 @@ crack_given_columns_nodes_to_long <- function(nodes, columns, table_description,
 	)
 
 	if(use_indices) {
+		unique_spath <- unique(spath)
 		indexed_spath <- gsub(
 			pattern = "(^|/)([^/[]+)(?=/|$)",
 			replacement = "\\11",
-			x = spath,
+			x = unique_spath,
 			perl = TRUE
 		)
-		d[, id := gsub("(^\\.)|(\\.$)", "", gsub("[^0-9]+", ".", indexed_spath))]
+		ids <- gsub("(^\\.)|(\\.$)", "", gsub("[^0-9]+", ".", indexed_spath))
+		d[, id := ids[match(spath, unique_spath)]]
 	}
 
 	d
@@ -662,7 +664,7 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 
 				if(0 < length(nodelist)){
 					d <- crack_given_columns_nodes_to_long(
-						nodes             = xml_nodeset(nodelist),
+						nodes             = xml_nodeset(nodelist, deduplicate = FALSE),
 						columns           = rep(names(colwise_list), lengths(colwise_list)),
 						table_description = table_description,
 						use_indices       = TRUE
@@ -734,13 +736,14 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 
 					if(0 < length(nodelist)){
 						d <- crack_given_columns_nodes_to_long(
-							nodes             = xml_nodeset(nodelist),
+							nodes             = xml_nodeset(nodelist, deduplicate = FALSE),
 							columns           = rep(names(colwise_list), lengths(colwise_list)),
 							table_description = table_description,
 							use_indices       = use_indices
 						)
 						if(use_indices) {
-							d <- (d[, paste0(bra, id, ket, value, collapse = table_description@sep), by=c('entry', 'column')] |>
+							d[, indexed_value := paste0(bra, id, ket, value)]
+							d <- (d[, paste0(indexed_value, collapse = table_description@sep), by=c('entry', 'column')] |>
 								  	dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
 						} else {
 							d <- (d[, paste0(value, collapse = table_description@sep), by=c('entry', 'column')] |> dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]

@@ -196,6 +196,47 @@ testthat::test_that(
 )
 
 testthat::test_that(
+	"fhir_crack preserves nodes selected by overlapping columns", {
+		bundles <- fhir_unserialize(example_bundles3)
+		cols <- c(
+			any_city = "address/city",
+			home_city = "address[use[@value='home']]/city"
+		)
+
+		compact <- fhir_crack(
+			bundles = bundles,
+			design = fhir_table_description(resource = "Patient", cols = cols),
+			verbose = 0,
+			data.table = TRUE
+		)
+		testthat::expect_equal(
+			compact$home_city,
+			c("Amsterdam", "Rome", "Berlin")
+		)
+		testthat::expect_equal(
+			compact$any_city,
+			c("Amsterdam", "Rome:::Stockholm", "Berlin:::London")
+		)
+
+		wide <- fhir_crack(
+			bundles = bundles,
+			design = fhir_table_description(
+				resource = "Patient",
+				cols = cols,
+				format = "wide",
+				brackets = c("[", "]")
+			),
+			verbose = 0,
+			data.table = TRUE
+		)
+		testthat::expect_equal(wide$`[1.1]home_city`, c("Amsterdam", "Rome", "Berlin"))
+		testthat::expect_equal(wide$`[1.1]any_city`, c("Amsterdam", "Rome", "Berlin"))
+		testthat::expect_equal(wide$`[2.1]any_city`, c(NA, "Stockholm", NA))
+		testthat::expect_equal(wide$`[3.1]any_city`, c(NA, NA, "London"))
+	}
+)
+
+testthat::test_that(
 	"fhir_crack wide given columns produces correct output",{
 		expect_snapshot_value({
 			bundles <- fhir_unserialize(example_bundles3)
