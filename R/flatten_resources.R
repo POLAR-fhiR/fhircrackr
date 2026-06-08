@@ -815,23 +815,13 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 						table_description = table_description,
 						use_indices       = use_indices
 					)
-					if(use_indices) {
-						d <- cast_compact_given_columns(
-							d                 = d,
-							table_description = table_description,
-							use_indices       = TRUE,
-							bra               = bra,
-							ket               = ket
-						)
-					} else {
-						d <- cast_compact_given_columns(
-							d                 = d,
-							table_description = table_description,
-							use_indices       = FALSE,
-							bra               = bra,
-							ket               = ket
-						)
-					}
+					d <- cast_compact_given_columns(
+						d                 = d,
+						table_description = table_description,
+						use_indices       = use_indices,
+						bra               = bra,
+						ket               = ket
+					)
 				}
 			},
 			mc.cores = ncores
