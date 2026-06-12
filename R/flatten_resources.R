@@ -1,7 +1,7 @@
 ## This file contains all functions needed for flattening ##
 ## Exported functions are on top, internal functions below ##
 
-path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- dummy <- NULL #To stop "no visible binding" NOTE in check()
+path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- index <- dummy <- NULL #To stop "no visible binding" NOTE in check()
 
 
 #' Flatten list of FHIR bundles
@@ -574,121 +574,6 @@ crack_compact_all_columns <- function(bundles, table_description, ncores = 1) {
 	)
 }
 
-#' Convert extracted XML attribute nodes into a long table
-#' @param nodes XML attribute nodes extracted from one bundle
-#' @param columns Column names matching the extracted nodes
-#' @param table_description A fhir_table_description
-#' @param use_indices Whether FHIR path indices should be extracted
-#' @noRd
-crack_given_columns_nodes_to_long <- function(nodes, columns, table_description, use_indices) {
-	paths <- xml2::xml_path(nodes)
-	values <- xml2::xml_text(nodes)
-	entry_close <- regexpr("]", paths, fixed = TRUE)
-	attr_start <- regexpr("/@", paths, fixed = TRUE)
-
-	if(table_description@keep_attr) {
-		columns <- paste0(columns, "@", substring(paths, attr_start + 2L))
-	}
-
-	d <- data.table(
-		entry  = as.integer(substr(paths, nchar("/Bundle/entry[") + 1L, entry_close - 1L)),
-		column = columns,
-		value  = values
-	)
-
-	if(use_indices) {
-		resource_start <- entry_close + nchar("]/resource/")
-		slash_after_resource <- regexpr("/", substring(paths, resource_start), fixed = TRUE)
-		spath_start <- resource_start + slash_after_resource
-		spath <- substr(paths, spath_start, attr_start - 1L)
-		unique_spath <- unique(spath)
-		indexed_spath <- gsub(
-			pattern = "(^|/)([^/[]+)(?=/|$)",
-			replacement = "\\11",
-			x = unique_spath,
-			perl = TRUE
-		)
-		ids <- gsub("(^\\.)|(\\.$)", "", gsub("[^0-9]+", ".", indexed_spath))
-		d[, id := ids[match(spath, unique_spath)]]
-	}
-
-	d
-}
-
-#' Cast compact given-column values to one row per resource entry
-#' @param d A long data.table with entry, column, value and optional id columns
-#' @param table_description A fhir_table_description
-#' @param use_indices Whether FHIR path indices should be prepended to values
-#' @param bra Opening bracket for indices
-#' @param ket Closing bracket for indices
-#' @noRd
-cast_compact_given_columns <- function(d, table_description, use_indices, bra, ket) {
-	entries <- sort(unique(d$entry))
-	cols <- sort(unique(d$column))
-	values <- matrix(NA_character_, nrow = length(entries), ncol = length(cols))
-
-	# Dense repeated columns are faster with data.table's grouped collapse.
-	if(nrow(d) / (length(entries) * length(table_description@cols)) > 2) {
-		if(use_indices) {
-			d <- d[
-				,
-				paste0(bra, id, ket, value, collapse = table_description@sep),
-				by = c('entry', 'column')
-			]
-		} else {
-			d <- d[
-				,
-				paste0(value, collapse = table_description@sep),
-				by = c('entry', 'column')
-			]
-		}
-		values[cbind(match(d$entry, entries), match(d$column, cols))] <- d$V1
-		return(data.table::setnames(data.table::as.data.table(values), cols))
-	}
-
-	data.table::setorder(d, entry, column)
-	group_start <- c(TRUE, d$entry[-1L] != d$entry[-nrow(d)] | d$column[-1L] != d$column[-nrow(d)])
-	group_start <- which(group_start)
-	group_end <- c(group_start[-1L] - 1L, nrow(d))
-	group_size <- group_end - group_start + 1L
-	singleton_group <- group_size == 1L
-
-	if(use_indices) {
-		group_values <- paste0(bra, d$id, ket, d$value)
-	} else {
-		group_values <- d$value
-	}
-
-	if(any(singleton_group)) {
-		singleton_start <- group_start[singleton_group]
-		values[
-			cbind(
-				match(d$entry[singleton_start], entries),
-				match(d$column[singleton_start], cols)
-			)
-		] <- group_values[singleton_start]
-	}
-
-	if(any(!singleton_group)) {
-		multi_rows <- rep(!singleton_group, group_size)
-		multi_values <- data.table(
-			entry = d$entry[multi_rows],
-			column = d$column[multi_rows],
-			value = group_values[multi_rows]
-		)[
-			,
-			paste0(value, collapse = table_description@sep),
-			by = c('entry', 'column')
-		]
-		values[
-			cbind(
-				match(multi_values$entry, entries),
-				match(multi_values$column, cols)
-			)
-		] <- multi_values$V1
-	}
-	data.table::setnames(data.table::as.data.table(values), cols)
-}
 
 #' Convert Bundles to a wide table when only some elements should be extracted
 #' @param bundles A fhir_bundle_list
@@ -842,4 +727,128 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 	}
 	if(rm_dummy){result[,grep("^dummy", names(result)):=NULL]}
 	result
+}
+
+#' Convert extracted XML attribute nodes into a long table
+#' @param nodes XML attribute nodes extracted from one bundle
+#' @param columns Column names matching the extracted nodes
+#' @param table_description A fhir_table_description
+#' @param use_indices Whether FHIR path indices should be extracted
+#'
+#' @return A data.table with columns
+#' - entry: representing the entry in the FHIR-Bundle
+#' - column: the column name for the cracked table
+#' - value: the extracted value
+#' - index: FHIR path index for multiple values, only returned if use_indices=TRUE
+#'
+#' @noRd
+crack_given_columns_nodes_to_long <- function(nodes, columns, table_description, use_indices) {
+	paths <- xml2::xml_path(nodes)
+	values <- xml2::xml_text(nodes)
+	entry_close <- regexpr("]", paths, fixed = TRUE)
+	attr_start <- regexpr("/@", paths, fixed = TRUE)
+
+	if(table_description@keep_attr) {
+		columns <- paste0(columns, "@", substring(paths, attr_start + 2L))
+	}
+
+	d <- data.table(
+		entry  = as.integer(substr(paths, nchar("/Bundle/entry[") + 1L, entry_close - 1L)),
+		column = columns,
+		value  = values
+	)
+
+	if(use_indices) {
+		resource_start <- entry_close + nchar("]/resource/")
+		slash_after_resource <- regexpr("/", substring(paths, resource_start), fixed = TRUE)
+		spath_start <- resource_start + slash_after_resource
+		spath <- substr(paths, spath_start, attr_start - 1L)
+		unique_spath <- unique(spath)
+		indexed_spath <- gsub(
+			pattern = "(^|/)([^/[]+)(?=/|$)",
+			replacement = "\\11",
+			x = unique_spath,
+			perl = TRUE
+		)
+		ids <- gsub("(^\\.)|(\\.$)", "", gsub("[^0-9]+", ".", indexed_spath))
+		d[, index := ids[match(spath, unique_spath)]]
+	}
+
+	d
+}
+
+#' Convert a long table as returned by [crack_given_columns_nodes_to_long] to a table
+#' with one row per resource
+#' @param d A long data.table with entry, column, value and optional index columns
+#' @param table_description A fhir_table_description
+#' @param use_indices Whether FHIR path indices should be prepended to values
+#' @param bra Opening bracket for indices
+#' @param ket Closing bracket for indices
+#' @noRd
+cast_compact_given_columns <- function(d, table_description, use_indices, bra, ket) {
+	entries <- sort(unique(d$entry))
+	cols <- sort(unique(d$column))
+	values <- matrix(NA_character_, nrow = length(entries), ncol = length(cols))
+
+	# Dense repeated columns are faster with data.table's grouped collapse.
+	if(nrow(d) / (length(entries) * length(table_description@cols)) > 2) {
+		if(use_indices) {
+			d <- d[
+				,
+				paste0(bra, index, ket, value, collapse = table_description@sep),
+				by = c('entry', 'column')
+			]
+		} else {
+			d <- d[
+				,
+				paste0(value, collapse = table_description@sep),
+				by = c('entry', 'column')
+			]
+		}
+		values[cbind(match(d$entry, entries), match(d$column, cols))] <- d$V1
+		return(data.table::setnames(data.table::as.data.table(values), cols))
+	}
+
+	data.table::setorder(d, entry, column)
+	group_start <- c(TRUE, d$entry[-1L] != d$entry[-nrow(d)] | d$column[-1L] != d$column[-nrow(d)])
+	group_start <- which(group_start)
+	group_end <- c(group_start[-1L] - 1L, nrow(d))
+	group_size <- group_end - group_start + 1L
+	singleton_group <- group_size == 1L
+
+	if(use_indices) {
+		group_values <- paste0(bra, d$index, ket, d$value)
+	} else {
+		group_values <- d$value
+	}
+
+	if(any(singleton_group)) {
+		singleton_start <- group_start[singleton_group]
+		values[
+			cbind(
+				match(d$entry[singleton_start], entries),
+				match(d$column[singleton_start], cols)
+			)
+		] <- group_values[singleton_start]
+	}
+
+	if(any(!singleton_group)) {
+		multi_rows <- rep(!singleton_group, group_size)
+		multi_values <- data.table(
+			entry = d$entry[multi_rows],
+			column = d$column[multi_rows],
+			value = group_values[multi_rows]
+		)[
+			,
+			paste0(value, collapse = table_description@sep),
+			by = c('entry', 'column')
+		]
+		values[
+			cbind(
+				match(multi_values$entry, entries),
+				match(multi_values$column, cols)
+			)
+		] <- multi_values$V1
+	}
+	data.table::setnames(data.table::as.data.table(values), cols)
 }
