@@ -745,21 +745,29 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 crack_given_columns_nodes_to_long <- function(nodes, columns, table_description, use_indices) {
 	paths <- xml2::xml_path(nodes)
 	values <- xml2::xml_text(nodes)
-	entry_close <- regexpr("]", paths, fixed = TRUE)
+	entry_close <- regexpr("]/resource/", paths, fixed = TRUE)
 	attr_start <- regexpr("/@", paths, fixed = TRUE)
+	has_entry_index <- entry_close != -1L
+	entry <- rep.int(1L, length(paths))
+	entry[has_entry_index] <- as.integer(substr(
+		paths[has_entry_index],
+		nchar("/Bundle/entry[") + 1L,
+		entry_close[has_entry_index] - 1L
+	))
 
 	if(table_description@keep_attr) {
 		columns <- paste0(columns, "@", substring(paths, attr_start + 2L))
 	}
 
 	d <- data.table(
-		entry  = as.integer(substr(paths, nchar("/Bundle/entry[") + 1L, entry_close - 1L)),
+		entry  = entry,
 		column = columns,
 		value  = values
 	)
 
 	if(use_indices) {
-		resource_start <- entry_close + nchar("]/resource/")
+		resource_start <- rep.int(nchar("/Bundle/entry/resource/") + 1L, length(paths))
+		resource_start[has_entry_index] <- entry_close[has_entry_index] + nchar("]/resource/")
 		slash_after_resource <- regexpr("/", substring(paths, resource_start), fixed = TRUE)
 		spath_start <- resource_start + slash_after_resource
 		spath <- substr(paths, spath_start, attr_start - 1L)
