@@ -20,7 +20,7 @@ fhir_is_empty(bundles)
 \code{TRUE} if the bundle/bundle list is empty, \code{FALSE} if it is not empty.
 }
 \description{
-Checks if a \linkS4class{fhir_bundle_xml} or \linkS4class{fhir_bundle_list} is empty, i.e. does not contain any resources.
+Checks if a \link[=fhir_bundle_xml-class]{fhir_bundle_xml} or \link[=fhir_bundle_list-class]{fhir_bundle_list} is empty, i.e. does not contain any resources.
 }
 \details{
 Empty bundles are returned when a search on a FHIR server does not yield any resources,
@@ -28,9 +28,9 @@ such as when no resources on the server match the specified search criteria. In 
 the server responds with an empty searchset bundle.
 This function checks whether:
 \itemize{
-\item For objects of type \linkS4class{fhir_bundle_xml}, the bundle contains at least one "entry" element
+\item For objects of type \link[=fhir_bundle_xml-class]{fhir_bundle_xml}, the bundle contains at least one "entry" element
 (if not, the bundle is empty and the functions returns \code{TRUE})
-\item For objects of type \linkS4class{fhir_bundle_list}, the first bundle in the list contains at least one "entry" element
+\item For objects of type \link[=fhir_bundle_list-class]{fhir_bundle_list}, the first bundle in the list contains at least one "entry" element
 (if not, the bundle is empty and the functions returns \code{TRUE})
 }
 }

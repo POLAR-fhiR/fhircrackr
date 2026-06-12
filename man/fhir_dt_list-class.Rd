@@ -14,6 +14,6 @@ in the slot \code{design}.
 \describe{
 \item{\code{names}}{A character vector containing the names of the data.tables.}
 
-\item{\code{design}}{An object of class \linkS4class{fhir_design} that was used to create the dt_list.}
+\item{\code{design}}{An object of class \link[=fhir_design-class]{fhir_design} that was used to create the dt_list.}
 }}
 

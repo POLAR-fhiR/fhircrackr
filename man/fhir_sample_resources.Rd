@@ -20,7 +20,7 @@ fhir_sample_resources(
 \arguments{
 \item{base_url}{A character vector of length one specifying the base URL of the FHIR server, e.g. \code{"http://hapi.fhir.org/baseR4"}.}
 
-\item{resource}{A character vector of length one or \linkS4class{fhir_resource_type} object with the resource type to be downloaded, e.g. \code{"Patient"}.}
+\item{resource}{A character vector of length one or \link[=fhir_resource_type-class]{fhir_resource_type} object with the resource type to be downloaded, e.g. \code{"Patient"}.}
 
 \item{parameters}{Optional. Either a length 1 character vector containing properly formatted FHIR search parameters, e.g.
 \code{"gender=male&_summary=count"} or a named list or named character vector e.g. \code{list(gender="male", "_summary"="count")}
@@ -43,7 +43,7 @@ for how to create this.}
 \item{verbose}{An integer of length 1 containing the level of verbosity. Defaults to 1.}
 }
 \value{
-A \linkS4class{fhir_bundle_list} containing randomly sampled resources.
+A \link[=fhir_bundle_list-class]{fhir_bundle_list} containing randomly sampled resources.
 }
 \description{
 Downloads a random sample of resources of a given resource type from a FHIR server. The resources can be further constrained

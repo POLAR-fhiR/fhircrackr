@@ -6,7 +6,7 @@
 \alias{fhir_resource_xml,xml_document-method}
 \alias{fhir_resource_xml,xml_node-method}
 \alias{fhir_resource_xml,character-method}
-\title{Create \linkS4class{fhir_resource_xml} object}
+\title{Create \link[=fhir_resource_xml-class]{fhir_resource_xml} object}
 \usage{
 fhir_resource_xml(resource)
 
@@ -20,7 +20,7 @@ fhir_resource_xml(resource)
 \item{resource}{A xml-object representing a FHIR resource}
 }
 \description{
-Create \linkS4class{fhir_resource_xml} object
+Create \link[=fhir_resource_xml-class]{fhir_resource_xml} object
 }
 \examples{
 fhir_resource_xml(resource = xml2::read_xml("<Patient><id value = '1'/></Patient>"))

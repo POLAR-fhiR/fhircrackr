@@ -11,16 +11,16 @@ fhir_build_resource(row, brackets, resource_type)
 
 \item{brackets}{A character vector of length one. The brackets used for cracking.}
 
-\item{resource_type}{A character vector of length one or \linkS4class{fhir_resource_type} object
+\item{resource_type}{A character vector of length one or \link[=fhir_resource_type-class]{fhir_resource_type} object
 indicating which resource type the table is build from.}
 }
 \value{
-A \linkS4class{fhir_resource_xml} object.
+A \link[=fhir_resource_xml-class]{fhir_resource_xml} object.
 }
 \description{
-This function takes a single row from a wide table as produced by \code{\link[=fhir_crack]{fhir_crack()}} and builds a \linkS4class{fhir_resource_xml} object from it. The column names of the table
+This function takes a single row from a wide table as produced by \code{\link[=fhir_crack]{fhir_crack()}} and builds a \link[=fhir_resource_xml-class]{fhir_resource_xml} object from it. The column names of the table
 must represent the XPath expression of the respective element with indices for repeating items. A table like this is produced when FHIR resources have
-been cracked with \code{\link[=fhir_crack]{fhir_crack()}} without assigning explicit column names in the \linkS4class{fhir_design}/\linkS4class{fhir_table_description} and with \code{format} set to \code{"wide"}.
+been cracked with \code{\link[=fhir_crack]{fhir_crack()}} without assigning explicit column names in the \link[=fhir_design-class]{fhir_design}/\link[=fhir_table_description-class]{fhir_table_description} and with \code{format} set to \code{"wide"}.
 }
 \examples{
 #unserialize example

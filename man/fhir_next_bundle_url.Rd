@@ -11,8 +11,8 @@ fhir_next_bundle_url(bundle = NULL)
 extract the next link from the last bundle that was downloaded in the most recent call to \code{\link[=fhir_search]{fhir_search()}}.}
 }
 \value{
-A \linkS4class{fhir_url} object referencing next bundle available on the FHIR server.
-Empty \linkS4class{fhir_url} / character vector, if no further bundle is available.
+A \link[=fhir_url-class]{fhir_url} object referencing next bundle available on the FHIR server.
+Empty \link[=fhir_url-class]{fhir_url} / character vector, if no further bundle is available.
 }
 \description{
 fhir_next_bundle_url() gives the link to the next available bundle, either of the bundle
