@@ -22,7 +22,7 @@ fhir_search(
 )
 }
 \arguments{
-\item{request}{An object of class \linkS4class{fhir_url} or a character vector of length one containing the full FHIR search request. It is
+\item{request}{An object of class \link[=fhir_url-class]{fhir_url} or a character vector of length one containing the full FHIR search request. It is
 recommended to explicitly create the request via \code{\link[=fhir_url]{fhir_url()}} as this will do some validity checks and format the url properly.
 Defaults to \code{\link[=fhir_current_request]{fhir_current_request()}}}
 
@@ -79,7 +79,7 @@ See \code{\link[=fhir_rm_div]{fhir_rm_div()}} and \code{\link[=fhir_rm_tag]{fhir
 }}
 }
 \value{
-A \linkS4class{fhir_bundle_list} when \code{save_to_disc = NULL} (the default),  else \code{NULL}.
+A \link[=fhir_bundle_list-class]{fhir_bundle_list} when \code{save_to_disc = NULL} (the default),  else \code{NULL}.
 }
 \description{
 Downloads all FHIR bundles of a FHIR search request from a FHIR server by iterating through the bundles. Search via GET

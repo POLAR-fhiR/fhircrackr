@@ -6,7 +6,7 @@
 \alias{fhir_design,fhir_table_description-method}
 \alias{fhir_design,list-method}
 \alias{fhir_design,fhir_table_list-method}
-\title{Create a \linkS4class{fhir_design} object}
+\title{Create a \link[=fhir_design-class]{fhir_design} object}
 \usage{
 fhir_design(...)
 
@@ -18,7 +18,7 @@ fhir_design(...)
 }
 \arguments{
 \item{...}{One or more \code{fhir_table_description} objects or a named list containing
-\code{fhir_table_description} objects, or an object of class \linkS4class{fhir_df_list}/\linkS4class{fhir_dt_list}.
+\code{fhir_table_description} objects, or an object of class \link[=fhir_df_list-class]{fhir_df_list}/\link[=fhir_dt_list-class]{fhir_dt_list}.
 See \code{\link[=fhir_table_description]{fhir_table_description()}}.}
 }
 \description{
@@ -70,7 +70,7 @@ resource type. See examples.
 For backwards compatibility it is for the moment also possible to build it from an
 old-style design as used in \verb{fhircrackr (< 1.0.0)}. See examples.
 
-If this function is given an object of class \linkS4class{fhir_df_list} or \linkS4class{fhir_dt_list}, it will
+If this function is given an object of class \link[=fhir_df_list-class]{fhir_df_list} or \link[=fhir_dt_list-class]{fhir_dt_list}, it will
 extract the design that was used to create the respective list.
 }
 \examples{

@@ -1,7 +1,7 @@
 ## This file contains all functions needed for flattening ##
 ## Exported functions are on top, internal functions below ##
 
-path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- index <- dummy <- NULL #To stop "no visible binding" NOTE in check()
+path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- index <- dummy <- NULL #To stop "no visible binding" NOTE in check()
 
 
 #' Flatten list of FHIR bundles
@@ -629,8 +629,8 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 						table_description = table_description,
 						use_indices       = TRUE
 					)
-					d[, column := paste0(bra, id, ket, column)]
-					d[, id := NULL]
+					d[, column := paste0(bra, index, ket, column)]
+					d[, index := NULL]
 					cols <- unique(d$column)
 					d <- dcast(d, entry ~ column) # cast columns by bundle and entry
 					data.table::setcolorder(x = d, neworder = cols)
@@ -777,7 +777,7 @@ crack_given_columns_nodes_to_long <- function(nodes, columns, table_description,
 	d
 }
 
-#' Convert a long table as returned by [crack_given_columns_nodes_to_long] to a table
+#' Convert a long table as returned by crack_given_columns_nodes_to_long to a table
 #' with one row per resource
 #' @param d A long data.table with entry, column, value and optional index columns
 #' @param table_description A fhir_table_description

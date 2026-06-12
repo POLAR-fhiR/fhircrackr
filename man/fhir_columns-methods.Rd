@@ -8,7 +8,7 @@
 \alias{fhir_columns,character,character-method}
 \alias{fhir_columns,character,missing-method}
 \alias{fhir_columns,list,missing-method}
-\title{Create \linkS4class{fhir_columns} object}
+\title{Create \link[=fhir_columns-class]{fhir_columns} object}
 \usage{
 fhir_columns(xpaths, colnames)
 
@@ -24,7 +24,7 @@ fhir_columns(xpaths, colnames)
 }
 \arguments{
 \item{xpaths}{A (named) character vector or (named) list containing xpath xpaths,
-or a \linkS4class{fhir_xpath_expression} object.}
+or a \link[=fhir_xpath_expression-class]{fhir_xpath_expression} object.}
 
 \item{colnames}{The names of the columns to create. If no colnames are provided and the list or vector
 in \code{xpaths} has names, those names are taken as the colnames. If no colnames are provided and

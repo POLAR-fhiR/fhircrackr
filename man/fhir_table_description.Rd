@@ -2,7 +2,7 @@
 % Please edit documentation in R/fhir_table_description.R
 \name{fhir_table_description}
 \alias{fhir_table_description}
-\title{Create \linkS4class{fhir_table_description} object}
+\title{Create \link[=fhir_table_description-class]{fhir_table_description} object}
 \usage{
 fhir_table_description(
   resource,
@@ -16,13 +16,13 @@ fhir_table_description(
 )
 }
 \arguments{
-\item{resource}{A character vector of length one or \linkS4class{fhir_resource_type} object
+\item{resource}{A character vector of length one or \link[=fhir_resource_type-class]{fhir_resource_type} object
 indicating which resource type should be extracted.}
 
-\item{cols}{Optional. A \linkS4class{fhir_columns} object or something that can be coerced to one,
+\item{cols}{Optional. A \link[=fhir_columns-class]{fhir_columns} object or something that can be coerced to one,
 like a (named) character vector, a (named) list containing xpath expressions,
-or a \linkS4class{fhir_xpath_expression} object. See \code{\link[=fhir_columns]{fhir_columns()}} and the examples.
-If this argument is omitted, an empty \linkS4class{fhir_columns} object will be supplied.
+or a \link[=fhir_xpath_expression-class]{fhir_xpath_expression} object. See \code{\link[=fhir_columns]{fhir_columns()}} and the examples.
+If this argument is omitted, an empty \link[=fhir_columns-class]{fhir_columns} object will be supplied.
 This means that in the call to \code{\link[=fhir_crack]{fhir_crack()}}, all available elements are extracted in put
 in automatically named columns.}
 
@@ -45,7 +45,7 @@ should be attached to the name of the variable in the resulting table. Defaults 
 \item{style}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 }
 \value{
-An object of class \linkS4class{fhir_table_description}.
+An object of class \link[=fhir_table_description-class]{fhir_table_description}.
 }
 \description{
 A \code{fhir_table_description} holds the information \code{\link[=fhir_crack]{fhir_crack()}} needs to flatten (aka crack)

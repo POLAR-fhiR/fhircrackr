@@ -2,7 +2,7 @@
 % Please edit documentation in R/fhir_resource_type.R
 \name{fhir_resource_type}
 \alias{fhir_resource_type}
-\title{Create \linkS4class{fhir_resource_type} object}
+\title{Create \link[=fhir_resource_type-class]{fhir_resource_type} object}
 \usage{
 fhir_resource_type(string, fix_capitalization = TRUE)
 }
@@ -14,10 +14,10 @@ types listed at https://hl7.org/FHIR/resourcelist.html}
 \code{medicationstatement -> MedicationStatement}. Defaults to TRUE.}
 }
 \value{
-An \linkS4class{fhir_resource_type} object
+An \link[=fhir_resource_type-class]{fhir_resource_type} object
 }
 \description{
-This function creates an object of class \linkS4class{fhir_resource_type}. It checks the resource type against the list
+This function creates an object of class \link[=fhir_resource_type-class]{fhir_resource_type}. It checks the resource type against the list
 of resource types provided at https://hl7.org/FHIR/resourcelist.html, corrects wrong cases (which can be disabled with \code{fix_capitalization = FALSE})
 and throws a warning if the resource cannot be found at hl7.org.
 }
