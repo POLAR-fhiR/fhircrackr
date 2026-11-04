@@ -15,7 +15,7 @@ fhir_load(directory, indices = NULL, pattern = "^[0-9]+\\\\.xml$")
 to be read. Defaults to the regex expression matching file names as produced by \code{\link[=fhir_save]{fhir_save()}}.}
 }
 \value{
-A \linkS4class{fhir_bundle_list}.
+A \link[=fhir_bundle_list-class]{fhir_bundle_list}.
 }
 \description{
 Reads all bundles stored as xml files from a directory.

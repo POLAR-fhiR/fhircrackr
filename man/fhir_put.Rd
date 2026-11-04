@@ -16,9 +16,9 @@ fhir_put(
 )
 }
 \arguments{
-\item{url}{An object of class \linkS4class{fhir_url} or a character vector of length one containing the url to PUT to.}
+\item{url}{An object of class \link[=fhir_url-class]{fhir_url} or a character vector of length one containing the url to PUT to.}
 
-\item{body}{An object of class \linkS4class{fhir_resource} or \linkS4class{fhir_body}. See details for how to generate them.}
+\item{body}{An object of class \link[=fhir_resource-class]{fhir_resource} or \link[=fhir_body-class]{fhir_body}. See details for how to generate them.}
 
 \item{username}{A character vector of length one containing the username for basic authentication.}
 
@@ -43,10 +43,10 @@ This function is a convenience wrapper around \code{\link[httr:PUT]{httr::PUT()}
 \details{
 \code{\link[=fhir_put]{fhir_put()}} accepts two classes for the body:
 \enumerate{
-\item A \linkS4class{fhir_resource} as created by \code{\link[=fhir_build_resource]{fhir_build_resource()}}. This is used when just a single resource should be PUT to the server.
+\item A \link[=fhir_resource-class]{fhir_resource} as created by \code{\link[=fhir_build_resource]{fhir_build_resource()}}. This is used when just a single resource should be PUT to the server.
 In this case \code{url} must contain the base url plus the resource type and the resource id,
 e.g. http://hapi.fhir.org/baseR4/Patient/1a2b3c.
-\item A \linkS4class{fhir_body} as created by \code{\link[=fhir_body]{fhir_body()}}. This is the most flexible approach, because within the \linkS4class{fhir_body} object you can represent
+\item A \link[=fhir_body-class]{fhir_body} as created by \code{\link[=fhir_body]{fhir_body()}}. This is the most flexible approach, because within the \link[=fhir_body-class]{fhir_body} object you can represent
 any kind of \code{content} as a string and set the \code{type} accordingly. See examples.
 }
 

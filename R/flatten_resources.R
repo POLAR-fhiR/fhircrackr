@@ -1,7 +1,7 @@
 ## This file contains all functions needed for flattening ##
 ## Exported functions are on top, internal functions below ##
 
-path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- dummy <- NULL #To stop "no visible binding" NOTE in check()
+path <- node <- value <- attrib <- entry <- spath <- xpath <- column <- id <- index <- dummy <- NULL #To stop "no visible binding" NOTE in check()
 
 
 #' Flatten list of FHIR bundles
@@ -574,6 +574,7 @@ crack_compact_all_columns <- function(bundles, table_description, ncores = 1) {
 	)
 }
 
+
 #' Convert Bundles to a wide table when only some elements should be extracted
 #' @param bundles A fhir_bundle_list
 #' @param table_description A fhir_table_description with a non-empty cols element
@@ -595,17 +596,23 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 		table_description@cols <- fhir_columns(c(c(dummy="id"), table_description@cols))
 		rm_dummy <- TRUE
 	}
+	xpaths <- stats::setNames(
+		paste0('./entry/resource/', table_description@resource, '/', table_description@cols, '/@*'),
+		names(table_description@cols)
+	)
 
 	result <- data.table::rbindlist(
 		parallel::mclapply(
 			seq_along(bundles),
 			function(bundle_id) {# bundle_id <- 1
+				bundle_ns <- xml2::xml_ns(bundles[[bundle_id]])
 				colwise_list <- lapply(
-					table_description@cols,
+					xpaths,
 					function(xpath) {# xpath <- table_description@cols[[1]]
 						xml2::xml_find_all(
 							bundles[[bundle_id]],
-							stringr::str_c('./entry/resource/', table_description@resource, '/', xpath, '/@*')
+							xpath,
+							ns = bundle_ns
 						)
 					}
 				)
@@ -615,25 +622,15 @@ crack_wide_given_columns <- function(bundles, table_description, ncores = 1) {
 					use.names = FALSE
 				)
 
-				d <- data.table(
-					node   = xml_nodeset(nodelist),
-					column = rep(names(colwise_list), lengths(colwise_list))
-				)
-				if(0 < nrow(d)){
-					d <- (d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '') |> busg('([^]])/', '\\1[1]/')] # add missing indices
-						  [, value    := xml2::xml_text(node)] # get value
-						  [, attrib   := path |> busg('.*@', '')] # get attribute
-						  [, path     := path |> busg('@.*', '')] # remove attribute from path
-						  [, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
-						  [, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
-						  [, id       := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')] # extract ids
-						  [, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')] # remove ids
-						  [, column   := stringr::str_c(bra, id, ket, column) |>
-						  		#busg('/', '.') |>
-						  		stringr::str_c(if(table_description@keep_attr) stringr::str_c('@', attrib) else '')
-						  ] # create column name
-						  [, -c('node', 'xpath', 'spath', 'attrib', 'id')] # remove unnecessary columns
+				if(0 < length(nodelist)){
+					d <- crack_given_columns_nodes_to_long(
+						nodes             = xml_nodeset(nodelist, deduplicate = FALSE),
+						columns           = rep(names(colwise_list), lengths(colwise_list)),
+						table_description = table_description,
+						use_indices       = TRUE
 					)
+					d[, column := paste0(bra, index, ket, column)]
+					d[, index := NULL]
 					cols <- unique(d$column)
 					d <- dcast(d, entry ~ column) # cast columns by bundle and entry
 					data.table::setcolorder(x = d, neworder = cols)
@@ -671,60 +668,195 @@ crack_compact_given_columns <- function(bundles, table_description, ncores = 1) 
 		ket <- table_description@brackets[[2]]
 		use_indices <- TRUE
 	}
-	result <- unique(
-		data.table::rbindlist(
-			parallel::mclapply(
-				seq_along(bundles),
-				function(bundle_id) {# bundle_id <- 1
-					colwise_list <- lapply(
-						table_description@cols,
-						function(xpath) {# xpath <- table_description@cols[[1]]
-							xml2::xml_find_all(
-								bundles[[bundle_id]],
-								stringr::str_c('./entry/resource/', table_description@resource, '/', xpath, '/@*')
-							)
-						}
-					)
-					nodelist <-	unlist(
-						colwise_list,
-						recursive = FALSE,
-						use.names = FALSE
-					)
-
-					d <- data.table(
-						node   = xml_nodeset(nodelist),
-						column = rep(names(colwise_list), lengths(colwise_list))
-					)
-					if(0 < nrow(d)){
-						(d[, path     := xml2::xml_path(node) |> busg('/Bundle/', '')|> busg('([^]])/', '\\1[1]/')] # add missing indices
-						 [, value    := xml2::xml_text(node)] # get value
-						 [, attrib   := path |> busg('.*@', '')] # get attribute
-						 [, path     := path |> busg('@.*', '')] # remove attribute from path
-						 [, entry    := path |> busg('entry\\[([0-9]+)].*', '\\1') |> as.integer()] # enumerate entry
-						 [, spath    := path |> busg('^[^/]+/[^/]+/[^/]+/','')] # remove 'Bundle/entry/resource' from paths
-						 [, xpath    := spath |> busg('\\[[0-9]+]*/', '/') |> busg('\\/$', '')]
-						 [, column   := column |> stringr::str_c(if(table_description@keep_attr) stringr::str_c('@', attrib) else '')] #attach attribute to column name
-						 # [, column   := stringr::str_c(names(table_description@cols)[match(xpath, gsub("\\[.*\\]", "",table_description@cols))]) |>
-						 # 		busg('/', '.') |>
-						 # 		stringr::str_c(if(table_description@keep_attr) stringr::str_c('@', attrib) else '')
-						 # ] # create column name
-						)
-						if(use_indices) {
-							d <- (d[, id := spath |> busg('[^0-9]+', '.') |> busg('(^\\.)|(\\.$)', '')][, stringr::str_c(bra, id, ket, value, collapse = table_description@sep), by=c('entry', 'column')] |>
-								  	dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
-						} else {
-							d <- (d[, stringr::str_c(value, collapse = table_description@sep), by=c('entry', 'column')] |> dcast(entry ~ column, value.var = 'V1'))[,-c('entry')]
-						}
-					}
-				},
-				mc.cores = ncores
-			),
-			use.names = TRUE,
-			fill = TRUE
-		)
+	xpaths <- stats::setNames(
+		paste0('./entry/resource/', table_description@resource, '/', table_description@cols, '/@*'),
+		names(table_description@cols)
 	)
+	result <- data.table::rbindlist(
+		parallel::mclapply(
+			seq_along(bundles),
+			function(bundle_id) {# bundle_id <- 1
+				bundle_ns <- xml2::xml_ns(bundles[[bundle_id]])
+				colwise_list <- lapply(
+					xpaths,
+					function(xpath) {# xpath <- table_description@cols[[1]]
+						xml2::xml_find_all(
+							bundles[[bundle_id]],
+							xpath,
+							ns = bundle_ns
+						)
+					}
+				)
+				nodelist <-	unlist(
+					colwise_list,
+					recursive = FALSE,
+					use.names = FALSE
+				)
+
+				if(0 < length(nodelist)){
+					d <- crack_given_columns_nodes_to_long(
+						nodes             = xml_nodeset(nodelist, deduplicate = FALSE),
+						columns           = rep(names(colwise_list), lengths(colwise_list)),
+						table_description = table_description,
+						use_indices       = use_indices
+					)
+					d <- cast_compact_given_columns(
+						d                 = d,
+						table_description = table_description,
+						use_indices       = use_indices,
+						bra               = bra,
+						ket               = ket
+					)
+				}
+			},
+			mc.cores = ncores
+		),
+		use.names = TRUE,
+		fill = TRUE
+	)
+	resource_id_col <- names(table_description@cols)[table_description@cols == "id"]
+	if(
+		nrow(result) != 0 &&
+		(
+			length(resource_id_col) != 1 ||
+			!resource_id_col %in% names(result) ||
+			anyDuplicated(result[[resource_id_col]]) != 0
+		)
+	) {
+		result <- unique(result)
+	}
 	if(rm_dummy){result[,grep("^dummy", names(result)):=NULL]}
 	result
 }
 
+#' Convert extracted XML attribute nodes into a long table
+#' @param nodes XML attribute nodes extracted from one bundle
+#' @param columns Column names matching the extracted nodes
+#' @param table_description A fhir_table_description
+#' @param use_indices Whether FHIR path indices should be extracted
+#'
+#' @return A data.table with columns
+#' - entry: representing the entry in the FHIR-Bundle
+#' - column: the column name for the cracked table
+#' - value: the extracted value
+#' - index: FHIR path index for multiple values, only returned if use_indices=TRUE
+#'
+#' @noRd
+crack_given_columns_nodes_to_long <- function(nodes, columns, table_description, use_indices) {
+	paths <- xml2::xml_path(nodes)
+	values <- xml2::xml_text(nodes)
+	entry_close <- regexpr("]/resource/", paths, fixed = TRUE)
+	attr_start <- regexpr("/@", paths, fixed = TRUE)
+	has_entry_index <- entry_close != -1L
+	entry <- rep.int(1L, length(paths))
+	entry[has_entry_index] <- as.integer(substr(
+		paths[has_entry_index],
+		nchar("/Bundle/entry[") + 1L,
+		entry_close[has_entry_index] - 1L
+	))
 
+	if(table_description@keep_attr) {
+		columns <- paste0(columns, "@", substring(paths, attr_start + 2L))
+	}
+
+	d <- data.table(
+		entry  = entry,
+		column = columns,
+		value  = values
+	)
+
+	if(use_indices) {
+		resource_start <- rep.int(nchar("/Bundle/entry/resource/") + 1L, length(paths))
+		resource_start[has_entry_index] <- entry_close[has_entry_index] + nchar("]/resource/")
+		slash_after_resource <- regexpr("/", substring(paths, resource_start), fixed = TRUE)
+		spath_start <- resource_start + slash_after_resource
+		spath <- substr(paths, spath_start, attr_start - 1L)
+		unique_spath <- unique(spath)
+		indexed_spath <- gsub(
+			pattern = "(^|/)([^/[]+)(?=/|$)",
+			replacement = "\\11",
+			x = unique_spath,
+			perl = TRUE
+		)
+		ids <- gsub("(^\\.)|(\\.$)", "", gsub("[^0-9]+", ".", indexed_spath))
+		d[, index := ids[match(spath, unique_spath)]]
+	}
+
+	d
+}
+
+#' Convert a long table as returned by crack_given_columns_nodes_to_long to a table
+#' with one row per resource
+#' @param d A long data.table with entry, column, value and optional index columns
+#' @param table_description A fhir_table_description
+#' @param use_indices Whether FHIR path indices should be prepended to values
+#' @param bra Opening bracket for indices
+#' @param ket Closing bracket for indices
+#' @noRd
+cast_compact_given_columns <- function(d, table_description, use_indices, bra, ket) {
+	entries <- sort(unique(d$entry))
+	cols <- sort(unique(d$column))
+	values <- matrix(NA_character_, nrow = length(entries), ncol = length(cols))
+
+	# Dense repeated columns are faster with data.table's grouped collapse.
+	if(nrow(d) / (length(entries) * length(table_description@cols)) > 2) {
+		if(use_indices) {
+			d <- d[
+				,
+				paste0(bra, index, ket, value, collapse = table_description@sep),
+				by = c('entry', 'column')
+			]
+		} else {
+			d <- d[
+				,
+				paste0(value, collapse = table_description@sep),
+				by = c('entry', 'column')
+			]
+		}
+		values[cbind(match(d$entry, entries), match(d$column, cols))] <- d$V1
+		return(data.table::setnames(data.table::as.data.table(values), cols))
+	}
+
+	data.table::setorder(d, entry, column)
+	group_start <- c(TRUE, d$entry[-1L] != d$entry[-nrow(d)] | d$column[-1L] != d$column[-nrow(d)])
+	group_start <- which(group_start)
+	group_end <- c(group_start[-1L] - 1L, nrow(d))
+	group_size <- group_end - group_start + 1L
+	singleton_group <- group_size == 1L
+
+	if(use_indices) {
+		group_values <- paste0(bra, d$index, ket, d$value)
+	} else {
+		group_values <- d$value
+	}
+
+	if(any(singleton_group)) {
+		singleton_start <- group_start[singleton_group]
+		values[
+			cbind(
+				match(d$entry[singleton_start], entries),
+				match(d$column[singleton_start], cols)
+			)
+		] <- group_values[singleton_start]
+	}
+
+	if(any(!singleton_group)) {
+		multi_rows <- rep(!singleton_group, group_size)
+		multi_values <- data.table(
+			entry = d$entry[multi_rows],
+			column = d$column[multi_rows],
+			value = group_values[multi_rows]
+		)[
+			,
+			paste0(value, collapse = table_description@sep),
+			by = c('entry', 'column')
+		]
+		values[
+			cbind(
+				match(multi_values$entry, entries),
+				match(multi_values$column, cols)
+			)
+		] <- multi_values$V1
+	}
+	data.table::setnames(data.table::as.data.table(values), cols)
+}

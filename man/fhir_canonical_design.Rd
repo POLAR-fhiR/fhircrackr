@@ -7,7 +7,7 @@
 fhir_canonical_design()
 }
 \description{
-Returns the \linkS4class{fhir_design} of the last call to \code{\link[=fhir_crack]{fhir_crack()}}.
+Returns the \link[=fhir_design-class]{fhir_design} of the last call to \code{\link[=fhir_crack]{fhir_crack()}}.
 }
 \examples{
 #load example bundles

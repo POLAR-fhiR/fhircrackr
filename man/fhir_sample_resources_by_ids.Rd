@@ -21,7 +21,7 @@ fhir_sample_resources_by_ids(
 \arguments{
 \item{base_url}{A character vector of length one specifying the base URL of the FHIR server, e.g. \code{"http://hapi.fhir.org/baseR4"}.}
 
-\item{resource}{A character vector of length one or \linkS4class{fhir_resource_type} object with the resource type to be downloaded e.g. \code{"Patient"}.}
+\item{resource}{A character vector of length one or \link[=fhir_resource_type-class]{fhir_resource_type} object with the resource type to be downloaded e.g. \code{"Patient"}.}
 
 \item{ids}{A character vector containing the IDs from which to sample.}
 

@@ -51,7 +51,7 @@ fhir_crack(
 \arguments{
 \item{bundles}{A FHIR search result as returned by \code{\link[=fhir_search]{fhir_search()}}.}
 
-\item{design}{A \linkS4class{fhir_design} or \linkS4class{fhir_table_description} object. See \code{\link[=fhir_design]{fhir_design()}}/\code{\link[=fhir_table_description]{fhir_table_description()}}
+\item{design}{A \link[=fhir_design-class]{fhir_design} or \link[=fhir_table_description-class]{fhir_table_description} object. See \code{\link[=fhir_design]{fhir_design()}}/\code{\link[=fhir_table_description]{fhir_table_description()}}
 and the corresponding vignette (\code{vignette("flattenResources", package ="fhircrackr")}) for a more detailed explanation and
 comprehensive examples of both.}
 
@@ -82,11 +82,11 @@ cpu cores that should be used for parallelised cracking. Parallelisation current
 Defaults to \code{NULL}.}
 }
 \value{
-If a \linkS4class{fhir_design} was used, the result is a list of data.frames, i.e. a \linkS4class{fhir_df_list} object, or a list of data.tables,
-i.e. a \linkS4class{fhir_dt_list} object. If a \linkS4class{fhir_table_description} was used, the result is a single data.frame/data.table.
+If a \link[=fhir_design-class]{fhir_design} was used, the result is a list of data.frames, i.e. a \link[=fhir_df_list-class]{fhir_df_list} object, or a list of data.tables,
+i.e. a \link[=fhir_dt_list-class]{fhir_dt_list} object. If a \link[=fhir_table_description-class]{fhir_table_description} was used, the result is a single data.frame/data.table.
 }
 \description{
-Converts a \linkS4class{fhir_bundle_list} (the result of \code{\link[=fhir_search]{fhir_search()}}) to a data.frame/data.table or list of df/dt,
+Converts a \link[=fhir_bundle_list-class]{fhir_bundle_list} (the result of \code{\link[=fhir_search]{fhir_search()}}) to a data.frame/data.table or list of df/dt,
 if more than one resource type is extracted at once.
 
 There are two main output formats for the table: compact and wide. They differ regarding their handling of multiple occurrences of

@@ -22,10 +22,10 @@ A fhir_style object
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 This function was used to create an object of class \code{fhir_style} in fhircrackr < 2.0.0.
-It is now deprecated, the information that used to be coded in \code{fhir_style} has been moved to the \linkS4class{fhir_table_description}.
+It is now deprecated, the information that used to be coded in \code{fhir_style} has been moved to the \link[=fhir_table_description-class]{fhir_table_description}.
 }
 \details{
-A \code{fhir_style} object is part of a \linkS4class{fhir_table_description} which in turn is part of a \linkS4class{fhir_design} and
+A \code{fhir_style} object is part of a \link[=fhir_table_description-class]{fhir_table_description} which in turn is part of a \link[=fhir_design-class]{fhir_design} and
 ultimately used in \code{\link[=fhir_crack]{fhir_crack()}}. A \code{fhir_style} object contains three elements:
 \itemize{
 \item \code{sep}: A string defining the separator used to separate multiple entries for the same element in a FHIR resource,

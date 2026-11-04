@@ -999,7 +999,7 @@ fhir_authenticate <- function(
 #' Download single FHIR bundle
 #' @description Download a single FHIR bundle via FHIR search request and return it as a xml object.
 #'
-#' @param request An object of class [fhir_search_url-class] or character vector of length one containing the full FHIR search request.
+#' @param request An object of class [fhir_url-class] or character vector of length one containing the full FHIR search request.
 #' @param username A character vector of length one containing the username for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param password A character vector of length one containing the password for basic authentication. Defaults to NULL, meaning no authentication.
 #' @param token The token for token based auth, either a string or a httr token object

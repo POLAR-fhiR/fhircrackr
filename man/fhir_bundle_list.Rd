@@ -2,7 +2,7 @@
 % Please edit documentation in R/fhir_bundle_list.R
 \name{fhir_bundle_list}
 \alias{fhir_bundle_list}
-\title{Create \linkS4class{fhir_bundle_list} object}
+\title{Create \link[=fhir_bundle_list-class]{fhir_bundle_list} object}
 \usage{
 fhir_bundle_list(bundles)
 }
@@ -14,8 +14,8 @@ A fhir_bundle_list is a list of fhir_bundle_xml or fhir_bundle_serialized object
 usually returned by a call to \code{\link[=fhir_search]{fhir_search()}}.
 }
 \details{
-The only scenario where one would use this constructor function is when several \linkS4class{fhir_bundle}
-or \linkS4class{fhir_bundle_list} objects should be merged into one big \linkS4class{fhir_bundle_list} before cracking (see examples).
+The only scenario where one would use this constructor function is when several \link[=fhir_bundle-class]{fhir_bundle}
+or \link[=fhir_bundle_list-class]{fhir_bundle_list} objects should be merged into one big \link[=fhir_bundle_list-class]{fhir_bundle_list} before cracking (see examples).
 }
 \examples{
 

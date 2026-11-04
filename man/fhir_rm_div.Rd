@@ -7,7 +7,7 @@
 fhir_rm_div(x)
 }
 \arguments{
-\item{x}{A \linkS4class{fhir_bundle_xml} or \linkS4class{fhir_bundle_list} object or a character vector
+\item{x}{A \link[=fhir_bundle_xml-class]{fhir_bundle_xml} or \link[=fhir_bundle_list-class]{fhir_bundle_list} object or a character vector
 containing xml objects.}
 }
 \value{

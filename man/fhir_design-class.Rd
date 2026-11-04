@@ -5,7 +5,7 @@
 \alias{fhir_design-class}
 \title{A S4 class containing a design for \code{\link[=fhir_crack]{fhir_crack()}}}
 \description{
-A fhir_design is a named list of \linkS4class{fhir_table_description} objects. Each table_description
+A fhir_design is a named list of \link[=fhir_table_description-class]{fhir_table_description} objects. Each table_description
 contains information on how to flatten one resource type which will result in one
 data.frame. The fhir_design is passed to the function \code{\link[=fhir_crack]{fhir_crack()}} along with a
 list of bundles containing FHIR resources.

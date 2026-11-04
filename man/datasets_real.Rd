@@ -43,7 +43,7 @@ patient_bundles
 These data examples can be used to explore some of the functions from the fhircrackr package
 when direct access to a FHIR server is not possible.
 
-All example data sets are \linkS4class{fhir_bundle_list}s containing \linkS4class{fhir_bundle_serialized} objects
+All example data sets are \link[=fhir_bundle_list-class]{fhir_bundle_list}s containing \link[=fhir_bundle_serialized-class]{fhir_bundle_serialized} objects
 representing FHIR bundles as returned by \code{\link[=fhir_search]{fhir_search()}}. They have to be unserialized (once per R session),
 before you can work with them!
 }

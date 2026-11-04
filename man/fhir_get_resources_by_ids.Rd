@@ -20,7 +20,7 @@ fhir_get_resources_by_ids(
 \arguments{
 \item{base_url}{A character vector of length one specifying the base URL of the FHIR server, e.g. \code{"http://hapi.fhir.org/baseR4"}.}
 
-\item{resource}{A character vector of length one or \linkS4class{fhir_resource_type} object with the resource type to be searched, e.g. \code{"Patient"}.}
+\item{resource}{A character vector of length one or \link[=fhir_resource_type-class]{fhir_resource_type} object with the resource type to be searched, e.g. \code{"Patient"}.}
 
 \item{ids}{A character vector containing the IDs of the resources that should be downloaded. In the default setting these should be resource (aka logical) IDs.}
 
@@ -45,7 +45,7 @@ for how to create this.}
 \item{verbose}{An integer vector of length 1 containing the level of verbosity. Defaults to 0.}
 }
 \value{
-A \linkS4class{fhir_bundle_list} containing the downloaded resources.
+A \link[=fhir_bundle_list-class]{fhir_bundle_list} containing the downloaded resources.
 }
 \description{
 Downloads FHIR resources represented by a vector of resource IDs.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_resources.R
 \name{as_fhir}
 \alias{as_fhir}
-\title{Coerce character vector to \linkS4class{fhir_bundle_list}}
+\title{Coerce character vector to \link[=fhir_bundle_list-class]{fhir_bundle_list}}
 \usage{
 as_fhir(x)
 }
@@ -11,7 +11,7 @@ as_fhir(x)
 }
 \description{
 Tries to convert a character vector containing xml strings representing FHIR bundles to an object of
-class \linkS4class{fhir_bundle_list}.
+class \link[=fhir_bundle_list-class]{fhir_bundle_list}.
 }
 \examples{
 

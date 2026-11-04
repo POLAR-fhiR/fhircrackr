@@ -17,7 +17,7 @@ fhir_rm_tag(x, tag)
 \S4method{fhir_rm_tag}{fhir_bundle_list}(x, tag)
 }
 \arguments{
-\item{x}{A \linkS4class{fhir_bundle_xml} or \linkS4class{fhir_bundle_list} object or a character vector
+\item{x}{A \link[=fhir_bundle_xml-class]{fhir_bundle_xml} or \link[=fhir_bundle_list-class]{fhir_bundle_list} object or a character vector
 containing xml objects.}
 
 \item{tag}{A character vector of length 1 containing the tag that should be removed, e.g. \code{"div"}.}
@@ -26,7 +26,7 @@ containing xml objects.}
 An object of the same class as \code{x} where all tags matching the \code{tag} argument are removed.
 }
 \description{
-Removes a given xml tag from xml objects represented in a \linkS4class{fhir_bundle_xml}, \linkS4class{fhir_bundle_list}
+Removes a given xml tag from xml objects represented in a \link[=fhir_bundle_xml-class]{fhir_bundle_xml}, \link[=fhir_bundle_list-class]{fhir_bundle_list}
 or character vector.
 }
 \details{

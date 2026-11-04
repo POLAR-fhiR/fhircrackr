@@ -20,7 +20,7 @@ fhir_tree(
 
 \item{brackets}{A character vector of length two. The brackets used in the table.}
 
-\item{resource}{A character vector of length one or \linkS4class{fhir_resource_type} object indicating which resource type the table is build from.}
+\item{resource}{A character vector of length one or \link[=fhir_resource_type-class]{fhir_resource_type} object indicating which resource type the table is build from.}
 
 \item{keep_attr}{A logical vector of length one indicating whether attributes should be displayed or not.
 Only used for formats \code{"plain"} and \code{"fancy"}.}

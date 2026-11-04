@@ -115,12 +115,12 @@ fhir_tree <- function(table,
 
 #' Create text version of tree
 #'
-#' @param tree A tree as produced by [fhir_tree.new()]
+#' @param tree A tree as produced by fhir_tree.new()
 #' @param tabs A string that is put at the beginning of each line
 #' @param tab The string used for indentation of each line
-#' @param keep_attr A logical of length one indication whether attributes should be keeped in names. Defaults to `FALSE`.
-#' @param keep_ids A logical of length one indication whether attributes should be keeped in names. Defaults to `TRUE`.
-#' @param skip_one A logical of length one indication whether attributes should be keeped in names. Defaults to `TRUE`. Has no effect if `keep_ids` is `FALSE`.
+#' @param keep_attr A logical of length one indication whether attributes should be kept in names. Defaults to `FALSE`.
+#' @param keep_ids A logical of length one indication whether attributes should be kept in names. Defaults to `TRUE`.
+#' @param skip_one A logical of length one indication whether attributes should be kept in names. Defaults to `TRUE`. Has no effect if `keep_ids` is `FALSE`.
 #'
 #' @noRd
 #' @examples
@@ -187,11 +187,11 @@ fhir_tree.as_text <- function(tree,
 
 #' Create string for printing of tree
 #'
-#' @param tree A tree as produced by [fhir_tree.new()]
+#' @param tree A tree as produced by fhir_tree.new()
 #' @param prompt A string that is put between each element and its value. Defaults to a semicolon.
-#' @param keep_attr A logical of length one indication whether attributes should be keeped in names. Defaults to `FALSE`.
-#' @param keep_ids A logical of length one indication whether attributes should be keeped in names. Defaults to `TRUE`.
-#' @param skip_one A logical of length one indication whether attributes should be keeped in names. Defaults to `TRUE`. Has no effect if `keep_ids` is `FALSE`.
+#' @param keep_attr A logical of length one indication whether attributes should be kept in names. Defaults to `FALSE`.
+#' @param keep_ids A logical of length one indication whether attributes should be kept in names. Defaults to `TRUE`.
+#' @param skip_one A logical of length one indication whether attributes should be kept in names. Defaults to `TRUE`. Has no effect if `keep_ids` is `FALSE`.
 #'
 #' @noRd
 #' @examples
@@ -301,7 +301,7 @@ fhir_tree.as_string <-
 
 #' Create xml version of tree
 #'
-#' @param tree A tree as produced by [fhir_tree.new()]
+#' @param tree A tree as produced by fhir_tree.new()
 #' @param escaped Escape special xml characters? Defaults to `TRUE`
 #' @param tabs A string that is put at the beginning of each line
 #' @param tab The string used for indentation of each line
@@ -484,68 +484,11 @@ fhir_tree.new <- function(table, brackets, root) {
 	}
 	tree
 }
-#'
-#' #' Apply Functions on a Tree
-#' #'
-#' #' @param tree A tree as build by fhir_tree.new() from a wide cracked table.
-#' #' @param fun.start A Function called before going deeper into the tree.
-#' #' @param fun.finish A Function called after going deeper into the tree.
-#' #'
-#' #' @return A Tree.
-#' #' @export
-#' #'
-#' #' @examples
-#' #' #unserialize example
-#' #' bundles <- fhir_unserialize(bundles = example_bundles1)
-#' #'
-#' #' #crack fhir resources
-#' #' table_desc <- fhir_table_description(
-#' #'     resource = "Patient",
-#' #'     brackets = c("[", "]"),
-#' #'     sep      = " "
-#' #' )
-#' #' df <- fhir_crack(bundles = bundles, design = table_desc)
-#' #'
-#' #' #cast silently using bracktets and separator definitions from table_desc
-#' #' cast_df <- fhir_cast(df, brackets = table_desc@brackets, sep = table_desc@sep, verbose = 0)
-#' #'
-#' #' #build tree
-#' #' tree <- fhir_tree.new(cast_df, brackets = table_desc@brackets, root = "Patient")
-#' #' tree_applied <- fhir_tree.apply(tree, fhir_tree.fun.rm_ids)
-#' #' tree_faster <- fhir_tree.rm_ids(tree)
-#' #' cat(fhir_tree.as_text(tree_applied))
-#' #' cat(fhir_tree.as_text(tree_faster))
-#' fhir_tree.apply <- function(tree, fun.start = NULL, fun.finish = NULL) {
-#' 	if(!is.null(fun.start)) tree <- fun.start(node = tree)
-#' 	for(n in seq_along(tree)) {
-#' 		tree[[n]] <- fhir_tree.apply(tree = tree[[n]], fun.start = fun.start, fun.finish = fun.finish)
-#' 	}
-#' 	if(!is.null(fun.finish)) tree <- fun.finish(node = tree)
-#' 	tree
-#' }
-#'
-#' ###
-#' # Closure Functions for fhir_tree.apply
-#' ###
-#' #' more docu needed
-#' #' @param node the node
-#' #' @noRd
-#' fhir_tree.fun.rm_ids <- function(node) {
-#' 	names(node) <- gsub('[0-9]+$', '', names(node))
-#' 	node
-#' }
-#'
-#' #' more docu needed
-#' #' @param node the node
-#' #' @noRd
-#' fhir_tree.fun.skip_one <- function(node) {
-#' 	names(node) <- gsub('([^0-9]+)(1$)', '\\1',  names(node))
-#' 	node
-#' }
+
 
 #' Remove ids from tree
 #' Removes the ids leftover from the casted table
-#' @param tree A tree as produced by [fhir_tree.new()]
+#' @param tree A tree as produced by fhir_tree.new()
 #'
 #' @examples
 #' #unserialize example

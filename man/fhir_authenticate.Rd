@@ -37,7 +37,7 @@ Could hold info about user identity and scope for keycloak like this:
 }\if{html}{\out{</div>}}}
 }
 \description{
-This function is a wrapper to create an \link[httr:Token-class]{httr::Token} object for authentication with OAuth2/OpenID Connect.
+This function is a wrapper to create an \link[httr:Token]{httr::Token} object for authentication with OAuth2/OpenID Connect.
 Internally, it calls \code{\link[httr:oauth_app]{httr::oauth_app()}}, \code{\link[httr:oauth_endpoint]{httr::oauth_endpoint()}} and \code{\link[httr:oauth2.0_token]{httr::oauth2.0_token()}} to create a token that can
 then be used in \link{fhir_search}.
 }

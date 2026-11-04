@@ -24,7 +24,7 @@ fhir_url(url, resource, parameters, url_enc = TRUE)
 e.g. \code{"http://hapi.fhir.org/baseR4/Patient?gender=male&_summary=count"}, or
 the base URL to the FHIR server, e.g. \code{"http://hapi.fhir.org/baseR4"}.}
 
-\item{resource}{A character of length one or \linkS4class{fhir_resource_type} object with the resource type to be searched, e.g. \code{"Patient"}.}
+\item{resource}{A character of length one or \link[=fhir_resource_type-class]{fhir_resource_type} object with the resource type to be searched, e.g. \code{"Patient"}.}
 
 \item{parameters}{Optional. Either a length 1 character containing properly formatted FHIR search parameters, e.g.
 \code{"gender=male&_summary=count"} or a named list or named character vector e.g. \code{list(gender="male", "_summary"="count")}
@@ -33,10 +33,10 @@ or \code{c(gender="male", "_summary"="count")}. Note that parameter names beginn
 \item{url_enc}{Should the url be URL-encoded? Defaults to \code{TRUE}.}
 }
 \value{
-An object of class \linkS4class{fhir_url}
+An object of class \link[=fhir_url-class]{fhir_url}
 }
 \description{
-This function creates an object of class \linkS4class{fhir_url} which mostly represents a URL-encoded URL for
+This function creates an object of class \link[=fhir_url-class]{fhir_url} which mostly represents a URL-encoded URL for
 a FHIR search request. A valid Search URL contains a base URL and a resource type and may contain additional
 search parameters. For more info on FHIR search see https://www.hl7.org/fhir/search.html.
 }

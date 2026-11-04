@@ -9,7 +9,7 @@
 \alias{fhir_body,list,character-methods}
 \alias{fhir_body,character,character-method}
 \alias{fhir_body,character,character-methods}
-\title{Create \linkS4class{fhir_body} object}
+\title{Create \link[=fhir_body-class]{fhir_body} object}
 \usage{
 fhir_body(content, type)
 
@@ -28,10 +28,10 @@ and will be concatenated appropriately. In this case the \code{type} will automa
 \item{type}{A string defining the type of the body e.g. \code{"application/x-www-form-urlencoded"} or \code{"xml"}.}
 }
 \value{
-An object of type \linkS4class{fhir_body}.
+An object of type \link[=fhir_body-class]{fhir_body}.
 }
 \description{
-Create \linkS4class{fhir_body} object
+Create \link[=fhir_body-class]{fhir_body} object
 }
 \examples{
 #body that could be used in a FHIR search request POSTed to an URL like baseurl/Patient/_search

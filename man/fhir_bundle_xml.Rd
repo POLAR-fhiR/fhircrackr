@@ -2,7 +2,7 @@
 % Please edit documentation in R/fhir_bundle.R
 \name{fhir_bundle_xml}
 \alias{fhir_bundle_xml}
-\title{Create \linkS4class{fhir_bundle_xml} object}
+\title{Create \link[=fhir_bundle_xml-class]{fhir_bundle_xml} object}
 \usage{
 fhir_bundle_xml(bundle)
 }

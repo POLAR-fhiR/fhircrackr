@@ -6,7 +6,7 @@
 \title{An S4 class to represent a design for cracking FHIR resources}
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
-\linkS4class{fhir_style} is now deprecated, the information that used to be coded here has been moved to the \linkS4class{fhir_table_description}.
+\link[=fhir_style-class]{fhir_style} is now deprecated, the information that used to be coded here has been moved to the \link[=fhir_table_description-class]{fhir_table_description}.
 }
 \section{Slots}{
 

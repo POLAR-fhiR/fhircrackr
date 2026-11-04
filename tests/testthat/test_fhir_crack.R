@@ -196,6 +196,123 @@ testthat::test_that(
 )
 
 testthat::test_that(
+	"fhir_crack given columns handles bundles with a single unindexed entry", {
+		bundle <- xml2::read_xml(
+			"<Bundle>
+				<type value='searchset'/>
+				<entry>
+					<resource>
+						<Patient>
+							<id value='id1'/>
+							<gender value='female'/>
+							<address>
+								<city value='Amsterdam'/>
+							</address>
+							<address>
+								<city value='Rome'/>
+							</address>
+						</Patient>
+					</resource>
+				</entry>
+			</Bundle>"
+		)
+		bundle_list <- fhir_bundle_list(list(fhir_bundle_xml(bundle)))
+		cols <- c(id = "id", gender = "gender", city = "address/city")
+
+		compact <- fhir_crack(
+			bundles = bundle_list,
+			design = fhir_table_description("Patient", cols = cols),
+			verbose = 0,
+			data.table = TRUE
+		)
+		testthat::expect_equal(compact$id, "id1")
+		testthat::expect_equal(compact$gender, "female")
+		testthat::expect_equal(compact$city, "Amsterdam:::Rome")
+
+		wide <- fhir_crack(
+			bundles = bundle_list,
+			design = fhir_table_description(
+				"Patient",
+				cols = cols,
+				format = "wide",
+				brackets = c("[", "]")
+			),
+			verbose = 0,
+			data.table = TRUE
+		)
+		testthat::expect_equal(wide$`[1]id`, "id1")
+		testthat::expect_equal(wide$`[1]gender`, "female")
+		testthat::expect_equal(wide$`[1.1]city`, "Amsterdam")
+		testthat::expect_equal(wide$`[2.1]city`, "Rome")
+	}
+)
+
+testthat::test_that(
+	"fhir_crack preserves nodes selected by overlapping columns", {
+		bundles <- fhir_unserialize(example_bundles3)
+		cols <- c(
+			any_city = "address/city",
+			home_city = "address[use[@value='home']]/city"
+		)
+
+		compact <- fhir_crack(
+			bundles = bundles,
+			design = fhir_table_description(resource = "Patient", cols = cols),
+			verbose = 0,
+			data.table = TRUE
+		)
+		testthat::expect_equal(
+			compact$home_city,
+			c("Amsterdam", "Rome", "Berlin")
+		)
+		testthat::expect_equal(
+			compact$any_city,
+			c("Amsterdam", "Rome:::Stockholm", "Berlin:::London")
+		)
+
+		wide <- fhir_crack(
+			bundles = bundles,
+			design = fhir_table_description(
+				resource = "Patient",
+				cols = cols,
+				format = "wide",
+				brackets = c("[", "]")
+			),
+			verbose = 0,
+			data.table = TRUE
+		)
+		testthat::expect_equal(wide$`[1.1]home_city`, c("Amsterdam", "Rome", "Berlin"))
+		testthat::expect_equal(wide$`[1.1]any_city`, c("Amsterdam", "Rome", "Berlin"))
+		testthat::expect_equal(wide$`[2.1]any_city`, c(NA, "Stockholm", NA))
+		testthat::expect_equal(wide$`[3.1]any_city`, c(NA, NA, "London"))
+	}
+)
+
+testthat::test_that(
+	"fhir_crack compact given columns deduplicates repeated resource ids", {
+		bundles <- fhir_unserialize(example_bundles3)
+		duplicated_bundles <- fhir_bundle_list(c(bundles, bundles))
+
+		compact <- fhir_crack(
+			bundles = duplicated_bundles,
+			design = fhir_table_description(
+				resource = "Patient",
+				cols = c(id = "id", city = "address/city")
+			),
+			verbose = 0,
+			data.table = TRUE
+		)
+
+		testthat::expect_equal(nrow(compact), 3L)
+		testthat::expect_equal(compact$id, c("id1", "id2", "id3"))
+		testthat::expect_equal(
+			compact$city,
+			c("Amsterdam", "Rome:::Stockholm", "Berlin:::London")
+		)
+	}
+)
+
+testthat::test_that(
 	"fhir_crack wide given columns produces correct output",{
 		expect_snapshot_value({
 			bundles <- fhir_unserialize(example_bundles3)
