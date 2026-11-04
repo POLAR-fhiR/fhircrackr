@@ -1,7 +1,7 @@
 Package: fhircrackr
 Type: Package
 Title: Handling HL7 FHIR® Resources in R
-Version: 2.4.0
+Version: 2.4.9000
 Date: 2026-06-04
 Authors@R: c(
     person( given = "Thomas", 
@@ -13,6 +13,10 @@ Authors@R: c(
             email = "julia.palm@med.uni-jena.de", 
             role = c("aut","cre"),
             comment=c(ORCID = "0000-0003-1568-5893")),
+    person( given = "Alexander", 
+            family = "Strübing", 
+            role = c("aut"),
+            comment=c(ORCID = "0000-0001-5151-7665")),
     person( given = "Jens", 
             family = "Przybilla", 
             email = "jprzybilla@imise.uni-leipzig.de", 
